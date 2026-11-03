@@ -103,8 +103,8 @@ const heroPhoto=photoLibrary['hero-aotearoa'];
       }, {signal});
     }
 
-    document.querySelectorAll('main h1, main h2, .cinema-end-title').forEach(h => { if (!h.closest('.cinema-hero')) letterTitle(h); });
-    const targets = [...document.querySelectorAll('.type-reveal, .route-card, .prepare-card, .map-wrap, .field-opening>div, .section-heading>p, .map-intro, .journey-intro, .future-reserve, .home-shortlist img')];
+    document.querySelectorAll('main h1, main h2, .cinema-end-title').forEach(h => { if (!h.closest('.cinema-hero, .home-shortlist')) letterTitle(h); });
+    const targets = [...document.querySelectorAll('.type-reveal, .route-card, .prepare-card, .map-wrap, .field-opening>div, .section-heading>p, .map-intro, .journey-intro, .future-reserve, .home-shortlist > div:first-child > img')];
     targets.forEach(el => { if (!el.classList.contains('type-reveal')) el.classList.add('motion-reveal'); });
     if (!enabled || !('IntersectionObserver' in window)) targets.forEach(el => el.classList.add('is-visible'));
     else {
@@ -207,6 +207,7 @@ function render(){document.documentElement.lang=lang==='zh'?'zh-Hans':'en';docum
 $('#language').addEventListener('click',()=>{lang=lang==='zh'?'en':'zh';const query=new URLSearchParams(location.search);query.set('lang',lang);history.replaceState(null,'',location.pathname+'?'+query+location.hash);render()});
 document.querySelectorAll('[data-island]').forEach(b=>b.addEventListener('click',()=>{islandFilter=b.dataset.island;updateFilterUrl();renderRoutes();window.initSiteMotion?.()}));document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>{mode=b.dataset.mode;updateFilterUrl();renderRoutes();window.initSiteMotion?.()}));
 if($('#atlasToggle'))$('#atlasToggle').addEventListener('click',()=>{const open=$('#routeAtlas').hidden;$('#routeAtlas').hidden=!open;$('#atlasToggle').setAttribute('aria-expanded',String(open));$('#atlasToggle').textContent=t(open?'closeAtlas':'openAtlas');if(open)renderAtlas(filteredRoutes())});
+messages.zh.privacy='行程保存在此浏览器中，无需账号。';messages.en.privacy='Your itinerary stays in this browser. No account is required.';
 window.setupP10Planner?.();render();
 if(page==='index'&&/^#journey\//.test(location.hash))location.replace(routeUrl(location.hash.slice(9)));
 if(page==='index'&&['#routes','#planner','#prepare'].includes(location.hash))location.replace(pageUrl({'#routes':'routes','#planner':'plan','#prepare':'prepare'}[location.hash]));

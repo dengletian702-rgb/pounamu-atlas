@@ -103,8 +103,8 @@ const heroPhoto=photoLibrary['hero-aotearoa'];
       }, {signal});
     }
 
-    document.querySelectorAll('main h1, main h2, .cinema-end-title').forEach(h => { if (!h.closest('.cinema-hero')) letterTitle(h); });
-    const targets = [...document.querySelectorAll('.type-reveal, .route-card, .prepare-card, .map-wrap, .field-opening>div, .section-heading>p, .map-intro, .journey-intro, .future-reserve, .home-shortlist img')];
+    document.querySelectorAll('main h1, main h2, .cinema-end-title').forEach(h => { if (!h.closest('.cinema-hero, .home-shortlist')) letterTitle(h); });
+    const targets = [...document.querySelectorAll('.type-reveal, .route-card, .prepare-card, .map-wrap, .field-opening>div, .section-heading>p, .map-intro, .journey-intro, .future-reserve, .home-shortlist > div:first-child > img')];
     targets.forEach(el => { if (!el.classList.contains('type-reveal')) el.classList.add('motion-reveal'); });
     if (!enabled || !('IntersectionObserver' in window)) targets.forEach(el => el.classList.add('is-visible'));
     else {

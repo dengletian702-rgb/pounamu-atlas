@@ -404,7 +404,7 @@ if (typeof window !== 'undefined') {
     if(result.minimum>result.input.days){
       const f=result.fits,dropped=f?f.dropped.map(w=>p10Esc(w[p10Lang()])).join(zh?'、':', '):'';
       const more=result.minimum<=21?`<button type="button" class="p10-add-stop" data-p10-days="${result.minimum}">${zh?`改成 ${result.minimum} 天`:`Change to ${result.minimum} days`}</button>`:'';
-      const trim=f&&f.dropped.length&&f.dropped.length<result.order.length?`<button type="button" class="p10-add-stop" data-p10-trim="1">${zh?`只保留排得下的地方（去掉${dropped}）`:`Keep what fits (drop ${dropped})`}</button>`:'';
+      const trim=f&&f.dropped.length&&f.dropped.length<result.order.length?`<button type="button" class="p10-add-stop" data-p10-trim="1">${zh?`只保留排得下的地方（去掉${dropped}）`:`Keep what fits (drop ${dropped})`}</button>`:`<button type="button" class="p10-add-stop" data-p10-edit="1">${zh?'调整目的地':'Choose different places'}</button>`;
       el.innerHTML=`<p class="p10-warning">${zh?`这些地方至少需要 ${result.minimum} 天，你选了 ${result.input.days} 天。`:`These places need at least ${result.minimum} days; you chose ${result.input.days}.`}</p><div class="p10-along">${more} ${trim}</div>`;
       return;
     }
@@ -447,10 +447,16 @@ if (typeof window !== 'undefined') {
     p10$('#p10-start').value='christchurch';p10$('#p10-end').value='queenstown';
     p10$('#days').innerHTML=Array.from({length:19},(_,i)=>`<option value="${i+3}">${i+3}</option>`).join('');p10$('#days').value='7';
     p10$('#p10-wishes').innerHTML=WISHES.map(w=>`<label data-p10-wish="${p10Esc(w.id)}"><input type="checkbox" name="p10-wish" value="${p10Esc(w.id)}"><span>${p10Esc(w.zh)}</span></label>`).join('');
-    const method=p10$('#plannerMethod');method.addEventListener('change',()=>{p10$('#jevConsent').hidden=method.value!=='jev';p10$('#jevConsentCheck').checked=false;p10Status('');});
+    const method=p10$('#plannerMethod'), jevAvailable=Boolean(window.TripPlanner?.jevEnabled);
+    const methodLabel=p10$('#p10-method-label'), jevOption=p10$('#p10-jev-label');
+    method.hidden=!jevAvailable;if(methodLabel)methodLabel.hidden=!jevAvailable;if(jevOption)jevOption.disabled=!jevAvailable;
+    if(!jevAvailable){method.value='local';p10$('#jevConsent').hidden=true;}
+    method.addEventListener('change',()=>{p10$('#jevConsent').hidden=method.value!=='jev';p10$('#jevConsentCheck').checked=false;p10Status('');});
     try{const saved=JSON.parse(localStorage.getItem('p10-road-plan'));if(saved){for(const [selector,value] of [['#p10-start',saved.start],['#p10-end',saved.end],['#days',saved.days],['#p10-pace',saved.pace],['#preference',saved.preference],['#p10-transport',saved.car?'car':'public']])if(value!=null&&p10$(selector).querySelector(`option[value="${String(value)}"]`))p10$(selector).value=String(value);for(const box of form.querySelectorAll('[name=p10-wish]'))box.checked=(saved.wishes||[]).includes(box.value);}}catch{}
     p10$('#planResult').addEventListener('click',event=>{
       const focus=event.target.closest('[data-p10-focus],[data-p10-map-day]');if(focus){const day=focus.dataset.p10Focus||focus.dataset.p10MapDay;p10FocusDay(day);if(focus.dataset.p10Focus)p10$('#p10-trip-map')?.scrollIntoView({behavior:'auto',block:'start'});return;}
+      const edit=event.target.closest('[data-p10-edit]');
+      if(edit){const choices=form.querySelector('.p10-choices');choices.open=true;choices.scrollIntoView({behavior:'auto',block:'start'});choices.querySelector('summary')?.focus({preventScroll:true});return;}
       const more=event.target.closest('[data-p10-days]'),trim=event.target.closest('[data-p10-trim]');
       if((more||trim)&&p10Result){
         const input=more?{...p10Result.input,days:Number(more.dataset.p10Days)}:{...p10Result.input,wishes:p10Result.fits.keep};

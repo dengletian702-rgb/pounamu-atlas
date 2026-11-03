@@ -1,20 +1,29 @@
-/* Jev runs only after the visitor opts in. The API key is held by the
- * local server, never by this browser code. */
-const JEV_CONNECTION_ENABLED = false;
+/* Configure the deployed Worker URL here; leave empty until it is deployed.
+ * This is a public endpoint, never an API key. Only HTTPS endpoints are accepted. */
+const JEV_API_BASE = '';
+const jevEndpoint = (() => {
+  if (!JEV_API_BASE.trim()) return '';
+  try {
+    const url = new URL(JEV_API_BASE.trim());
+    if (url.protocol !== 'https:' || url.username || url.password || url.search || url.hash) return '';
+    return url.href.replace(/\/+$/, '');
+  } catch { return ''; }
+})();
 window.TripPlanner = {
+  jevEnabled: Boolean(jevEndpoint),
   createPlan({days, preference, island='south'}) { return {days, preference, island}; },
   async chooseWithJev({days, preference, island='south'}) {
-    if (!JEV_CONNECTION_ENABLED) throw new Error('not_enabled');
+    if (!jevEndpoint) throw new Error('not_enabled');
     let response;
     try {
-      const capabilities = await fetch('/api/capabilities', {cache:'no-store'});
+      const capabilities = await fetch(`${jevEndpoint}/api/capabilities`, {cache:'no-store'});
       if (!capabilities.ok || (await capabilities.json()).version < 2) throw new Error('service_update_required');
     } catch (error) {
       if (error.message === 'service_update_required') throw error;
       throw new Error('local_service_unavailable');
     }
     try {
-      response = await fetch('/api/jev/choice', {
+      response = await fetch(`${jevEndpoint}/api/jev/choice`, {
         method: 'POST', headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({days, preference, island})
       });

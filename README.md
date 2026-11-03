@@ -4,7 +4,7 @@
 
 ## 在线浏览 / Live website
 
-[打开绿石之地](https://dengletian702-rgb.github.io/pounamu-atlas/)：无需安装，支持线路浏览和本地行程规划。线上静态版不提供 Jev；本机版可按需启用。
+[打开绿石之地](https://dengletian702-rgb.github.io/pounamu-atlas/)：无需安装，支持线路浏览和本地行程规划。Jev 代理尚未部署，线上目前提供本地规划；部署与配置说明见 [Worker 指南](worker/README.md)。
 
 ## 本地运行 / Run locally
 
@@ -14,7 +14,7 @@
 node outputs/jev-server.js
 ```
 
-打开终端打印的本机地址。默认规划使用本地规则、不需要账号。Jev 推荐是可选功能，仅在访客明确选择并同意后使用；该服务需要在服务端环境中配置 `TYPESAFE_API_KEY`，不要把密钥写进网页或提交到仓库。The optional Jev service requires a server-side environment variable; never commit credentials.
+打开终端打印的本机地址。默认规划使用本地规则、不需要账号。Jev 推荐是可选功能：部署 Worker 并将公开的 Worker 地址填入两份 `planner-adapter.js` 的 `JEV_API_BASE` 后，访客同意才会调用；密钥只放在服务端 secret 中，不要提交到仓库。The optional Jev service requires a server-side environment variable; never commit credentials.
 
 ## 使用与数据 / Usage and data
 
@@ -29,3 +29,5 @@ node outputs/jev-server.js
 ## 已知限制 / Known limitations
 
 缺少完整道路与湖泊轮廓数据和可靠海拔剖面；规划地图是连接地点的示意。部分图片仍偏阴；尚未完成所有照片叠字和动态状态的完整 WCAG AA 审计。The map is schematic, detailed road/lake shapes and elevation profiles are not included, and a full accessibility audit remains outstanding.
+
+修改网站 JavaScript 或 CSS 后，运行 `node scripts/version-assets.mjs` 更新两份网站的资源版本，再用 `node scripts/version-assets.mjs --check` 检查。

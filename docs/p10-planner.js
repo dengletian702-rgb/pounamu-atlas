@@ -49,6 +49,7 @@ const NODES = {
   wellington: { at: [-41.29, 174.78], en: 'Wellington', zh: '惠灵顿', hub: true },
   paihia: { at: [-35.28, 174.09], en: 'Paihia (Bay of Islands)', zh: '派希亚（岛屿湾）' },
   hahei: { at: [-36.84, 175.8], en: 'Hahei (Coromandel)', zh: '哈黑（科罗曼德）' },
+  hamilton: { at: [-37.79, 175.28], en: 'Hamilton', zh: '汉密尔顿' },
   matamata: { at: [-37.81, 175.77], en: 'Matamata', zh: '玛塔玛塔' },
   waitomo: { at: [-38.26, 175.1], en: 'Waitomo', zh: '怀托摩' },
   rotorua: { at: [-38.14, 176.25], en: 'Rotorua', zh: '罗托鲁瓦', hub: true },
@@ -98,6 +99,11 @@ const EDGES = [
   // North Island
   ['auckland', 'paihia', 3.25, 230, R('SH1 north', 'SH1 北上'), 'coach'],
   ['auckland', 'hahei', 2.5, 175, R('SH2 and SH25 to the Coromandel', 'SH2、SH25 到科罗曼德'), null],
+  ['auckland', 'hamilton', 1.5, 125, R('SH1 Waikato Expressway', 'SH1 怀卡托高速'), 'coach'],
+  ['hamilton', 'matamata', 0.75, 60, R('SH26 and SH27', 'SH26、SH27'), 'coach'],
+  ['hamilton', 'waitomo', 1, 75, R('SH39 and SH3', 'SH39、SH3'), 'coach'],
+  ['hamilton', 'rotorua', 1.5, 110, R('SH1 and SH5 via Tīrau', 'SH1、SH5 经蒂劳'), 'coach'],
+  ['hamilton', 'taupo', 2, 150, R('SH1 via Tokoroa', 'SH1 经托科罗阿'), 'coach'],
   ['auckland', 'matamata', 2, 160, R('SH1 and SH27', 'SH1、SH27'), 'coach'],
   ['matamata', 'rotorua', 1, 65, R('SH27 and SH5 via Tīrau', 'SH27、SH5 经蒂劳'), 'coach'],
   ['auckland', 'waitomo', 2.5, 195, R('SH1 and SH3', 'SH1、SH3'), 'coach'],
@@ -126,7 +132,7 @@ const WISHES = [
   { id: 'aoraki', island: 'south', base: 'aoraki', days: 1, en: 'Aoraki/Mount Cook', zh: '库克山', routes: ['hooker-valley'], places: ['tasman-lake'] },
   { id: 'wanaka', island: 'south', base: 'wanaka', days: 1, en: 'Wānaka', zh: '瓦纳卡', routes: ['roys-peak'], places: ['wanaka-tree'] },
   { id: 'queenstown', island: 'south', base: 'queenstown', days: 2, en: 'Queenstown', zh: '皇后镇', routes: ['queenstown-trail'], places: ['skyline-qt', 'shotover-jet', 'kawarau-bungy', 'arrowtown', 'glenorchy'] },
-  { id: 'milford', island: 'south', base: 'milford', days: 1, en: 'Milford Sound', zh: '米尔福德峡湾', routes: ['milford-road'], ptRoutes: ['milford-coach'], places: ['milford-cruise'], weather: true },
+  { id: 'milford', island: 'south', base: 'te-anau', days: 1, en: 'Milford Sound', zh: '米尔福德峡湾', routes: ['milford-road'], ptRoutes: ['milford-coach'], places: ['milford-cruise'], weather: true },
   { id: 'te-anau', island: 'south', base: 'te-anau', days: 0.5, en: 'Te Anau glowworms and Fiordland walks', zh: '蒂阿瑙萤火虫洞与峡湾步道', routes: ['key-summit'], places: ['te-anau-glowworms'] },
   { id: 'glaciers', island: 'south', base: 'franz-josef', days: 1, en: 'The glaciers (Franz Josef and Fox)', zh: '冰川（弗朗茨约瑟夫与福克斯）', routes: ['lake-matheson', 'glacier-coast'], places: [], weather: true },
   { id: 'haast', island: 'south', base: 'haast', days: 0.5, en: 'Haast and the Haast Pass', zh: '哈斯特与哈斯特隘口', routes: ['haast-pass'], places: [] },
@@ -152,6 +158,18 @@ const WISHES = [
   { id: 'wellington', island: 'north', base: 'wellington', days: 1, en: 'Wellington', zh: '惠灵顿', routes: ['escarpment-track'], places: ['te-papa', 'zealandia', 'cable-car'] },
   { id: 'taranaki', island: 'north', base: 'new-plymouth', days: 1, en: 'Taranaki and the Pouākai Crossing', zh: '塔拉纳基与波阿凯穿越', routes: ['pouakai-crossing'], places: ['three-sisters'], weather: true },
 ];
+
+// One plain line on what to do there, for places without a route guide and for the Milford day trip.
+const P10_WISH_TIPS = {
+  milford:{zh:'米尔福德住宿极少，通常住蒂阿瑙，当天往返（SH94 单程约 2 小时，118 km），游船需预订。',en:'There are very few beds at Milford Sound; most visitors stay in Te Anau and go out and back (SH94, about 2 h, 118 km each way). Book the cruise ahead.'},
+  rotorua:{zh:'地热公园和毛利文化表演选一两处即可，多数需预订。',en:'Pick one or two geothermal parks or a Māori cultural evening; most need booking.'},
+  hobbiton:{zh:'霍比特村只能跟团参观，约 2 小时，需提前预订。',en:'Hobbiton is by guided tour only, about 2 hours; book ahead.'},
+  waitomo:{zh:'萤火虫洞游览约 45 分钟，需预订。',en:'The glowworm cave tour takes about 45 minutes; book ahead.'},
+  tekapo:{zh:'傍晚去好牧羊人教堂，晚上看星空（观星团需预订）。',en:'Visit the Church of the Good Shepherd at dusk and stay for the stars (stargazing tours need booking).'},
+  kaikoura:{zh:'观鲸船约 3 小时，受海况影响，建议安排在上午。',en:'Whale-watching boats take about 3 hours and depend on the sea; go in the morning.'},
+  stewart:{zh:'奥本镇周边步道和乌尔瓦岛观鸟，可按天气安排。',en:'Short walks around Oban and birdwatching on Ulva Island, arranged around the weather.'},
+  catlins:{zh:'沿南部风景公路看瀑布、灯塔和海岸，需要自驾。',en:'Waterfalls, lighthouses and coast along the Southern Scenic Route; you need a car.'},
+};
 
 // Suggestions link to existing guides. These are ideas for independent planning, not scheduled activities.
 const P10_GUIDES = {
@@ -182,7 +200,7 @@ const P10_WISH_GUIDES = {
   picton:{drive:['coastroad'],transit:['coastal','pictonnelson']}, tekapo:{cycle:['alps2ocean'],drive:['aorakidrive']},
   aoraki:{walk:['hooker'],drive:['aorakidrive']}, wanaka:{walk:['roys-peak'],drive:['haast']},
   queenstown:{walk:['routeburn-track'],cycle:['queenstowncycle'],transit:['teanaubus']},
-  milford:{walk:['milford-track'],drive:['milford']}, 'te-anau':{walk:['keysummit','milford-track'],drive:['milford'],transit:['teanaubus']},
+  milford:{walk:['keysummit'],drive:['milford']}, 'te-anau':{walk:['keysummit'],drive:['milford'],transit:['teanaubus']},
   glaciers:{walk:['matheson']}, haast:{drive:['haast']}, hokitika:{cycle:['wilderness']},
   'arthurs-pass':{walk:['punchbowl'],drive:['arthurs'],transit:['tranzalpine']}, kaikoura:{drive:['coastroad'],transit:['coastal']},
   'abel-tasman':{walk:['abel-tasman'],cycle:['greattaste']}, dunedin:{transit:['dunedinbus']}, catlins:{drive:['catlins']},
@@ -257,14 +275,15 @@ function p10Build(input, wanted) {
   const order=p10Order(net,input.start,input.end,reachable), stream=[]; let at=input.start;
   for(const w of order){for(const leg of net.path(at,w.base))stream.push({type:'leg',leg});stream.push({type:'activity',wish:w});at=w.base;}
   for(const leg of net.path(at,input.end))stream.push({type:'leg',leg});
+  const cap=input.car?(Number(input.pace)||5):6.5;
   const days=[{kind:'arrive',at:input.start,legs:[],activities:[],used:0}]; let day=days[0];
   function open(){day={kind:'travel',at:days[days.length-1].at,legs:[],activities:[],used:0}; days.push(day);return day;}
   for(const item of stream){
     if(item.type==='leg'){
-      if(day.kind==='arrive'||day.kind==='activity'||(day.used+item.leg.h>6.5&&day.used))open();
+      if(day.kind==='arrive'||day.kind==='activity'||(day.used+item.leg.h>cap&&day.used))open();
       day.legs.push(item.leg);day.used+=item.leg.h;day.at=item.leg.b;
     }else if(item.wish.days<1){
-      if(day.kind==='arrive'||day.kind==='activity'||day.used+3>6.5)open();
+      if(day.kind==='arrive'||day.kind==='activity'||day.used+3>cap)open();
       day.activities.push({wish:item.wish,part:1,total:1});day.used+=3;
     }else{
       for(let n=1;n<=Math.ceil(item.wish.days);n++){day={kind:'activity',at:item.wish.base,legs:[],activities:[{wish:item.wish,part:n,total:Math.ceil(item.wish.days)}],used:0};days.push(day);}
@@ -282,7 +301,16 @@ function p10Plan(input) {
     const candidates=plan.order.map(w=>({wish:w,days:p10Build(input,plan.order.filter(x=>x!==w)).days.length})).sort((a,b)=>a.days-b.days);
     if(candidates[0]&&candidates[0].days<minimum)suggestion=candidates[0];
   }
-  return {...plan,minimum,spare:Math.max(0,input.days-minimum),suggestion,input};
+  let fits=null;
+  if(minimum>input.days){
+    let keep=[...plan.order];
+    while(keep.length&&p10Build(input,keep).days.length>input.days){
+      const next=keep.map(w=>({w,days:p10Build(input,keep.filter(x=>x!==w)).days.length})).sort((a,b)=>a.days-b.days)[0];
+      keep=keep.filter(x=>x!==next.w);
+    }
+    fits={keep:keep.map(w=>w.id),dropped:plan.order.filter(w=>!keep.includes(w)),days:p10Build(input,keep).days.length};
+  }
+  return {...plan,minimum,spare:Math.max(0,input.days-minimum),suggestion,fits,input};
 }
 function p10Timeline(plan) {
   if (plan.disconnected || !plan.days.length) return [];
@@ -373,7 +401,13 @@ if (typeof window !== 'undefined') {
     const el=p10$('#planResult');if(!el||!result)return;const x=p10Text(),zh=p10Lang()==='zh';
     if(result.disconnected){el.innerHTML=`<p class="p10-warning">${x.disconnected}</p>`;return;}
     const notices=[];
-    if(result.minimum>result.input.days)notices.push(`<p class="p10-warning">${zh?'所选天数无法排下当前行程，请增加天数或减少目的地。':'The selected days do not fit this itinerary. Add days or remove a destination.'} ${result.suggestion?`${x.drop} ${p10Esc(result.suggestion.wish[p10Lang()])}。`:x.dropNo}</p>`);
+    if(result.minimum>result.input.days){
+      const f=result.fits,dropped=f?f.dropped.map(w=>p10Esc(w[p10Lang()])).join(zh?'、':', '):'';
+      const more=result.minimum<=21?`<button type="button" class="p10-add-stop" data-p10-days="${result.minimum}">${zh?`改成 ${result.minimum} 天`:`Change to ${result.minimum} days`}</button>`:'';
+      const trim=f&&f.dropped.length&&f.dropped.length<result.order.length?`<button type="button" class="p10-add-stop" data-p10-trim="1">${zh?`只保留排得下的地方（去掉${dropped}）`:`Keep what fits (drop ${dropped})`}</button>`:'';
+      el.innerHTML=`<p class="p10-warning">${zh?`这些地方至少需要 ${result.minimum} 天，你选了 ${result.input.days} 天。`:`These places need at least ${result.minimum} days; you chose ${result.input.days}.`}</p><div class="p10-along">${more} ${trim}</div>`;
+      return;
+    }
     if(result.inaccessible.length)notices.push(`<p class="p10-warning">${x.unreachable}：${result.inaccessible.map(w=>p10Esc(w[p10Lang()])).join('、')}。</p>`);
     const suggestions=p10AlongWay(result);
     if(suggestions.length)notices.push(`<div class="p10-along"><span>${zh?'还可以加入顺路地点：':'Add a stop along the way:'}</span> ${suggestions.map(w=>`<button type="button" class="p10-add-stop" data-p10-add="${p10Esc(w.id)}">＋ ${p10Esc(w[p10Lang()])}</button>`).join(' ')}</div>`);
@@ -391,7 +425,7 @@ if (typeof window !== 'undefined') {
       const total=travel>0?`<p class="p10-daily-total">${zh?'当天路上约':'Travel today: about '}${p10DailyTime(travel,p10Lang())}${zh?'（不含当地接驳）':' (local connections excluded)'}</p>`:'';
       const stops=p10BreakStops(d),names=stops.map(id=>p10Esc(p10Name(id))).join(zh?'或':' or ');
       const longDay=driving>pace?`<p class="p10-warning p10-long-day">${zh?'这天开车较长':'This is a long driving day'}${names?(zh?`，可以在${names}多住一晚并调整行程。`:`; consider an overnight stop in ${names} and adjust the itinerary.`):(zh?'，可以在途中多住一晚并调整行程。':'; consider an overnight stop and adjust the itinerary.')}</p>`:'';
-      const activities=d.activities.map(a=>{const suggested=p10Suggestions(a.wish.id,result.input.preference);const guides=suggested.map(g=>`<a href="route.html?id=${encodeURIComponent(g.id)}&amp;lang=${p10Lang()}">${p10Esc(g[p10Lang()])}</a>`).join(' · ');const note=zh?'以下线路供参考，尚未排入行程。':'These guides are suggestions only and are not scheduled.';const none=zh?'该目的地暂无此活动的线路建议。':'No guide for this activity at this destination is available here; no specific activity has been scheduled.';return `<p>${x.activity}：${p10Esc(a.wish[p10Lang()])}${a.total>1?` (${a.part}/${a.total})`:''}。 ${x.localTransport}</p><p class="p10-suggestions">${suggested.length?`${note} ${guides}`:none}</p>`;}).join('');
+      const activities=d.activities.map(a=>{const suggested=p10Suggestions(a.wish.id,result.input.preference);const guides=suggested.map(g=>`<a href="route.html?id=${encodeURIComponent(g.id)}&amp;lang=${p10Lang()}">${p10Esc(g[p10Lang()])}</a>`).join(' · ');const note=zh?'当天线路：':'Route for the day: ';const tip=P10_WISH_TIPS[a.wish.id]?.[p10Lang()]||'';return `<p>${x.activity}：${p10Esc(a.wish[p10Lang()])}${a.total>1?` (${a.part}/${a.total})`:''}。${tip?' '+p10Esc(tip):''} ${x.localTransport}</p>${suggested.length?`<p class="p10-suggestions">${note}${guides}</p>`:''}`;}).join('');
       const arrivalTip=d.kind==='arrive'?(zh?'抵达后建议休息，避免落地当天长途驾驶。':'Rest after arrival and avoid a long drive on the first day.') : '';
       return `<article class="plan-day"><button class="p10-day-focus" type="button" data-p10-focus="${number}">${x.day}${number}${x.dayEnd} <span aria-hidden="true">↗</span></button><span class="plan-day-title">${heading}</span>${arrivalTip?`<p>${arrivalTip}</p>`:''}${legs?`<ul class="p10-legs">${legs}</ul>`:''}${total}${longDay}${activities}${d.kind==='depart'?'':`<p>${x.night}：${p10Esc(p10Name(d.at))}</p>`}</article>`;
     }).join('');
@@ -417,6 +451,14 @@ if (typeof window !== 'undefined') {
     try{const saved=JSON.parse(localStorage.getItem('p10-road-plan'));if(saved){for(const [selector,value] of [['#p10-start',saved.start],['#p10-end',saved.end],['#days',saved.days],['#p10-pace',saved.pace],['#preference',saved.preference],['#p10-transport',saved.car?'car':'public']])if(value!=null&&p10$(selector).querySelector(`option[value="${String(value)}"]`))p10$(selector).value=String(value);for(const box of form.querySelectorAll('[name=p10-wish]'))box.checked=(saved.wishes||[]).includes(box.value);}}catch{}
     p10$('#planResult').addEventListener('click',event=>{
       const focus=event.target.closest('[data-p10-focus],[data-p10-map-day]');if(focus){const day=focus.dataset.p10Focus||focus.dataset.p10MapDay;p10FocusDay(day);if(focus.dataset.p10Focus)p10$('#p10-trip-map')?.scrollIntoView({behavior:'auto',block:'start'});return;}
+      const more=event.target.closest('[data-p10-days]'),trim=event.target.closest('[data-p10-trim]');
+      if((more||trim)&&p10Result){
+        const input=more?{...p10Result.input,days:Number(more.dataset.p10Days)}:{...p10Result.input,wishes:p10Result.fits.keep};
+        if(more)p10$('#days').value=String(input.days);
+        if(trim)for(const box of form.querySelectorAll('[name=p10-wish]'))box.checked=input.wishes.includes(box.value);
+        try{p10Result=p10Plan(input);localStorage.setItem('p10-road-plan',JSON.stringify(input));p10Show(p10Result);p10Status('');}catch{p10Status(p10Lang()==='zh'?'请检查出发地、终点和天数。':'Check the start, destination and days.');}
+        return;
+      }
       const add=event.target.closest('[data-p10-add]');if(!add||!p10Result)return;
       const id=add.dataset.p10Add, checkbox=[...form.querySelectorAll('[name=p10-wish]')].find(box=>box.value===id);
       if(!checkbox)return;checkbox.checked=true;

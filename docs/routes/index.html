@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Pounamu Atlas — Start where you land</title>
+  <meta name="description" content="Plan a New Zealand trip from the city you land in: pick the days and the places, and get a day-by-day route on real roads, with official sources. All 78 walks, rides, road trips and car-free routes on their own page. 绿石之地 · 中英双语。">
+  <meta name="theme-color" content="#1d1e20">
+  <link rel="icon" href="/pounamu-atlas/favicon.svg" type="image/svg+xml">
+  <link rel="alternate" hreflang="en" href="/pounamu-atlas/?lang=en">
+  <link rel="alternate" hreflang="zh-Hans" href="/pounamu-atlas/?lang=zh">
+  <link rel="stylesheet" href="/pounamu-atlas/css/style.css">
+  <link rel="stylesheet" href="/pounamu-atlas/css/v3.css">
+  <link rel="stylesheet" href="/pounamu-atlas/css/v4.css">
+  <link rel="stylesheet" href="/pounamu-atlas/css/stone.css">
+  <link rel="stylesheet" href="/pounamu-atlas/css/finder.css">
+  <script type="module" src="/pounamu-atlas/js/app.js"></script>
+  <script type="module" src="/pounamu-atlas/js/extras.js"></script>
+  <script type="module" src="/pounamu-atlas/js/finder.js"></script>
+</head>
+<body>
+  <!-- Opening: the coast is traced and the name written in (js/intro.js). Without script it fades out by itself. -->
+  <div class="intro" id="intro" aria-hidden="true">
+    <svg class="intro-map" preserveAspectRatio="xMidYMid meet"></svg>
+    <p class="intro-word"><span class="iw-main"></span><span class="iw-sub"></span></p>
+  </div>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <nav class="bar" id="bar" aria-label="Primary">
+    <a class="bar-mark" href="/pounamu-atlas/"><svg class="mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3c6 4 10 9 10 15a10 10 0 0 1-20 0C6 12 10 7 16 3Z"/><path d="M16 9c-2.6 3-4 6-4 9a4 4 0 0 0 8 0c0-3-1.4-6-4-9Z" class="mark-in"/></svg><span data-t="wordmark">Pounamu Atlas</span></a>
+    <div class="bar-links">
+      <a href="/pounamu-atlas/#finder" data-n="plan">Plan a trip</a>
+      <a href="/pounamu-atlas/#trips" data-n="trips">Ready-made trips</a>
+      <a href="/pounamu-atlas/routes" data-n="routes">All routes</a>
+      <a href="/pounamu-atlas/compare" data-n="compare">Compare</a>
+      <a href="/pounamu-atlas/#prepare" data-n="prep">Before you go</a>
+    </div>
+    <button class="bar-map" id="bar-map" type="button" data-t="navMap">Map</button>
+    <button class="motion-btn" id="motion" type="button" aria-pressed="false">Motion off</button>
+    <button class="lang" id="lang" type="button" lang="zh-Hans">中文</button>
+  </nav>
+
+  <main id="main">
+    <section class="hero" id="top" aria-labelledby="h1">
+      <div class="hero-text">
+        <p class="wordmark" data-t="wordmark">Pounamu Atlas</p>
+        <h1 id="h1" data-t="h1">Start where you land</h1>
+        <p class="lead" data-t="lead"></p>
+        <p class="hero-actions"><a class="btn btn-jade" href="/pounamu-atlas/#finder" data-t="cta">Plan a trip</a><a class="btn btn-line" href="/pounamu-atlas/routes" data-n="heroAll" data-view="home">See all routes</a><button class="btn btn-line" type="button" id="hero-open" data-t="openMap" data-view="routes">Open the map</button></p>
+        <ul class="stats" id="stats"></ul>
+      </div>
+      <div class="hero-map" id="hero-map"></div>
+    </section>
+
+    <section class="finder" id="finder" data-view="home" aria-labelledby="finder-h">
+      <div class="fd-head"><h2 id="finder-h"></h2><p id="finder-lead"></p></div>
+      <div class="fd">
+        <div class="fd-left"><form class="fd-form" id="fd-form"></form><div class="fd-out" id="fd-out" aria-live="polite"></div></div>
+        <div class="fd-map" id="fd-map"></div>
+      </div>
+    </section>
+
+    <section class="reel" id="reel" data-view="routes" aria-labelledby="reel-h" aria-roledescription="carousel">
+      <div class="reel-head">
+        <h2 id="reel-h"></h2>
+        <div class="reel-ctl">
+          <button type="button" class="reel-btn" id="reel-prev"><span aria-hidden="true">‹</span><span class="vh"></span></button>
+          <button type="button" class="reel-btn" id="reel-pause"></button>
+          <button type="button" class="reel-btn" id="reel-next"><span aria-hidden="true">›</span><span class="vh"></span></button>
+        </div>
+      </div>
+      <div class="reel-stage" id="reel-stage" aria-live="polite"></div>
+      <ol class="reel-dots" id="reel-dots"></ol>
+    </section>
+
+    <section class="ways" id="ways" data-view="routes" aria-labelledby="ways-h">
+      <div class="ways-plate" id="ways-plate"></div>
+      <div class="ways-text">
+        <div class="tabs" role="tablist" id="mode-tabs"></div>
+        <div class="ways-copy">
+          <h2 id="ways-h"></h2>
+          <p id="ways-desc"></p>
+        </div>
+        <div class="cells">
+          <a class="cell cell-ink" href="#top10" id="cell-top"></a>
+          <button class="cell cell-tone" type="button" id="cell-map"></button>
+        </div>
+      </div>
+    </section>
+
+    <section class="top" id="top10" data-view="routes" aria-labelledby="top-h">
+      <div class="top-head">
+        <div>
+          <h2 id="top-h"></h2>
+          <p class="note" id="top-note"></p>
+        </div>
+        <div class="seg" role="group" id="island-seg"></div>
+      </div>
+      <ol class="cards" id="top-list"></ol>
+    </section>
+
+    <section class="island" id="island" data-view="routes" aria-labelledby="island-h">
+      <div class="top-head"><div><h2 id="island-h"></h2><p class="note" id="island-lead"></p></div></div>
+      <div class="isl"><form class="isl-form" id="island-form"></form><div class="isl-out" id="island-out" aria-live="polite"></div></div>
+    </section>
+
+    <section class="trips" id="trips" data-view="home" aria-labelledby="trips-h">
+      <div class="top-head">
+        <div>
+          <h2 id="trips-h"></h2>
+          <p class="note" id="trips-lead"></p>
+        </div>
+      </div>
+      <div class="trips-filter" role="group" id="trips-filter"></div>
+      <ol class="tts" id="trips-list"></ol>
+      <p class="note" id="trips-note"></p>
+    </section>
+
+    <section class="all" id="routes" data-view="routes" aria-labelledby="all-h">
+      <div class="all-head">
+        <h2 id="all-h"></h2>
+        <p class="note" id="all-count" aria-live="polite"></p>
+      </div>
+      <form class="filters" id="filters"></form>
+      <div id="all-list"></div>
+      <p><a class="cmp-link" id="cmp-entry" href="/pounamu-atlas/compare">Compare routes →</a></p>
+    </section>
+
+    <section class="tiers-sec" id="tiers" data-view="routes" aria-labelledby="tiers-h">
+      <div class="top-head"><div><h2 id="tiers-h"></h2><p class="note" id="tiers-lead"></p></div></div>
+      <div class="tiers" id="tiers-list"></div>
+      <p class="tier-crit" id="tiers-crit"></p>
+    </section>
+
+    <section class="months" id="months" data-view="routes" aria-labelledby="months-h">
+      <div class="top-head"><div><h2 id="months-h"></h2><p class="note" id="months-lead"></p></div></div>
+      <table class="mg-table"><thead id="months-head"></thead><tbody id="months-body"></tbody></table>
+      <p class="note" id="months-src"></p>
+    </section>
+
+    <section class="plan" id="plan" data-view="routes" aria-labelledby="plan-h">
+      <div class="plan-intro">
+        <h2 id="plan-h"></h2>
+        <p id="plan-lead"></p>
+      </div>
+      <form class="plan-form" id="plan-form"></form>
+      <div class="slip-wrap" id="slip-wrap" aria-live="polite"></div>
+      <div class="saved" id="saved"></div>
+    </section>
+
+    <section class="prep" id="prepare" data-view="home" aria-labelledby="prep-h">
+      <h2 id="prep-h" class="prep-h"></h2>
+      <div class="prep-blocks" id="prep-blocks"></div>
+    </section>
+
+    <section class="faq" id="faq" data-view="home" aria-labelledby="faq-h">
+      <div class="faq-text">
+        <h2 id="faq-h"></h2>
+        <ul class="facts" id="facts"></ul>
+        <div class="qs" id="qs"></div>
+        <a class="btn" href="#finder" data-t="cta">Plan a trip</a>
+      </div>
+      <div class="faq-art">
+        <div class="faq-tall" id="faq-tall"></div>
+        <div class="faq-square" id="faq-square"></div>
+      </div>
+    </section>
+
+    <section class="sources" id="sources" aria-labelledby="src-h">
+      <h2 id="src-h"></h2>
+      <p class="note" id="src-lead"></p>
+      <ul class="rows" id="src-list"></ul>
+      <h3 class="group-h credits-h" id="credits-h"></h3>
+      <ul class="rows credits" id="credits"></ul>
+    </section>
+
+    <section class="end" id="end" hidden aria-labelledby="end-h">
+      <div class="end-art" id="end-art"></div>
+      <div class="end-text">
+        <h2 id="end-h"></h2>
+        <p id="end-lead"></p>
+        <ul class="reserved" id="reserved"></ul>
+        <a class="btn btn-paper" href="#plan" data-t="cta">Plan my trip</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p id="foot-about"></p>
+    <p class="foot-links"><a href="/pounamu-atlas/#finder" data-n="plan">Plan a trip</a><a href="/pounamu-atlas/routes" data-n="routes">All routes</a><a href="/pounamu-atlas/compare" data-n="compare">Compare</a><a href="#sources" id="foot-src">Sources</a></p>
+    <p id="foot-privacy"></p>
+  </footer>
+
+  <!-- The map opens only when a route, a trip or "Map" is chosen. -->
+  <div class="atlas" id="atlas" role="dialog" aria-modal="true" aria-labelledby="atlas-h" hidden>
+    <div class="atlas-map">
+      <div id="map" class="map-holder"></div>
+      <ul class="legend" id="legend"></ul>
+      <button class="atlas-close" id="atlas-close" type="button"><span aria-hidden="true">×</span><span class="vh" id="atlas-close-t">Close map</span></button>
+    </div>
+    <aside class="atlas-card" id="atlas-card" tabindex="-1"></aside>
+  </div>
+  <noscript><p class="noscript">This guide needs JavaScript for the map and planner. 本网站的地图和行程功能需要启用 JavaScript。</p></noscript>
+</body>
+</html>

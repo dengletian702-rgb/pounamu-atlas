@@ -1,0 +1,12 @@
+{
+  "name": "pounamu-atlas",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Pounamu Atlas / 绿石之地: a bilingual New Zealand trip planner that starts from the city you land in, plus 78 walks, rides, road trips and car-free routes with official sources.",
+  "scripts": {
+    "start": "node server.js",
+    "test:pipeline": "node pipeline/selftest.js"
+  },
+  "engines": { "node": ">=20" }
+}

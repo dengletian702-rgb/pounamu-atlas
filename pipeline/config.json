@@ -1,0 +1,38 @@
+{
+  "_comment": "Each step names its own provider + model. Swap any step independently here, or override with env vars PIPELINE_<STEP>_PROVIDER / PIPELINE_<STEP>_MODEL (e.g. PIPELINE_WRITE_PROVIDER=openai-compatible). Keys are never stored here — only the NAME of the env var that holds them.",
+  "steps": {
+    "candidates": { "provider": "rules", "model": "deterministic-filter" },
+    "score":      { "provider": "jev", "model": "jev-1.14.0", "fallback": "heuristic" },
+    "select":     { "provider": "jev", "model": "jev-1.14.0", "fallback": "heuristic" },
+    "write":      { "provider": "mock", "model": "mock-writer-v1", "fallback": "mock" },
+    "validate":   { "provider": "jev", "model": "jev-1.14.0", "fallback": "heuristic" }
+  },
+  "providers": {
+    "jev": {
+      "endpoint": "https://api.typesafe.ai/v1/systemone",
+      "apiKeyEnv": "TYPESAFE_API_KEY",
+      "timeoutMs": 20000,
+      "maxCallsPerMinute": 12,
+      "usdPerMillionInputTokens": 0.042
+    },
+    "openai-compatible": {
+      "_comment": "For DeepSeek or any OpenAI-compatible API. Not active until chosen for the write step.",
+      "baseUrl": "https://api.deepseek.com/v1",
+      "model": "deepseek-chat",
+      "apiKeyEnv": "DEEPSEEK_API_KEY",
+      "timeoutMs": 60000
+    },
+    "ollama": {
+      "_comment": "Local model via Ollama. Not active until chosen for the write step.",
+      "baseUrl": "http://127.0.0.1:11434",
+      "model": "qwen2.5:14b",
+      "timeoutMs": 120000
+    }
+  },
+  "planner": {
+    "maxCandidates": 14,
+    "maxOptions": 4,
+    "validationThreshold": 0.5,
+    "maxRetries": 1
+  }
+}

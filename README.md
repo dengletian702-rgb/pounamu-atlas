@@ -2,6 +2,10 @@
 
 新西兰旅行线路与行程指南，提供中英文浏览、路线攻略和本机行程规划。A bilingual New Zealand travel guide and local itinerary planner.
 
+## 在线浏览 / Live website
+
+[打开绿石之地](https://dengletian702-rgb.github.io/pounamu-atlas/)：无需安装，支持线路浏览和本地行程规划。线上静态版不提供 Jev；本机版可按需启用。
+
 ## 本地运行 / Run locally
 
 需要 Node.js 20 或更新版本，无须安装依赖。Requires Node.js 20 or newer; no package installation is needed.

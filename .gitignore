@@ -1,28 +1,5 @@
-# Working material that stays on this Mac (see docs/OPEN-SOURCE-CHECKLIST.md)
-_old/
-_src/
-_from-codex/
-.taste-skill/
-.claude/
-screenshots/
-node_modules/
-.DS_Store
-
-# Internal planning and research notes
-README.md
-docs/CODEX-BRIEF-handdrawn-map.md
-docs/reference-douyin-luke.md
-docs/plan-validation.md
-docs/rectification-plan-v3.md
-
-# One-off importers that read another local folder
-scripts/import-codex.mjs
-scripts/import-photos.mjs
-scripts/shots-v2.mjs
-scripts/screenshots.mjs
-
-# Never commit keys
 .env
 .env.*
-*.pem
-*.key
+node_modules/
+.DS_Store
+*.log

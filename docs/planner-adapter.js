@@ -9,19 +9,22 @@ const jevEndpoint = (() => {
     return url.href.replace(/\/+$/, '');
   } catch { return ''; }
 })();
+// Check once per page load. Store a settled result so offline errors are handled
+// when the visitor requests a recommendation, without unhandled rejections.
+const jevCapabilities = jevEndpoint
+  ? fetch(`${jevEndpoint}/api/capabilities`, {cache:'no-store'})
+      .then(async response => response.ok && (await response.json()).version >= 2
+        ? 'ok' : 'service_update_required')
+      .catch(() => 'local_service_unavailable')
+  : Promise.resolve('not_enabled');
 window.TripPlanner = {
   jevEnabled: Boolean(jevEndpoint),
   createPlan({days, preference, island='south'}) { return {days, preference, island}; },
   async chooseWithJev({days, preference, island='south'}) {
     if (!jevEndpoint) throw new Error('not_enabled');
+    const capabilityStatus = await jevCapabilities;
+    if (capabilityStatus !== 'ok') throw new Error(capabilityStatus);
     let response;
-    try {
-      const capabilities = await fetch(`${jevEndpoint}/api/capabilities`, {cache:'no-store'});
-      if (!capabilities.ok || (await capabilities.json()).version < 2) throw new Error('service_update_required');
-    } catch (error) {
-      if (error.message === 'service_update_required') throw error;
-      throw new Error('local_service_unavailable');
-    }
     try {
       response = await fetch(`${jevEndpoint}/api/jev/choice`, {
         method: 'POST', headers: {'Content-Type': 'application/json'},

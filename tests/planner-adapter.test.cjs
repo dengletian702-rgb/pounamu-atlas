@@ -25,6 +25,9 @@ function load(base, response) {
   assert.equal(await planner.chooseWithJev({days:7,preference:'walk',island:'south'}),'hooker');
   assert.equal(calls[0].url,'https://demo.example.invalid/api/capabilities');
   assert.equal(calls[1].url,'https://demo.example.invalid/api/jev/choice');
+  assert.equal(await planner.chooseWithJev({days:8,preference:'drive',island:'north'}),'hooker');
+  assert.equal(calls.filter(call => call.url.endsWith('/capabilities')).length,1, 'capabilities is requested only once per page');
+  assert.equal(calls.filter(call => call.url.endsWith('/choice')).length,2);
   assert.deepEqual(JSON.parse(calls[1].options.body),{days:7,preference:'walk',island:'south'});
   const bad = load('https://demo.example.invalid',async()=>({ok:false,json:async()=>({})}));
   await assert.rejects(bad.planner.chooseWithJev({days:7,preference:'walk'}),/service_update_required/);

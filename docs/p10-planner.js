@@ -169,6 +169,30 @@ const P10_WISH_TIPS = {
   kaikoura:{zh:'观鲸船约 3 小时，受海况影响，建议安排在上午。',en:'Whale-watching boats take about 3 hours and depend on the sea; go in the morning.'},
   stewart:{zh:'奥本镇周边步道和乌尔瓦岛观鸟，可按天气安排。',en:'Short walks around Oban and birdwatching on Ulva Island, arranged around the weather.'},
   catlins:{zh:'沿南部风景公路看瀑布、灯塔和海岸，需要自驾。',en:'Waterfalls, lighthouses and coast along the Southern Scenic Route; you need a car.'},
+  christchurch:{zh:'可逛植物园和河畔，也可搭乘缆车欣赏港湾景色。',en:'Visit the Botanic Gardens and riverfront, or take the gondola for harbour views.'},
+  nelson:{zh:'可逛市中心与海滨，或骑行大味道骑行道的一段。',en:'Explore the town and waterfront, or ride a section of the Great Taste Trail.'},
+  picton:{zh:'沿海滨散步，或乘船探索夏洛特皇后峡湾。',en:'Walk the waterfront or take a boat into Queen Charlotte Sound.'},
+  aoraki:{zh:'从库克山村出发，按天气和步道开放情况选择胡克谷或塔斯曼湖步道。',en:'From Aoraki/Mount Cook Village, choose the Hooker Valley or Tasman Lake walk according to weather and track conditions.'},
+  wanaka:{zh:'沿瓦纳卡湖步道散步，或查看罗伊峰步道的季节性关闭信息。',en:'Walk along Lake Wānaka or check seasonal closures before attempting Roys Peak.'},
+  queenstown:{zh:'可沿湖散步、乘缆车或到箭镇，热门活动宜提前预订。',en:'Walk the lakefront, take the gondola or visit Arrowtown; book popular activities ahead.'},
+  'te-anau':{zh:'可参加萤火虫洞游览，或沿蒂阿瑙湖边散步。',en:'Visit the glowworm caves or walk along Lake Te Anau.'},
+  glaciers:{zh:'查看冰川地区的步道开放和天气信息，按现场条件选择观景步道。',en:'Check track openings and weather, then choose a glacier-area viewpoint walk for the conditions.'},
+  haast:{zh:'可沿哈斯特隘口公路停看瀑布与短步道，留意路况。',en:'Stop for waterfalls and short walks along the Haast Pass road; check road conditions.'},
+  hokitika:{zh:'可到霍基蒂卡峡谷看蓝绿色河水，再回镇上海滩散步。',en:'Visit Hokitika Gorge for turquoise river views, then walk the town beach.'},
+  punakaiki:{zh:'可走千层岩与喷水洞环道，潮汐会影响喷水洞的观赏效果。',en:'Walk the Pancake Rocks and blowholes loop; tides affect the blowholes.'},
+  'arthurs-pass':{zh:'在亚瑟隘口村附近选择短步道，出发前查看天气和步道情况。',en:'Choose a short walk near Arthur’s Pass village and check weather and track conditions first.'},
+  'abel-tasman':{zh:'从马拉豪或凯特里特里安排海岸步道、皮划艇或水上出租船。',en:'Arrange a coastal walk, kayak or water taxi from Mārahau or Kaiteriteri.'},
+  akaroa:{zh:'在海港村散步，或预订出海观赏赫氏海豚。',en:'Walk around the harbour village or book a cruise to see Hector’s dolphins.'},
+  dunedin:{zh:'可逛市中心历史建筑，或去奥塔哥半岛看野生动物。',en:'Explore the city’s historic buildings or visit the Otago Peninsula for wildlife.'},
+  oamaru:{zh:'参观奥马鲁历史街区，或安排傍晚企鹅观赏；圆石可结合潮汐前往。',en:'Visit Ōamaru’s historic precinct or see penguins in the evening; plan the boulders around the tide.'},
+  auckland:{zh:'可乘渡轮到德文波特，或预订船票去朗伊托托步行登顶。',en:'Take the ferry to Devonport, or book a boat to walk up Rangitoto.'},
+  'bay-of-islands':{zh:'从派希亚乘船游览海湾，也可参观怀唐伊条约签署地。',en:'Take a boat trip from Paihia or visit the Waitangi Treaty Grounds.'},
+  coromandel:{zh:'查看教堂湾步道开放情况；热水海滩需按潮汐安排。',en:'Check access to Cathedral Cove; visit Hot Water Beach around low tide.'},
+  taupo:{zh:'可到胡卡瀑布观景，再沿陶波湖畔散步。',en:'Visit Huka Falls and walk along the Lake Taupō waterfront.'},
+  tongariro:{zh:'汤加里罗高山穿越全程单程 20.2 km；11 月至次年 4 月约 7–8 小时，5–10 月约 9 小时。建议预订接驳车；天气不好时不要上山，用机动日改期。',en:'The Tongariro Alpine Crossing is 20.2 km one way: 7–8 hours from November to April and around 9 hours from May to October. Book a shuttle; avoid the mountain in bad weather and use a buffer day to reschedule.'},
+  napier:{zh:'1931 年地震后重建的装饰艺术小城，可沿 Marine Parade 散步、参加装饰艺术建筑导览，或去附近的霍克斯湾酒庄。',en:'Rebuilt after the 1931 earthquake, Napier is known for Art Deco architecture. Walk Marine Parade, join an architecture tour or visit nearby Hawke’s Bay wineries.'},
+  wellington:{zh:'可参观蒂帕帕博物馆、乘缆车，或沿海滨散步。',en:'Visit Te Papa museum, ride the cable car or walk the waterfront.'},
+  taranaki:{zh:'按天气选择新普利茅斯海滨或塔拉纳基山区步道，山区出发前查看警报。',en:'Choose the New Plymouth waterfront or a Taranaki mountain walk for the weather, and check alpine alerts first.'},
 };
 
 // Suggestions link to existing guides. These are ideas for independent planning, not scheduled activities.
@@ -210,6 +234,18 @@ const P10_WISH_GUIDES = {
   tongariro:{walk:['tongariro-crossing'],drive:['ni-volcanicloop'],transit:['ni-northernexplorer']},
   napier:{transit:['ni-wellingtonnapier']}, wellington:{walk:['ni-escarpment'],drive:['ni-martinborough'],transit:['ni-kapitirail','ni-northernexplorer']}
 };
+// Infer the Jev island from the selected destinations; a tie falls back to the start city.
+function p10JevIsland(start,wishes){
+  let north=0,south=0;
+  for(const id of new Set(wishes||[])){const wish=WISHES.find(w=>w.id===id);if(wish?.island==='north')north++;else if(wish?.island==='south')south++;}
+  if(north!==south)return north>south?'north':'south';
+  return new Set(['auckland','wellington','rotorua']).has(start)?'north':'south';
+}
+// The recommendation must resolve against the same site data used to render route pages.
+function p10JevRouteName(routeId,lang,routeData){
+  const route=Array.isArray(routeData)?routeData.find(r=>r.id===routeId):null;
+  return route && (lang==='zh'?route.zh:route.name) || '';
+}
 function p10Suggestions(wishId,preference){
   return (P10_WISH_GUIDES[wishId]?.[preference]||[]).filter(id=>P10_GUIDES[id]).map(id=>({id,en:P10_GUIDES[id][0],zh:P10_GUIDES[id][1]}));
 }
@@ -350,18 +386,18 @@ function p10BreakStops(day){
   const priority=['haast','wanaka','arthurs-pass','hokitika'];
   return [...stops].sort((a,b)=>{const ai=priority.indexOf(a),bi=priority.indexOf(b);return (ai<0?100:ai)-(bi<0?100:bi);}).slice(0,2);
 }
-if (typeof module !== 'undefined' && module.exports) module.exports={p10Plan,p10Timeline,p10AlongWay,p10Duration,p10DailyTime,p10BreakStops,p10Net,p10Suggestions,p10LegDescription,P10_WISH_GUIDES,NODES,WISHES};
+if (typeof module !== 'undefined' && module.exports) module.exports={p10Plan,p10Timeline,p10AlongWay,p10Duration,p10DailyTime,p10BreakStops,p10Net,p10Suggestions,p10LegDescription,p10JevIsland,p10JevRouteName,P10_WISH_TIPS,P10_WISH_GUIDES,NODES,WISHES};
 
 if (typeof window !== 'undefined') {
   let p10Result=null, p10Recommendation=null;
   const p10$=selector=>document.querySelector(selector);
   const p10Text=()=>document.documentElement.lang.startsWith('zh') ? {
     start:'从哪里出发',end:'从哪里离开',days:'旅行天数',pace:'每天自驾节奏',pace35:'最多 3.5 小时',pace5:'最多 5 小时',pace65:'最多 6.5 小时',places:'想去哪些地方？',choose:'选择多个目的地',transport:'城市之间怎么走',car:'自驾',public:'公共交通',preference:'偏好的活动',method:'是否使用 Jev 推荐',local:'本地规划',jev:'Jev 辅助推荐',submit:'生成行程',
-    consent:'只有勾选同意，才会把所选岛屿、天数和活动方式发送给 TypeSafe，服务方也会收到请求 IP；地点和起终点不会发送。',statusConsent:'请先同意，再使用 Jev 推荐。',loading:'正在请求 Jev 推荐…',error:'Jev 推荐暂不可用，下面仍显示本地规划。',reco:'Jev 建议另行了解',
+    consent:'只有勾选同意，才会把所选岛屿、天数和活动方式发送给 TypeSafe，服务方也会收到请求 IP；地点和起终点不会发送。',statusConsent:'请先同意，再使用 Jev 推荐。',loading:'正在请求 Jev 推荐…',error:'Jev 推荐暂不可用，下面仍显示本地规划。',reco:'Jev 推荐',
     disclaimer:'出发前请查看 NZTA 路况和各线路链接的官方信息。',min:'至少需要',have:'你选择了',drop:'可增加天数或移除',unreachable:'以下地点目前无法按所选交通方式衔接，需另行安排',disconnected:'起点与终点之间缺少可用的交通连接，请改选交通方式或另行安排。',unknownNight:'',day:'第',dayEnd:'天',arrive:'抵达',depart:'离开',night:'住',check:'',activity:'安排时间游览',localTransport:'景点与步道起点的当地接驳不包含在行程中。',ferry:'渡轮',train:'火车',coach:'大巴',shuttle:'接驳车',road:'自驾',hour:'小时',dropNo:'请减少目的地或增加天数。',sources:'路况与交通来源'
   } : {
     start:'Start city',end:'Departure city',days:'Days available',pace:'Daily driving pace',pace35:'Up to 3.5 hours',pace5:'Up to 5 hours',pace65:'Up to 6.5 hours',places:'Where would you like to go?',choose:'Choose multiple destinations',transport:'Between towns',car:'Drive',public:'Public transport',preference:'Preferred activity',method:'Jev suggestions',local:'Local plan',jev:'Jev-assisted suggestion',submit:'Build itinerary',
-    consent:'Only with your consent, the selected island, days and activity type are sent to TypeSafe, which also receives the request IP. Your selected places and start/end are not sent.',statusConsent:'Please consent before using Jev.',loading:'Requesting a Jev suggestion…',error:'Jev is unavailable; the local plan is shown below.',reco:'Additional Jev suggestion',
+    consent:'Only with your consent, the selected island, days and activity type are sent to TypeSafe, which also receives the request IP. Your selected places and start/end are not sent.',statusConsent:'Please consent before using Jev.',loading:'Requesting a Jev suggestion…',error:'Jev is unavailable; the local plan is shown below.',reco:'Jev recommendation',
     disclaimer:'Check NZTA road conditions and the linked official information before you go.',min:'Minimum days',have:'Days selected',drop:'Removing this destination may reduce the trip to',unreachable:'These places need separate transport with the selected mode',disconnected:'No available connection is modelled between the start and end. Choose another mode or arrange this separately.',unknownNight:'',day:'Day ',dayEnd:'',arrive:'Arrive in',depart:'Depart from',night:'Overnight',check:'',activity:'Allow time to explore',localTransport:'Check local transport to sights and trailheads and return separately.',ferry:'Ferry',train:'Train',coach:'Coach',shuttle:'Shuttle',road:'Drive',hour:'h',dropNo:'Remove a destination or add more days.',sources:'Road and transport sources'
   };
   const p10Esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -429,7 +465,8 @@ if (typeof window !== 'undefined') {
       const arrivalTip=d.kind==='arrive'?(zh?'抵达后建议休息，避免落地当天长途驾驶。':'Rest after arrival and avoid a long drive on the first day.') : '';
       return `<article class="plan-day"><button class="p10-day-focus" type="button" data-p10-focus="${number}">${x.day}${number}${x.dayEnd} <span aria-hidden="true">↗</span></button><span class="plan-day-title">${heading}</span>${arrivalTip?`<p>${arrivalTip}</p>`:''}${legs?`<ul class="p10-legs">${legs}</ul>`:''}${total}${longDay}${activities}${d.kind==='depart'?'':`<p>${x.night}：${p10Esc(p10Name(d.at))}</p>`}</article>`;
     }).join('');
-    const reco=p10Recommendation?`<p>${x.reco}：<a href="route.html?id=${encodeURIComponent(p10Recommendation)}&amp;lang=${p10Lang()}">${p10Esc(p10Recommendation)}</a></p>`:'';
+    const recoName=p10JevRouteName(p10Recommendation,p10Lang(),typeof routes==='undefined'?[]:routes);
+    const reco=recoName?`<p>${x.reco}：<a href="route.html?id=${encodeURIComponent(p10Recommendation)}&amp;lang=${p10Lang()}">${p10Esc(recoName)}</a></p>`:'';
     el.innerHTML=`${notices.join('')}${reco}${p10TripMap(timeline)}${rows}<p class="planner-small">${x.sources}: <a href="https://www.journeys.nzta.govt.nz/" target="_blank" rel="noopener noreferrer">NZTA</a> · <a href="https://www.intercity.co.nz/" target="_blank" rel="noopener noreferrer">InterCity</a> · <a href="https://www.greatjourneysnz.com/" target="_blank" rel="noopener noreferrer">KiwiRail</a></p>`;
     p10FocusDay('all');
   }
@@ -478,7 +515,7 @@ if (typeof window !== 'undefined') {
       const input={start,end,days,pace,preference,car,wishes};p10Recommendation=null;p10Status('');
       if(methodValue==='jev'){
         const button=form.querySelector('button[type=submit]');button.disabled=true;p10Status(x.loading);
-        try{const northern=new Set(['auckland','wellington','rotorua']);p10Recommendation=await window.TripPlanner.chooseWithJev({days,preference,island:northern.has(start)?'north':'south'});p10Status('');}catch{p10Status(x.error);}finally{button.disabled=false;}
+        try{p10Recommendation=await window.TripPlanner.chooseWithJev({days,preference,island:p10JevIsland(start,wishes)});p10Status('');}catch{p10Status(x.error);}finally{button.disabled=false;}
       }
       try{p10Result=p10Plan(input);localStorage.setItem('p10-road-plan',JSON.stringify(input));p10Show(p10Result);}catch{p10Status(p10Lang()==='zh'?'请检查出发地、终点和天数。':'Check the start, destination and days.');}
     });

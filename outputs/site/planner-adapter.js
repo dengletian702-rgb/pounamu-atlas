@@ -1,6 +1,6 @@
 /* Configure the deployed Worker URL here; leave empty until it is deployed.
  * This is a public endpoint, never an API key. Only HTTPS endpoints are accepted. */
-const JEV_API_BASE = '';
+const JEV_API_BASE = 'https://pounamu-atlas-jev.dengletian702.workers.dev';
 const jevEndpoint = (() => {
   if (!JEV_API_BASE.trim()) return '';
   try {

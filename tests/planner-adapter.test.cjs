@@ -6,12 +6,12 @@ const vm = require('node:vm');
 const root = path.resolve(__dirname, '..');
 const source = fs.readFileSync(path.join(root, 'docs/planner-adapter.js'), 'utf8');
 assert.equal(source, fs.readFileSync(path.join(root, 'outputs/site/planner-adapter.js'), 'utf8'));
-const placeholder = "const JEV_API_BASE = '';";
-assert(source.includes(placeholder), 'the public Worker address must be empty until deployment');
+const baseDeclaration = /const JEV_API_BASE = '[^']*';/;
+assert(baseDeclaration.test(source), 'the Worker address configuration must be present');
 function load(base, response) {
   const calls = [], window = {};
   const fetch = async (url, options) => { calls.push({url, options}); return response(url, options); };
-  vm.runInNewContext(source.replace(placeholder, `const JEV_API_BASE = ${JSON.stringify(base)};`), {window, URL, fetch, Error, Boolean, JSON});
+  vm.runInNewContext(source.replace(baseDeclaration, `const JEV_API_BASE = ${JSON.stringify(base)};`), {window, URL, fetch, Error, Boolean, JSON});
   return {planner:window.TripPlanner, calls};
 }
 (async()=>{

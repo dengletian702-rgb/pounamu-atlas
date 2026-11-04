@@ -189,7 +189,7 @@ const P10_WISH_TIPS = {
   'bay-of-islands':{zh:'从派希亚乘船游览海湾，也可参观怀唐伊条约签署地。',en:'Take a boat trip from Paihia or visit the Waitangi Treaty Grounds.'},
   coromandel:{zh:'查看教堂湾步道开放情况；热水海滩需按潮汐安排。',en:'Check access to Cathedral Cove; visit Hot Water Beach around low tide.'},
   taupo:{zh:'可到胡卡瀑布观景，再沿陶波湖畔散步。',en:'Visit Huka Falls and walk along the Lake Taupō waterfront.'},
-  tongariro:{zh:'汤加里罗高山穿越全程单程 20.2 km；11 月至次年 4 月约 7–8 小时，5–10 月约 9 小时。建议预订接驳车；天气不好时不要上山，用机动日改期。',en:'The Tongariro Alpine Crossing is 20.2 km one way: 7–8 hours from November to April and around 9 hours from May to October. Book a shuttle; avoid the mountain in bad weather and use a buffer day to reschedule.'},
+  tongariro:{zh:'汤加里罗高山穿越全程单程 20.2 km；11 月至次年 4 月约 7–8 小时，5–10 月约 9 小时。建议提前预订接驳车，乘接驳车须预订步道；5–10 月需高山技能，接驳车通常停运。天气不好时不要上山，用机动日改期。',en:'The Tongariro Alpine Crossing is 20.2 km one way: 7–8 hours from November to April and around 9 hours from May to October. Book a shuttle ahead; a track booking is required to use it. May–October requires alpine skills and shuttles generally do not operate. Avoid the mountain in bad weather and use a buffer day to reschedule.'},
   napier:{zh:'1931 年地震后重建的装饰艺术小城，可沿 Marine Parade 散步、参加装饰艺术建筑导览，或去附近的霍克斯湾酒庄。',en:'Rebuilt after the 1931 earthquake, Napier is known for Art Deco architecture. Walk Marine Parade, join an architecture tour or visit nearby Hawke’s Bay wineries.'},
   wellington:{zh:'可参观蒂帕帕博物馆、乘缆车，或沿海滨散步。',en:'Visit Te Papa museum, ride the cable car or walk the waterfront.'},
   taranaki:{zh:'按天气选择新普利茅斯海滨或塔拉纳基山区步道，山区出发前查看警报。',en:'Choose the New Plymouth waterfront or a Taranaki mountain walk for the weather, and check alpine alerts first.'},

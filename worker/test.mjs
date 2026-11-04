@@ -56,20 +56,52 @@ test('CORS permits the exact origin and rejects missing or different origins', a
   const badPreflight = await worker.fetch(req('/api/jev/choice','OPTIONS',{headers:{'Access-Control-Request-Method':'DELETE'}}),env());assert.equal(badPreflight.status,403);
 });
 
-test('each IP is limited to ten requests in a rolling minute, including concurrent calls', async () => {
-  const configuration=env();
-  const results=await Promise.all(Array.from({length:20},()=>worker.fetch(req('/api/capabilities'),configuration)));
-  assert.equal(results.filter(r=>r.status===200).length,10);assert.equal(results.filter(r=>r.status===429).length,10);
-  assert.equal((await worker.fetch(req('/api/capabilities','GET',{ip:'198.51.100.2'}),configuration)).status,200);
-  const limiter=configuration.RATE_LIMITER.instances.get('198.51.100.1');limiter.state.storage.values.set('requests',Array(10).fill(Date.now()-60_001));
-  assert.equal((await worker.fetch(req('/api/capabilities'),configuration)).status,200);
+test('preflights and capabilities do not consume the ten POST allowance', async () => {
+  const configuration = env();
+  const options = () => req('/api/jev/choice', 'OPTIONS', {headers:{'Access-Control-Request-Method':'POST','Access-Control-Request-Headers':'content-type'}});
+  globalThis.fetch = async (url, init) => {
+    const choice = Object.keys(JSON.parse(init.body).questions.starting_route.criteria)[0];
+    return new Response(JSON.stringify({answers:{starting_route:{type:'choice',choice}}}), {status:200});
+  };
+  try {
+    for (let i = 0; i < 15; i++) {
+      assert.equal((await worker.fetch(options(), configuration)).status, 204);
+      assert.equal((await worker.fetch(req('/api/capabilities'), configuration)).status, 200);
+    }
+    assert.equal(configuration.RATE_LIMITER.instances.size, 0);
+    for (let i = 0; i < 10; i++) assert.equal((await worker.fetch(post(input), configuration)).status, 200);
+    assert.equal((await worker.fetch(post(input), configuration)).status, 429);
+    assert.equal((await worker.fetch(options(), configuration)).status, 204);
+    assert.equal((await worker.fetch(req('/api/capabilities'), configuration)).status, 200);
+    assert.equal((await worker.fetch(req('/api/capabilities', 'GET', {origin:'https://evil.example'}), configuration)).status, 403);
+    assert.equal((await worker.fetch(req('/api/jev/choice', 'OPTIONS', {origin:'https://evil.example', headers:{'Access-Control-Request-Method':'POST'}}), configuration)).status, 403);
+    const otherIp = req('/api/jev/choice', 'POST', {ip:'198.51.100.2', headers:{'Content-Type':'application/json'}, body:JSON.stringify(input)});
+    assert.equal((await worker.fetch(otherIp, configuration)).status, 200);
+    const limiter = configuration.RATE_LIMITER.instances.get('198.51.100.1');
+    limiter.state.storage.values.set('requests', Array(10).fill(Date.now() - 60_001));
+    assert.equal((await worker.fetch(post(input), configuration)).status, 200);
+  } finally { globalThis.fetch = networkFetch; }
 });
 
-test('unavailable or missing rate limiting fails closed', async () => {
-  const missingIp=new Request('https://worker.example/api/capabilities',{headers:{Origin:origin}});
-  assert.equal((await worker.fetch(missingIp,env())).status,429);
-  const broken={RATE_LIMITER:{idFromName(){throw Error('unavailable')}}};
-  assert.equal((await worker.fetch(req('/api/capabilities'),broken)).status,503);
+test('concurrent POST requests cannot exceed the ten-request limit', async () => {
+  const configuration = env();
+  globalThis.fetch = async (url, init) => {
+    const choice = Object.keys(JSON.parse(init.body).questions.starting_route.criteria)[0];
+    return new Response(JSON.stringify({answers:{starting_route:{type:'choice',choice}}}));
+  };
+  try {
+    const results = await Promise.all(Array.from({length:20}, () => worker.fetch(post(input), configuration)));
+    assert.equal(results.filter(r => r.status === 200).length, 10);
+    assert.equal(results.filter(r => r.status === 429).length, 10);
+  } finally { globalThis.fetch = networkFetch; }
+});
+
+test('unavailable or missing rate limiting fails closed for POST only', async () => {
+  const missingIp = new Request(endpoint, {method:'POST', headers:{Origin:origin,'Content-Type':'application/json'}, body:JSON.stringify(input)});
+  assert.equal((await worker.fetch(missingIp, env())).status, 429);
+  const broken = {RATE_LIMITER:{idFromName(){throw Error('unavailable')}}};
+  assert.equal((await worker.fetch(post(input), broken)).status, 503);
+  assert.equal((await worker.fetch(req('/api/capabilities'), broken)).status, 200);
 });
 
 test('body schema, content type and length are enforced', async () => {

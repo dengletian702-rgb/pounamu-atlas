@@ -90,9 +90,6 @@ async function underLimit(request, env) {
 async function handle(request, env) {
   const origin = request.headers.get('Origin');
   if (origin !== ALLOWED_ORIGIN) return json(403, { error: 'origin_denied' }, null);
-  let allowed = false;
-  try { allowed = await underLimit(request, env); } catch { return json(503, { error: 'limiter_unavailable' }, origin); }
-  if (!allowed) return json(429, { error: 'rate_limited' }, origin);
   const path = new URL(request.url).pathname;
   if (!['/api/capabilities', '/api/jev/choice'].includes(path)) return json(404, { error: 'not_found' }, origin);
   if (request.method === 'OPTIONS') {
@@ -104,6 +101,11 @@ async function handle(request, env) {
   }
   if (request.method === 'GET' && path === '/api/capabilities') return json(200, { version: 2, islands: ISLANDS, routeCount: catalog.length }, origin);
   if (request.method !== 'POST' || path !== '/api/jev/choice') return json(405, { error: 'method_not_allowed' }, origin);
+  // Only recommendation requests consume the per-IP allowance. Origin checks
+  // still run before every route, including preflights and capabilities.
+  let allowed = false;
+  try { allowed = await underLimit(request, env); } catch { return json(503, { error: 'limiter_unavailable' }, origin); }
+  if (!allowed) return json(429, { error: 'rate_limited' }, origin);
   if ((request.headers.get('Content-Type') || '').split(';')[0].trim().toLowerCase() !== 'application/json') return json(403, { error: 'origin_denied' }, origin);
   const declared = request.headers.get('Content-Length');
   if (declared && (!/^\d+$/.test(declared) || Number(declared) > MAX_BODY_BYTES)) return json(413, { error: 'body_too_large' }, origin);

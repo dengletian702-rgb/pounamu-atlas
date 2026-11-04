@@ -4,7 +4,7 @@
 
 ## 在线浏览 / Live website
 
-[打开绿石之地](https://dengletian702-rgb.github.io/pounamu-atlas/)：无需安装，支持线路浏览和本地行程规划。Jev 代理尚未部署，线上目前提供本地规划；部署与配置说明见 [Worker 指南](worker/README.md)。
+[打开绿石之地](https://dengletian702-rgb.github.io/pounamu-atlas/)：无需安装，支持线路浏览和本地行程规划。Jev Worker 已部署并接入网站；访客选择 Jev 并勾选同意后，才会发送岛屿、天数和活动方式。重新部署说明见 [Worker 指南](worker/README.md)。
 
 ## 本地运行 / Run locally
 
@@ -14,7 +14,7 @@
 node outputs/jev-server.js
 ```
 
-打开终端打印的本机地址。默认规划使用本地规则、不需要账号。Jev 推荐是可选功能：部署 Worker 并将公开的 Worker 地址填入两份 `planner-adapter.js` 的 `JEV_API_BASE` 后，访客同意才会调用；密钥只放在服务端 secret 中，不要提交到仓库。The optional Jev service requires a server-side environment variable; never commit credentials.
+打开终端打印的本机地址。默认规划使用本地规则、不需要账号。Jev 推荐是可选功能，线上已接入 Worker；访客勾选同意后才会发送岛屿、天数和活动方式。密钥只放在服务端 secret 中，不要提交到仓库。The optional Jev service requires a server-side environment variable; never commit credentials.
 
 ## 使用与数据 / Usage and data
 

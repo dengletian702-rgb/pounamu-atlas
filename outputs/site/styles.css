@@ -497,3 +497,52 @@ html.motion-off .route-card-link:hover .route-visual img{transform:none!importan
 /* Keep walking-list thumbnails aligned and visible on every row. */
 .home-shortlist .walk-recommendation-link .walk-thumb{display:block;margin:0;max-width:none;aspect-ratio:auto;opacity:1;transform:none}
 .home-shortlist h2{overflow:visible;overflow-wrap:anywhere}
+
+/* Mobile reading rhythm: one left edge and a clear hierarchy on inner pages. */
+@media (max-width: 750px) {
+  body[data-page=plan] .planner h1,
+  body[data-page=routes] .page-intro h1,
+  body[data-page=prepare] .page-intro h1,
+  body[data-page=route] .journey-hero h1 {
+    font-family: var(--bodyface) !important;
+    font-size: clamp(30px, 9vw, 36px) !important;
+    font-weight: 650;
+    line-height: 1.3 !important;
+    letter-spacing: 0;
+    text-align: left;
+    overflow-wrap: anywhere;
+  }
+  body[data-page=plan] .planner h1 { margin: 0 0 20px; }
+  body[data-page=plan] .planner-copy > .section-label,
+  body[data-page=routes] .page-intro .section-label,
+  body[data-page=prepare] .page-intro .section-label { margin-bottom: 16px; }
+  body[data-page=plan] .planner-copy > p:not(.section-label),
+  body[data-page=routes] .page-lead,
+  body[data-page=prepare] .page-lead,
+  body[data-page=route] .journey-lead { font-size: 16px; line-height: 1.7; }
+  body[data-page=plan] .planner-promise { align-items: flex-start; font-size: 14px; line-height: 1.65; gap: 12px; }
+  body[data-page=plan] .planner-promise > span:first-child { font-size: 20px; line-height: 1.5; }
+  body[data-page=plan] .page-planner > .planner-box { padding: 22px; margin-top: 30px; }
+  body[data-page=plan] .planner-box-heading { font-size: 15px; line-height: 1.5; letter-spacing: 0; }
+  body[data-page=plan] #plannerForm label,
+  body[data-page=plan] #plannerForm select,
+  body[data-page=plan] #plannerForm summary,
+  body[data-page=plan] #plannerForm button { font-size: 16px; line-height: 1.5; }
+  body[data-page=plan] #plannerForm select { min-width: 0; }
+  body[data-page=plan] .jev-checkbox { align-items: flex-start; }
+  body[data-page=plan] .jev-checkbox input { margin-top: .35em; }
+  body[data-page=plan] .plan-result h3,
+  body[data-page=plan] .p10-map-heading h2 { font-family: var(--bodyface); font-size: 24px; line-height: 1.35; letter-spacing: 0; }
+  body[data-page=plan] .plan-result .plan-day-title { font-family: var(--bodyface); font-size: 20px; line-height: 1.45; }
+  body[data-page=route] .journey-section h2,
+  body[data-page=index] .section-heading h2,
+  body[data-page=index] .map-chapter-copy h2,
+  body[data-page=index] .home-shortlist h2 { font-size: 32px; line-height: 1.3; letter-spacing: 0; }
+  body[data-page=route] .journey-hero-content { padding-left: 6%; padding-right: 6%; }
+  body[data-page=route] .timeline-copy h3,
+  body .route-body h3,
+  body[data-page=prepare] .prepare-card h2 { font-size: 22px; line-height: 1.4; }
+  .header .nav a { font-size: 13px; letter-spacing: 0; }
+  .footer { gap: 16px; }
+  .footer > p { max-width: none; }
+}

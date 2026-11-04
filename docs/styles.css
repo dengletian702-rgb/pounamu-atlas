@@ -484,7 +484,7 @@ main p:not(.section-label):not(.eyebrow):not(.walk-photo-credit):not(.journey-ph
 .home-ways .ways-grid p{color:#f7f3e8;font-size:16px}
 @media(min-width:751px){body[data-page=index] .map-section{padding-top:100px;padding-bottom:45px}.nz-map-wrap svg.nz-map{max-height:55svh}}
 /* Alternate long catalogue and itinerary surfaces in solid colour bands. */
-.catalogue{background-image:repeating-linear-gradient(to bottom,#f5ede1 0,#f5ede1 900px,#e5ece2 900px,#e5ece2 1800px,#f7f1e8 1800px,#f7f1e8 2700px)!important}
+.catalogue{background-color:#f5ede1!important;background-image:none!important}
 .plan-result .plan-day{padding:24px;background:#f5f0e5}
 .plan-result .plan-day:nth-of-type(3n+1){background:#e7eee5}
 .plan-result .plan-day:nth-of-type(3n+2){background:#f4eadb}
@@ -545,4 +545,17 @@ html.motion-off .route-card-link:hover .route-visual img{transform:none!importan
   .header .nav a { font-size: 13px; letter-spacing: 0; }
   .footer { gap: 16px; }
   .footer > p { max-width: none; }
+}
+
+/* The form and its explanation share the card; results retain the full width. */
+.planner-explainer {display:none}
+@media (min-width:1001px) {
+  body[data-page=plan] .page-planner > .planner-box {display:grid;grid-template-columns:minmax(0,1fr) minmax(250px,.75fr);column-gap:clamp(40px,6vw,90px);align-items:start}
+  body[data-page=plan] .planner-box-heading, body[data-page=plan] .planner-small, body[data-page=plan] .plan-result {grid-column:1 / -1}
+  body[data-page=plan] #plannerForm {width:100%;max-width:none;grid-column:1}
+  .planner-explainer {display:block;grid-column:2;grid-row:2;padding:30px;background:#f5ede1;border-left:3px solid #c87d4b}
+  .planner-explainer h2 {font-family:var(--bodyface);font-size:23px;line-height:1.35;margin:0 0 18px;color:var(--ink)}
+  .planner-explainer ul {padding-left:1.2em;margin:0;line-height:1.75;font-size:16px}
+  .planner-explainer li + li {margin-top:8px}
+  html:lang(zh) .planner-explainer-en, html:lang(en) .planner-explainer-zh {display:none}
 }

@@ -97,3 +97,62 @@ test('an edited trip survives refresh, appends a place, and confirms a template 
     await new Promise(resolve => server.close(resolve));
   }
 });
+
+test('blank and sample entries confirm before replacing an edited draft, and deleting a day lists its name', async (t) => {
+  const chromium = loadChromium();
+  if (!chromium || !fs.existsSync('/usr/bin/google-chrome')) {
+    t.skip('browser driver is not available in this environment');
+    return;
+  }
+  const server = await startDocsServer();
+  const port = server.address().port;
+  const browser = await chromium.launch({ executablePath: '/usr/bin/google-chrome', args: ['--no-sandbox', '--disable-dev-shm-usage'] });
+  try {
+    for (const lang of ['zh', 'en']) {
+      for (const width of [1280, 390]) {
+        const context = await browser.newContext({ viewport: { width, height: width === 1280 ? 900 : 844 } });
+        const page = await context.newPage();
+        const base = `http://127.0.0.1:${port}`;
+        const placeOf = text => text.split('·').slice(1).join('·').replace(/待核|To verify/g, '').trim();
+        await page.goto(`${base}/guide.html?template=SI-09B&lang=${lang}`, { waitUntil: 'networkidle' });
+        const second = placeOf(await page.locator('article.v4-day h3').nth(1).innerText());
+        await page.locator('[data-up="1"]').click();
+        await page.waitForFunction(text => document.querySelector('article.v4-day h3').textContent.includes(text), second);
+        await page.goto(`${base}/index.html?lang=${lang}`, { waitUntil: 'networkidle' });
+        await page.fill('#v4-q', 'zzzz-not-a-place');
+        await page.click('#v4-search-form button[type=submit]');
+        await page.getByRole('link', { name: lang === 'zh' ? '从空白行程开始' : 'Start from a blank itinerary' }).click();
+        await page.waitForSelector('[data-keep]');
+        assert.match(await page.locator('.v4-modal').innerText(), lang === 'zh' ? /从空白行程开始/ : /blank itinerary/i);
+        await page.locator('[data-keep]').click();
+        assert.equal(new URL(page.url()).searchParams.get('blank'), null);
+        assert.equal(placeOf(await page.locator('article.v4-day h3').nth(0).innerText()), second);
+        await page.goto(`${base}/guide.html?demo=tight&lang=${lang}`, { waitUntil: 'networkidle' });
+        await page.waitForSelector('[data-keep]');
+        await page.locator('[data-keep]').click();
+        assert.equal(new URL(page.url()).searchParams.get('demo'), null);
+        assert.equal(placeOf(await page.locator('article.v4-day h3').nth(0).innerText()), second);
+        await page.goto(`${base}/guide.html?blank=1&lang=${lang}`, { waitUntil: 'networkidle' });
+        await page.locator('[data-do-replace]').click();
+        await page.waitForSelector('#v4-toast [data-v4-undo]');
+        assert.equal(await page.locator('article.v4-day').count(), 0);
+        await page.locator('#v4-toast [data-v4-undo]').click();
+        assert.equal(placeOf(await page.locator('article.v4-day h3').nth(0).innerText()), second);
+        await page.reload({ waitUntil: 'networkidle' });
+        assert.equal(new URL(page.url()).searchParams.get('blank'), null);
+        assert.equal(placeOf(await page.locator('article.v4-day h3').nth(0).innerText()), second);
+        await page.locator('[data-del="0"]').click();
+        await page.waitForSelector('.v4-unscheduled');
+        assert.match(await page.locator('.v4-unscheduled').innerText(), new RegExp(second.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+        assert.doesNotMatch(await page.locator('.v4-unscheduled').innerText(), /si-|ni-/);
+        await page.locator('#v4-toast [data-v4-undo]').click();
+        assert.equal(placeOf(await page.locator('article.v4-day h3').nth(0).innerText()), second);
+        assert.equal(await page.locator('.v4-unscheduled').count(), 0);
+        await context.close();
+      }
+    }
+  } finally {
+    await browser.close();
+    await new Promise(resolve => server.close(resolve));
+  }
+});

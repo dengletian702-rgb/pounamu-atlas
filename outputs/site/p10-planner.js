@@ -522,6 +522,11 @@ function p10ShortfallNote(plan, present, lang) {
     ? `行程结束在${here.zh}，还没到${goal.zh}${extra}。`
     : `The trip ends in ${here.en} and has not reached ${goal.en}${extra}.`;
 }
+function p10StillTight(plan, present) {
+  if (!(plan && plan.input && plan.minimum > plan.input.days)) return false;
+  if (present && (present.unscheduled || []).length) return true;
+  return Boolean(p10ShortfallNote(plan, present, 'zh'));
+}
 function p10AlongWay(plan){
   if(plan.disconnected || plan.minimum>plan.input.days || !plan.spare) return [];
   const routeNodes=new Set(plan.days.flatMap(d=>d.legs.flatMap(l=>[l.a,l.b])));
@@ -543,7 +548,7 @@ function p10BreakStops(day){
   const priority=['haast','wanaka','arthurs-pass','hokitika'];
   return [...stops].sort((a,b)=>{const ai=priority.indexOf(a),bi=priority.indexOf(b);return (ai<0?100:ai)-(bi<0?100:bi);}).slice(0,2);
 }
-if (typeof module !== 'undefined' && module.exports) module.exports={p10Plan,p10Timeline,p10Present,p10Removable,p10ShortfallNote,p10AlongWay,p10Duration,p10DailyTime,p10BreakStops,p10Net,p10Suggestions,p10LegDescription,p10JevIsland,p10JevRouteName,P10_WISH_TIPS,P10_WISH_GUIDES,NODES,WISHES};
+if (typeof module !== 'undefined' && module.exports) module.exports={p10Plan,p10Timeline,p10Present,p10Removable,p10ShortfallNote,p10StillTight,p10AlongWay,p10Duration,p10DailyTime,p10BreakStops,p10Net,p10Suggestions,p10LegDescription,p10JevIsland,p10JevRouteName,P10_WISH_TIPS,P10_WISH_GUIDES,NODES,WISHES};
 globalThis.P10_NODES = NODES;
 
   if (typeof window !== 'undefined') {
@@ -600,8 +605,9 @@ globalThis.P10_NODES = NODES;
     const el=p10$('#planResult');if(!el||!result)return;const x=p10Text(),zh=p10Lang()==='zh';
     if(result.disconnected){el.innerHTML=`<p class="p10-warning">${x.disconnected}</p>`;return;}
     const notices=[];
-    if(result.minimum>result.input.days){
-      const early=p10Present(result);
+    const early=p10Present(result);
+    const stillTight=p10StillTight(result, early);
+    if(stillTight){
       const removable=p10Removable(result, early);
       const dropped=removable.map(w=>p10Esc(w[p10Lang()])).join(zh?'、':', ');
       const more=result.minimum<=21?`<button type="button" class="p10-add-stop" data-p10-days="${result.minimum}">${zh?`把天数改成 ${result.minimum}`:`Change to ${result.minimum} days`}</button>`:'';

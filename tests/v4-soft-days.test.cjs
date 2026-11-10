@@ -49,4 +49,11 @@ test('a 5-day cap ends before the departure city and keeps reached places off th
   const removable = planner.p10Removable(plan, view).map(item => item.id);
   assert.deepEqual(removable, ['milford']);
   assert.equal(planner.p10ShortfallNote(plan, view, 'en').includes('Wānaka'), true);
+  const fitted = planner.p10Plan({
+    start: 'christchurch', end: 'queenstown', days: 9, pace: 5, preference: 'drive', car: true,
+    wishes: ['tekapo', 'aoraki', 'wanaka', 'queenstown'],
+  });
+  const fittedView = planner.p10Present(fitted);
+  assert.equal(fittedView.unscheduled.length, 0);
+  assert.equal(planner.p10StillTight(fitted, fittedView), false);
 });

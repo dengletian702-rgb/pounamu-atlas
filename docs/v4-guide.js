@@ -402,33 +402,25 @@
     const template = q.get('template');
     const add = q.get('add');
     const saved = savedDraft();
-    state.pendingTemplate = '';
-    if (template) {
+    state.pendingAction = null;
+    if (template || q.get('blank') === '1' || q.get('demo') === 'tight') {
+      const action = template
+        ? { kind: 'template', id: template, view: q.get('view') || '' }
+        : q.get('blank') === '1'
+          ? { kind: 'blank', view: q.get('view') || '' }
+          : { kind: 'tight' };
       if (saved && saved.edited) {
         state.draft = saved;
-        state.pendingTemplate = template;
+        state.pendingAction = action;
         stripEntryParams();
         return;
       }
-      state.draft = draftFromTemplate(template);
-      state.draft.edited = false;
-      if (q.get('view')) state.draft.view = q.get('view');
+      applyAction(action);
       stripEntryParams();
       return;
     }
     if (add) {
       state.draft = appendPlace(saved, add);
-      stripEntryParams();
-      return;
-    }
-    if (q.get('blank') === '1') {
-      state.draft = blankDraft();
-      if (q.get('view')) state.draft.view = q.get('view');
-      stripEntryParams();
-      return;
-    }
-    if (q.get('demo') === 'tight') {
-      state.draft = draftFromTight();
       stripEntryParams();
       return;
     }
@@ -603,10 +595,21 @@
         ${via}${legHtml(day)}${ferry}${pace}
         ${day.notes && !state.draft.hideVerify ? `<p class="v4-note">${esc(day.notes)}</p>` : ''}
       </article>`;
-    }).join('') + ((state.draft.unscheduled || []).length ? `<section class="v4-unscheduled"><h3>${esc(t('unscheduled'))}</h3><ul>${state.draft.unscheduled.map(item => {
-      const label = state.lang === 'en' ? (item.label_en || item.label_zh || '') : (item.label_zh || item.label_en || '');
-      return label ? `<li>${esc(label)}</li>` : '';
-    }).join('')}</ul></section>` : '');
+    }).join('') + unscheduledHtml();
+  }
+  function unscheduledRecord(day) {
+    const id = day && (day.placeId || (typeof day === 'string' ? day : ''));
+    const p = id ? byId(id) : null;
+    const label_zh = (day && day.label_zh) || (p && p.name_zh) || '';
+    const label_en = (day && day.label_en) || (p && p.name_en) || '';
+    if (!label_zh && !label_en) return null;
+    return { placeId: id || '', label_zh, label_en, lat: p ? p.lat : day.lat, lon: p ? p.lon : day.lon };
+  }
+  function unscheduledHtml() {
+    const onTrip = new Set((state.draft.days || []).map(day => day.placeId).filter(Boolean));
+    const items = (state.draft.unscheduled || []).map(unscheduledRecord).filter(item => item && item.placeId && !onTrip.has(item.placeId));
+    if (!items.length) return '';
+    return `<section class="v4-unscheduled"><h3>${esc(t('unscheduled'))}</h3><ul>${items.map(item => `<li>${esc(state.lang === 'en' ? (item.label_en || item.label_zh) : (item.label_zh || item.label_en))}</li>`).join('')}</ul></section>`;
   }
   function tightBlock() {
     const min = Number(state.draft.minimum) || state.draft.days.length;
@@ -747,7 +750,10 @@
         pushUndo();
         const i = Number(del.dataset.del);
         const [gone] = state.draft.days.splice(i, 1);
-        if (gone && gone.placeId) state.draft.unscheduled.push(gone.placeId);
+        const record = gone && unscheduledRecord(gone);
+        if (record && !state.draft.days.some(day => day.placeId === record.placeId)) {
+          state.draft.unscheduled = [...(state.draft.unscheduled || []), record];
+        }
         persist(); toast(t('toastDeleted')); renderGuide(); return;
       }
       const dest = event.target.closest('[data-dest-day]');
@@ -938,9 +944,26 @@
       });
     }
   }
-  function openReplace(templateId) {
-    const item = (state.catalog.templates || []).find(row => row.id === templateId);
-    const name = item ? (state.lang === 'en' ? item.title_en : item.title_zh) : templateId;
+  function applyAction(action) {
+    if (!action) return;
+    if (action.kind === 'template') {
+      state.draft = draftFromTemplate(action.id);
+      state.draft.edited = false;
+      if (action.view) state.draft.view = action.view;
+      return;
+    }
+    if (action.kind === 'tight') {
+      state.draft = draftFromTight();
+      state.draft.edited = false;
+      return;
+    }
+    state.draft = blankDraft();
+    if (action.view) state.draft.view = action.view;
+  }
+  function openReplace(action) {
+    const name = action.kind === 'template'
+      ? ((state.catalog.templates || []).find(row => row.id === action.id) || {})[state.lang === 'en' ? 'title_en' : 'title_zh'] || action.id
+      : action.kind === 'tight' ? t('tightSample') : t('blankTrip');
     const modal = document.createElement('div');
     modal.className = 'v4-modal';
     modal.innerHTML = `<article role="dialog" aria-modal="true"><h2>${esc(t('replaceTitle'))}</h2><p>${esc(t('replaceBody', { name }))}</p><div class="v4-actions"><button type="button" data-do-replace>${esc(t('replaceYes'))}</button><button type="button" data-keep>${esc(t('replaceNo'))}</button></div></article>`;
@@ -950,8 +973,7 @@
       if (event.target.closest('[data-keep]')) { modal.remove(); return; }
       if (!event.target.closest('[data-do-replace]')) return;
       pushUndo();
-      state.draft = draftFromTemplate(templateId);
-      state.draft.edited = false;
+      applyAction(action);
       persist();
       modal.remove();
       renderGuide();
@@ -985,10 +1007,10 @@
         delete state.draft.pendingToast;
         persist();
       }
-      if (state.pendingTemplate) {
-        const next = state.pendingTemplate;
-        state.pendingTemplate = '';
-        openReplace(next);
+      if (state.pendingAction) {
+        const action = state.pendingAction;
+        state.pendingAction = null;
+        openReplace(action);
       }
     }
     if (document.querySelector('#v4-destination')) await renderDestination();

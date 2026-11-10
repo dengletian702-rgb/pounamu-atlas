@@ -96,6 +96,7 @@
   "replaceYes": { "zh": "替换当前行程", "en": "Replace current trip" },
   "replaceNo": { "zh": "保留当前行程", "en": "Keep current trip" },
   "replacedTrip": { "zh": "已换成新的线路。", "en": "The trip was replaced." },
+  "tightSample": { "zh": "示例的紧凑行程", "en": "the sample short trip" },
   "redo": { "zh": "重做", "en": "Redo" },
   "saveState": { "zh": "已写入这台浏览器", "en": "Saved in this browser" },
   "exportJson": { "zh": "导出 JSON", "en": "Export JSON" },

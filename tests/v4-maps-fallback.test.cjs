@@ -107,6 +107,13 @@ test('an invalid map key falls back to the schematic', async (t) => {
     await live.waitForTimeout(1500);
     assert.equal(await live.locator('#v4-map').getAttribute('data-map-kind'), 'svg');
     assert.equal(liveErrors.length, 0);
+    const again = await live.evaluate(async () => {
+      const started = performance.now();
+      await window.PounamuMaps.mount(document.querySelector('#v4-map'), { lang: 'zh', stops: [], candidates: [] });
+      return performance.now() - started;
+    });
+    assert.ok(again < 1000, 'second mount took ' + again + 'ms');
+    assert.equal(liveErrors.length, 0);
     await live.close();
   } finally {
     await browser.close();

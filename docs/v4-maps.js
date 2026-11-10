@@ -65,7 +65,41 @@
       });
     });
   }
+  let sessionSvg = false;
+  let errorHandler = null;
+  let nativeObserver = null;
+  let watchedObservers = [];
+  function stopMapHooks() {
+    if (errorHandler) {
+      window.removeEventListener('error', errorHandler, true);
+      errorHandler = null;
+    }
+    for (const obs of watchedObservers) {
+      try { obs.disconnect(); } catch { /* already disconnected */ }
+    }
+    watchedObservers = [];
+    if (nativeObserver) {
+      window.IntersectionObserver = nativeObserver;
+      nativeObserver = null;
+    }
+  }
+  function watchObservers() {
+    if (nativeObserver || typeof window.IntersectionObserver !== 'function') return;
+    nativeObserver = window.IntersectionObserver;
+    const Native = nativeObserver;
+    window.IntersectionObserver = function (callback, options) {
+      const wrapped = (entries, observer) => {
+        try { callback(entries, observer); }
+        catch { /* a removed map node can make the old observer throw */ }
+      };
+      const obs = new Native(wrapped, options);
+      watchedObservers.push(obs);
+      return obs;
+    };
+    window.IntersectionObserver.prototype = Native.prototype;
+  }
   function showSvg(el, state) {
+    stopMapHooks();
     el.dataset.mapKind = 'svg';
     el.innerHTML = schematicSvg(state);
     bindSvg(el, state);
@@ -85,30 +119,33 @@
   }
   async function mount(el, state) {
     if (!el) return { kind: 'none' };
+    stopMapHooks();
     const key = keyFromWindow();
-    el.replaceChildren();
-    if (!key) return showSvg(el, state);
+    if (!key || sessionSvg) return showSvg(el, state);
+    watchObservers();
     let failed = false;
-    const onMapError = event => {
+    errorHandler = event => {
       const file = String(event.filename || '');
       const msg = String(event.message || '');
       if (file.includes('maps.googleapis') || file.includes('maps.gstatic') || /google maps|invalidkey|gm_auth|getRootNode/i.test(msg)) {
         event.preventDefault();
         failed = true;
+        sessionSvg = true;
         showSvg(el, state);
       }
     };
-    window.addEventListener('error', onMapError, true);
-    window.gm_authFailure = () => { failed = true; showSvg(el, state); };
+    window.addEventListener('error', errorHandler, true);
+    window.gm_authFailure = () => { failed = true; sessionSvg = true; showSvg(el, state); };
     const ok = await loadGoogle(key);
     if (ok && !failed) await new Promise(resolve => setTimeout(resolve, 800));
-    if (failed) return { kind: 'svg' };
-    if (!ok || !window.google || !window.google.maps) return showSvg(el, state);
+    if (failed || sessionSvg) return { kind: 'svg' };
+    if (!ok || !window.google || !window.google.maps) { sessionSvg = true; return showSvg(el, state); }
     try {
+      watchObservers();
       el.dataset.mapKind = 'google';
       const mapDiv = document.createElement('div');
       mapDiv.className = 'v4-google-map';
-      el.appendChild(mapDiv);
+      el.replaceChildren(mapDiv);
       const map = new window.google.maps.Map(mapDiv, {
         center: { lat: -41.3, lng: 174.0 },
         zoom: 5,
@@ -149,9 +186,10 @@
         });
       }
       if (path.length || pool.length) map.fitBounds(bounds, 48);
-      if (failed) return showSvg(el, state);
+      if (failed || sessionSvg) { sessionSvg = true; return showSvg(el, state); }
       return { kind: 'google', map };
     } catch {
+      sessionSvg = true;
       return showSvg(el, state);
     }
   }

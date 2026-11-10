@@ -54,7 +54,7 @@ MIT does **not** apply to text, data, photographs, map data or fonts.
 
 ## 3. Sources we link to but do not copy
 
-Ngā Haerenga NZ Cycle Trails, NZTA, newzealand.com, MetService, Mountain Safety Council, transport operators, councils and regional tourism sites: we state individual facts in our own words with a link and, for checking, keep a short quotation in `data/evidence/`. Their licences were not confirmed (review section 8). AllTrails, Tramper and similar third-party sites are not used as sources and no content is copied from them.
+Ngā Haerenga NZ Cycle Trails, NZTA, newzealand.com, MetService, Mountain Safety Council, transport operators, councils and regional tourism sites: we state individual facts in our own words with a link and, for checking, keep a short quotation in `data/evidence/`. newzealand.com is © Tourism New Zealand under its terms of use (checked 2026-11-11): no copying or adapting of its text, images or trade marks without written permission, so we only link and restate facts. The other sites' licences were not confirmed (review section 8). AllTrails, Tramper and similar third-party sites are not used as sources and no content is copied from them.
 
 ## 4. If you reuse this site's content
 
@@ -69,7 +69,7 @@ Our own arrangement of the place and route tables, and the Chinese names we publ
 | Coordinates whose notes say they come from OSM Nominatim, including town-centre approximations based on those coordinates | `inputs/atlas/places-v2.csv`, `docs/data/v4-catalog.json` | [ODbL 1.0](https://opendatacommons.org/licenses/odbl/). Not this site's CC BY 4.0 |
 | Driving times and kilometres whose cell is marked OSRM | `inputs/meridian/routes-v2.csv` | OSRM is built on OpenStreetMap, so those readings stay under [ODbL 1.0](https://opendatacommons.org/licenses/odbl/). They are not an official NZTA or operator figure, and they are not a value checked by this site. Not CC BY 4.0 |
 | DOC track rows and summaries written from DOC open-data fields | `docs/data/doc-tracks.json`, DOC-sourced place rows | DOC data: “Sourced from the Department of Conservation Te Papa Atawhai and licensed for reuse under CC BY 4.0.” |
-| Itinerary order adapted from newzealand.com | route template notes and `source_url` on each day | 依据 newzealand.com 行程改编. Example: [South Island alpine lakes](https://www.newzealand.com/int/feature/south-island-alpine-lakes-itinerary/), accessed 2026-11-11. The pages are linked; their wording and pictures are not copied |
+| Day order referenced from newzealand.com | route template notes and `source_url` on each day | **Not licensed to us and not covered by our CC BY 4.0.** newzealand.com content is © Tourism New Zealand, all rights reserved ([terms of use](https://www.newzealand.com/int/utilities/terms-of-use/), last updated 14 August 2025). We use only facts — towns in day order, published drive times and road numbers — with a link and access date. No wording, photographs, logos or trade marks are copied. Shown on the site as “参考：newzealand.com 公开行程”. Example: [South Island alpine lakes](https://www.newzealand.com/int/feature/south-island-alpine-lakes-itinerary/), accessed 2026-11-11. |
 | Wikimedia photographs | unchanged | Per-image credit in `outputs/IMAGE-CREDITS.md` and `outputs/SPORTS-IMAGE-CREDITS.md` |
 
 Pages and maps that use OSM coordinates or OSRM times show “© OpenStreetMap contributors” and link to https://www.openstreetmap.org/copyright.

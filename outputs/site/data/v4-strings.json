@@ -143,7 +143,7 @@
   "trackSearchPh": { "zh": "按名称、城镇或地区搜索", "en": "Search by name, town or region" },
   "namePending": { "zh": "没有中文名，显示 DOC 英文名。", "en": "No Chinese name; the DOC English name is shown." },
   "sourceToVerify": { "zh": "来源待核", "en": "Source to verify" },
-  "adaptedFrom": { "zh": "依据 newzealand.com 行程改编", "en": "Adapted from a newzealand.com itinerary" },
+  "adaptedFrom": { "zh": "参考：newzealand.com 公开行程（本站自写，非 Tourism New Zealand 内容）", "en": "Reference: a public newzealand.com itinerary (written by Pounamu Atlas, not Tourism New Zealand content)" },
   "nzPage": { "zh": "newzealand.com 原页 ↗", "en": "newzealand.com page ↗" },
   "accessedOn": { "zh": "访问日期", "en": "Accessed" },
   "switchLang": { "zh": "EN", "en": "中文" },

@@ -86,6 +86,28 @@ test('an invalid map key falls back to the schematic', async (t) => {
     });
     assert.equal(auth.kind, 'svg');
     assert.equal(auth.errors.length, 0);
+    const hung = await browser.newPage();
+    const hungErrors = [];
+    hung.on('pageerror', error => hungErrors.push(error.message));
+    await hung.addInitScript(value => { window.POUNAMU_GOOGLE_MAPS_KEY = value; }, fake);
+    await hung.route('**://maps.googleapis.com/**', () => {});
+    const started = Date.now();
+    await hung.goto(`http://127.0.0.1:${port}/guide.html?view=pick&blank=1&lang=zh`, { waitUntil: 'domcontentloaded' });
+    await hung.waitForSelector('.v4-schematic', { timeout: 6000 });
+    const elapsed = Date.now() - started;
+    assert.ok(elapsed < 5500, 'fallback took ' + elapsed + 'ms');
+    assert.equal(hungErrors.length, 0);
+    await hung.close();
+    const live = await browser.newPage();
+    const liveErrors = [];
+    live.on('pageerror', error => liveErrors.push(error.message));
+    await live.addInitScript(value => { window.POUNAMU_GOOGLE_MAPS_KEY = value; }, fake);
+    await live.goto(`http://127.0.0.1:${port}/guide.html?view=pick&blank=1&lang=zh`, { waitUntil: 'domcontentloaded' });
+    await live.waitForSelector('.v4-schematic', { timeout: 20000 });
+    await live.waitForTimeout(1500);
+    assert.equal(await live.locator('#v4-map').getAttribute('data-map-kind'), 'svg');
+    assert.equal(liveErrors.length, 0);
+    await live.close();
   } finally {
     await browser.close();
     await new Promise(resolve => server.close(resolve));

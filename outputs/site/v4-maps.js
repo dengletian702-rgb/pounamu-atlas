@@ -21,16 +21,19 @@
   function schematicSvg(state) {
     const zh = state.lang !== 'en';
     const lineStops = (state.stops || []).filter(finite);
-    const pool = (state.candidates && state.candidates.length ? state.candidates : state.stops || []).filter(finite);
+    let pool = (state.candidates && state.candidates.length ? state.candidates : state.stops || []).filter(finite);
+    if (state.startId && !pool.some(p => p.id === state.startId)) {
+      const extra = lineStops.find(s => s.id === state.startId);
+      if (extra) pool = [extra, ...pool];
+    }
     const pts = lineStops.map(s => ({ ...s, xy: project(Number(s.lat), Number(s.lon)) }));
-    const startId = pts[0] && pts[0].id;
-    const endId = pts.length ? pts[pts.length - 1].id : '';
+    const endId = state.endId || (pts.length ? pts[pts.length - 1].id : '');
     const line = pts.length > 1 ? pts.map(p => p.xy.map(n => n.toFixed(1)).join(',')).join(' ') : '';
     const dots = pool.map(p => {
       const xy = project(Number(p.lat), Number(p.lon));
-      const label = zh ? (p.name_zh || p.name_en || p.id) : (p.name_en || p.name_zh || p.id);
-      const isStart = p.id === startId;
-      const isEnd = p.id === endId;
+      const label = zh ? (p.name_zh || p.name_en || '') : (p.name_en || p.name_zh || '');
+      const isStart = Boolean(state.startId) && p.id === state.startId;
+      const isEnd = Boolean(endId) && p.id === endId;
       const tag = isStart && isEnd ? (zh ? '起终' : 'Start/end') : isStart ? (zh ? '起' : 'S') : isEnd ? (zh ? '终' : 'E') : '';
       const cls = [
         'v4-map-stop',
@@ -55,7 +58,10 @@
       const toggle = () => { if (typeof state.onToggle === 'function') state.onToggle(node.dataset.place); };
       node.addEventListener('click', toggle);
       node.addEventListener('keydown', event => {
-        if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggle(); }
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          if (typeof state.onToggle === 'function') state.onToggle(node.dataset.place, 'key');
+        }
       });
     });
   }
@@ -69,7 +75,7 @@
     if (window.google && window.google.maps && window.google.maps.Map) return Promise.resolve(true);
     return new Promise(resolve => {
       const s = document.createElement('script');
-      const timer = setTimeout(() => { s.remove(); resolve(false); }, 8000);
+      const timer = setTimeout(() => { s.remove(); resolve(false); }, 4000);
       s.async = true;
       s.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}&v=weekly&libraries=marker`;
       s.onload = () => { clearTimeout(timer); resolve(Boolean(window.google && window.google.maps)); };
@@ -83,8 +89,19 @@
     el.replaceChildren();
     if (!key) return showSvg(el, state);
     let failed = false;
+    const onMapError = event => {
+      const file = String(event.filename || '');
+      const msg = String(event.message || '');
+      if (file.includes('maps.googleapis') || file.includes('maps.gstatic') || /google maps|invalidkey|gm_auth|getRootNode/i.test(msg)) {
+        event.preventDefault();
+        failed = true;
+        showSvg(el, state);
+      }
+    };
+    window.addEventListener('error', onMapError, true);
     window.gm_authFailure = () => { failed = true; showSvg(el, state); };
     const ok = await loadGoogle(key);
+    if (ok && !failed) await new Promise(resolve => setTimeout(resolve, 800));
     if (failed) return { kind: 'svg' };
     if (!ok || !window.google || !window.google.maps) return showSvg(el, state);
     try {
@@ -109,12 +126,12 @@
       pool.forEach(s => {
         const pos = { lat: Number(s.lat), lng: Number(s.lon) };
         bounds.extend(pos);
-        const title = (state.lang === 'en' ? s.name_en : s.name_zh) || s.id;
+        const title = (state.lang === 'en' ? (s.name_en || s.name_zh) : (s.name_zh || s.name_en)) || '';
         let marker;
         if (Marker) {
           const dot = document.createElement('div');
           dot.className = s.selected ? 'v4-g-dot is-on' : 'v4-g-dot';
-          dot.textContent = s.id === (state.stops && state.stops[0] && state.stops[0].id) ? 'S' : '';
+          dot.textContent = state.startId && s.id === state.startId ? (state.lang === 'en' ? 'S' : '起') : '';
           marker = new Marker({ map, position: pos, title, content: dot });
           marker.addListener('click', () => { if (typeof state.onToggle === 'function') state.onToggle(s.id); });
         } else {

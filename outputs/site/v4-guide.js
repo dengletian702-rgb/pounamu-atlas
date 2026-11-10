@@ -286,7 +286,7 @@
   }
 
   function blankDraft() {
-    return { templateId: '', title: '', requestedDays: 3, days: [], unscheduled: [], chosen: [], island: 'all', regions: [], hideVerify: false, view: 'pick', minimum: 0 };
+    return { templateId: '', title: '', requestedDays: 3, days: [], unscheduled: [], chosen: [], island: 'all', regions: [], hideVerify: false, view: 'pick', minimum: 0, edited: false };
   }
   function dayFromRoute(row) {
     return {
@@ -342,10 +342,20 @@
     });
     return { templateId: 'p10-tight', title: '', requestedDays: 9, days, unscheduled, chosen: days.map(d => d.placeId).filter(Boolean), island: 'south', regions: [], hideVerify: false, view: 'edit', minimum: plan.minimum, oneWay: false, p10Input: input };
   }
+  function placeForNode(node) {
+    if (!node) return null;
+    const zh = fold(node.zh);
+    const en = fold(node.en);
+    const list = towns();
+    return list.find(p => fold(p.name_zh) === zh || fold(p.name_en) === en)
+      || list.find(p => zh && fold(p.name_zh).startsWith(zh))
+      || list.find(p => en && fold(p.name_en).startsWith(en))
+      || null;
+  }
   function dayFromNode(d) {
     const nodes = window.P10_NODES || {};
     const node = nodes[d.at] || {};
-    const place = towns().find(p => fold(p.name_en) === fold(node.en) || fold(p.name_zh) === fold(node.zh));
+    const place = placeForNode(node);
     const legs = (d.legs || []).map(l => {
       const src = l.src || {};
       const date = src.checkedAt || '';
@@ -353,35 +363,82 @@
       const text = (l.h ? String(l.h) : '') + (l.km ? ' · ' + l.km + ' km' : '');
       return { text: text || (state.lang === 'en' ? 'planning estimate' : '规划估算'), kind, hasAbout: false, date };
     });
-    return { uid: uid(), placeId: place ? place.place_id : '', nodeId: d.at, from: '', to: node.en || d.at || '', via: '', parts: legs, notes: '', ferry: false, source_url: '', est_date: '', nameVerify: false, km: '', rawTime: '' };
+    return { uid: uid(), placeId: place ? place.place_id : '', nodeId: d.at, from: '', to: '', label_zh: (place && place.name_zh) || node.zh || '', label_en: (place && place.name_en) || node.en || '', via: '', parts: legs, notes: '', ferry: false, source_url: '', est_date: '', nameVerify: false, km: '', rawTime: '' };
   }
-  function loadDraft() {
-    const q = new URLSearchParams(location.search);
-    if (q.get('blank') === '1') return blankDraft();
-    if (q.get('demo') === 'tight') return draftFromTight();
-    if (q.get('template')) {
-      const draft = draftFromTemplate(q.get('template'));
-      if (q.get('view')) draft.view = q.get('view');
-      return draft;
-    }
-    if (q.get('add')) {
-      const d = blankDraft();
-      d.chosen = [q.get('add')];
-      d.view = 'pick';
-      const p = byId(q.get('add'));
-      if (p) d.days = [{ uid: uid(), placeId: p.place_id, from: '', to: p.name_en, via: '', parts: [], notes: '', ferry: false, source_url: p.source_url, est_date: '', nameVerify: /†|待核/.test(p.name_zh + p.name_en + (p.notes || '')), km: '', rawTime: '' }];
-      return d;
-    }
+  function savedDraft() {
     try {
       const saved = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null');
       if (saved && Array.isArray(saved.days)) return saved;
     } catch { /* keep going */ }
-    return draftFromTemplate('SI-09B');
+    return null;
+  }
+  function stripEntryParams() {
+    const q = new URLSearchParams(location.search);
+    let changed = false;
+    for (const key of ['template', 'add', 'blank', 'demo']) {
+      if (q.has(key)) { q.delete(key); changed = true; }
+    }
+    if (!changed) return;
+    const next = q.toString();
+    history.replaceState(null, '', location.pathname + (next ? '?' + next : ''));
+  }
+  function dayForPlace(p) {
+    return { uid: uid(), placeId: p.place_id, from: '', to: '', label_zh: p.name_zh || '', label_en: p.name_en || '', via: '', parts: [], notes: '', ferry: false, source_url: p.source_url || '', est_date: '', nameVerify: Boolean(p.verify), km: '', rawTime: '' };
+  }
+  function appendPlace(base, id) {
+    const draft = base && Array.isArray(base.days) ? base : blankDraft();
+    const p = byId(id);
+    if (!p) return draft;
+    const already = (draft.chosen || []).includes(p.place_id) || draft.days.some(d => d.placeId === p.place_id);
+    draft.pendingToast = already ? 'alreadyIn' : 'added';
+    if (already) return draft;
+    draft.edited = true;
+    draft.chosen = [...(draft.chosen || []), p.place_id];
+    draft.days = [...draft.days, dayForPlace(p)];
+    return draft;
+  }
+  function applyEntry() {
+    const q = new URLSearchParams(location.search);
+    const template = q.get('template');
+    const add = q.get('add');
+    const saved = savedDraft();
+    state.pendingTemplate = '';
+    if (template) {
+      if (saved && saved.edited) {
+        state.draft = saved;
+        state.pendingTemplate = template;
+        stripEntryParams();
+        return;
+      }
+      state.draft = draftFromTemplate(template);
+      state.draft.edited = false;
+      if (q.get('view')) state.draft.view = q.get('view');
+      stripEntryParams();
+      return;
+    }
+    if (add) {
+      state.draft = appendPlace(saved, add);
+      stripEntryParams();
+      return;
+    }
+    if (q.get('blank') === '1') {
+      state.draft = blankDraft();
+      if (q.get('view')) state.draft.view = q.get('view');
+      stripEntryParams();
+      return;
+    }
+    if (q.get('demo') === 'tight') {
+      state.draft = draftFromTight();
+      stripEntryParams();
+      return;
+    }
+    state.draft = saved || draftFromTemplate('SI-09B');
   }
   function persist() {
     try { localStorage.setItem(DRAFT_KEY, JSON.stringify(state.draft)); } catch { /* private mode */ }
   }
   function pushUndo() {
+    if (state.draft) state.draft.edited = true;
     state.undo.push(JSON.stringify(state.draft));
     if (state.undo.length > 20) state.undo.shift();
     state.redo = [];
@@ -390,8 +447,9 @@
     let el = document.querySelector('#v4-toast');
     if (!el) { el = document.createElement('div'); el.id = 'v4-toast'; el.className = 'v4-toast'; el.setAttribute('role', 'status'); document.body.appendChild(el); }
     el.innerHTML = `<span>${esc(message)}</span><button type="button" data-v4-undo>${esc(t('undo'))}</button>`;
+    el.onclick = event => { if (event.target.closest('[data-v4-undo]')) undo(); };
     clearTimeout(state.toastTimer);
-    state.toastTimer = setTimeout(() => { el.remove(); }, 7000);
+    state.toastTimer = setTimeout(() => { if (el.isConnected) el.remove(); }, 7000);
   }
   function undo() {
     if (!state.undo.length) return;
@@ -472,15 +530,34 @@
     }
     return html || `<p>${esc(t('noPlacesInRegion'))}</p>`;
   }
+  function placeFromLabel(label) {
+    const text = fold(label);
+    if (!text) return null;
+    const hits = towns().filter(p => {
+      const zh = fold(p.name_zh);
+      const en = fold(p.name_en);
+      return (zh && text.includes(zh)) || (en && text.includes(en));
+    });
+    hits.sort((a, b) => Math.max(fold(b.name_zh).length, fold(b.name_en).length) - Math.max(fold(a.name_zh).length, fold(a.name_en).length));
+    return hits[0] || null;
+  }
+  function mapPoint(p) {
+    if (!p || p.lat == null || p.lon == null) return null;
+    return { id: p.place_id, lat: p.lat, lon: p.lon, name_zh: p.name_zh, name_en: p.name_en, selected: true };
+  }
   function mapStops() {
     const stops = [];
+    const origin = placeFromLabel(state.draft.days[0] && state.draft.days[0].from);
+    const originPoint = mapPoint(origin);
+    if (originPoint) stops.push(originPoint);
     for (const day of state.draft.days) {
       const p = byId(day.placeId);
-      if (p && p.lat != null && p.lon != null) stops.push({ id: p.place_id, lat: p.lat, lon: p.lon, name_zh: p.name_zh, name_en: p.name_en, selected: true });
+      const point = mapPoint(p);
+      if (point && !(stops.length === 1 && stops[0].id === point.id)) stops.push(point);
       else if (day.nodeId && window.P10_NODES && window.P10_NODES[day.nodeId] && window.P10_NODES[day.nodeId].at) {
         const at = window.P10_NODES[day.nodeId].at;
         const node = window.P10_NODES[day.nodeId];
-        stops.push({ id: day.nodeId, lat: at[0], lon: at[1], name_zh: node.zh, name_en: node.en, selected: true });
+        stops.push({ id: day.nodeId, lat: at[0], lon: at[1], name_zh: node.zh || '', name_en: node.en || '', selected: true });
       }
     }
     return stops;
@@ -507,7 +584,9 @@
     const days = state.draft.days;
     return days.map((day, i) => {
       const p = byId(day.placeId);
-      const title = p ? nameOf(p) : (day.to || day.nodeId || t('dayN', { n: i + 1 }));
+      const title = state.lang === 'en'
+        ? (day.label_en || (p && p.name_en) || '')
+        : (day.label_zh || (p && p.name_zh) || '');
       const verify = (day.nameVerify || (p && p.verify)) && !state.draft.hideVerify ? ` <span class="v4-badge">${esc(t('verifyBadge'))}</span>` : '';
       const via = day.via ? `<p>${esc(day.via)}${/†|待核/.test(day.via) ? ` <span class="v4-badge">${esc(t('verifyBadge'))}</span>` : ''}</p>` : '';
       const pace = /超过\s*5|接近\/超过5|≥\s*5|4–5h|5h/.test(`${day.notes} ${day.rawTime}`) ? `<p class="v4-alert">${esc(t('paceAlert'))}</p>` : '';
@@ -524,7 +603,10 @@
         ${via}${legHtml(day)}${ferry}${pace}
         ${day.notes && !state.draft.hideVerify ? `<p class="v4-note">${esc(day.notes)}</p>` : ''}
       </article>`;
-    }).join('') + ((state.draft.unscheduled || []).length ? `<section class="v4-day v4-unscheduled"><h3>${esc(t('unscheduled'))}</h3><ul>${state.draft.unscheduled.map(item => `<li>${esc(state.lang === 'en' ? (item.label_en || item) : (item.label_zh || item))}</li>`).join('')}</ul></section>` : '');
+    }).join('') + ((state.draft.unscheduled || []).length ? `<section class="v4-unscheduled"><h3>${esc(t('unscheduled'))}</h3><ul>${state.draft.unscheduled.map(item => {
+      const label = state.lang === 'en' ? (item.label_en || item.label_zh || '') : (item.label_zh || item.label_en || '');
+      return label ? `<li>${esc(label)}</li>` : '';
+    }).join('')}</ul></section>` : '');
   }
   function tightBlock() {
     const min = Number(state.draft.minimum) || state.draft.days.length;
@@ -576,8 +658,27 @@
         </aside>
       </div>`;
     const mapEl = host.querySelector('#v4-map');
-    if (window.PounamuMaps) window.PounamuMaps.mount(mapEl, { lang: state.lang, stops: mapStops(), candidates: mapCandidates(), onToggle: id => togglePlace(id) });
+    const stops = mapStops();
+    const last = state.draft.days[state.draft.days.length - 1];
+    if (window.PounamuMaps) window.PounamuMaps.mount(mapEl, {
+      lang: state.lang,
+      stops,
+      candidates: mapCandidates(),
+      startId: stops[0] && stops[0].id,
+      endId: last && last.placeId,
+      onToggle: (id, how) => { if (how === 'key') state.focusPlace = id; togglePlace(id); },
+    });
     bindGuide(host);
+    if (state.focusDay != null) {
+      const card = host.querySelector(`.v4-day[data-index="${state.focusDay}"]`);
+      if (card) card.focus();
+      state.focusDay = null;
+    }
+    if (state.focusPlace) {
+      const node = host.querySelector(`[data-place="${CSS.escape(state.focusPlace)}"]`);
+      if (node) node.focus();
+      state.focusPlace = '';
+    }
   }
   function togglePlace(id) {
     pushUndo();
@@ -599,6 +700,7 @@
     days.splice(to, 0, item);
     persist();
     toast(t('toastMoved'));
+    state.focusDay = to;
     renderGuide();
   }
   function bindGuide(host) {
@@ -824,8 +926,37 @@
         <h3>${esc(t('sportsBlock'))}</h3>${sport ? `<p><a href="city.html?id=${esc(sport.id)}&amp;lang=${state.lang}">${esc(t('openSports'))}</a></p>` : `<p><a href="cities.html?lang=${state.lang}">${esc(t('openSports'))}</a></p>`}
         <h3>${esc(t('routeBlock'))}</h3><p><a href="routes.html?island=${town.island}&amp;lang=${state.lang}">${esc(t('readGuide'))}</a></p>
       </section>
-      <section class="v4-block" id="links"><h2>${esc(t('officialLinks'))}</h2>${[town, ...visible].filter(k => k.source_url).slice(0, 12).map(k => safeHttp(k.source_url) ? `<p><a href="${esc(k.source_url)}" target="_blank" rel="noopener noreferrer">${esc(nameOf(k))}</a>${k.summary_accessed ? ' · ' + esc(k.summary_accessed) : ''}</p>` : `<p>${esc(nameOf(k))} · ${esc(t('sourceToVerify'))}</p>`).join('')}</section>`;
+      <section class="v4-block" id="links"><h2>${esc(t('officialLinks'))}</h2>${[town, ...visible].filter(k => k.source_url).slice(0, 12).map(k => safeHttp(k.source_url) ? `<p><a href="${esc(k.source_url)}" target="_blank" rel="noopener noreferrer">${esc(nameOf(k))}</a>${k.summary_accessed ? ' · ' + esc(k.summary_accessed) : ''}</p>` : `<p>${esc(nameOf(k))} · ${esc(t('sourceToVerify'))}</p>`).join('')}</section>
+      ${town.lat != null && town.lon != null ? `<section class="v4-block" id="place-map"><h2>${esc(t('viewMap'))}</h2><div id="v4-dest-map"></div><p class="v4-note">${esc(t('noKeyNote'))}</p><p class="v4-note"><a href="https://www.openstreetmap.org/copyright">${esc(t('osmCredit'))}</a> · ODbL</p></section>` : ''}`;
     document.title = nameOf(town) + ' — 绿石之地 · Pounamu Atlas';
+    const mapEl = host.querySelector('#v4-dest-map');
+    if (mapEl && window.PounamuMaps) {
+      window.PounamuMaps.mount(mapEl, {
+        lang: state.lang,
+        stops: [{ id: town.place_id, lat: town.lat, lon: town.lon, name_zh: town.name_zh, name_en: town.name_en, selected: true }],
+        candidates: [],
+      });
+    }
+  }
+  function openReplace(templateId) {
+    const item = (state.catalog.templates || []).find(row => row.id === templateId);
+    const name = item ? (state.lang === 'en' ? item.title_en : item.title_zh) : templateId;
+    const modal = document.createElement('div');
+    modal.className = 'v4-modal';
+    modal.innerHTML = `<article role="dialog" aria-modal="true"><h2>${esc(t('replaceTitle'))}</h2><p>${esc(t('replaceBody', { name }))}</p><div class="v4-actions"><button type="button" data-do-replace>${esc(t('replaceYes'))}</button><button type="button" data-keep>${esc(t('replaceNo'))}</button></div></article>`;
+    document.body.appendChild(modal);
+    modal.querySelector('[data-keep]').focus();
+    modal.addEventListener('click', event => {
+      if (event.target.closest('[data-keep]')) { modal.remove(); return; }
+      if (!event.target.closest('[data-do-replace]')) return;
+      pushUndo();
+      state.draft = draftFromTemplate(templateId);
+      state.draft.edited = false;
+      persist();
+      modal.remove();
+      renderGuide();
+      toast(t('replacedTrip'));
+    });
   }
 
   window.v4TrackMatches = function (track, query) {
@@ -846,9 +977,19 @@
     if (headerLang) headerLang.textContent = t('switchLang');
     if (document.querySelector('#v4-search')) renderSearch();
     if (document.querySelector('#v4-app')) {
-      if (!state.draft) state.draft = loadDraft();
+      if (!state.draft) applyEntry();
       persist();
       await renderGuide();
+      if (state.draft && state.draft.pendingToast) {
+        toast(state.draft.pendingToast === 'alreadyIn' ? t('alreadyInTrip') : t('toastAdded'));
+        delete state.draft.pendingToast;
+        persist();
+      }
+      if (state.pendingTemplate) {
+        const next = state.pendingTemplate;
+        state.pendingTemplate = '';
+        openReplace(next);
+      }
     }
     if (document.querySelector('#v4-destination')) await renderDestination();
     if (document.body.dataset.page === 'tracks') {

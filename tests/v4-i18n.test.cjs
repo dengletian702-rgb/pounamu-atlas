@@ -16,7 +16,7 @@ test('every new interface string has both zh and en', () => {
     assert.ok(row.en.trim(), key + ' en');
   }
   const planner = fs.readFileSync(path.join(__dirname, '../docs/p10-planner.js'), 'utf8');
-  for (const line of ['排不下的地点在「未安排」里', 'Places that do not fit are under Unscheduled', '减点或换点', 'Remove or swap a place', '把天数改成', 'Change to', '未安排', 'Unscheduled']) {
+  for (const line of ['排不下的地点在「未安排」里', 'Places that do not fit are under Unscheduled', '减点或换点', 'Remove or swap a place', '把天数改成', 'Change to', '未安排', 'Unscheduled', '行程结束在', 'has not reached', '估算约']) {
     assert.ok(planner.includes(line), line);
   }
 });

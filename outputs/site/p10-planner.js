@@ -459,12 +459,18 @@ function p10Present(plan){
   const tight = Boolean(plan && plan.input && plan.minimum > selected);
   const days = tight ? full.slice(0, selected).map((d, i) => ({ ...d, n: i + 1 })) : full;
   const scheduled = new Set();
-  for (const d of days) for (const a of d.activities || []) if (a.wish) scheduled.add(a.wish.id);
+  const visited = new Set();
+  for (const d of days) {
+    if (d.at) visited.add(d.at);
+    for (const leg of d.legs || []) { visited.add(leg.a); visited.add(leg.b); }
+    for (const a of d.activities || []) if (a.wish) scheduled.add(a.wish.id);
+  }
   const unscheduled = [];
   const seenWish = new Set();
   if (tight) {
-    for (const d of full.slice(selected)) for (const a of d.activities || []) {
-      if (!a.wish || scheduled.has(a.wish.id) || seenWish.has(a.wish.id)) continue;
+    for (const d of full) for (const a of d.activities || []) {
+      if (!a.wish || seenWish.has(a.wish.id)) continue;
+      if (scheduled.has(a.wish.id) || visited.has(a.wish.base)) { scheduled.add(a.wish.id); continue; }
       seenWish.add(a.wish.id);
       unscheduled.push({ id: a.wish.id, en: a.wish.en, zh: a.wish.zh, base: a.wish.base });
     }
@@ -490,6 +496,32 @@ function p10Present(plan){
     warning: tight ? { minimum: plan.minimum, selected, suggestions: ['drop-or-swap', 'add-days', 'switch-template'] } : null,
   };
 }
+function p10Removable(plan, present) {
+  const end = plan && plan.input && plan.input.end;
+  return (present && present.unscheduled || []).filter(w => w && w.id !== end && w.base !== end);
+}
+function p10ShortfallNote(plan, present, lang) {
+  const days = present && present.days || [];
+  const last = days[days.length - 1];
+  const end = plan && plan.input && plan.input.end;
+  if (!last || !end || last.at === end || !(plan.minimum > plan.input.days)) return '';
+  const here = NODES[last.at], goal = NODES[end];
+  if (!here || !goal) return '';
+  const zh = lang !== 'en';
+  const net = p10Net(plan.input.car !== false);
+  const legs = net.path(last.at, end);
+  let extra = '';
+  if (legs && legs.length) {
+    const hours = legs.reduce((sum, leg) => sum + leg.h, 0);
+    const km = legs.reduce((sum, leg) => sum + (Number(leg.km) || 0), 0);
+    extra = zh
+      ? `（估算约 ${p10Duration(hours, 'zh')}${km ? '，' + km + ' km' : ''}）`
+      : ` (estimate, about ${p10Duration(hours, 'en')}${km ? ', ' + km + ' km' : ''})`;
+  }
+  return zh
+    ? `行程结束在${here.zh}，还没到${goal.zh}${extra}。`
+    : `The trip ends in ${here.en} and has not reached ${goal.en}${extra}.`;
+}
 function p10AlongWay(plan){
   if(plan.disconnected || plan.minimum>plan.input.days || !plan.spare) return [];
   const routeNodes=new Set(plan.days.flatMap(d=>d.legs.flatMap(l=>[l.a,l.b])));
@@ -511,7 +543,7 @@ function p10BreakStops(day){
   const priority=['haast','wanaka','arthurs-pass','hokitika'];
   return [...stops].sort((a,b)=>{const ai=priority.indexOf(a),bi=priority.indexOf(b);return (ai<0?100:ai)-(bi<0?100:bi);}).slice(0,2);
 }
-if (typeof module !== 'undefined' && module.exports) module.exports={p10Plan,p10Timeline,p10Present,p10AlongWay,p10Duration,p10DailyTime,p10BreakStops,p10Net,p10Suggestions,p10LegDescription,p10JevIsland,p10JevRouteName,P10_WISH_TIPS,P10_WISH_GUIDES,NODES,WISHES};
+if (typeof module !== 'undefined' && module.exports) module.exports={p10Plan,p10Timeline,p10Present,p10Removable,p10ShortfallNote,p10AlongWay,p10Duration,p10DailyTime,p10BreakStops,p10Net,p10Suggestions,p10LegDescription,p10JevIsland,p10JevRouteName,P10_WISH_TIPS,P10_WISH_GUIDES,NODES,WISHES};
 globalThis.P10_NODES = NODES;
 
   if (typeof window !== 'undefined') {
@@ -538,7 +570,7 @@ globalThis.P10_NODES = NODES;
   window.P10_COAST_PATH = P10_COAST;
   const P10_DAY_COLORS=['#b44e2d','#225a4b','#9b5c1d','#4d5c8a','#8c3862','#446e28','#8b501b','#315d71','#944c40','#605292','#46695e','#a13e2e'];
   const p10MapPoint=id=>{const at=NODES[id]?.at;if(!at)return null;return [392.5+(at[1]-174.76)*38.05,189.7+(-at[0]-36.85)*50.5]};
-  function p10TripMap(days){
+  function p10TripMap(days, startId){
     const zh=p10Lang()==='zh', dots=new Map();
     const lines=days.map(d=>{const ids=d.legs.length?[d.legs[0].a,...d.legs.map(l=>l.b)]:[d.at],coords=ids.map(p10MapPoint).filter(Boolean),color=P10_DAY_COLORS[(d.n-1)%P10_DAY_COLORS.length];
       ids.forEach(id=>{if(!dots.has(id)&&p10MapPoint(id))dots.set(id,p10MapPoint(id))});
@@ -548,7 +580,8 @@ globalThis.P10_NODES = NODES;
     }).join('');
     const names=[...dots].map(([id,p])=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2.5"><title>${p10Esc(p10Name(id))}</title></circle>`).join('')+(p10View&&p10View.unscheduled||[]).map(w=>{const p=p10MapPoint(w.base);if(!p||dots.has(w.base))return '';return `<circle class="p10-unscheduled-dot" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="6"><title>${p10Esc((zh?w.zh:w.en)||p10Name(w.base))}</title></circle>`;}).join('');
     const selectors=days.map(d=>`<button type="button" data-p10-map-day="${d.n}" aria-pressed="false" style="--day-color:${P10_DAY_COLORS[(d.n-1)%P10_DAY_COLORS.length]}">${zh?'第 '+d.n+' 天':'Day '+d.n}</button>`).join('');
-    return `<section class="p10-map-panel" id="p10-trip-map" aria-label="${zh?'行程地图':'Itinerary map'}"><div class="p10-map-heading"><div><p>${zh?'逐日路线':'DAY BY DAY'}</p><h2>${zh?'行程地图':'Your trip map'}</h2></div><p>${zh?'选择某一天，查看当天经过的地点。':'Choose a day to focus on its stops.'}</p></div><div class="p10-map-day-list" aria-label="${zh?'选择日期':'Choose a day'}"><button type="button" data-p10-map-day="all" aria-pressed="true">${zh?'全部':'All days'}</button>${selectors}</div><p class="p10-map-selection" role="status" aria-live="polite">${zh?'显示全部行程地点':'Showing all itinerary stops'}</p><svg class="p10-trip-svg" viewBox="0 0 680 820" role="img" aria-label="${zh?'行程地点与每日路段示意图':'Schematic map of itinerary stops and daily connections'}"><rect width="680" height="820" fill="#e2ece8"/><path class="p10-coast" d="${P10_COAST}"/><g class="p10-map-lines">${lines}</g><g class="p10-map-dots">${names}</g></svg><p class="p10-map-note">${zh?'地点之间的连线为示意，不能用于导航。':'Connections between places are schematic, not for navigation.'} <a href="https://www.naturalearthdata.com/about/terms-of-use/" target="_blank" rel="noopener noreferrer">Natural Earth</a> · ${zh?'海岸线包含取自':'Coastline contains data sourced from the'} <a href="https://data.linz.govt.nz/layer/51153-nz-coastlines-and-islands-polygons-topo-150k/" target="_blank" rel="noopener noreferrer">LINZ Data Service</a> ${zh?'并按':'licensed for reuse under'} <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>${zh?' 许可再利用的数据':''}</p></section>`;
+    const startAt=p10MapPoint(startId), startTag=startAt?`<text class="p10-map-tag" x="${startAt[0].toFixed(1)}" y="${(startAt[1]-10).toFixed(1)}" text-anchor="middle">${zh?'起':'S'}</text>`:'';
+    return `<section class="p10-map-panel" id="p10-trip-map" aria-label="${zh?'行程地图':'Itinerary map'}"><div class="p10-map-heading"><div><p>${zh?'逐日路线':'DAY BY DAY'}</p><h2>${zh?'行程地图':'Your trip map'}</h2></div><p>${zh?'选择某一天，查看当天经过的地点。':'Choose a day to focus on its stops.'}</p></div><div class="p10-map-day-list" aria-label="${zh?'选择日期':'Choose a day'}"><button type="button" data-p10-map-day="all" aria-pressed="true">${zh?'全部':'All days'}</button>${selectors}</div><p class="p10-map-selection" role="status" aria-live="polite">${zh?'显示全部行程地点':'Showing all itinerary stops'}</p><svg class="p10-trip-svg" viewBox="0 0 680 820" role="img" aria-label="${zh?'行程地点与每日路段示意图':'Schematic map of itinerary stops and daily connections'}"><rect width="680" height="820" fill="#e2ece8"/><path class="p10-coast" d="${P10_COAST}"/><g class="p10-map-lines">${lines}</g><g class="p10-map-dots">${names}${startTag}</g></svg><p class="p10-map-note">${zh?'地点之间的连线为示意，不能用于导航。':'Connections between places are schematic, not for navigation.'} <a href="https://www.naturalearthdata.com/about/terms-of-use/" target="_blank" rel="noopener noreferrer">Natural Earth</a> · ${zh?'海岸线包含取自':'Coastline contains data sourced from the'} <a href="https://data.linz.govt.nz/layer/51153-nz-coastlines-and-islands-polygons-topo-150k/" target="_blank" rel="noopener noreferrer">LINZ Data Service</a> ${zh?'并按':'licensed for reuse under'} <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>${zh?' 许可再利用的数据':''}</p></section>`;
   }
   function p10FocusDay(day){
     const panel=p10$('#p10-trip-map'),svg=panel?.querySelector('.p10-trip-svg');if(!svg)return;
@@ -568,9 +601,11 @@ globalThis.P10_NODES = NODES;
     if(result.disconnected){el.innerHTML=`<p class="p10-warning">${x.disconnected}</p>`;return;}
     const notices=[];
     if(result.minimum>result.input.days){
-      const f=result.fits,dropped=f?f.dropped.map(w=>p10Esc(w[p10Lang()])).join(zh?'、':', '):'';
+      const early=p10Present(result);
+      const removable=p10Removable(result, early);
+      const dropped=removable.map(w=>p10Esc(w[p10Lang()])).join(zh?'、':', ');
       const more=result.minimum<=21?`<button type="button" class="p10-add-stop" data-p10-days="${result.minimum}">${zh?`把天数改成 ${result.minimum}`:`Change to ${result.minimum} days`}</button>`:'';
-      const trim=f&&f.dropped.length&&f.dropped.length<result.order.length?`<button type="button" class="p10-add-stop" data-p10-trim="1">${zh?`减点或换点（去掉${dropped}）`:`Remove or swap a place (drop ${dropped})`}</button>`:`<button type="button" class="p10-add-stop" data-p10-edit="1">${zh?'减点或换点':'Remove or swap a place'}</button>`;
+      const trim=removable.length?`<button type="button" class="p10-add-stop" data-p10-trim="1" data-p10-drop="${p10Esc(removable.map(w=>w.id).join(','))}">${zh?`减点或换点（去掉${dropped}）`:`Remove or swap a place (drop ${dropped})`}</button>`:`<button type="button" class="p10-add-stop" data-p10-edit="1">${zh?'减点或换点':'Remove or swap a place'}</button>`;
       const tmpl=`<a class="p10-add-stop" href="guide.html?template=SI-09B&amp;lang=${p10Lang()}">${zh?'改选线路模板':'Switch route template'}</a>`;
       notices.push(`<div class="p10-tight" role="alert"><p class="p10-warning">${zh?`这些地方至少需要约 ${result.minimum} 天，你选了 ${result.input.days} 天。下面是这 ${result.input.days} 天，排不下的地点在「未安排」里，没有自动删点。`:`These places need about ${result.minimum} days; you chose ${result.input.days}. These ${result.input.days} days are shown below. Places that do not fit are under Unscheduled, and nothing was removed for you.`}</p><div class="p10-along">${trim} ${more} ${tmpl}</div></div>`);
     }
@@ -604,7 +639,8 @@ globalThis.P10_NODES = NODES;
     const reco=recoName?`<p>${x.reco}：<a href="route.html?id=${encodeURIComponent(p10Recommendation)}&amp;lang=${p10Lang()}">${p10Esc(recoName)}</a></p>`:'';
     const uns=p10View.unscheduled||[];
     const unsHtml=uns.length?`<section class="p10-unscheduled"><h3>${zh?'未安排':'Unscheduled'}</h3><ul>${uns.map(w=>`<li>${p10Esc(zh?w.zh:w.en)}</li>`).join('')}</ul></section>`:'';
-    el.innerHTML=`${notices.join('')}${unsHtml}${reco}${p10TripMap(timeline)}${rows}<p class="planner-small"><strong>${zh?'路段时间和里程都是估算值':'Segment times and distances are estimates'}</strong>${zh?`：自驾时间是 ${P10_NZTA_DATE} 在 NZTA Journey Planner 逐段查询的读数（含查询当时的路况），取整到 15 分钟，不含停留；NZTA 不显示里程，里程仍是规划估算。巴士、火车和渡轮时间是估算，以运营商时刻表为准。出发前请在下列官方来源核对。`:`: driving times are readings taken segment by segment in NZTA Journey Planner on ${P10_NZTA_DATE} (with the traffic at that moment), rounded to 15 minutes, without stops; NZTA shows no distances, so km are planning estimates. Coach, train and ferry times are estimates; check the operator's timetable. Check the official sources below before you go.`} ${x.sources}: ${(globalThis.P10_ROAD_SOURCES||[]).map(r=>`<a href="${r.url}" target="_blank" rel="noopener noreferrer">${p10Esc(r.label)}</a>`).join(' · ')}</p>`;
+    const shortfall=p10ShortfallNote(result, {days: timeline}, p10Lang());
+    el.innerHTML=`${notices.join('')}${unsHtml}${reco}${p10TripMap(timeline, result.input && result.input.start)}${rows}${shortfall?`<p class="p10-warning p10-shortfall">${p10Esc(shortfall)}</p>`:''}<p class="planner-small"><strong>${zh?'路段时间和里程都是估算值':'Segment times and distances are estimates'}</strong>${zh?`：自驾时间是 ${P10_NZTA_DATE} 在 NZTA Journey Planner 逐段查询的读数（含查询当时的路况），取整到 15 分钟，不含停留；NZTA 不显示里程，里程仍是规划估算。巴士、火车和渡轮时间是估算，以运营商时刻表为准。出发前请在下列官方来源核对。`:`: driving times are readings taken segment by segment in NZTA Journey Planner on ${P10_NZTA_DATE} (with the traffic at that moment), rounded to 15 minutes, without stops; NZTA shows no distances, so km are planning estimates. Coach, train and ferry times are estimates; check the operator's timetable. Check the official sources below before you go.`} ${x.sources}: ${(globalThis.P10_ROAD_SOURCES||[]).map(r=>`<a href="${r.url}" target="_blank" rel="noopener noreferrer">${p10Esc(r.label)}</a>`).join(' · ')}</p>`;
     p10FocusDay('all');
   }
   const P10_WISH_REGION={christchurch:'christchurch-canterbury',nelson:'nelson-tasman',picton:'marlborough',tekapo:'christchurch-canterbury',aoraki:'christchurch-canterbury',wanaka:'wanaka',queenstown:'queenstown',milford:'fiordland','te-anau':'fiordland',glaciers:'west-coast',haast:'west-coast',hokitika:'west-coast',punakaiki:'west-coast','arthurs-pass':'christchurch-canterbury',kaikoura:'christchurch-canterbury','abel-tasman':'nelson-tasman',akaroa:'christchurch-canterbury',dunedin:'dunedin',oamaru:'dunedin',catlins:'clutha',stewart:'southland',auckland:'auckland','bay-of-islands':'northland-bay-of-islands',coromandel:'coromandel',hobbiton:'hamilton-waikato',waitomo:'hamilton-waikato',rotorua:'rotorua',taupo:'taupo',tongariro:'ruapehu',napier:'hawkes-bay',wellington:'wellington',taranaki:'taranaki'};
@@ -677,7 +713,8 @@ globalThis.P10_NODES = NODES;
       }
       const more=event.target.closest('[data-p10-days]'),trim=event.target.closest('[data-p10-trim]');
       if((more||trim)&&p10Result){
-        const input=more?{...p10Result.input,days:Number(more.dataset.p10Days)}:{...p10Result.input,wishes:p10Result.fits.keep};
+        const drop=new Set(trim?(trim.dataset.p10Drop||'').split(',').filter(Boolean):[]);
+        const input=more?{...p10Result.input,days:Number(more.dataset.p10Days)}:{...p10Result.input,wishes:p10Result.input.wishes.filter(id=>!drop.has(id))};
         if(more)p10$('#days').value=String(input.days);
         if(trim)for(const box of form.querySelectorAll('[name=p10-wish]'))box.checked=input.wishes.includes(box.value);
         try{p10Result=p10Plan(input);localStorage.setItem('p10-road-plan',JSON.stringify(input));p10Show(p10Result);p10Status('');}catch{p10Status(p10Lang()==='zh'?'请检查出发地、终点和天数。':'Check the start, destination and days.');}

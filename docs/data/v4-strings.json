@@ -137,6 +137,7 @@
   "namePending": { "zh": "没有中文名，显示 DOC 英文名。", "en": "No Chinese name; the DOC English name is shown." },
   "sourceToVerify": { "zh": "来源待核", "en": "Source to verify" },
   "adaptedFrom": { "zh": "依据 newzealand.com 行程改编", "en": "Adapted from a newzealand.com itinerary" },
+  "nzPage": { "zh": "newzealand.com 原页 ↗", "en": "newzealand.com page ↗" },
   "accessedOn": { "zh": "访问日期", "en": "Accessed" },
   "switchLang": { "zh": "EN", "en": "中文" },
   "homeCrumb": { "zh": "首页", "en": "Home" },

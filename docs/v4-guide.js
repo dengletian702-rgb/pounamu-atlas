@@ -246,10 +246,13 @@
     return `<article class="v4-card" data-template="${esc(item.id)}"><p>${badge ? `<span class="v4-badge">${esc(badge)}</span>` : ''}<span class="v4-badge">${esc(item.id)}</span> ${esc(String(item.stated_days || item.day_count))} · ${esc(t('actDrive'))}</p><h3>${esc(title)}</h3><p>${esc(blurb)}</p>${item.oneWay ? `<p>${esc(t('oneWayNote'))}</p>` : ''}${nzCredit(item)}<div class="v4-actions"><a href="guide.html?template=${esc(item.id)}&amp;lang=${state.lang}">${esc(t('openEdit'))}</a></div></article>`;
   }
   function nzCredit(item) {
-    const url = item && item.nz_source_url;
-    if (!url || !/^https?:\/\//i.test(url)) return '';
-    const date = item.nz_accessed || '';
-    return `<p class="v4-note">${esc(t('adaptedFrom'))} · <a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(url)}</a>${date ? ' · ' + esc(t('accessedOn')) + ' ' + esc(date) : ''}</p>`;
+    const listed = item && Array.isArray(item.nz_sources) && item.nz_sources.length
+      ? item.nz_sources
+      : (item && item.nz_source_url ? [{ url: item.nz_source_url, accessed: item.nz_accessed || '' }] : []);
+    const links = listed.filter(row => row && /^https?:\/\//i.test(row.url) && /newzealand\.com/i.test(row.url));
+    if (!links.length) return '';
+    const rows = links.map(row => `<li><a href="${esc(row.url)}" target="_blank" rel="noopener noreferrer">${esc(t('nzPage'))}</a>${row.accessed ? ' · ' + esc(t('accessedOn')) + ' ' + esc(row.accessed) : ''}</li>`).join('');
+    return `<p class="v4-note">${esc(t('adaptedFrom'))}</p><ul class="v4-nz-sources">${rows}</ul>`;
   }
   function cardPlace(p) {
     return `<article class="v4-card"><h3>${esc(nameOf(p))} ${esc(state.lang === 'en' ? p.name_zh : p.name_en)}</h3><p>${esc(p.island === 'north' ? t('islandNorth') : t('islandSouth'))} · ${esc(p.atlas_region)}</p><div class="v4-actions"><a href="destination.html?id=${esc(p.place_id)}&amp;lang=${state.lang}">${esc(t('viewDest'))}</a><a class="v4-alt" href="guide.html?add=${esc(p.place_id)}&amp;lang=${state.lang}">${esc(t('addToTrip'))}</a></div></article>`;
@@ -322,6 +325,7 @@
       oneWay: Boolean(item.oneWay),
       nz_source_url: item.nz_source_url || '',
       nz_accessed: item.nz_accessed || '',
+      nz_sources: Array.isArray(item.nz_sources) ? item.nz_sources : [],
     };
   }
   function draftFromTight() {

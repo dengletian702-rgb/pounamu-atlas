@@ -319,9 +319,17 @@ function importRoutes(text, placesById) {
       blurb_en: 'Overnights follow the order in the route table.',
       aliases: [],
     };
-    const nz = days.map(d => d.source_url).find(url => /newzealand\.com/i.test(url || ''));
-    const accessed = (days.find(d => d.source_url === nz) || {}).est_date || '';
-    templates.push({ id, ...meta, day_count: days.length, stated_days: days[0] ? days[0].days : days.length, days, nz_source_url: nz || '', nz_accessed: nz ? accessed : '' });
+    const nzSources = [];
+    const seenNz = new Set();
+    for (const day of days) {
+      const url = day.source_url || '';
+      if (!/newzealand\.com/i.test(url) || seenNz.has(url)) continue;
+      seenNz.add(url);
+      nzSources.push({ url, accessed: day.est_date || '' });
+    }
+    const nz = nzSources[0] ? nzSources[0].url : '';
+    const accessed = nzSources[0] ? nzSources[0].accessed : '';
+    templates.push({ id, ...meta, day_count: days.length, stated_days: days[0] ? days[0].days : days.length, days, nz_source_url: nz, nz_accessed: accessed, nz_sources: nzSources });
   }
   templates.sort((a, b) => a.id.localeCompare(b.id));
   return { rows, count: rows.length, templates, missing };

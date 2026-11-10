@@ -35,7 +35,7 @@ test('generated pages and data do not keep the old Chinese names', () => {
 test('every town Chinese overview avoids Latin region names', () => {
   const places = importPlaces(fs.readFileSync(path.join(__dirname, '../inputs/atlas/places-v2.csv'), 'utf8'));
   const towns = places.rows.filter(row => row.type === 'town');
-  assert.equal(towns.length, 49);
+  assert.equal(towns.length, 57);
   for (const town of towns) {
     const region = TNZ_REGIONS.find(item => item.id === town.region_id);
     assert.ok(region, town.place_id);

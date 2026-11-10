@@ -62,6 +62,8 @@
   async function ensureData() {
     if (!state.strings) state.strings = await loadJson('data/v4-strings.json');
     if (!state.catalog) state.catalog = await loadJson('data/v4-catalog.json');
+    window.P10_CATALOG_TOWNS = (state.catalog.places || []).filter(p => p.type === 'town');
+    if (typeof window.renderP10Planner === 'function') window.renderP10Planner();
   }
 
   function mountNav() {
@@ -219,12 +221,15 @@
       const clear = event.target.closest('[data-v4-clear]');
       if (clear) { writeSearch({ q: readSearch().q, scope: 'all', days: 'any', exact: '', activity: 'all' }, true); renderSearch(); }
       const south = event.target.closest('[data-v4-south]');
-      if (south) { writeSearch({ island: 'south', days: '7-10', activity: 'drive', scope: 'itineraries', exact: '' }, true); renderSearch(); }
+      if (south) { writeSearch({ q: '', island: 'south', days: '7-10', activity: 'drive', scope: 'itineraries', exact: '' }, true); renderSearch(); }
     });
   }
   function renderResultCards(templates, places, guides, nine, empty, filters) {
     if (empty) {
-      const unrelated = (state.catalog.templates || []).filter(item => item.id === 'SI-07A' || item.id === 'NI-01').slice(0, 3);
+      const pool = state.catalog.templates || [];
+      const unrelated = filters.island === 'north'
+        ? pool.filter(item => String(item.id).startsWith('NI')).slice(0, 2)
+        : ['SI-09B', 'SI-07A'].map(id => pool.find(item => item.id === id)).filter(Boolean);
       return `<div class="v4-alert"><h3>${esc(t('noResults', { q: filters.q }))}</h3><p>${esc(t('noResultsWhy'))}</p>
         <div class="v4-actions"><button type="button" data-v4-clear>${esc(t('clearFilters'))}</button>
         <button type="button" data-v4-south>${esc(t('seeSouth'))}</button>
@@ -233,8 +238,17 @@
         <p class="v4-note">${esc(t('unrelated'))}</p>${unrelated.map(cardTemplate).join('')}`;
     }
     const cards = [];
-    if (!filters.q && filters.scope !== 'destinations') cards.push(...(state.catalog.templates || []).filter(item => daysOk(item.stated_days || item.day_count, filters.days, filters.exact) && (filters.activity === 'all' || item.activity === filters.activity) && (filters.island === 'all' || (filters.island === 'south' ? String(item.id).startsWith('SI') : String(item.id).startsWith('NI')))).map(item => cardTemplate(item)));
-    else cards.push(...templates.map(item => cardTemplate(item, nine && item.id === 'SI-09A')));
+    if (!filters.q && filters.scope !== 'destinations') {
+      const pool = (state.catalog.templates || []).filter(item => daysOk(item.stated_days || item.day_count, filters.days, filters.exact) && (filters.activity === 'all' || item.activity === filters.activity) && (filters.island === 'all' || (filters.island === 'south' ? String(item.id).startsWith('SI') : String(item.id).startsWith('NI'))));
+      pool.sort((a, b) => {
+        if (filters.island === 'south' && filters.days === '7-10') {
+          const rank = id => id === 'SI-09B' ? 0 : id === 'SI-09A' ? 1 : id === 'SI-07A' ? 2 : id === 'SI-07B' ? 3 : 9;
+          return rank(a.id) - rank(b.id) || String(a.id).localeCompare(String(b.id));
+        }
+        return String(a.id).localeCompare(String(b.id));
+      });
+      cards.push(...pool.map(item => cardTemplate(item)));
+    } else cards.push(...templates.map(item => cardTemplate(item, nine && item.id === 'SI-09A')));
     cards.push(...places.map(cardPlace));
     cards.push(...guides.map(cardGuide));
     return cards.join('') || `<p class="v4-note">${esc(t('browseDest'))}</p>`;

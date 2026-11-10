@@ -13,7 +13,7 @@ test('imported v2 rows match the delivered CSV data rows', () => {
   assert.equal(routesText.charCodeAt(0), 0xfeff);
   const placeRows = parseCsv(placesText);
   const routeRows = parseCsv(routesText);
-  assert.equal(placeRows.length, 463);
+  assert.equal(placeRows.length, 471);
   assert.equal(routeRows.length, 78);
   assert.equal(placeRows[0].place_id.startsWith('\ufeff'), false);
   assert.equal(routeRows[0].route_id.startsWith('\ufeff'), false);
@@ -23,6 +23,13 @@ test('imported v2 rows match the delivered CSV data rows', () => {
   assert.equal(places.count, placeRows.length);
   assert.equal(routes.count, routeRows.length);
   assert.equal(routes.missing.length, 0);
+  const byRegion = {};
+  for (const region of require('../scripts/lib/v4-import.cjs').TNZ_REGIONS) byRegion[region.id] = 0;
+  for (const row of places.rows) if (row.type === 'town' && row.region_id) byRegion[row.region_id] += 1;
+  for (const [id, count] of Object.entries(byRegion)) assert.ok(count > 0, id);
+  for (const id of ['bay-of-plenty', 'tairawhiti-gisborne', 'whanganui', 'manawatu', 'wairarapa', 'central-otago']) {
+    assert.ok(byRegion[id] >= 2, id + ' ' + byRegion[id]);
+  }
   const catalogPath = path.join(root, 'docs/data/v4-catalog.json');
   if (fs.existsSync(catalogPath)) {
     const catalog = JSON.parse(fs.readFileSync(catalogPath, 'utf8'));

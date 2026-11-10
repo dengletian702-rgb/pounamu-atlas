@@ -652,6 +652,16 @@ globalThis.P10_NODES = NODES;
   const P10_WISH_REGION={christchurch:'christchurch-canterbury',nelson:'nelson-tasman',picton:'marlborough',tekapo:'christchurch-canterbury',aoraki:'christchurch-canterbury',wanaka:'wanaka',queenstown:'queenstown',milford:'fiordland','te-anau':'fiordland',glaciers:'west-coast',haast:'west-coast',hokitika:'west-coast',punakaiki:'west-coast','arthurs-pass':'christchurch-canterbury',kaikoura:'christchurch-canterbury','abel-tasman':'nelson-tasman',akaroa:'christchurch-canterbury',dunedin:'dunedin',oamaru:'dunedin',catlins:'clutha',stewart:'southland',auckland:'auckland','bay-of-islands':'northland-bay-of-islands',coromandel:'coromandel',hobbiton:'hamilton-waikato',waitomo:'hamilton-waikato',rotorua:'rotorua',taupo:'taupo',tongariro:'ruapehu',napier:'hawkes-bay',wellington:'wellington',taranaki:'taranaki'};
   const P10_REGIONS=[{id:'northland-bay-of-islands',island:'north',zh:'北地与岛屿湾',en:'Northland & Bay of Islands'},{id:'auckland',island:'north',zh:'奥克兰',en:'Auckland'},{id:'coromandel',island:'north',zh:'科罗曼德',en:'The Coromandel'},{id:'hamilton-waikato',island:'north',zh:'汉密尔顿－怀卡托',en:'Hamilton - Waikato'},{id:'bay-of-plenty',island:'north',zh:'丰盛湾',en:'Bay of Plenty'},{id:'tairawhiti-gisborne',island:'north',zh:'泰拉维蒂／吉斯伯恩',en:'Tairāwhiti Gisborne'},{id:'rotorua',island:'north',zh:'罗托鲁瓦',en:'Rotorua'},{id:'taupo',island:'north',zh:'陶波',en:'Taupō'},{id:'ruapehu',island:'north',zh:'鲁阿佩胡',en:'Ruapehu'},{id:'hawkes-bay',island:'north',zh:'霍克斯湾',en:"Hawke's Bay"},{id:'taranaki',island:'north',zh:'塔拉纳基',en:'Taranaki'},{id:'whanganui',island:'north',zh:'旺格努伊',en:'Whanganui'},{id:'manawatu',island:'north',zh:'马纳瓦图',en:'Manawatū'},{id:'wairarapa',island:'north',zh:'怀拉拉帕',en:'Wairarapa'},{id:'wellington',island:'north',zh:'惠灵顿',en:'Wellington'},{id:'nelson-tasman',island:'south',zh:'纳尔逊－塔斯曼',en:'Nelson-Tasman'},{id:'marlborough',island:'south',zh:'马尔堡',en:'Marlborough'},{id:'christchurch-canterbury',island:'south',zh:'基督城－坎特伯雷',en:'Christchurch - Canterbury'},{id:'west-coast',island:'south',zh:'西海岸',en:'West Coast'},{id:'wanaka',island:'south',zh:'瓦纳卡',en:'Wānaka'},{id:'queenstown',island:'south',zh:'皇后镇',en:'Queenstown'},{id:'central-otago',island:'south',zh:'中奥塔哥',en:'Central Otago'},{id:'dunedin',island:'south',zh:'但尼丁',en:'Dunedin'},{id:'clutha',island:'south',zh:'克卢萨',en:'Clutha'},{id:'fiordland',island:'south',zh:'峡湾',en:'Fiordland'},{id:'southland',island:'south',zh:'南地',en:'Southland'}];
   function p10WishLabel(w){const lang=p10Lang();if(w.id==='tekapo'&&lang==='zh')return '特卡波与暗夜星空';return w[lang];}
+  function p10CatalogTowns(regionId, island){
+    const all=window.P10_CATALOG_TOWNS;
+    if(!Array.isArray(all)) return null;
+    return all.filter(t=>t.region_id===regionId && (island==='all' || t.island===island));
+  }
+  function p10RegionCount(regionId, island){
+    const towns=p10CatalogTowns(regionId, island);
+    if(towns) return towns.length;
+    return WISHES.filter(w=>w.island===(island==='all'?w.island:island)&&P10_WISH_REGION[w.id]===regionId).length;
+  }
   function p10RenderWishes(){
     const box=p10$('#p10-wishes');if(!box)return;
     const form=p10$('#plannerForm');if(!form)return;
@@ -662,10 +672,17 @@ globalThis.P10_NODES = NODES;
     const islandHost=document.getElementById('p10-island');
     if(islandHost){islandHost.innerHTML=[['all',zh?'全部':'All'],['north',zh?'北岛':'North Island'],['south',zh?'南岛':'South Island']].map(([id,label])=>`<button type="button" data-p10-island="${id}" aria-pressed="${island===id}">${label}</button>`).join('');}
     const regionHost=document.getElementById('p10-region');
-    if(regionHost){const regs=P10_REGIONS.filter(r=>island==='all'||r.island===island);regionHost.innerHTML=`<button type="button" data-p10-region="all" aria-pressed="${region==='all'}">${zh?'全部地区':'All regions'}</button>`+regs.map(r=>{const n=WISHES.filter(w=>w.island===(island==='all'?w.island:island)&&P10_WISH_REGION[w.id]===r.id).length;return `<button type="button" data-p10-region="${r.id}" aria-pressed="${region===r.id}" ${n?'':'disabled'}>${zh?r.zh:r.en} (${n})${n?'':zh?' · 本目录暂无地点':' · No places in this directory yet'}</button>`;}).join('');}
+    if(regionHost){const regs=P10_REGIONS.filter(r=>island==='all'||r.island===island);regionHost.innerHTML=`<button type="button" data-p10-region="all" aria-pressed="${region==='all'}">${zh?'全部地区':'All regions'}</button>`+regs.map(r=>{const n=p10RegionCount(r.id, island);return `<button type="button" data-p10-region="${r.id}" aria-pressed="${region===r.id}" ${n?'':'disabled'}>${zh?r.zh:r.en} (${n})${n?'':zh?' · 本目录暂无地点':' · No places in this directory yet'}</button>`;}).join('');}
     const list=WISHES.filter(w=>(island==='all'||w.island===island)&&(region==='all'||P10_WISH_REGION[w.id]===region||(region==='unmapped'&&!P10_WISH_REGION[w.id])));
     const groups=new Map();
     for(const w of list){const key=P10_WISH_REGION[w.id]||'unmapped';if(!groups.has(key))groups.set(key,[]);groups.get(key).push(w);}
+    const townLinks=region!=='all' && !list.length ? (p10CatalogTowns(region, island)||[]) : [];
+    if(townLinks.length){
+      const meta=P10_REGIONS.find(r=>r.id===region);
+      const heading=meta?(zh?meta.zh:meta.en):region;
+      box.innerHTML=`<section><h3>${p10Esc(heading)}</h3>${townLinks.map(t=>`<p><a href="destination.html?id=${encodeURIComponent(t.place_id)}&amp;lang=${p10Lang()}">${p10Esc(zh?(t.name_zh||t.name_en):(t.name_en||t.name_zh))}</a></p>`).join('')}</section>`;
+      return;
+    }
     box.innerHTML=[...groups].map(([key,rows])=>{const meta=P10_REGIONS.find(r=>r.id===key);const heading=meta?(zh?meta.zh:meta.en):key;return `<section><h3>${p10Esc(heading)}</h3>${rows.map(w=>{const note=w.id==='oamaru'?(zh?' · 怀塔基区':' · Waitaki District'):'';return `<label data-p10-wish="${p10Esc(w.id)}"><input type="checkbox" name="p10-wish" value="${p10Esc(w.id)}" ${checked.has(w.id)?'checked':''}><span>${p10Esc(p10WishLabel(w)+note)}</span></label>`;}).join('')}</section>`;}).join('');
   }
   window.renderP10Planner=function(){

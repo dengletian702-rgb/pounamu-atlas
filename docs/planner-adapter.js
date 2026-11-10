@@ -12,7 +12,7 @@ const jevEndpoint = (() => {
 // Check once per page load. Store a settled result so offline errors are handled
 // when the visitor requests a recommendation, without unhandled rejections.
 // Capabilities are fetched only when chooseWithJev runs. v4 hides that control
-// (James 审定·待乐天确认) so a normal page load does not call the Worker.
+// 乐天 11/11 04:34 定（经 Keystone 转）: keep the function, do not call the Worker on page load.
 let jevCapabilities = null;
 function loadJevCapabilities() {
   if (!jevEndpoint) return Promise.resolve('not_enabled');

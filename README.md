@@ -34,6 +34,23 @@ node outputs/jev-server.js    # 带 Jev 代理的预览，端口随机，需要�
 
 首页开场图片是 AI 生成的南阿尔卑斯意境图，并非特定地点的实景。网站包含实拍照片，各自的作者、来源、许可和改动说明见 [图片署名](outputs/IMAGE-CREDITS.md)。地图数据来源见 [地图来源](outputs/MAP-SOURCES.md)，路线资料见 [线路来源](outputs/ROUTE-SOURCES.md)。字体许可在 [OFL.txt](outputs/site/assets/fonts/OFL.txt)。
 
+## 中文地名对照
+
+页面显示用这一张别名表，不改 CSV 原文件：
+
+| 页面统一用 | 同时覆盖这些写法 |
+|---|---|
+| 特卡波 | 特卡波湖、蒂卡普湖、蒂卡普 |
+| 但尼丁 | 达尼丁 |
+| 罗托鲁瓦 | 罗托鲁阿 |
+| 内皮尔 | 纳皮尔（依据 [newzealand.com/cn/napier](https://www.newzealand.com/cn/napier/) 的官方中文名） |
+
+怀塔基区的 Ōamaru 及同区条目归在「但尼丁」地区下，城镇旁注明「怀塔基区 / Waitaki District」。
+
+## 本地地图配置
+
+公开页面不加载地图密钥。若要在本机试 Google 地图，把 `docs/local-config.example.js` 复制为 `docs/local-config.js`（该文件已被忽略，不会入库），在里面设置 `POUNAMU_GOOGLE_MAPS_KEY`，并只在你自己的浏览器里于 `v4-maps.js` 之前加入 `<script src="local-config.js"></script>`。线上站点不注入这个值；没有密钥时使用示意图。
+
 ## 许可 / Licence
 
 本项目自有代码以 [MIT License](LICENSE) 发布；文字、数据和第三方素材的许可见 [CONTENT-LICENSE.md](CONTENT-LICENSE.md)。第三方照片、地图数据和字体不适用 MIT：它们按各自的许可和署名要求使用，详见上述文件。The MIT licence applies to project-owned code only; third-party photographs, map data and fonts retain their own licences and attribution requirements.

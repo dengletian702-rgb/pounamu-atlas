@@ -62,9 +62,26 @@ const REGION_MAP = {
   Fiordland: { id: 'fiordland', basis: 'UI-IA Fiordland' },
   Southland: { id: 'southland', basis: 'UI-IA Southland; 团队定 Stewart Island stays in Southland' },
   Mackenzie: { id: 'christchurch-canterbury', basis: '团队定：麦肯齐与奥拉基挂在基督城－坎特伯雷下。Atlas 写法 Mackenzie 不是 TNZ region_id。' },
-  Waitaki: { id: null, basis: 'UI-IA：Waitaki 不在 TNZ 南岛 11 区名单中，不猜测归区。', uncertain: true },
+  // Ōamaru and the other Waitaki rows sit under Dunedin. The town row keeps a district note.
+  Waitaki: { id: 'dunedin', basis: 'Follow-up: file Waitaki places under Dunedin and label the district.', district: 'waitaki' },
 };
 
+const ZH_ALIASES = [
+  ['特卡波湖', '特卡波'],
+  ['蒂卡普湖', '特卡波'],
+  ['蒂卡普', '特卡波'],
+  ['达尼丁', '但尼丁'],
+  ['罗托鲁阿', '罗托鲁瓦'],
+  ['纳皮尔', '内皮尔'],
+];
+
+function aliasZh(value) {
+  let text = String(value ?? '');
+  for (const [from, to] of ZH_ALIASES) text = text.split(from).join(to);
+  return text;
+}
+
+// 乐天 11/11 04:34 定（经 Keystone 转）: SI-09B primary, SI-09A alternate, SI-07A primary. Jev stays hidden.
 const TEMPLATE_META = {
   'SI-09B': {
     role: 'primary-9',
@@ -72,8 +89,8 @@ const TEMPLATE_META = {
     oneWay: false,
     title_zh: '9 天自驾环南岛',
     title_en: '9-day South Island self-drive',
-    blurb_zh: '线路表上的 9 个过夜点：基督城经格雷茅斯、福克斯冰川、瓦纳卡、皇后镇和米尔福德峡湾，再经库克山村回到基督城。特卡波写在返回基督城当天的途经里，不是单独过夜。主模板。James 审定·待乐天确认。',
-    blurb_en: 'Nine overnights from the route table: Christchurch via Greymouth, Fox Glacier, Wānaka, Queenstown and Milford Sound, then Aoraki/Mount Cook Village and back to Christchurch. Lake Tekapo is a via stop on the return day, not its own night. Primary template. James reviewed; Letian has not confirmed.',
+    blurb_zh: '9 天自驾。过夜顺序：基督城、格雷茅斯、福克斯冰川、瓦纳卡、皇后镇、米尔福德峡湾，再经库克山村回到基督城。特卡波在返回基督城那天经过。',
+    blurb_en: 'A 9-day drive. Overnights: Christchurch, Greymouth, Fox Glacier, Wānaka, Queenstown, Milford Sound, then Aoraki/Mount Cook Village and back to Christchurch. Tekapo is passed on the return day.',
     aliases: ['9 天自驾环南岛', '9天自驾环南岛', '环南岛9天', '环南岛 9 天', '9-day south island self-drive', '9 day south island self-drive', 'south island self-drive'],
   },
   'SI-09A': {
@@ -82,8 +99,8 @@ const TEMPLATE_META = {
     oneWay: false,
     title_zh: '9 天南岛东线（含斯图尔特岛渡轮）',
     title_en: '9-day South Island east route (with Stewart Island ferry)',
-    blurb_zh: '备选。过夜点含奥马鲁、但尼丁、因弗卡吉尔、斯图尔特岛、蒂阿瑙、皇后镇和库克山村。斯图尔特岛那天含码头接驳和渡轮，渡轮时间不写成驾车。James 审定·待乐天确认。',
-    blurb_en: 'Alternate. Overnights include Ōamaru, Dunedin, Invercargill, Stewart Island, Te Anau, Queenstown and Aoraki/Mount Cook Village. The Stewart Island day includes a ferry; that ferry time is not labelled as driving. James reviewed; Letian has not confirmed.',
+    blurb_zh: '9 天。过夜点含奥马鲁、但尼丁、因弗卡吉尔、斯图尔特岛、蒂阿瑙、皇后镇和库克山村。去斯图尔特岛那天含渡轮，渡轮时间不记成驾车。',
+    blurb_en: '9 days. Overnights include Ōamaru, Dunedin, Invercargill, Stewart Island, Te Anau, Queenstown and Aoraki/Mount Cook Village. The Stewart Island day includes a ferry, which is not counted as driving.',
     aliases: ['9天东线', 'stewart island 9', '斯图尔特岛 9'],
   },
   'SI-07A': {
@@ -92,8 +109,8 @@ const TEMPLATE_META = {
     oneWay: true,
     title_zh: '7 天南岛自驾（基督城至皇后镇）',
     title_en: '7-day South Island drive (Christchurch to Queenstown)',
-    blurb_zh: '7 天主模板。单程，从基督城到皇后镇，可能涉及异地还车。James 审定·待乐天确认。',
-    blurb_en: 'Primary 7-day template. One way, Christchurch to Queenstown, which may mean returning the car in a different town. James reviewed; Letian has not confirmed.',
+    blurb_zh: '7 天，从基督城开到皇后镇，可能要在另一座城镇还车。',
+    blurb_en: '7 days from Christchurch to Queenstown. You may return the car in a different town.',
     aliases: ['7 天南岛', '7-day south island', 'christchurch to queenstown'],
   },
   'SI-07B': {
@@ -112,8 +129,8 @@ const TEMPLATE_META = {
     oneWay: false,
     title_zh: '14 天南岛西线',
     title_en: '14-day South Island west route',
-    blurb_zh: '线路表 14 天西线过夜顺序，按 place_id 原样预填。',
-    blurb_en: '14-day west-route overnights from the route table, prefilled by place_id.',
+    blurb_zh: '14 天，沿西海岸一侧过夜。',
+    blurb_en: '14 days of overnights along the west side of the South Island.',
     aliases: ['14 天南岛', '14-day south'],
   },
   'SI-14B': {
@@ -122,8 +139,8 @@ const TEMPLATE_META = {
     oneWay: false,
     title_zh: '14 天南岛东线往返',
     title_en: '14-day South Island east loop',
-    blurb_zh: '线路表另一条 14 天过夜顺序，按 place_id 原样预填。',
-    blurb_en: 'The other 14-day overnight order from the route table, prefilled by place_id.',
+    blurb_zh: '14 天，沿东侧往返。',
+    blurb_en: '14 days out and back along the east side of the South Island.',
     aliases: ['14天东线'],
   },
   'NI-01': {
@@ -132,8 +149,8 @@ const TEMPLATE_META = {
     oneWay: true,
     title_zh: '5 天北岛中轴',
     title_en: '5-day North Island spine',
-    blurb_zh: '怀托摩、罗托鲁瓦、陶波、北帕默斯顿、惠灵顿。按线路表预填。',
-    blurb_en: 'Waitomo, Rotorua, Taupō, Palmerston North, Wellington. Prefilled from the route table.',
+    blurb_zh: '5 天，经怀托摩、罗托鲁瓦、陶波、北帕默斯顿到惠灵顿。',
+    blurb_en: '5 days through Waitomo, Rotorua, Taupō and Palmerston North to Wellington.',
     aliases: ['北岛中轴', 'north island spine', 'auckland rotorua'],
   },
   'NI-02': {
@@ -142,8 +159,8 @@ const TEMPLATE_META = {
     oneWay: true,
     title_zh: '6 天北地',
     title_en: '6-day Northland',
-    blurb_zh: '奥波诺尼、凯塔亚、派希亚、旺格雷、奥克兰。按线路表预填。',
-    blurb_en: 'Opononi, Kaitaia, Paihia, Whangārei, Auckland. Prefilled from the route table.',
+    blurb_zh: '6 天，经奥波诺尼、凯塔亚、派希亚、旺格雷到奥克兰。',
+    blurb_en: '6 days through Opononi, Kaitaia, Paihia and Whangārei to Auckland.',
     aliases: ['北地', 'northland drive'],
   },
   'NI-03': {
@@ -152,8 +169,8 @@ const TEMPLATE_META = {
     oneWay: false,
     title_zh: '4 天科罗曼德',
     title_en: '4-day Coromandel',
-    blurb_zh: '科罗曼德镇、惠蒂昂格、旺格玛塔、奥克兰。按线路表预填。',
-    blurb_en: 'Coromandel Town, Whitianga, Whangamatā, Auckland. Prefilled from the route table.',
+    blurb_zh: '4 天，经科罗曼德镇、惠蒂昂格、旺格玛塔回到奥克兰。',
+    blurb_en: '4 days through Coromandel Town, Whitianga and Whangamatā, back to Auckland.',
     aliases: ['科罗曼德', 'coromandel'],
   },
   'NI-04': {
@@ -162,8 +179,8 @@ const TEMPLATE_META = {
     oneWay: true,
     title_zh: '3 天忘却世界公路',
     title_en: '3-day Forgotten World Highway',
-    blurb_zh: '陶马鲁努依、旺格摩摩纳、斯特拉福德。按线路表预填。',
-    blurb_en: 'Taumarunui, Whangamōmona, Stratford. Prefilled from the route table.',
+    blurb_zh: '3 天，经陶马鲁努依、旺格摩摩纳到斯特拉福德。',
+    blurb_en: '3 days through Taumarunui and Whangamōmona to Stratford.',
     aliases: ['忘却世界', 'forgotten world'],
   },
 };
@@ -230,18 +247,20 @@ function importPlaces(text) {
       region_id: mapped.id,
       region_basis: mapped.basis,
       region_uncertain: Boolean(mapped.uncertain || mapped.unknown),
+      district_zh: mapped.district === 'waitaki' ? '怀塔基区' : '',
+      district_en: mapped.district === 'waitaki' ? 'Waitaki District' : '',
       town: r.town,
       name_en: r.name_en,
-      name_zh: r.name_zh,
+      name_zh: aliasZh(r.name_zh),
       type: r.type,
       lat: num(r.lat),
       lon: num(r.lon),
       suggested_stay: r.suggested_stay,
       season: r.season,
       source_url: r.source_url,
-      notes: r.notes,
+      notes: aliasZh(r.notes),
       summary_en: r.summary_en,
-      summary_zh: r.summary_zh,
+      summary_zh: aliasZh(r.summary_zh),
       summary_source_url: r.summary_source_url,
       summary_accessed: r.summary_accessed,
       verify: /待核|待核实/.test(r.notes || '') || /†/.test(`${r.name_en}${r.name_zh}${r.notes}`),
@@ -275,14 +294,14 @@ function importRoutes(text, placesById) {
       island: r.island,
       days: Number(r.days),
       day: Number(r.day),
-      from: r.from,
-      to: r.to,
-      via: r.via,
+      from: aliasZh(r.from),
+      to: aliasZh(r.to),
+      via: aliasZh(r.via),
       km: r.km,
       drive_time_est: r.drive_time_est,
       est_date: r.est_date,
       source_url: r.source_url,
-      notes: r.notes,
+      notes: aliasZh(r.notes),
       place_id: r.place_id,
       parts: labelDrive(r.drive_time_est, r.est_date),
       ferry: /渡轮|ferry/i.test(`${r.notes} ${r.drive_time_est}`),
@@ -296,11 +315,13 @@ function importRoutes(text, placesById) {
     const meta = TEMPLATE_META[id] || {
       role: 'template', activity: 'drive', oneWay: false,
       title_zh: id, title_en: id,
-      blurb_zh: '按线路表 place_id 预填，没有另写停靠。',
-      blurb_en: 'Prefilled from the route table by place_id.',
+      blurb_zh: '按表中的过夜顺序排列。',
+      blurb_en: 'Overnights follow the order in the route table.',
       aliases: [],
     };
-    templates.push({ id, ...meta, day_count: days.length, stated_days: days[0] ? days[0].days : days.length, days });
+    const nz = days.map(d => d.source_url).find(url => /newzealand\.com/i.test(url || ''));
+    const accessed = (days.find(d => d.source_url === nz) || {}).est_date || '';
+    templates.push({ id, ...meta, day_count: days.length, stated_days: days[0] ? days[0].days : days.length, days, nz_source_url: nz || '', nz_accessed: nz ? accessed : '' });
   }
   templates.sort((a, b) => a.id.localeCompare(b.id));
   return { rows, count: rows.length, templates, missing };
@@ -319,26 +340,7 @@ function haversineKm(lat1, lon1, lat2, lon2) {
 }
 
 function searchTracks(tracks, query, towns) {
-  const q = fold(query);
-  if (!q) return tracks.slice();
-  const matchedTowns = (towns || []).filter(t => {
-    const names = [t.name_en, t.name_zh, t.town, t.name].map(fold).filter(Boolean);
-    return names.some(n => n.includes(q) || q.includes(n));
-  });
-  return tracks.filter(tr => {
-    const blob = fold([tr.name, tr.zh, tr.region, tr.regionName, tr.url].filter(Boolean).join(' '));
-    if (blob.includes(q)) return true;
-    for (const town of matchedTowns) {
-      const en = fold(town.name_en || town.town || '');
-      if (en && en.length > 2 && blob.includes(en)) return true;
-      const lat = Number(town.lat);
-      const lon = Number(town.lon);
-      if (Number.isFinite(lat) && Number.isFinite(lon) && Number.isFinite(Number(tr.lat)) && Number.isFinite(Number(tr.lon))) {
-        if (haversineKm(lat, lon, Number(tr.lat), Number(tr.lon)) <= 45) return true;
-      }
-    }
-    return false;
-  });
+  return require('../../docs/v4-match.js').searchTracks(tracks, query, towns);
 }
 
 function daysBucket(days, bucket) {
@@ -407,5 +409,5 @@ module.exports = {
   TNZ_REGIONS, REGION_MAP, TEMPLATE_META,
   stripBom, parseCsv, importPlaces, importRoutes, labelDrive,
   searchTracks, searchTemplates, daysBucket, fold, haversineKm,
-  writeSiteData, mapRegion,
+  writeSiteData, mapRegion, aliasZh, ZH_ALIASES,
 };

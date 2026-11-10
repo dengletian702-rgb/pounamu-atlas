@@ -38,7 +38,7 @@ const NODES = {
   wanaka: { at: [-44.7, 169.13], en: 'Wānaka', zh: '瓦纳卡' },
   'te-anau': { at: [-45.41, 167.72], en: 'Te Anau', zh: '蒂阿瑙' },
   milford: { at: [-44.67, 167.93], en: 'Milford Sound', zh: '米尔福德峡湾' },
-  tekapo: { at: [-44.0, 170.48], en: 'Lake Tekapo', zh: '蒂卡普' },
+  tekapo: { at: [-44.0, 170.48], en: 'Lake Tekapo', zh: '特卡波' },
   twizel: { at: [-44.26, 170.1], en: 'Twizel', zh: '特威泽尔' },
   aoraki: { at: [-43.73, 170.1], en: 'Aoraki/Mount Cook Village', zh: '库克山村' },
   oamaru: { at: [-45.1, 170.97], en: 'Ōamaru', zh: '奥马鲁' },
@@ -156,10 +156,10 @@ const EDGE_SOURCES = {
   "te-anau|invercargill": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJa15mlSBt1KkRULR5hIbvAAU&b=ChIJ12kUrJTE0qkRIKSW54jvAAo", checkedAt: "2026-11-10", nzta: { from: "蒂阿瑙, 新西兰", to: "因弗卡吉尔, 新西兰", route: "State Hwy 94和State Hwy 6", time: "1h 50m", minutes: 110, traffic: "1 min faster than normal", readAt: "2026-11-10T05:40:42.673Z" }, hoursBefore: 2 },
   "invercargill|bluff": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJ12kUrJTE0qkRIKSW54jvAAo&b=ChIJu0c6TmS40qkRkGF5hIbvAAU", checkedAt: "2026-11-10", nzta: { from: "因弗卡吉尔, 新西兰", to: "布拉夫, 新西兰", route: "SH 1", time: "20 mins", minutes: 20, traffic: "1 min faster than normal", readAt: "2026-11-10T05:41:12.652Z" }, hoursBefore: 0.5 },
   "invercargill|owaka": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJ12kUrJTE0qkRIKSW54jvAAo&b=ChIJCZC19cOxLagRkJx5hIbvAAU", checkedAt: "2026-11-10", nzta: { from: "因弗卡吉尔, 新西兰", to: "Owaka, 新西兰", route: "SH 1、State Hwy 93和Owaka Valley Rd", time: "1h 38m", minutes: 98, traffic: "1 min faster than normal", readAt: "2026-11-10T05:41:17.307Z" }, hoursBefore: 2 },
-  "owaka|dunedin": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJCZC19cOxLagRkJx5hIbvAAU&b=ChIJPVFfD-DkK6gRQZl5hIbvAAU", checkedAt: "2026-11-10", nzta: { from: "Owaka, 新西兰", to: "达尼丁, 新西兰", route: "Southern Scenic Rte", time: "1h 27m", minutes: 87, traffic: "3 min slower than normal", readAt: "2026-11-10T05:41:22.287Z" }, hoursBefore: 1.5 },
-  "invercargill|dunedin": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJ12kUrJTE0qkRIKSW54jvAAo&b=ChIJPVFfD-DkK6gRQZl5hIbvAAU", checkedAt: "2026-11-10", nzta: { from: "因弗卡吉尔, 新西兰", to: "达尼丁, 新西兰", route: "SH 1和SH 1", time: "2h 35m", minutes: 155, traffic: "2 min slower than normal", readAt: "2026-11-10T05:41:27.323Z" }, hoursBefore: 2.75 },
-  "dunedin|queenstown": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJPVFfD-DkK6gRQZl5hIbvAAU&b=ChIJX96o1_Ed1akRAKZ5hIbvAAU", checkedAt: "2026-11-10", nzta: { from: "达尼丁, 新西兰", to: "皇后镇, 新西兰", route: "State Hwy 8", time: "3h 37m", minutes: 217, traffic: "1 min slower than normal", readAt: "2026-11-10T05:41:31.969Z" }, hoursBefore: 3.5 },
-  "dunedin|oamaru": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJPVFfD-DkK6gRQZl5hIbvAAU&b=ChIJeQZQVPd1KagR4O95hIbvAAU", checkedAt: "2026-11-10", nzta: { from: "达尼丁, 新西兰", to: "Oamaru, 新西兰", route: "SH 1", time: "1h 28m", minutes: 88, traffic: "1 min slower than normal", readAt: "2026-11-10T05:41:36.983Z" }, hoursBefore: 1.25 },
+  "owaka|dunedin": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJCZC19cOxLagRkJx5hIbvAAU&b=ChIJPVFfD-DkK6gRQZl5hIbvAAU", checkedAt: "2026-11-10", nzta: { from: "Owaka, 新西兰", to: "但尼丁, 新西兰", route: "Southern Scenic Rte", time: "1h 27m", minutes: 87, traffic: "3 min slower than normal", readAt: "2026-11-10T05:41:22.287Z" }, hoursBefore: 1.5 },
+  "invercargill|dunedin": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJ12kUrJTE0qkRIKSW54jvAAo&b=ChIJPVFfD-DkK6gRQZl5hIbvAAU", checkedAt: "2026-11-10", nzta: { from: "因弗卡吉尔, 新西兰", to: "但尼丁, 新西兰", route: "SH 1和SH 1", time: "2h 35m", minutes: 155, traffic: "2 min slower than normal", readAt: "2026-11-10T05:41:27.323Z" }, hoursBefore: 2.75 },
+  "dunedin|queenstown": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJPVFfD-DkK6gRQZl5hIbvAAU&b=ChIJX96o1_Ed1akRAKZ5hIbvAAU", checkedAt: "2026-11-10", nzta: { from: "但尼丁, 新西兰", to: "皇后镇, 新西兰", route: "State Hwy 8", time: "3h 37m", minutes: 217, traffic: "1 min slower than normal", readAt: "2026-11-10T05:41:31.969Z" }, hoursBefore: 3.5 },
+  "dunedin|oamaru": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJPVFfD-DkK6gRQZl5hIbvAAU&b=ChIJeQZQVPd1KagR4O95hIbvAAU", checkedAt: "2026-11-10", nzta: { from: "但尼丁, 新西兰", to: "Oamaru, 新西兰", route: "SH 1", time: "1h 28m", minutes: 88, traffic: "1 min slower than normal", readAt: "2026-11-10T05:41:36.983Z" }, hoursBefore: 1.25 },
   "oamaru|christchurch": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJeQZQVPd1KagR4O95hIbvAAU&b=ChIJAe3FY0gvMm0RRZl5hIbvAAU", checkedAt: "2026-11-10", nzta: { from: "Oamaru, 新西兰", to: "基督城, 新西兰", route: "SH 1", time: "3h 6m", minutes: 186, traffic: "5 min faster than normal", readAt: "2026-11-10T05:41:41.668Z" }, hoursBefore: 3 },
   "oamaru|twizel": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJeQZQVPd1KagR4O95hIbvAAU&b=ChIJv-27KHPgKm0RALt5hIbvAAU", checkedAt: "2026-11-10", nzta: { from: "Oamaru, 新西兰", to: "Twizel, 新西兰", route: "State Hwy 83", time: "1h 46m", minutes: 106, traffic: "5 min slower than normal", readAt: "2026-11-10T05:41:46.644Z" }, hoursBefore: 1.75 },
   "auckland|paihia": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJ--acWvtHDW0RF5miQ2HvAAU&b=ChIJTx6ROraiC20RgPOiQ2HvAAU", checkedAt: "2026-11-10", nzta: { from: "奥克兰, 新西兰", to: "派希亚, 新西兰", route: "SH 1和SH 1", time: "3h 1m", minutes: 181, traffic: "1 min slower than normal", readAt: "2026-11-10T05:43:47.658Z" }, hoursBefore: 3.25 },
@@ -209,7 +209,7 @@ const WISHES = [
   { id: 'christchurch', island: 'south', base: 'christchurch', days: 1, en: 'Christchurch', zh: '基督城', routes: ['bridle-path'], places: ['chch-gardens'] },
   { id: 'nelson', island: 'south', base: 'nelson', days: 1, en: 'Nelson', zh: '纳尔逊', routes: [], places: [] },
   { id: 'picton', island: 'south', base: 'picton', days: 1, en: 'Picton', zh: '皮克顿', routes: [], places: [] },
-  { id: 'tekapo', island: 'south', base: 'tekapo', days: 0.5, en: 'Lake Tekapo and the dark-sky reserve', zh: '蒂卡普湖与暗夜星空', routes: ['mackenzie-route'], places: ['good-shepherd', 'dark-sky'] },
+  { id: 'tekapo', island: 'south', base: 'tekapo', days: 0.5, en: 'Lake Tekapo and the dark-sky reserve', zh: '特卡波与暗夜星空', routes: ['mackenzie-route'], places: ['good-shepherd', 'dark-sky'] },
   { id: 'aoraki', island: 'south', base: 'aoraki', days: 1, en: 'Aoraki/Mount Cook', zh: '奥拉基／库克山', routes: ['hooker-valley'], places: ['tasman-lake'] },
   { id: 'wanaka', island: 'south', base: 'wanaka', days: 1, en: 'Wānaka', zh: '瓦纳卡', routes: ['roys-peak'], places: ['wanaka-tree'] },
   { id: 'queenstown', island: 'south', base: 'queenstown', days: 2, en: 'Queenstown', zh: '皇后镇', routes: ['queenstown-trail'], places: ['skyline-qt', 'shotover-jet', 'kawarau-bungy', 'arrowtown', 'glenorchy'] },
@@ -248,7 +248,7 @@ const P10_WISH_TIPS = {
   "rotorua": {"zh":"地热公园和毛利文化表演选一两处即可，多数需预订。","en":"Pick one or two geothermal parks or a Māori cultural evening; most need booking.","verify":true,"check":"https://www.rotoruanz.com/"},
   "hobbiton": {"zh":"霍比特村电影片场是全程导览的步行游览，约 2.5 小时，需凭预订号取票。","en":"The Hobbiton Movie Set tour is fully guided on foot and takes about 2.5 hours; bring your booking reference.","src":[{"url":"https://www.hobbitontours.com/experiences/hobbiton-movie-set-tour/","checkedAt":"2026-11-10"}]},
   "waitomo": {"zh":"怀托摩萤火虫洞游览约 45 分钟，官方建议提前预订。","en":"The Waitomo Glowworm Caves tour takes about 45 minutes; the operator recommends booking ahead.","src":[{"url":"https://www.waitomo.com/waitomo-glowworm-caves","checkedAt":"2026-11-10"}]},
-  "tekapo": {"zh":"蒂卡普可看好牧羊人教堂、泡温泉，或参加观星团。","en":"In Tekapo, see the Church of the Good Shepherd, soak in the hot pools or join a stargazing tour.","src":[{"url":"https://www.mackenzienz.com/","checkedAt":"2026-11-10"}]},
+  "tekapo": {"zh":"特卡波可看好牧羊人教堂、泡温泉，或参加观星团。","en":"In Tekapo, see the Church of the Good Shepherd, soak in the hot pools or join a stargazing tour.","src":[{"url":"https://www.mackenzienz.com/","checkedAt":"2026-11-10"}]},
   "kaikoura": {"zh":"观鲸船出海受海况影响，出发前查看运营商信息。","en":"Whale-watching trips depend on the sea; check with the operator before you go.","verify":true,"check":"https://www.whalewatch.co.nz/"},
   "stewart": {"zh":"奥本镇周边短步道和乌尔瓦岛观鸟，可按天气安排。","en":"Short walks around Oban and birdwatching on Ulva Island, arranged around the weather.","verify":true,"check":"https://www.doc.govt.nz/parks-and-recreation/places-to-go/southland/places/stewart-island-rakiura/"},
   "catlins": {"zh":"沿南部风景公路看瀑布、灯塔和海岸，需要自驾。","en":"Waterfalls, lighthouses and coast along the Southern Scenic Route; you need a car.","verify":true,"check":"https://www.southernscenicroute.co.nz/"},
@@ -454,24 +454,40 @@ function p10Project(at){
   return [392.5+(at[1]-174.76)*38.05, 189.7+(-at[0]-36.85)*50.5];
 }
 function p10Present(plan){
-  const days = plan && !plan.disconnected ? p10Timeline(plan) : [];
-  const points = [];
-  const seen = new Set();
-  for (const d of days) {
-    const ids = d.legs && d.legs.length ? [d.legs[0].a, ...d.legs.map(l => l.b)] : [d.at];
-    for (const id of ids) {
-      if (!id || seen.has(id)) continue;
-      const at = NODES[id] && NODES[id].at;
-      if (!at) continue;
-      seen.add(id);
-      points.push({ id, at, xy: p10Project(at) });
+  const full = plan && !plan.disconnected ? p10Timeline(plan) : [];
+  const selected = plan && plan.input ? plan.input.days : full.length;
+  const tight = Boolean(plan && plan.input && plan.minimum > selected);
+  const days = tight ? full.slice(0, selected).map((d, i) => ({ ...d, n: i + 1 })) : full;
+  const scheduled = new Set();
+  for (const d of days) for (const a of d.activities || []) if (a.wish) scheduled.add(a.wish.id);
+  const unscheduled = [];
+  const seenWish = new Set();
+  if (tight) {
+    for (const d of full.slice(selected)) for (const a of d.activities || []) {
+      if (!a.wish || scheduled.has(a.wish.id) || seenWish.has(a.wish.id)) continue;
+      seenWish.add(a.wish.id);
+      unscheduled.push({ id: a.wish.id, en: a.wish.en, zh: a.wish.zh, base: a.wish.base });
     }
   }
-  const tight = Boolean(plan && plan.input && plan.minimum > plan.input.days);
+  const points = [];
+  const seen = new Set();
+  function addPoint(id, scheduledPoint) {
+    if (!id || seen.has(id)) return;
+    const at = NODES[id] && NODES[id].at;
+    if (!at) return;
+    seen.add(id);
+    points.push({ id, at, xy: p10Project(at), scheduled: scheduledPoint });
+  }
+  for (const d of days) {
+    const ids = d.legs && d.legs.length ? [d.legs[0].a, ...d.legs.map(l => l.b)] : [d.at];
+    for (const id of ids) addPoint(id, true);
+  }
+  for (const w of unscheduled) addPoint(w.base, false);
   return {
     days,
+    unscheduled,
     map: { points, schematic: true },
-    warning: tight ? { minimum: plan.minimum, selected: plan.input.days, suggestions: ['drop-or-swap', 'add-days', 'switch-template'] } : null,
+    warning: tight ? { minimum: plan.minimum, selected, suggestions: ['drop-or-swap', 'add-days', 'switch-template'] } : null,
   };
 }
 function p10AlongWay(plan){
@@ -530,7 +546,7 @@ globalThis.P10_NODES = NODES;
       const attrs=`data-p10-map-line="${d.n}" data-points="${points}" data-places="${p10Esc(ids.map(p10Name).join(' → '))}"`;
       return coords.length>1?`<polyline ${attrs} points="${points}" stroke="${color}"/>`:`<circle ${attrs} cx="${coords[0][0]}" cy="${coords[0][1]}" r="3" fill="${color}"/>`;
     }).join('');
-    const names=[...dots].map(([id,p])=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2.5"><title>${p10Esc(p10Name(id))}</title></circle>`).join('');
+    const names=[...dots].map(([id,p])=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2.5"><title>${p10Esc(p10Name(id))}</title></circle>`).join('')+(p10View&&p10View.unscheduled||[]).map(w=>{const p=p10MapPoint(w.base);if(!p||dots.has(w.base))return '';return `<circle class="p10-unscheduled-dot" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="6"><title>${p10Esc((zh?w.zh:w.en)||p10Name(w.base))}</title></circle>`;}).join('');
     const selectors=days.map(d=>`<button type="button" data-p10-map-day="${d.n}" aria-pressed="false" style="--day-color:${P10_DAY_COLORS[(d.n-1)%P10_DAY_COLORS.length]}">${zh?'第 '+d.n+' 天':'Day '+d.n}</button>`).join('');
     return `<section class="p10-map-panel" id="p10-trip-map" aria-label="${zh?'行程地图':'Itinerary map'}"><div class="p10-map-heading"><div><p>${zh?'逐日路线':'DAY BY DAY'}</p><h2>${zh?'行程地图':'Your trip map'}</h2></div><p>${zh?'选择某一天，查看当天经过的地点。':'Choose a day to focus on its stops.'}</p></div><div class="p10-map-day-list" aria-label="${zh?'选择日期':'Choose a day'}"><button type="button" data-p10-map-day="all" aria-pressed="true">${zh?'全部':'All days'}</button>${selectors}</div><p class="p10-map-selection" role="status" aria-live="polite">${zh?'显示全部行程地点':'Showing all itinerary stops'}</p><svg class="p10-trip-svg" viewBox="0 0 680 820" role="img" aria-label="${zh?'行程地点与每日路段示意图':'Schematic map of itinerary stops and daily connections'}"><rect width="680" height="820" fill="#e2ece8"/><path class="p10-coast" d="${P10_COAST}"/><g class="p10-map-lines">${lines}</g><g class="p10-map-dots">${names}</g></svg><p class="p10-map-note">${zh?'地点之间的连线为示意，不能用于导航。':'Connections between places are schematic, not for navigation.'} <a href="https://www.naturalearthdata.com/about/terms-of-use/" target="_blank" rel="noopener noreferrer">Natural Earth</a> · ${zh?'海岸线包含取自':'Coastline contains data sourced from the'} <a href="https://data.linz.govt.nz/layer/51153-nz-coastlines-and-islands-polygons-topo-150k/" target="_blank" rel="noopener noreferrer">LINZ Data Service</a> ${zh?'并按':'licensed for reuse under'} <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>${zh?' 许可再利用的数据':''}</p></section>`;
   }
@@ -556,14 +572,14 @@ globalThis.P10_NODES = NODES;
       const more=result.minimum<=21?`<button type="button" class="p10-add-stop" data-p10-days="${result.minimum}">${zh?`把天数改成 ${result.minimum}`:`Change to ${result.minimum} days`}</button>`:'';
       const trim=f&&f.dropped.length&&f.dropped.length<result.order.length?`<button type="button" class="p10-add-stop" data-p10-trim="1">${zh?`减点或换点（去掉${dropped}）`:`Remove or swap a place (drop ${dropped})`}</button>`:`<button type="button" class="p10-add-stop" data-p10-edit="1">${zh?'减点或换点':'Remove or swap a place'}</button>`;
       const tmpl=`<a class="p10-add-stop" href="guide.html?template=SI-09B&amp;lang=${p10Lang()}">${zh?'改选线路模板':'Switch route template'}</a>`;
-      notices.push(`<div class="p10-tight" role="alert"><p class="p10-warning">${zh?`这些地方至少需要约 ${result.minimum} 天，你选了 ${result.input.days} 天。行程和地图仍然留在下面，没有自动删点。`:`These places need about ${result.minimum} days; you chose ${result.input.days}. The days and the map stay below. Nothing was removed for you.`}</p><div class="p10-along">${trim} ${more} ${tmpl}</div></div>`);
+      notices.push(`<div class="p10-tight" role="alert"><p class="p10-warning">${zh?`这些地方至少需要约 ${result.minimum} 天，你选了 ${result.input.days} 天。下面是这 ${result.input.days} 天，排不下的地点在「未安排」里，没有自动删点。`:`These places need about ${result.minimum} days; you chose ${result.input.days}. These ${result.input.days} days are shown below. Places that do not fit are under Unscheduled, and nothing was removed for you.`}</p><div class="p10-along">${trim} ${more} ${tmpl}</div></div>`);
     }
     if(result.inaccessible.length)notices.push(`<p class="p10-warning">${x.unreachable}：${result.inaccessible.map(w=>p10Esc(w[p10Lang()])).join('、')}。</p>`);
     const suggestions=p10AlongWay(result);
     if(suggestions.length)notices.push(`<div class="p10-along"><span>${zh?'还可以加入顺路地点：':'Add a stop along the way:'}</span> ${suggestions.map(w=>`<button type="button" class="p10-add-stop" data-p10-add="${p10Esc(w.id)}">＋ ${p10Esc(w[p10Lang()])}</button>`).join(' ')}</div>`);
     if(!p10View || p10View.token!==result){
-      const fresh=result.disconnected?[]:p10Timeline(result).map(d=>({...d,legs:[...d.legs],activities:[...d.activities]}));
-      p10View={token:result,days:fresh};
+      const present=p10Present(result);
+      p10View={token:result,days:present.days.map(d=>({...d,legs:[...(d.legs||[])],activities:[...(d.activities||[])]})),unscheduled:present.unscheduled||[]};
     }
     const timeline=p10View.days;
     const p10DayTools=(index,total)=>{const zh=p10Lang()==='zh';return `<div class="p10-day-tools"><button type="button" draggable="true" data-p10-drag="${index}" aria-label="${zh?'拖动排序':'Drag to reorder'}">⋮⋮</button><button type="button" data-p10-up="${index}" ${index===0?'disabled':''}>${zh?'上移':'Move up'}</button><button type="button" data-p10-down="${index}" ${index===total-1?'disabled':''}>${zh?'下移':'Move down'}</button><button type="button" data-p10-moveto="${index}">${zh?'移到…':'Move to…'}</button></div>`;};
@@ -586,10 +602,12 @@ globalThis.P10_NODES = NODES;
     }).join('');
     const recoName=p10JevRouteName(p10Recommendation,p10Lang(),typeof routes==='undefined'?[]:routes);
     const reco=recoName?`<p>${x.reco}：<a href="route.html?id=${encodeURIComponent(p10Recommendation)}&amp;lang=${p10Lang()}">${p10Esc(recoName)}</a></p>`:'';
-    el.innerHTML=`${notices.join('')}${reco}${p10TripMap(timeline)}${rows}<p class="planner-small"><strong>${zh?'路段时间和里程都是估算值':'Segment times and distances are estimates'}</strong>${zh?`：自驾时间是 ${P10_NZTA_DATE} 在 NZTA Journey Planner 逐段查询的读数（含查询当时的路况），取整到 15 分钟，不含停留；NZTA 不显示里程，里程仍是规划估算。巴士、火车和渡轮时间是估算，以运营商时刻表为准。出发前请在下列官方来源核对。`:`: driving times are readings taken segment by segment in NZTA Journey Planner on ${P10_NZTA_DATE} (with the traffic at that moment), rounded to 15 minutes, without stops; NZTA shows no distances, so km are planning estimates. Coach, train and ferry times are estimates; check the operator's timetable. Check the official sources below before you go.`} ${x.sources}: ${(globalThis.P10_ROAD_SOURCES||[]).map(r=>`<a href="${r.url}" target="_blank" rel="noopener noreferrer">${p10Esc(r.label)}</a>`).join(' · ')}</p>`;
+    const uns=p10View.unscheduled||[];
+    const unsHtml=uns.length?`<section class="p10-unscheduled"><h3>${zh?'未安排':'Unscheduled'}</h3><ul>${uns.map(w=>`<li>${p10Esc(zh?w.zh:w.en)}</li>`).join('')}</ul></section>`:'';
+    el.innerHTML=`${notices.join('')}${unsHtml}${reco}${p10TripMap(timeline)}${rows}<p class="planner-small"><strong>${zh?'路段时间和里程都是估算值':'Segment times and distances are estimates'}</strong>${zh?`：自驾时间是 ${P10_NZTA_DATE} 在 NZTA Journey Planner 逐段查询的读数（含查询当时的路况），取整到 15 分钟，不含停留；NZTA 不显示里程，里程仍是规划估算。巴士、火车和渡轮时间是估算，以运营商时刻表为准。出发前请在下列官方来源核对。`:`: driving times are readings taken segment by segment in NZTA Journey Planner on ${P10_NZTA_DATE} (with the traffic at that moment), rounded to 15 minutes, without stops; NZTA shows no distances, so km are planning estimates. Coach, train and ferry times are estimates; check the operator's timetable. Check the official sources below before you go.`} ${x.sources}: ${(globalThis.P10_ROAD_SOURCES||[]).map(r=>`<a href="${r.url}" target="_blank" rel="noopener noreferrer">${p10Esc(r.label)}</a>`).join(' · ')}</p>`;
     p10FocusDay('all');
   }
-  const P10_WISH_REGION={christchurch:'christchurch-canterbury',nelson:'nelson-tasman',picton:'marlborough',tekapo:'christchurch-canterbury',aoraki:'christchurch-canterbury',wanaka:'wanaka',queenstown:'queenstown',milford:'fiordland','te-anau':'fiordland',glaciers:'west-coast',haast:'west-coast',hokitika:'west-coast',punakaiki:'west-coast','arthurs-pass':'christchurch-canterbury',kaikoura:'christchurch-canterbury','abel-tasman':'nelson-tasman',akaroa:'christchurch-canterbury',dunedin:'dunedin',oamaru:null,catlins:'clutha',stewart:'southland',auckland:'auckland','bay-of-islands':'northland-bay-of-islands',coromandel:'coromandel',hobbiton:'hamilton-waikato',waitomo:'hamilton-waikato',rotorua:'rotorua',taupo:'taupo',tongariro:'ruapehu',napier:'hawkes-bay',wellington:'wellington',taranaki:'taranaki'};
+  const P10_WISH_REGION={christchurch:'christchurch-canterbury',nelson:'nelson-tasman',picton:'marlborough',tekapo:'christchurch-canterbury',aoraki:'christchurch-canterbury',wanaka:'wanaka',queenstown:'queenstown',milford:'fiordland','te-anau':'fiordland',glaciers:'west-coast',haast:'west-coast',hokitika:'west-coast',punakaiki:'west-coast','arthurs-pass':'christchurch-canterbury',kaikoura:'christchurch-canterbury','abel-tasman':'nelson-tasman',akaroa:'christchurch-canterbury',dunedin:'dunedin',oamaru:'dunedin',catlins:'clutha',stewart:'southland',auckland:'auckland','bay-of-islands':'northland-bay-of-islands',coromandel:'coromandel',hobbiton:'hamilton-waikato',waitomo:'hamilton-waikato',rotorua:'rotorua',taupo:'taupo',tongariro:'ruapehu',napier:'hawkes-bay',wellington:'wellington',taranaki:'taranaki'};
   const P10_REGIONS=[{id:'northland-bay-of-islands',island:'north',zh:'北地与岛屿湾',en:'Northland & Bay of Islands'},{id:'auckland',island:'north',zh:'奥克兰',en:'Auckland'},{id:'coromandel',island:'north',zh:'科罗曼德',en:'The Coromandel'},{id:'hamilton-waikato',island:'north',zh:'汉密尔顿－怀卡托',en:'Hamilton - Waikato'},{id:'bay-of-plenty',island:'north',zh:'丰盛湾',en:'Bay of Plenty'},{id:'tairawhiti-gisborne',island:'north',zh:'泰拉维蒂／吉斯伯恩',en:'Tairāwhiti Gisborne'},{id:'rotorua',island:'north',zh:'罗托鲁瓦',en:'Rotorua'},{id:'taupo',island:'north',zh:'陶波',en:'Taupō'},{id:'ruapehu',island:'north',zh:'鲁阿佩胡',en:'Ruapehu'},{id:'hawkes-bay',island:'north',zh:'霍克斯湾',en:"Hawke's Bay"},{id:'taranaki',island:'north',zh:'塔拉纳基',en:'Taranaki'},{id:'whanganui',island:'north',zh:'旺格努伊',en:'Whanganui'},{id:'manawatu',island:'north',zh:'马纳瓦图',en:'Manawatū'},{id:'wairarapa',island:'north',zh:'怀拉拉帕',en:'Wairarapa'},{id:'wellington',island:'north',zh:'惠灵顿',en:'Wellington'},{id:'nelson-tasman',island:'south',zh:'纳尔逊－塔斯曼',en:'Nelson-Tasman'},{id:'marlborough',island:'south',zh:'马尔堡',en:'Marlborough'},{id:'christchurch-canterbury',island:'south',zh:'基督城－坎特伯雷',en:'Christchurch - Canterbury'},{id:'west-coast',island:'south',zh:'西海岸',en:'West Coast'},{id:'wanaka',island:'south',zh:'瓦纳卡',en:'Wānaka'},{id:'queenstown',island:'south',zh:'皇后镇',en:'Queenstown'},{id:'central-otago',island:'south',zh:'中奥塔哥',en:'Central Otago'},{id:'dunedin',island:'south',zh:'但尼丁',en:'Dunedin'},{id:'clutha',island:'south',zh:'克卢萨',en:'Clutha'},{id:'fiordland',island:'south',zh:'峡湾',en:'Fiordland'},{id:'southland',island:'south',zh:'南地',en:'Southland'}];
   function p10WishLabel(w){const lang=p10Lang();if(w.id==='tekapo'&&lang==='zh')return '特卡波与暗夜星空';return w[lang];}
   function p10RenderWishes(){
@@ -606,7 +624,7 @@ globalThis.P10_NODES = NODES;
     const list=WISHES.filter(w=>(island==='all'||w.island===island)&&(region==='all'||P10_WISH_REGION[w.id]===region||(region==='unmapped'&&!P10_WISH_REGION[w.id])));
     const groups=new Map();
     for(const w of list){const key=P10_WISH_REGION[w.id]||'unmapped';if(!groups.has(key))groups.set(key,[]);groups.get(key).push(w);}
-    box.innerHTML=[...groups].map(([key,rows])=>{const meta=P10_REGIONS.find(r=>r.id===key);const heading=key==='unmapped'?(zh?'Waitaki（不在 TNZ 南岛 11 区）':'Waitaki (not a TNZ South Island region)'):(meta?(zh?meta.zh:meta.en):key);return `<section><h3>${p10Esc(heading)}</h3>${rows.map(w=>`<label data-p10-wish="${p10Esc(w.id)}"><input type="checkbox" name="p10-wish" value="${p10Esc(w.id)}" ${checked.has(w.id)?'checked':''}><span>${p10Esc(p10WishLabel(w))}</span></label>`).join('')}</section>`;}).join('');
+    box.innerHTML=[...groups].map(([key,rows])=>{const meta=P10_REGIONS.find(r=>r.id===key);const heading=meta?(zh?meta.zh:meta.en):key;return `<section><h3>${p10Esc(heading)}</h3>${rows.map(w=>{const note=w.id==='oamaru'?(zh?' · 怀塔基区':' · Waitaki District'):'';return `<label data-p10-wish="${p10Esc(w.id)}"><input type="checkbox" name="p10-wish" value="${p10Esc(w.id)}" ${checked.has(w.id)?'checked':''}><span>${p10Esc(p10WishLabel(w)+note)}</span></label>`;}).join('')}</section>`;}).join('');
   }
   window.renderP10Planner=function(){
     if(!p10$('#plannerForm'))return;const x=p10Text(),lang=p10Lang();

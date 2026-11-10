@@ -68,24 +68,19 @@
     const header = document.querySelector('.header');
     const nav = header && header.querySelector('.nav');
     if (!nav || header.querySelector('.v4-nav-toggle')) return;
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'v4-nav-toggle';
-    btn.setAttribute('aria-expanded', 'false');
-    const label = () => { btn.textContent = nav.classList.contains('is-open') ? t('closeMenu') : t('menu'); };
-    label();
-    btn.addEventListener('click', () => {
-      const open = nav.classList.toggle('is-open');
-      btn.setAttribute('aria-expanded', String(open));
+    if (!nav.querySelector('.v4-nav-toggle')) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'v4-nav-toggle';
+      btn.setAttribute('aria-expanded', 'false');
+      const label = () => { btn.textContent = nav.classList.contains('is-open') ? t('closeMenu') : t('menu'); };
       label();
-    });
-    nav.before(btn);
-    if (!nav.querySelector('a[href^="guide.html"]')) {
-      const a = document.createElement('a');
-      a.href = 'guide.html?lang=' + state.lang;
-      a.dataset.page = 'guide';
-      a.textContent = t('viewPick');
-      nav.appendChild(a);
+      btn.addEventListener('click', () => {
+        const open = nav.classList.toggle('is-open');
+        btn.setAttribute('aria-expanded', String(open));
+        label();
+      });
+      nav.before(btn);
     }
   }
 
@@ -248,7 +243,13 @@
     const title = state.lang === 'en' ? item.title_en : item.title_zh;
     const blurb = state.lang === 'en' ? item.blurb_en : item.blurb_zh;
     const badge = item.role === 'primary-9' || item.role === 'primary-7' ? t('primaryBadge') : (item.role === 'alternate-9' || item.role === 'alternate-7' || asAlt ? t('altBadge') : '');
-    return `<article class="v4-card" data-template="${esc(item.id)}"><p>${badge ? `<span class="v4-badge">${esc(badge)}</span>` : ''}<span class="v4-badge">${esc(item.id)}</span> ${esc(String(item.stated_days || item.day_count))} · ${esc(t('actDrive'))}</p><h3>${esc(title)}</h3><p>${esc(blurb)}</p>${item.oneWay ? `<p>${esc(t('oneWayNote'))}</p>` : ''}<div class="v4-actions"><a href="guide.html?template=${esc(item.id)}&amp;lang=${state.lang}">${esc(t('openEdit'))}</a></div></article>`;
+    return `<article class="v4-card" data-template="${esc(item.id)}"><p>${badge ? `<span class="v4-badge">${esc(badge)}</span>` : ''}<span class="v4-badge">${esc(item.id)}</span> ${esc(String(item.stated_days || item.day_count))} · ${esc(t('actDrive'))}</p><h3>${esc(title)}</h3><p>${esc(blurb)}</p>${item.oneWay ? `<p>${esc(t('oneWayNote'))}</p>` : ''}${nzCredit(item)}<div class="v4-actions"><a href="guide.html?template=${esc(item.id)}&amp;lang=${state.lang}">${esc(t('openEdit'))}</a></div></article>`;
+  }
+  function nzCredit(item) {
+    const url = item && item.nz_source_url;
+    if (!url || !/^https?:\/\//i.test(url)) return '';
+    const date = item.nz_accessed || '';
+    return `<p class="v4-note">${esc(t('adaptedFrom'))} · <a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(url)}</a>${date ? ' · ' + esc(t('accessedOn')) + ' ' + esc(date) : ''}</p>`;
   }
   function cardPlace(p) {
     return `<article class="v4-card"><h3>${esc(nameOf(p))} ${esc(state.lang === 'en' ? p.name_zh : p.name_en)}</h3><p>${esc(p.island === 'north' ? t('islandNorth') : t('islandSouth'))} · ${esc(p.atlas_region)}</p><div class="v4-actions"><a href="destination.html?id=${esc(p.place_id)}&amp;lang=${state.lang}">${esc(t('viewDest'))}</a><a class="v4-alt" href="guide.html?add=${esc(p.place_id)}&amp;lang=${state.lang}">${esc(t('addToTrip'))}</a></div></article>`;
@@ -319,6 +320,8 @@
       view: 'edit',
       minimum: item.stated_days || item.day_count,
       oneWay: Boolean(item.oneWay),
+      nz_source_url: item.nz_source_url || '',
+      nz_accessed: item.nz_accessed || '',
     };
   }
   function draftFromTight() {
@@ -327,19 +330,26 @@
     const plan = window.p10Plan(input);
     const present = window.p10Present(plan);
     const nodes = window.P10_NODES || {};
-    const days = present.days.map(d => {
-      const node = nodes[d.at] || {};
-      const place = towns().find(p => fold(p.name_en) === fold(node.en) || fold(p.name_zh) === fold(node.zh));
-      const legs = (d.legs || []).map(l => {
-        const src = l.src || {};
-        const date = src.checkedAt || '';
-        const kind = src.nzta || src.status === 'nzta-time-read' ? 'nzta' : 'planning';
-        const text = (l.h ? String(l.h) : '') + (l.km ? ' · ' + l.km + ' km' : '');
-        return { text: text || (state.lang === 'en' ? 'planning estimate' : '规划估算'), kind, hasAbout: false, date };
-      });
-      return { uid: uid(), placeId: place ? place.place_id : '', nodeId: d.at, from: '', to: node.en || d.at || '', via: '', parts: legs, notes: '', ferry: false, source_url: '', est_date: '', nameVerify: false, km: '', rawTime: '' };
+    const days = present.days.map(d => dayFromNode(d));
+    const unscheduled = (present.unscheduled || []).map(w => {
+      const node = nodes[w.base] || {};
+      const place = towns().find(p => fold(p.name_zh) === fold(w.zh) || fold(p.name_en) === fold(w.en));
+      return { placeId: place ? place.place_id : w.base, label_zh: w.zh, label_en: w.en, lat: node.at && node.at[0], lon: node.at && node.at[1] };
     });
-    return { templateId: 'p10-tight', title: t('tightTitle', { min: plan.minimum, have: 9 }), requestedDays: 9, days, unscheduled: [], chosen: days.map(d => d.placeId).filter(Boolean), island: 'south', regions: [], hideVerify: false, view: 'edit', minimum: plan.minimum, oneWay: false };
+    return { templateId: 'p10-tight', title: '', requestedDays: 9, days, unscheduled, chosen: days.map(d => d.placeId).filter(Boolean), island: 'south', regions: [], hideVerify: false, view: 'edit', minimum: plan.minimum, oneWay: false, p10Input: input };
+  }
+  function dayFromNode(d) {
+    const nodes = window.P10_NODES || {};
+    const node = nodes[d.at] || {};
+    const place = towns().find(p => fold(p.name_en) === fold(node.en) || fold(p.name_zh) === fold(node.zh));
+    const legs = (d.legs || []).map(l => {
+      const src = l.src || {};
+      const date = src.checkedAt || '';
+      const kind = src.nzta || src.status === 'nzta-time-read' ? 'nzta' : 'planning';
+      const text = (l.h ? String(l.h) : '') + (l.km ? ' · ' + l.km + ' km' : '');
+      return { text: text || (state.lang === 'en' ? 'planning estimate' : '规划估算'), kind, hasAbout: false, date };
+    });
+    return { uid: uid(), placeId: place ? place.place_id : '', nodeId: d.at, from: '', to: node.en || d.at || '', via: '', parts: legs, notes: '', ferry: false, source_url: '', est_date: '', nameVerify: false, km: '', rawTime: '' };
   }
   function loadDraft() {
     const q = new URLSearchParams(location.search);
@@ -423,7 +433,7 @@
       const label = (state.lang === 'en' ? r.en : r.zh) + ' (' + count + ')';
       const empty = count === 0 ? ' · ' + t('noPlacesInRegion') : '';
       return `<button type="button" data-region="${esc(r.id)}" aria-pressed="${on ? 'true' : 'false'}" ${count === 0 ? 'data-empty="1"' : ''}>${esc(label + empty)}</button>`;
-    }).join('') + `<button type="button" data-region="unmapped" aria-pressed="${(state.draft.regions || []).includes('unmapped') ? 'true' : 'false'}">${esc(t('unmappedRegion'))}</button>`;
+    }).join('');
   }
   function placeList() {
     const list = filteredTowns();
@@ -439,7 +449,7 @@
     let html = '';
     for (const [key, rows] of groups) {
       const meta = regionMeta(key);
-      const heading = key === 'unmapped' ? t('unmappedRegion') : (meta ? (state.lang === 'en' ? meta.en : meta.zh) : key);
+      const heading = meta ? (state.lang === 'en' ? meta.en : meta.zh) : key;
       html += `<section class="v4-group"><h3>${esc(heading)}</h3>`;
       if (!rows.length) html += `<p>${esc(t('noPlacesInRegion'))}</p>`;
       for (const p of rows) {
@@ -447,7 +457,8 @@
         const on = state.draft.chosen.includes(p.place_id);
         const verify = p.verify ? ` <span class="v4-badge">${esc(t('verifyBadge'))}</span>` : '';
         const coord = p.lat == null || p.lon == null ? ` <span class="v4-note">${esc(t('missingCoords'))}</span>` : '';
-        html += `<label class="v4-place"><input type="checkbox" data-place="${esc(p.place_id)}" ${on ? 'checked' : ''}><span><strong>${esc(nameOf(p))}</strong> ${esc(state.lang === 'en' ? p.name_zh : p.name_en)}${verify}${coord}</span></label>`;
+        const district = p.district_zh ? ` <span class="v4-note">${esc(state.lang === 'en' ? p.district_en : p.district_zh)}</span>` : '';
+        html += `<label class="v4-place"><input type="checkbox" data-place="${esc(p.place_id)}" ${on ? 'checked' : ''}><span><strong>${esc(nameOf(p))}</strong> ${esc(state.lang === 'en' ? p.name_zh : p.name_en)}${district}${verify}${coord}</span></label>`;
       }
       html += '</section>';
     }
@@ -470,6 +481,24 @@
     }
     return stops;
   }
+  function mapCandidates() {
+    const chosen = new Set(state.draft.chosen || []);
+    const uns = new Set((state.draft.unscheduled || []).map(item => item.placeId || item));
+    const list = filteredTowns().filter(p => p.lat != null && p.lon != null).map(p => ({
+      id: p.place_id, lat: p.lat, lon: p.lon, name_zh: p.name_zh, name_en: p.name_en,
+      selected: chosen.has(p.place_id) || state.draft.days.some(d => d.placeId === p.place_id),
+      unscheduled: uns.has(p.place_id),
+    }));
+    for (const item of state.draft.unscheduled || []) {
+      if (item.lat == null || list.some(p => p.id === item.placeId)) {
+        const hit = list.find(p => p.id === item.placeId);
+        if (hit) hit.unscheduled = true;
+        continue;
+      }
+      list.push({ id: item.placeId, lat: item.lat, lon: item.lon, name_zh: item.label_zh, name_en: item.label_en, selected: false, unscheduled: true });
+    }
+    return list;
+  }
   function dayCards() {
     const days = state.draft.days;
     return days.map((day, i) => {
@@ -491,7 +520,7 @@
         ${via}${legHtml(day)}${ferry}${pace}
         ${day.notes && !state.draft.hideVerify ? `<p class="v4-note">${esc(day.notes)}</p>` : ''}
       </article>`;
-    }).join('') + (state.draft.unscheduled.length ? `<section class="v4-day"><h3>${esc(t('unscheduled'))}</h3><ul>${state.draft.unscheduled.map(id => `<li>${esc(nameOf(byId(id)) || id)}</li>`).join('')}</ul></section>` : '');
+    }).join('') + ((state.draft.unscheduled || []).length ? `<section class="v4-day v4-unscheduled"><h3>${esc(t('unscheduled'))}</h3><ul>${state.draft.unscheduled.map(item => `<li>${esc(state.lang === 'en' ? (item.label_en || item) : (item.label_zh || item))}</li>`).join('')}</ul></section>` : '');
   }
   function tightBlock() {
     const min = Number(state.draft.minimum) || state.draft.days.length;
@@ -515,10 +544,10 @@
         <div class="v4-actions"><button type="button" data-undo>${esc(t('undo'))}</button><button type="button" data-redo>${esc(t('redo'))}</button>
         <button type="button" data-add-end>${esc(t('addDayEnd'))}</button><button type="button" data-export>${esc(t('exportJson'))}</button>
         <label class="v4-text-btn">${esc(t('importJson'))}<input id="v4-import" type="file" accept="application/json" hidden></label>
-        <button type="button" data-print>${esc(t('printPdf'))}</button><button type="button" data-clear>${esc(t('clearTrip'))}</button>
-        <button type="button" id="v4-lang">${esc(t('switchLang'))}</button></div></div>
+        <button type="button" data-print>${esc(t('printPdf'))}</button><button type="button" data-clear>${esc(t('clearTrip'))}</button></div></div>
       <p class="v4-note">${esc(t('keysHint'))} ${esc(t('saveState'))}</p>
       ${d.oneWay ? `<p class="v4-alert">${esc(t('oneWayNote'))}</p>` : ''}
+      ${nzCredit(d)}
       <label>${esc(t('daysLabel'))} <input id="v4-days" type="number" min="1" max="30" value="${esc(d.requestedDays)}"></label>
       <div class="v4-seg" role="group">${['pick', 'edit', 'map', 'chosen'].map(v => `<button type="button" data-view="${v}" aria-pressed="${(v === 'edit' ? view === 'edit' : view === v) ? 'true' : 'false'}">${esc(t(v === 'pick' ? 'viewPick' : v === 'edit' ? 'viewEdit' : v === 'map' ? 'viewMap' : 'viewChosen'))}</button>`).join('')}</div>
       ${tightBlock()}
@@ -537,15 +566,13 @@
           <section class="v4-pane-chosen"><h2>${esc(t('viewChosen'))}</h2><ul>${d.chosen.map(id => `<li>${esc(nameOf(byId(id)) || id)}</li>`).join('')}</ul></section>
         </div>
         <aside class="v4-map-card v4-pane-map"><h2>${esc(t('viewMap'))}</h2><div id="v4-map"></div>
-          <p class="v4-note">${esc(t('mapCaption'))}. ${esc(t('mapChooseNote'))}</p>
-          <p class="v4-note">${esc(t('mapStart'))} / ${esc(t('mapEnd'))}</p>
-          <p class="v4-note">${esc(t('noKeyNote'))} <button type="button" data-key-help>${esc(t('keyHelp'))}</button></p>
-          <p id="v4-key-help" class="v4-help" hidden>${esc(t('configHelp'))}</p>
+          <p class="v4-note">${esc(t('noKeyNote'))}</p>
+          <p class="v4-note"><a href="https://www.openstreetmap.org/copyright">${esc(t('osmCredit'))}</a></p>
           <p class="v4-note"><a href="https://www.openstreetmap.org/copyright">${esc(t('osmCredit'))}</a> · ODbL</p>
         </aside>
       </div>`;
     const mapEl = host.querySelector('#v4-map');
-    if (window.PounamuMaps) window.PounamuMaps.mount(mapEl, { lang: state.lang, stops: mapStops(), onToggle: id => togglePlace(id) });
+    if (window.PounamuMaps) window.PounamuMaps.mount(mapEl, { lang: state.lang, stops: mapStops(), candidates: mapCandidates(), onToggle: id => togglePlace(id) });
     bindGuide(host);
   }
   function togglePlace(id) {
@@ -620,7 +647,18 @@
       const dest = event.target.closest('[data-dest-day]');
       if (dest) { moveDay(state.moveFor, Number(dest.dataset.destDay)); return; }
       const tight = event.target.closest('[data-tight]');
-      if (tight && tight.dataset.tight === 'add') { state.draft.requestedDays = Number(state.draft.minimum) || state.draft.requestedDays; persist(); renderGuide(); return; }
+      if (tight && tight.dataset.tight === 'add') {
+        if (state.draft.templateId === 'p10-tight' && state.draft.p10Input && window.p10Plan) {
+          const input = { ...state.draft.p10Input, days: state.draft.minimum };
+          const present = window.p10Present(window.p10Plan(input));
+          state.draft.requestedDays = input.days;
+          state.draft.days = present.days.map(dayFromNode);
+          state.draft.unscheduled = [];
+          state.draft.minimum = input.days;
+          state.draft.p10Input = input;
+        } else state.draft.requestedDays = Number(state.draft.minimum) || state.draft.requestedDays;
+        persist(); renderGuide(); return;
+      }
       if (tight && tight.dataset.tight === 'drop') { state.draft.view = 'pick'; persist(); renderGuide(); return; }
     };
     host.onchange = event => {
@@ -714,6 +752,21 @@
     boot();
   }
 
+  function safeHttp(url) {
+    return /^https?:\/\//i.test(url || '') ? url : '';
+  }
+  function sourceHtml(url, date) {
+    if (!url) return date ? `<p>${esc(date)}</p>` : '';
+    if (!safeHttp(url)) return `<p>${esc(t('sourceToVerify'))}</p>`;
+    return `<p><a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(t('sourceLink'))}</a>${date ? ' ' + esc(date) : ''}</p>`;
+  }
+  function townOverviewZh(town, kids) {
+    const region = regionMeta(town.region_id);
+    const regionName = region ? region.zh : '';
+    const island = town.island === 'north' ? '北岛' : '南岛';
+    const stay = town.suggested_stay ? `；建议停留约 ${town.suggested_stay} 天（编辑估算）` : '';
+    return `${island}${regionName}一带的落脚城镇，本表收录周边 ${kids.length} 个地点${stay}。`;
+  }
   function childrenOf(town) {
     return (state.catalog.places || []).filter(p => p.type !== 'town' && p.town === town.town && p.island === town.island);
   }
@@ -734,11 +787,13 @@
     const sights = visible.filter(k => k.type === 'attraction' || k.type === 'seasonal');
     const acts = visible.filter(k => k.type === 'activity' || k.type === 'walk' || k.type === 'track' || k.type === 'boat');
     const boats = visible.filter(k => k.type === 'boat');
-    const summary = state.lang === 'en' ? town.summary_en : town.summary_zh;
-    const summaryUrl = town.summary_source_url || '';
+    const summary = state.lang === 'en' ? (town.summary_en || '') : townOverviewZh(town, kids);
+    const summaryUrl = safeHttp(town.summary_source_url);
     const summaryDate = town.summary_accessed || '';
     const reg = regionMeta(town.region_id);
-    const regionLabel = town.region_id && reg ? (state.lang === 'en' ? reg.en : reg.zh) : town.atlas_region;
+    const regionLabel = town.region_id && reg ? (state.lang === 'en' ? reg.en : reg.zh) : (state.lang === 'en' ? town.atlas_region : '');
+    const townLabel = nameOf(town);
+    const crumbRegion = regionLabel && regionLabel !== townLabel ? ` / ${esc(regionLabel)}` : '';
     const nearTracks = (state.tracks.tracks || []).filter(tr => window.v4TrackMatches(tr, state.lang === 'en' ? town.name_en : town.name_zh)).slice(0, 8);
     const sport = (state.sports.cities || []).find(c => fold(c.name) === fold(town.name_en) || fold(c.zh) === fold(town.name_zh));
     const fact = (label, value) => value ? `<p><strong>${esc(label)}</strong> ${value}</p>` : '';
@@ -746,10 +801,10 @@
       const sum = state.lang === 'en' ? k.summary_en : k.summary_zh;
       const verify = k.verify ? ` <span class="v4-badge">${esc(t('verifyBadge'))}</span>` : '';
       const date = k.summary_accessed ? `${esc(t('checked'))}: ${esc(k.summary_accessed)}` : '';
-      return `<article class="v4-place"><h3>${esc(nameOf(k))}${verify}</h3>${sum ? `<p>${esc(sum)}</p>` : `<p class="v4-note">${esc(t('summaryEmpty'))}</p>`}${k.source_url ? `<p><a href="${esc(k.source_url)}" target="_blank" rel="noopener noreferrer">${esc(t('sourceLink'))}</a> ${date}</p>` : (date ? `<p>${date}</p>` : '')}</article>`;
+      return `<article class="v4-place"><h3>${esc(nameOf(k))}${verify}</h3>${sum ? `<p>${esc(sum)}</p>` : `<p class="v4-note">${esc(t('summaryEmpty'))}</p>`}${sourceHtml(k.source_url, k.summary_accessed)}</article>`;
     };
-    host.innerHTML = `<p class="v4-note"><a href="index.html?lang=${state.lang}">${esc(t('homeCrumb'))}</a> / ${esc(town.island === 'north' ? t('islandNorth') : t('islandSouth'))} / ${esc(regionLabel)} / ${esc(nameOf(town))}</p>
-      <div class="v4-guide-top"><h1>${esc(nameOf(town))} ${esc(state.lang === 'en' ? town.name_zh : town.name_en)}</h1><button type="button" id="v4-lang">${esc(t('switchLang'))}</button></div>
+    host.innerHTML = `<p class="v4-note"><a href="index.html?lang=${state.lang}">${esc(t('homeCrumb'))}</a> / ${esc(town.island === 'north' ? t('islandNorth') : t('islandSouth'))}${crumbRegion} / ${esc(townLabel)}</p>
+      <div class="v4-guide-top"><h1>${esc(townLabel)} <span class="v4-en-name">${esc(state.lang === 'en' ? town.name_zh : town.name_en)}</span></h1></div>
       <div class="v4-photo-ph">${esc(t('photoPlaceholder'))}</div>
       <p>${esc(town.island === 'north' ? t('islandNorth') : t('islandSouth'))} · ${esc(regionLabel)}${town.region_uncertain ? ` <span class="v4-badge">${esc(t('verifyBadge'))}</span>` : ''}</p>
       ${town.suggested_stay ? `<p>${esc(t('suggestedStay', { n: town.suggested_stay }))}</p>` : ''}
@@ -765,23 +820,14 @@
         <h3>${esc(t('sportsBlock'))}</h3>${sport ? `<p><a href="city.html?id=${esc(sport.id)}&amp;lang=${state.lang}">${esc(t('openSports'))}</a></p>` : `<p><a href="cities.html?lang=${state.lang}">${esc(t('openSports'))}</a></p>`}
         <h3>${esc(t('routeBlock'))}</h3><p><a href="routes.html?island=${town.island}&amp;lang=${state.lang}">${esc(t('readGuide'))}</a></p>
       </section>
-      <section class="v4-block" id="links"><h2>${esc(t('officialLinks'))}</h2>${[town, ...visible].filter(k => k.source_url).slice(0, 12).map(k => `<p><a href="${esc(k.source_url)}" target="_blank" rel="noopener noreferrer">${esc(nameOf(k))}</a>${k.summary_accessed ? ' · ' + esc(k.summary_accessed) : ''}</p>`).join('')}</section>`;
+      <section class="v4-block" id="links"><h2>${esc(t('officialLinks'))}</h2>${[town, ...visible].filter(k => k.source_url).slice(0, 12).map(k => safeHttp(k.source_url) ? `<p><a href="${esc(k.source_url)}" target="_blank" rel="noopener noreferrer">${esc(nameOf(k))}</a>${k.summary_accessed ? ' · ' + esc(k.summary_accessed) : ''}</p>` : `<p>${esc(nameOf(k))} · ${esc(t('sourceToVerify'))}</p>`).join('')}</section>`;
     document.title = nameOf(town) + ' — 绿石之地 · Pounamu Atlas';
-    host.querySelector('#v4-lang')?.addEventListener('click', () => switchLang());
   }
 
   window.v4TrackMatches = function (track, query) {
-    const q = fold(query);
-    if (!q) return true;
-    const blob = fold([track.name, track.zh, track.region, track.regionName, track.url].filter(Boolean).join(' '));
-    if (blob.includes(q)) return true;
-    const matched = towns().filter(town => [town.name_en, town.name_zh, town.town].map(fold).filter(Boolean).some(n => n.includes(q) || q.includes(n)));
-    for (const town of matched) {
-      const en = fold(town.name_en || '');
-      if (en && en.length > 2 && blob.includes(en)) return true;
-      if (town.lat != null && track.lat != null && haversineKm(town.lat, town.lon, Number(track.lat), Number(track.lon)) <= 45) return true;
-    }
-    return false;
+    const api = globalThis.v4Match;
+    if (!api) return false;
+    return api.searchTracks([track], query, towns()).length > 0;
   };
 
   async function boot() {
@@ -812,6 +858,8 @@
     state.lang = pageLang();
     mountNav();
     if (state.catalog && document.querySelector('#v4-search')) renderSearch();
+    if (state.catalog && document.querySelector('#v4-app') && state.draft) renderGuide();
+    if (state.catalog && document.querySelector('#v4-destination')) renderDestination();
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();

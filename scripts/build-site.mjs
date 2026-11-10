@@ -34,7 +34,7 @@ lines[libLine] = 'const photoLibrary=' + JSON.stringify(library) + ';';
 const missing = routes.filter(r => r.photoId && !library[r.photoId]).map(r => r.id);
 if (missing.length) throw new Error('unknown photoId on: ' + missing.join(', '));
 lines[at('const routePhotos=')] = 'const routePhotos=Object.fromEntries(Object.entries(' + JSON.stringify(Object.fromEntries(routes.map(r => [r.id, r.photoId || 'v3-placeholder']))) + ').map(([id,p])=>[id,photoLibrary[p]]));';
-await writeFile(appPath, lines.join('\n'));
+await writeFile(appPath, v4.aliasZh(lines.join('\n')));
 // route sketches: their `sources` are always copied from the catalogue, so the two can never drift apart (James review 1-2)
 const mapPath = join(root, 'docs/route-maps.js');
 const mapLines = (await readFile(mapPath, 'utf8')).split('\n');
@@ -43,7 +43,7 @@ if (mi < 0) throw new Error('missing routeMapData line');
 const mapData = JSON.parse(mapLines[mi].slice('const routeMapData='.length).replace(/;\s*$/, ''));
 for (const [id, d] of Object.entries(mapData)) { const r = routes.find(x => x.id === id); if (!r) throw new Error('sketch without a catalogue route: ' + id); d.sources = r.sources.map(({label, url}) => ({label, url})); }
 mapLines[mi] = 'const routeMapData=' + JSON.stringify(mapData) + ';';
-await writeFile(mapPath, mapLines.join('\n'));
+await writeFile(mapPath, v4.aliasZh(mapLines.join('\n')));
 // the footer links to the licence page inside the site; keep that copy identical to the root file
 await cp(join(root, 'CONTENT-LICENSE.md'), join(root, 'docs/CONTENT-LICENSE.md'));
 await cp(join(root, 'docs'), join(root, 'outputs/site'), {recursive: true, filter: src => !src.endsWith('.nojekyll') && !src.endsWith('SPORTS-SPEC.md')});

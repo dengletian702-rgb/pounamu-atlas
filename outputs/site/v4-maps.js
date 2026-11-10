@@ -1,8 +1,6 @@
-/* Map surface for the guide. Google Maps is optional and local.
-   With no key, an invalid key, or a failed script, draw the schematic SVG.
+/* Map surface. No key, a failed script, a timeout, or gm_authFailure all draw the schematic SVG.
    Directions is never called. */
 (function () {
-  const COAST_ID = 'p10-coast-path';
   function project(lat, lon) {
     return [392.5 + (lon - 174.76) * 38.05, 189.7 + (-lat - 36.85) * 50.5];
   }
@@ -17,21 +15,31 @@
   function coastPath() {
     return window.P10_COAST_PATH || '';
   }
+  function finite(s) {
+    return s && Number.isFinite(Number(s.lat)) && Number.isFinite(Number(s.lon));
+  }
   function schematicSvg(state) {
     const zh = state.lang !== 'en';
-    const stops = (state.stops || []).filter(s => Number.isFinite(s.lat) && Number.isFinite(s.lon));
-    const pts = stops.map(s => ({ ...s, xy: project(s.lat, s.lon) }));
-    const start = pts[0];
-    const end = pts[pts.length - 1];
+    const lineStops = (state.stops || []).filter(finite);
+    const pool = (state.candidates && state.candidates.length ? state.candidates : state.stops || []).filter(finite);
+    const pts = lineStops.map(s => ({ ...s, xy: project(Number(s.lat), Number(s.lon)) }));
+    const startId = pts[0] && pts[0].id;
+    const endId = pts.length ? pts[pts.length - 1].id : '';
     const line = pts.length > 1 ? pts.map(p => p.xy.map(n => n.toFixed(1)).join(',')).join(' ') : '';
-    const dots = pts.map((p, i) => {
+    const dots = pool.map(p => {
+      const xy = project(Number(p.lat), Number(p.lon));
       const label = zh ? (p.name_zh || p.name_en || p.id) : (p.name_en || p.name_zh || p.id);
-      const isStart = i === 0;
-      const isEnd = i === pts.length - 1;
+      const isStart = p.id === startId;
+      const isEnd = p.id === endId;
       const tag = isStart && isEnd ? (zh ? '起终' : 'Start/end') : isStart ? (zh ? '起' : 'S') : isEnd ? (zh ? '终' : 'E') : '';
-      return `<g class="v4-map-stop" data-place="${esc(p.id)}" transform="translate(${p.xy[0].toFixed(1)} ${p.xy[1].toFixed(1)})">
-        <circle r="${p.selected ? 6 : 4}" class="${p.selected ? 'is-on' : ''}"><title>${esc(label)}</title></circle>
-        ${tag ? `<text y="-8" text-anchor="middle">${esc(tag)}</text>` : ''}
+      const cls = [
+        'v4-map-stop',
+        p.selected ? 'is-on' : 'is-off',
+        p.unscheduled ? 'is-unscheduled' : '',
+      ].filter(Boolean).join(' ');
+      return `<g class="${cls}" data-place="${esc(p.id)}" tabindex="0" role="button" aria-pressed="${p.selected ? 'true' : 'false'}" aria-label="${esc(label)}" transform="translate(${xy[0].toFixed(1)} ${xy[1].toFixed(1)})">
+        <circle r="${p.selected ? 7 : 5}"><title>${esc(label)}</title></circle>
+        ${tag ? `<text y="-10" text-anchor="middle">${esc(tag)}</text>` : ''}
       </g>`;
     }).join('');
     const coast = coastPath();
@@ -42,13 +50,28 @@
       ${dots}
     </svg>`;
   }
+  function bindSvg(el, state) {
+    el.querySelectorAll('[data-place]').forEach(node => {
+      const toggle = () => { if (typeof state.onToggle === 'function') state.onToggle(node.dataset.place); };
+      node.addEventListener('click', toggle);
+      node.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggle(); }
+      });
+    });
+  }
+  function showSvg(el, state) {
+    el.dataset.mapKind = 'svg';
+    el.innerHTML = schematicSvg(state);
+    bindSvg(el, state);
+    return { kind: 'svg' };
+  }
   function loadGoogle(key) {
-    if (window.google && window.google.maps) return Promise.resolve(true);
+    if (window.google && window.google.maps && window.google.maps.Map) return Promise.resolve(true);
     return new Promise(resolve => {
       const s = document.createElement('script');
-      const timer = setTimeout(() => resolve(false), 8000);
+      const timer = setTimeout(() => { s.remove(); resolve(false); }, 8000);
       s.async = true;
-      s.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}&v=weekly`;
+      s.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}&v=weekly&libraries=marker`;
       s.onload = () => { clearTimeout(timer); resolve(Boolean(window.google && window.google.maps)); };
       s.onerror = () => { clearTimeout(timer); resolve(false); };
       document.head.appendChild(s);
@@ -58,59 +81,62 @@
     if (!el) return { kind: 'none' };
     const key = keyFromWindow();
     el.replaceChildren();
-    if (!key) {
-      el.dataset.mapKind = 'svg';
-      el.innerHTML = schematicSvg(state);
-      return { kind: 'svg' };
-    }
+    if (!key) return showSvg(el, state);
+    let failed = false;
+    window.gm_authFailure = () => { failed = true; showSvg(el, state); };
     const ok = await loadGoogle(key);
-    if (!ok || !window.google || !window.google.maps) {
-      el.dataset.mapKind = 'svg';
-      el.innerHTML = schematicSvg(state);
-      return { kind: 'svg' };
-    }
-    el.dataset.mapKind = 'google';
-    const mapDiv = document.createElement('div');
-    mapDiv.className = 'v4-google-map';
-    el.appendChild(mapDiv);
-    const map = new window.google.maps.Map(mapDiv, {
-      center: { lat: -41.3, lng: 174.0 },
-      zoom: 5,
-      mapTypeId: 'roadmap',
-      mapTypeControl: true,
-      mapTypeControlOptions: { mapTypeIds: ['roadmap', 'satellite', 'terrain'] },
-      streetViewControl: false,
-      fullscreenControl: false,
-    });
-    const bounds = new window.google.maps.LatLngBounds();
-    const path = [];
-    (state.stops || []).forEach((s, i) => {
-      if (!Number.isFinite(s.lat) || !Number.isFinite(s.lon)) return;
-      const pos = { lat: s.lat, lng: s.lon };
-      bounds.extend(pos);
-      path.push(pos);
-      const isStart = i === 0;
-      const isEnd = i === state.stops.length - 1;
-      const marker = new window.google.maps.Marker({
-        map,
-        position: pos,
-        title: (state.lang === 'en' ? s.name_en : s.name_zh) || s.id,
-        label: isStart ? 'S' : isEnd ? 'E' : undefined,
+    if (failed) return { kind: 'svg' };
+    if (!ok || !window.google || !window.google.maps) return showSvg(el, state);
+    try {
+      el.dataset.mapKind = 'google';
+      const mapDiv = document.createElement('div');
+      mapDiv.className = 'v4-google-map';
+      el.appendChild(mapDiv);
+      const map = new window.google.maps.Map(mapDiv, {
+        center: { lat: -41.3, lng: 174.0 },
+        zoom: 5,
+        mapId: 'DEMO_MAP_ID',
+        mapTypeId: 'roadmap',
+        mapTypeControl: true,
+        mapTypeControlOptions: { mapTypeIds: ['roadmap', 'satellite', 'terrain'] },
+        streetViewControl: false,
+        fullscreenControl: false,
       });
-      marker.addListener('click', () => { if (typeof state.onToggle === 'function') state.onToggle(s.id); });
-    });
-    if (path.length > 1) {
-      new window.google.maps.Polyline({
-        map,
-        path,
-        strokeColor: '#9e4a2e',
-        strokeOpacity: 0.9,
-        strokeWeight: 3,
-        geodesic: false,
+      const bounds = new window.google.maps.LatLngBounds();
+      const path = [];
+      const Marker = window.google.maps.marker && window.google.maps.marker.AdvancedMarkerElement;
+      const pool = (state.candidates && state.candidates.length ? state.candidates : state.stops || []).filter(finite);
+      pool.forEach(s => {
+        const pos = { lat: Number(s.lat), lng: Number(s.lon) };
+        bounds.extend(pos);
+        const title = (state.lang === 'en' ? s.name_en : s.name_zh) || s.id;
+        let marker;
+        if (Marker) {
+          const dot = document.createElement('div');
+          dot.className = s.selected ? 'v4-g-dot is-on' : 'v4-g-dot';
+          dot.textContent = s.id === (state.stops && state.stops[0] && state.stops[0].id) ? 'S' : '';
+          marker = new Marker({ map, position: pos, title, content: dot });
+          marker.addListener('click', () => { if (typeof state.onToggle === 'function') state.onToggle(s.id); });
+        } else {
+          marker = new window.google.maps.Marker({ map, position: pos, title });
+          marker.addListener('click', () => { if (typeof state.onToggle === 'function') state.onToggle(s.id); });
+        }
       });
+      (state.stops || []).forEach(s => {
+        if (!finite(s)) return;
+        path.push({ lat: Number(s.lat), lng: Number(s.lon) });
+      });
+      if (path.length > 1) {
+        new window.google.maps.Polyline({
+          map, path, strokeColor: '#9e4a2e', strokeOpacity: 0.9, strokeWeight: 3, geodesic: false,
+        });
+      }
+      if (path.length || pool.length) map.fitBounds(bounds, 48);
+      if (failed) return showSvg(el, state);
+      return { kind: 'google', map };
+    } catch {
+      return showSvg(el, state);
     }
-    if (path.length) map.fitBounds(bounds, 48);
-    return { kind: 'google', map };
   }
-  window.PounamuMaps = { mount, project, schematicSvg, hasKey: keyFromWindow };
+  window.PounamuMaps = { mount, project, schematicSvg, hasKey: keyFromWindow, showSvg };
 })();

@@ -1,0 +1,29 @@
+[
+ {
+  "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/canterbury/places/arthurs-pass-national-park/",
+  "fetchedAt": "2026-11-10T01:04:41.410Z",
+  "status": 200,
+  "finalUrl": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/canterbury/places/arthurs-pass-national-park/",
+  "title": "Arthur's Pass National Park: Places to go in Canterbury",
+  "overview": [
+   "=\"doc-standard-overview__intro reverse\">",
+   "Arthur’s Pass National Park is in the heart of the Southern Alps/Kā Tiritiri o te Moana. Its high mountains with large scree slopes, steep gorges and wide braided rivers straddle the main divide, and are the ‘back bone’ of the South Island.",
+   "Dog access",
+   "No dogs. Other pets on conservation land rules.",
+   "Brochures",
+   "Discover Arthur's Pass brochure (PDF, 19,008K)",
+   "Tramping in Arthur's Pass brochure (PDF, 1,669K)",
+   "<doc-things-to-do data=\"[{\"recreationType\":2,\"tabName\":\"Walking and tramping\",\"tabId\":\"50578\",\"search\":{\"searchBlockId\":165894,\"fields\":[{\"selectableValues\":[{\"epiFindPropertyName\":\"Duration.List\",\"display\":\"Under 1 hour\",\"value\":\"Under 1 hour\",\"id\":1501000,\"isSelected\":false,\"sortOrder\":100,\"fieldId\":1696808602},{\"epiFindPropertyName\":\"Duration.List\",\"display\":\"1-4 hours\",\"value\":\"1-4 hours\",\"id\":1502000,\"isSelected\":false,\"sortOrder\":200,\"fieldId\":1696808602},{\"epiFindPropertyName\":\"Duration.List\",\"display\":\"Over 4 hours\",\"value\":\"Over 4 hours\",\"id\":1503000,\"isSelected\":false,\"sortOrder\":300,\"fieldId\":1696808602},{\"epiFindPropertyName\":\"Duration.List\",\"display\":\"Overnight\",\"value\":\"Overnight\",\"id\":1504000,\"isSelected\":false,\"sortOrder\":400,\"fieldId\":1696808602},{\"epiFindPropertyName\":\"Duration.List\",\"display\":\"Multi-night\",\"value\":\"Multi-night\",\"id\":1505000,\"isSelected\":false,\"sortOrder\":500,\"fieldId\":1696808602}],\"fieldName\":\"Duration\",\"isCheckbox\":false,\"linkUrl\":\"\",\"linkText\":\"\"},{\"selectableValues\":[{\"epiFindPropertyName\":\"Difficulty.List\",\"display\":\"Easiest\",\"value\":\"Easiest\",\"id\":1601000,\"isSelected\":false,\"sortOrder\":100,\"fieldId\":619807820},{\"epiFindPropertyName\":\"Difficulty.List\",\"display\":\"Easy\",\"value\":\"Easy\",\"id\":1602000,\"isSelected\":false,\"sortOrder\":200,\"fieldId\":619807820},{\"epiFindPropertyName\":\"Difficulty.List\",\"display\":\"Intermediate\",\"value\":\"Intermediate\",\"id\":1603000,\"isSelected\":false,\"sortOrder\":300,\"fieldId\":619807820},{\"epiFindPropertyName\":\"Difficulty.List\",\"display\":\"Advanced\",\"value\":\"Advanced\",\"id\":1604000,\"isSelected\":false,\"sortOrder\":400,\"fieldId\":619807820},{\"epiFindPropertyName\":\"Difficulty.List\",\"display\":\"Expert\",\"value\":\"Expert\",\"id\":1605000,\"isSelected\":false,\"sortOrder\":500,\"fieldId\":619807820}],\"fieldName\":\"Difficulty\",\"isCheckbox\":false,\"linkUrl\":\"/parks-and-recreation/things-to-do/walking-and-tramping/track-categories/\",\"linkText\":\"About track difficulties\"},{\"selectableValues\":[{\"epiFindPropertyName\":\"DogAccess\",\"display\":\"Dogs allowed\",\"value\":\"true\",\"id\":0,\"isSelected\":false,\"sortOrder\":0,\"fieldId\":1153495591},{\"epiFindPropertyName\":\"EasyAccess$$bool\",\"display\":\"Wheelchairs and buggies\",\"value\":\"true\",\"id\":0,\"isSelected\":false,\"sortOrder\":0,\"field"
+  ],
+  "stages": [],
+  "lines": [
+   "Department of Conservation Te Papa Atawhai",
+   "Department of Conservation | Te Papa Atawhai",
+   "Avalanches",
+   "Avalanches usually occur in Arthur's Pass National Park from May to November. Find out about avalanche danger in Arthur's Pass National Park .",
+   "For those planning overnight trips, there are many backcountry huts which trampers can use. The tracks are not as developed as they are in other parks and are not continuously marked. Check at the DOC visitor centre for up-to-date information on track conditions.",
+   "Arthur's Pass was established in 1929. It was New Zealand's third national park and the first one in the South Island. Jacks Hut is a rare surviving example of a roadman's cottage. Read about Historic Arthur's Pass .",
+   "Page-level feedback"
+  ]
+ }
+]

@@ -1,0 +1,20 @@
+{
+ "_about": "v3.1 photo picks for routes that had only the placeholder (James review B7). Each file shows the route itself or a named place on it; the caption names the place photographed. scripts/fetch-route-photos.mjs checks the licence with the Commons API, downloads a 1280 px copy and adds the record to data/photo-additions.json.",
+ "picks": [
+  {"route": "hump-ridge-track", "file": "Hump Ridge Track beach.jpg", "place": ["Beach on the Hump Ridge Track, Southland", "胡姆岭步道沿途的海滩（南地）"], "why": "Commons category Hump Ridge Track; description says on the track; GPS on Te Waewae Bay coast"},
+  {"route": "tasman-glacier-view", "file": "Tasman Lake and Tasman Glacier.jpg", "place": ["Tasman Lake and Tasman Glacier, Aoraki / Mount Cook National Park", "塔斯曼湖与塔斯曼冰川（奥拉基／库克山国家公园）"], "why": "GPS -43.6959, 170.1684, at the Tasman Glacier viewpoint above the lake"},
+  {"route": "lake-marian", "file": "Lake Marian Trail in Fiordland National Park 05.jpg", "place": ["Lake Marian Track, Fiordland National Park", "峡湾国家公园的玛丽安湖步道"], "why": "Commons category Lake Marian Trail; GPS on the lower track"},
+  {"route": "franz-josef-glacier-walk", "file": "Franz Josef Glacier 06.jpg", "place": ["Franz Josef Glacier / Kā Roimata o Hine Hukatere from the Waiho valley", "从 Waiho 河谷望弗朗茨约瑟夫冰川"], "why": "GPS -43.4358, 170.1705, in the glacier valley on the walk"},
+  {"route": "pancake-rocks", "file": "PancakeRocks MC.jpg", "place": ["Pancake Rocks blowhole, Punakaiki", "普纳凯基千层岩的喷水洞"], "why": "Commons category Pancake Rocks; GPS at the rocks"},
+  {"route": "hokitika-gorge", "file": "Hokitika Gorge Walk MRD 11.jpg", "place": ["Hokitika Gorge Walk, Hokitika Gorge Scenic Reserve", "霍基蒂卡峡谷步道（霍基蒂卡峡谷风景保护区）"], "why": "Commons category Hokitika Gorge Walk; GPS on the walk"},
+  {"route": "ben-lomond", "file": "View from Ben Lomond over Lake Wakatipu towards the Remarkables in spring.jpg", "place": ["View from Ben Lomond over Lake Wakatipu to the Remarkables", "从本洛蒙德山俯瞰瓦卡蒂普湖与卓越山"], "why": "GPS near the Ben Lomond summit"},
+  {"route": "isthmus-peak", "file": "View from Isthmus Peak to Isthmus Peak Trail, New Zealand.jpg", "place": ["Isthmus Peak Track seen from the summit", "从地峡峰顶回望地峡峰步道"], "why": "Title and GPS: the summit of Isthmus Peak"},
+  {"route": "waikoropupu-springs", "file": "Clear waters of Te Waikoropupu Springs.jpg", "place": ["Te Waikoropupū Springs, Golden Bay", "黄金湾的蒂怀科罗普普泉"], "why": "Title and GPS at the springs viewing platform"},
+  {"route": "mount-robert-circuit", "file": "View south from Mount Robert ridge.jpg", "place": ["View south from the Pourangahau / Mount Robert ridge, Nelson Lakes National Park", "从罗伯特山（Pourangahau）山脊向南望，尼尔森湖国家公园"], "why": "GPS -41.837, 172.817 on the Mount Robert ridge"},
+  {"route": "cathedral-cove", "file": "Cathedral Cove 06.jpg", "place": ["Mautohe Cathedral Cove, Coromandel", "科罗曼德的 Mautohe 教堂湾"], "why": "Title and GPS at the cove"},
+  {"route": "tane-mahuta", "file": "Waipoua Forest, Kauri walks - Tane Mahuta (1).jpg", "place": ["Tāne Mahuta, Waipoua Forest", "怀波瓦森林中的 Tāne Mahuta 贝壳杉"], "why": "Title and GPS at the tree"},
+  {"route": "pinnacles-kauaeranga", "file": "Kauaeranga valley pinnacles.jpg", "place": ["The Pinnacles, Kauaeranga Valley, Coromandel Forest Park", "科罗曼德森林公园考埃兰加河谷的 Pinnacles"], "why": "Title and GPS at the Pinnacles summit area"},
+  {"route": "te-paki-coastal", "file": "Te Werahi Beach, Tarawamaomao Point.jpg", "place": ["Te Werahi Beach on the Te Paki Coastal Track", "蒂帕基海岸步道途经的 Te Werahi 海滩"], "why": "DOC lists the Cape Reinga to Te Werahi Beach and Te Werahi Beach to Twilight Beach sections; GPS on the beach"},
+  {"route": "whanganui-journey", "file": "Whanganui Journey.jpg", "place": ["Canoes on the Ongarue River at Taumarunui, near the Ngāhuinga (Cherry Grove) start of the full Whanganui Journey", "陶马鲁努伊 Ongarue 河边的独木舟，靠近旺格努伊河之旅全程起点 Ngāhuinga（Cherry Grove）"], "why": "Commons category Whanganui Journey; GPS -38.8921, 175.2535 at Taumarunui"}
+ ]
+}

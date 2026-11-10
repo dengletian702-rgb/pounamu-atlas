@@ -1,0 +1,282 @@
+{
+ "cx-heaphy-river": {
+  "src": "assets/optimized/cx-heaphy-river.jpg",
+  "place": [
+   "Nīkau palms and the Heaphy River, Heaphy Track",
+   "希菲步道：尼考棕榈与希菲河"
+  ],
+  "author": "Pierre Lavaurs",
+  "source": "https://commons.wikimedia.org/wiki/File:HeaphyRiver.jpg",
+  "license": "Public domain",
+  "licenseUrl": "https://commons.wikimedia.org/wiki/File:HeaphyRiver.jpg#Licensing",
+  "title": "HeaphyRiver.jpg",
+  "route": "heaphy-track",
+  "checkedAt": "2026-11-10"
+ },
+ "cx-paparoa": {
+  "src": "assets/optimized/cx-paparoa.jpg",
+  "place": [
+   "Paparoa Track, Paparoa National Park",
+   "帕帕罗瓦国家公园的帕帕罗瓦步道"
+  ],
+  "author": "Mike and Lara Wolfe",
+  "source": "https://commons.wikimedia.org/wiki/File:Paparoa_Track.jpg",
+  "license": "CC0",
+  "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+  "title": "Paparoa_Track.jpg",
+  "route": "paparoa-track",
+  "checkedAt": "2026-11-10"
+ },
+ "cx-rakiura-lee-bay": {
+  "src": "assets/optimized/cx-rakiura-lee-bay.jpg",
+  "place": [
+   "Rakiura Track at Lee Bay, Stewart Island",
+   "斯图尔特岛 Lee Bay 的拉奇欧拉步道"
+  ],
+  "author": "AlasdairW",
+  "source": "https://commons.wikimedia.org/wiki/File:Rakiura_Track_at_Lee_Bay.jpg",
+  "license": "CC BY-SA 3.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+  "title": "Rakiura_Track_at_Lee_Bay.jpg",
+  "route": "rakiura-track",
+  "checkedAt": "2026-11-10"
+ },
+ "cx-waikaremoana": {
+  "src": "assets/optimized/cx-waikaremoana.jpg",
+  "place": [
+   "Lake Waikaremoana, Te Urewera",
+   "特乌雷维拉的怀卡雷莫阿纳湖"
+  ],
+  "author": "Krzysztof Golik",
+  "source": "https://commons.wikimedia.org/wiki/File:Lake_Waikaremoana_01.jpg",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "title": "Lake_Waikaremoana_01.jpg",
+  "route": "lake-waikaremoana",
+  "checkedAt": "2026-11-10"
+ },
+ "cx-pouakai-taranaki": {
+  "src": "assets/optimized/cx-pouakai-taranaki.jpg",
+  "place": [
+   "Taranaki from the Pouākai track, Egmont National Park",
+   "从波阿凯步道望塔拉纳基山（艾格蒙特国家公园）"
+  ],
+  "author": "Sarang",
+  "source": "https://commons.wikimedia.org/wiki/File:Pouakai_Track_7.jpg",
+  "license": "Public domain",
+  "licenseUrl": "https://commons.wikimedia.org/wiki/File:Pouakai_Track_7.jpg#Licensing",
+  "title": "Pouakai_Track_7.jpg",
+  "route": "pouakai-crossing",
+  "checkedAt": "2026-11-10"
+ },
+ "cx-hump-ridge-track": {
+  "src": "assets/optimized/cx-hump-ridge-track.jpg",
+  "place": [
+   "Beach on the Hump Ridge Track, Southland",
+   "胡姆岭步道沿途的海滩（南地）"
+  ],
+  "author": "Andre Richard Chalmers",
+  "source": "https://commons.wikimedia.org/wiki/File:Hump_Ridge_Track_beach.jpg",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "title": "Hump Ridge Track beach.jpg",
+  "route": "hump-ridge-track",
+  "checkedAt": "2026-11-10"
+ },
+ "cx-tasman-glacier-view": {
+  "src": "assets/optimized/cx-tasman-glacier-view.jpg",
+  "place": [
+   "Tasman Lake and Tasman Glacier, Aoraki / Mount Cook National Park",
+   "塔斯曼湖与塔斯曼冰川（奥拉基／库克山国家公园）"
+  ],
+  "author": "Krzysztof Golik",
+  "source": "https://commons.wikimedia.org/wiki/File:Tasman_Lake_and_Tasman_Glacier.jpg",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "title": "Tasman Lake and Tasman Glacier.jpg",
+  "route": "tasman-glacier-view",
+  "checkedAt": "2026-11-10"
+ },
+ "cx-lake-marian": {
+  "src": "assets/optimized/cx-lake-marian.jpg",
+  "place": [
+   "Lake Marian Track, Fiordland National Park",
+   "峡湾国家公园的玛丽安湖步道"
+  ],
+  "author": "Krzysztof Golik",
+  "source": "https://commons.wikimedia.org/wiki/File:Lake_Marian_Trail_in_Fiordland_National_Park_05.jpg",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "title": "Lake Marian Trail in Fiordland National Park 05.jpg",
+  "route": "lake-marian",
+  "checkedAt": "2026-11-10"
+ },
+ "cx-franz-josef-glacier-walk": {
+  "src": "assets/optimized/cx-franz-josef-glacier-walk.jpg",
+  "place": [
+   "Franz Josef Glacier / Kā Roimata o Hine Hukatere from the Waiho valley",
+   "从 Waiho 河谷望弗朗茨约瑟夫冰川"
+  ],
+  "author": "Krzysztof Golik",
+  "source": "https://commons.wikimedia.org/wiki/File:Franz_Josef_Glacier_06.jpg",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "title": "Franz Josef Glacier 06.jpg",
+  "route": "franz-josef-glacier-walk",
+  "checkedAt": "2026-11-10"
+ },
+ "cx-pancake-rocks": {
+  "src": "assets/optimized/cx-pancake-rocks.jpg",
+  "place": [
+   "Pancake Rocks blowhole, Punakaiki",
+   "普纳凯基千层岩的喷水洞"
+  ],
+  "author": "Christian Mehlführer",
+  "source": "https://commons.wikimedia.org/wiki/File:PancakeRocks_MC.jpg",
+  "license": "CC BY-SA 3.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+  "title": "PancakeRocks MC.jpg",
+  "route": "pancake-rocks",
+  "checkedAt": "2026-11-10"
+ },
+ "cx-hokitika-gorge": {
+  "src": "assets/optimized/cx-hokitika-gorge.jpg",
+  "place": [
+   "Hokitika Gorge Walk, Hokitika Gorge Scenic Reserve",
+   "霍基蒂卡峡谷步道（霍基蒂卡峡谷风景保护区）"
+  ],
+  "author": "Mike Dickison",
+  "source": "https://commons.wikimedia.org/wiki/File:Hokitika_Gorge_Walk_MRD_11.jpg",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+  "title": "Hokitika Gorge Walk MRD 11.jpg",
+  "route": "hokitika-gorge",
+  "checkedAt": "2026-11-10"
+ },
+ "cx-ben-lomond": {
+  "src": "assets/optimized/cx-ben-lomond.jpg",
+  "place": [
+   "View from Ben Lomond over Lake Wakatipu to the Remarkables",
+   "从本洛蒙德山俯瞰瓦卡蒂普湖与卓越山"
+  ],
+  "author": "Pseudopanax (English Wikipedia)",
+  "source": "https://commons.wikimedia.org/wiki/File:View_from_Ben_Lomond_over_Lake_Wakatipu_towards_the_Remarkables_in_spring.jpg",
+  "license": "CC BY 3.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+  "title": "View from Ben Lomond over Lake Wakatipu towards the Remarkables in spring.jpg",
+  "route": "ben-lomond",
+  "checkedAt": "2026-11-10"
+ },
+ "cx-isthmus-peak": {
+  "src": "assets/optimized/cx-isthmus-peak.jpg",
+  "place": [
+   "Isthmus Peak Track seen from the summit",
+   "从地峡峰顶回望地峡峰步道"
+  ],
+  "author": "Michal Klajban",
+  "source": "https://commons.wikimedia.org/wiki/File:View_from_Isthmus_Peak_to_Isthmus_Peak_Trail,_New_Zealand.jpg",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "title": "View from Isthmus Peak to Isthmus Peak Trail, New Zealand.jpg",
+  "route": "isthmus-peak",
+  "checkedAt": "2026-11-10"
+ },
+ "cx-waikoropupu-springs": {
+  "src": "assets/optimized/cx-waikoropupu-springs.jpg",
+  "place": [
+   "Te Waikoropupū Springs, Golden Bay",
+   "黄金湾的蒂怀科罗普普泉"
+  ],
+  "author": "Pseudopanax (English Wikipedia)",
+  "source": "https://commons.wikimedia.org/wiki/File:Clear_waters_of_Te_Waikoropupu_Springs.jpg",
+  "license": "Public domain",
+  "licenseUrl": "https://commons.wikimedia.org/wiki/File:Clear_waters_of_Te_Waikoropupu_Springs.jpg#Licensing",
+  "title": "Clear waters of Te Waikoropupu Springs.jpg",
+  "route": "waikoropupu-springs",
+  "checkedAt": "2026-11-10"
+ },
+ "cx-mount-robert-circuit": {
+  "src": "assets/optimized/cx-mount-robert-circuit.jpg",
+  "place": [
+   "View south from the Pourangahau / Mount Robert ridge, Nelson Lakes National Park",
+   "从罗伯特山（Pourangahau）山脊向南望，尼尔森湖国家公园"
+  ],
+  "author": "Pseudopanax (English Wikipedia)",
+  "source": "https://commons.wikimedia.org/wiki/File:View_south_from_Mount_Robert_ridge.jpg",
+  "license": "Public domain",
+  "licenseUrl": "https://commons.wikimedia.org/wiki/File:View_south_from_Mount_Robert_ridge.jpg#Licensing",
+  "title": "View south from Mount Robert ridge.jpg",
+  "route": "mount-robert-circuit",
+  "checkedAt": "2026-11-10"
+ },
+ "cx-cathedral-cove": {
+  "src": "assets/optimized/cx-cathedral-cove.jpg",
+  "place": [
+   "Mautohe Cathedral Cove, Coromandel",
+   "科罗曼德的 Mautohe 教堂湾"
+  ],
+  "author": "Krzysztof Golik",
+  "source": "https://commons.wikimedia.org/wiki/File:Cathedral_Cove_06.jpg",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "title": "Cathedral Cove 06.jpg",
+  "route": "cathedral-cove",
+  "checkedAt": "2026-11-10"
+ },
+ "cx-tane-mahuta": {
+  "src": "assets/optimized/cx-tane-mahuta.jpg",
+  "place": [
+   "Tāne Mahuta, Waipoua Forest",
+   "怀波瓦森林中的 Tāne Mahuta 贝壳杉"
+  ],
+  "author": "Michal Klajban",
+  "source": "https://commons.wikimedia.org/wiki/File:Waipoua_Forest,_Kauri_walks_-_Tane_Mahuta_(1).jpg",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "title": "Waipoua Forest, Kauri walks - Tane Mahuta (1).jpg",
+  "route": "tane-mahuta",
+  "checkedAt": "2026-11-10"
+ },
+ "cx-pinnacles-kauaeranga": {
+  "src": "assets/optimized/cx-pinnacles-kauaeranga.jpg",
+  "place": [
+   "The Pinnacles, Kauaeranga Valley, Coromandel Forest Park",
+   "科罗曼德森林公园考埃兰加河谷的 Pinnacles"
+  ],
+  "author": "Sonia",
+  "source": "https://commons.wikimedia.org/wiki/File:Kauaeranga_valley_pinnacles.jpg",
+  "license": "CC BY-SA 3.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+  "title": "Kauaeranga valley pinnacles.jpg",
+  "route": "pinnacles-kauaeranga",
+  "checkedAt": "2026-11-10"
+ },
+ "cx-te-paki-coastal": {
+  "src": "assets/optimized/cx-te-paki-coastal.jpg",
+  "place": [
+   "Te Werahi Beach on the Te Paki Coastal Track",
+   "蒂帕基海岸步道途经的 Te Werahi 海滩"
+  ],
+  "author": "ShakyIsles",
+  "source": "https://commons.wikimedia.org/wiki/File:Te_Werahi_Beach,_Tarawamaomao_Point.jpg",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "title": "Te Werahi Beach, Tarawamaomao Point.jpg",
+  "route": "te-paki-coastal",
+  "checkedAt": "2026-11-10"
+ },
+ "cx-whanganui-journey": {
+  "src": "assets/optimized/cx-whanganui-journey.jpg",
+  "place": [
+   "Canoes on the Ongarue River at Taumarunui, near the Ngāhuinga (Cherry Grove) start of the full Whanganui Journey",
+   "陶马鲁努伊 Ongarue 河边的独木舟，靠近旺格努伊河之旅全程起点 Ngāhuinga（Cherry Grove）"
+  ],
+  "author": "ShakyIsles",
+  "source": "https://commons.wikimedia.org/wiki/File:Whanganui_Journey.jpg",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "title": "Whanganui Journey.jpg",
+  "route": "whanganui-journey",
+  "checkedAt": "2026-11-10"
+ }
+}

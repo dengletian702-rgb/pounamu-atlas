@@ -30,6 +30,9 @@ test('every selectable destination has bilingual tips', () => {
   for (const wish of planner.WISHES) {
     assert.ok(planner.P10_WISH_TIPS[wish.id]?.zh, `${wish.id} Chinese`);
     assert.ok(planner.P10_WISH_TIPS[wish.id]?.en, `${wish.id} English`);
+    // v3.1 C12: each tip carries official sources or is flagged to verify
+    const tip=planner.P10_WISH_TIPS[wish.id];
+    assert.ok((Array.isArray(tip.src)&&tip.src.length&&tip.src.every(x=>/^https:\/\//.test(x.url)&&x.checkedAt))||tip.verify===true, `${wish.id} source or to-verify`);
   }
 });
 test('Auckland to Wellington plan includes Tongariro and Napier activity days', () => {
@@ -39,7 +42,7 @@ test('Auckland to Wellington plan includes Tongariro and Napier activity days', 
   assert.ok(ids.includes('tongariro'));
   assert.ok(ids.includes('napier'));
   assert.match(planner.P10_WISH_TIPS.tongariro.zh,/20\.2 km.*接驳车.*天气/);
-  assert.match(planner.P10_WISH_TIPS.napier.zh,/Marine Parade/);
+  assert.match(planner.P10_WISH_TIPS.napier.zh,/1931/);
 });
 test('deployed source copy and editable source are identical', () => {
   assert.equal(fs.readFileSync(plannerPath,'utf8'),fs.readFileSync(path.join(root,'outputs/site/p10-planner.js'),'utf8'));

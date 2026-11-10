@@ -6,9 +6,9 @@ import {dirname,join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 const root=dirname(dirname(fileURLToPath(import.meta.url)));
 const sites=['docs','outputs/site'];
-const assets=['app.js','route-maps.js','p10-planner.js','planner-adapter.js','styles.css','p10-planner.css'];
-const pages=['index.html','routes.html','route.html','prepare.html','plan.html'];
-const pattern=/\b(src|href)="(app\.js|route-maps\.js|p10-planner\.js|planner-adapter\.js|styles\.css|p10-planner\.css)(?:\?[^"#]*)?"/g;
+const assets=['app.js','v3.js','route-maps.js','p10-planner.js','planner-adapter.js','styles.css','v3.css','p10-planner.css'];
+const pages=['index.html','routes.html','route.html','prepare.html','plan.html','tracks.html','cities.html','city.html'];
+const pattern=/\b(src|href)="(app\.js|v3\.js|route-maps\.js|p10-planner\.js|planner-adapter\.js|styles\.css|v3\.css|p10-planner\.css)(?:\?[^"#]*)?"/g;
 const check=process.argv.includes('--check');let errors=[];const hashed={};
 for(const site of sites){
  const hashes={};for(const name of assets){const bytes=await readFile(join(root,site,name));hashes[name]=createHash('sha256').update(bytes).digest('hex').slice(0,12);}

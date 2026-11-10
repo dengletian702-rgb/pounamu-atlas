@@ -6,3 +6,7 @@ node_modules/
 
 .dev.vars*
 .wrangler/
+
+data/cache/
+.claude/
+screenshots/

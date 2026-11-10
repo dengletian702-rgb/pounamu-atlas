@@ -1,0 +1,85 @@
+/* v3 additions: verification marks, safety panel, DOC directory, sports cards. Uses the site's own tokens. */
+.v3-tv{display:inline-block;padding:2px 8px;border:1px dashed #9b4e2d;border-radius:999px;color:#8a3f1f;background:#f7ece3;font-size:11px;line-height:1.5;letter-spacing:.02em;text-decoration:none;white-space:nowrap;cursor:help}
+.v3-ok{display:inline-block;font-size:11px;line-height:1.5;color:#2d5a45;text-decoration:underline;text-underline-offset:3px}
+.v3-missing{color:#6a7a6f;font-style:italic;font-weight:400}
+.journey-facts>div .v3-tv,.journey-facts>div .v3-ok{margin-top:10px}
+.journey-facts>div .v3-tv{display:inline-block}
+.journey-facts>div .v3-ok{display:block}
+.v3-card-note{margin:14px 0 0;font-size:12px;color:var(--muted);line-height:1.6}
+.v3-lead{font-size:15px;line-height:1.8;color:var(--muted);max-width:64ch;margin:14px 0 22px}
+.v3-table-wrap{overflow-x:auto}
+.v3-table{width:100%;border-collapse:collapse;font-size:14px;line-height:1.65}
+.v3-table th,.v3-table td{text-align:left;vertical-align:top;padding:14px 14px 14px 0;border-bottom:1px solid #d4dbcf}
+.v3-table thead th{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#65796a;font-weight:500}
+.v3-table tbody th{font-weight:600;white-space:nowrap}
+.v3-table details{margin-top:8px;font-size:12px;color:var(--muted)}
+.v3-table summary{cursor:pointer}
+.v3-table q{display:block;margin:6px 0;padding-left:10px;border-left:2px solid #c8d2c3;quotes:'“' '”'}
+.v3-role{font-style:normal;font-size:11px;color:#65796a;border:1px solid #c8d2c3;border-radius:999px;padding:1px 8px;margin-left:6px;white-space:nowrap}
+.v3-status{font-size:13px;line-height:1.7;padding:12px 14px;background:#e9ede4;border-left:3px solid #65796a;margin:0 0 18px}
+.v3-status-closed{border-left-color:#9b4e2d;background:#f7ece3}
+.v3-status-pill{display:inline-block;font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid #c8d2c3;color:#53665b}
+.v3-status-pill.v3-status-open{border-color:#7fa58f;color:#2d5a45}
+.v3-status-pill.v3-status-closed{border-color:#9b4e2d;color:#8a3f1f;background:#f7ece3}
+.v3-map-note{padding:40px 0;color:var(--muted);font-size:14px}
+.v3-line-map svg{width:100%;height:auto;background:#e9ede4;border:1px solid #ccd5c6}
+.v3-line-map figcaption,.v3-attribution,.v3-credit{font-size:11px;line-height:1.7;color:#65796a;margin-top:10px}
+.v3-attribution a,.v3-credit a,.v3-licence a,.v3-notice a{text-decoration:underline;text-underline-offset:3px}
+.v3-notice{border:1px solid #ccd5c6;background:#eef1e9;padding:18px 20px;font-size:13px;line-height:1.8;margin-bottom:26px}
+.v3-notice p+p{margin-top:8px}
+.v3-licence{flex-basis:100%;font-size:11px;line-height:1.8;opacity:.85;margin-top:14px}
+.v3-track-controls{display:flex;flex-wrap:wrap;gap:14px 22px;align-items:center;margin-top:14px;font-size:12px;color:var(--muted)}
+.v3-track-controls select,.v3-track-controls input{font:inherit;font-size:13px;padding:9px 10px;min-height:44px;border:1px solid #b9c4b4;background:#fff;color:var(--ink);border-radius:2px;max-width:100%}
+.v3-track-controls .route-count{margin-left:auto}
+.v3-track-list{border-top:1px solid #d4dbcf}
+.v3-track{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,2fr) auto;gap:10px 28px;align-items:start;padding:18px 0;border-bottom:1px solid #d4dbcf}
+.v3-track h3{font-size:16px;line-height:1.4;font-weight:600}
+.v3-track h3 a{text-decoration:underline;text-underline-offset:3px}
+.v3-track-region{font-size:12px;color:var(--muted);margin-top:6px}
+.v3-track dl{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px 18px;margin:0}
+.v3-track dt{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#65796a;margin-bottom:5px}
+.v3-track dd{margin:0;font-size:13px;line-height:1.55}
+.v3-track .text-link{white-space:nowrap;font-size:13px}
+#trackMore,#venueMore{margin:26px 0}
+.v3-venue-grid,.v3-city-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:26px;margin:22px 0}
+.v3-venue{border:1px solid #ccd5c6;background:#f4f5ee;display:flex;flex-direction:column}
+.v3-venue-art{position:relative;aspect-ratio:16/9;background:#dfe5da;overflow:hidden}
+.v3-venue-art img{width:100%;height:100%;object-fit:cover;display:block}
+
+.v3-venue-body{padding:16px 18px 18px;display:grid;gap:8px}
+.v3-venue h3{font-size:16px;line-height:1.4;font-weight:600}
+.v3-venue-where{font-size:13px;color:var(--muted);line-height:1.5}
+.v3-venue-dist{font-size:12px;color:#8a3f1f}
+.v3-venue-facts{display:flex;flex-wrap:wrap;gap:6px}
+.v3-venue-facts span,.v3-city-counts span{font-size:11px;border:1px solid #c8d2c3;border-radius:999px;padding:2px 9px;color:#3c5547}
+.v3-venue .v3-credit{margin-top:0}
+.v3-city{display:block;border:1px solid #ccd5c6;background:#f4f5ee;padding:22px}
+.v3-city:hover{border-color:#65796a}
+.v3-city h3{font-size:24px;font-weight:500;margin:8px 0 14px}
+.v3-city-counts{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.v3-sport-filters{margin:6px 0 4px;display:flex;flex-wrap:wrap}
+@media(max-width:1000px){.v3-venue-grid,.v3-city-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.v3-track{grid-template-columns:1fr}.v3-track dl{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:750px){.v3-venue-grid,.v3-city-grid{grid-template-columns:1fr;gap:18px}.v3-table{font-size:13px}.v3-table tbody th{white-space:normal}.v3-track-controls .route-count{margin-left:0}.journey-facts>div .v3-tv,.journey-facts>div .v3-ok{margin-top:6px}}
+.v3-track h3,.v3-venue h3,.v3-city h3,.v3-table,.v3-verify h2,.v3-safety h2,.v3-sports h2{font-family:var(--sans,-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif)}
+.v3-track h3,.v3-venue h3{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB',sans-serif;letter-spacing:0}
+.v3-venue-art .v3-kind{position:absolute;left:12px;top:12px;background:#f6f5ef;color:#1e3c32;font-size:11px;line-height:1;padding:6px 10px;border-radius:999px;border:1px solid #ccd5c6}
+@media(min-width:751px){.v3-table td:last-child{white-space:nowrap}}
+/* v3.1 — six nav items on a phone: two rows of three, nothing scrolls or clips (James review 3) */
+@media(max-width:750px){.header,body[data-page=index] .header{height:auto;min-height:118px;padding-bottom:6px}.header .nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 10px;width:100%;overflow:visible}.header .nav a{white-space:nowrap;padding:11px 0 10px;font-size:13px;letter-spacing:0;text-align:left}html:lang(en) .header .nav a{font-size:12px}}
+/* v3.1 — route section tabs wrap instead of scrolling out of view on phones */
+@media(max-width:750px){.journey-tabs{flex-wrap:wrap;overflow:visible;gap:2px 18px}}
+/* v3.1 — card button label never wraps or clips; the arrow keeps its own space */
+.route-readmore{gap:12px}.route-readmore span:first-child{white-space:nowrap;overflow:visible;min-width:max-content}.route-readmore span:last-child{flex:none}
+/* v3.1 — official closure banner: first screen on phones, above the hero */
+.v3-closure{margin:0 0 0;padding-top:14px;padding-bottom:14px;background:#f6ead2;border-top:3px solid #c8923a;border-bottom:1px solid #e2cfa6;font-size:15px;line-height:1.6;color:#3a2a12}
+.v3-closure p{margin:0;max-width:980px}.v3-closure-src{font-size:12.5px;margin-top:6px!important;color:#5d4a2c;overflow-wrap:anywhere}
+.v3-closure-head{display:inline-block;margin-right:8px;padding:1px 8px;background:#8a5a14;color:#fff;font-weight:600;font-size:13px;letter-spacing:.02em}
+.v3-closure-on{background:#fbe3dc;border-top-color:#b3361d;border-bottom-color:#e7b8a9;color:#3d1309}.v3-closure-on .v3-closure-head{background:#b3361d}.v3-closure-on .v3-closure-src{color:#5e2a1d}
+.v3-card-closure{margin:10px 0 0;padding:4px 8px;background:#fbe3dc;color:#8e2a15;font-size:12.5px;font-weight:600;border-left:3px solid #b3361d}
+@media(max-width:750px){.v3-closure{font-size:14px;padding-top:12px;padding-bottom:12px}}
+/* v3.1 — five ways to travel (paddling added) */
+@media(min-width:751px){.ways-grid{grid-template-columns:repeat(5,1fr);gap:28px}}
+@media(max-width:750px){.ways-grid>a:last-child:nth-child(odd){grid-column:1 / -1}}
+/* v3.1 C12: planner tip sources */
+.p10-tip-src{font-size:.85em;color:var(--muted,#5b6b63)}
+.p10-tip-src a{color:inherit;text-decoration:underline;text-underline-offset:2px}

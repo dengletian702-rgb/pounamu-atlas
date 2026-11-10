@@ -1,0 +1,42 @@
+[
+ {
+  "url": "https://www.greatjourneysnz.com/scenic-trains/tranzalpine-train/",
+  "fetchedAt": "2026-11-10T01:18:26.900Z",
+  "status": 200,
+  "finalUrl": "https://www.greatjourneysnz.com/scenic-trains/tranzalpine-train/",
+  "title": "TranzAlpine train | Great Journeys NZ | Official",
+  "lines": [
+   "Until 20 November, the TranzAlpine is running between Christchurch and Arthur’s Pass, with a bus connection to Greymouth while we repair track damage. If you’re booked, we have options available for you.",
+   "Book a seat and travel throughout New Zealand aboard our world-class scenic trains.",
+   "Train timetables",
+   "How to book",
+   "1 day",
+   "Timetable",
+   "Check Arrival and Departure times",
+   "Step outside into the fresh air and take in uninterrupted panoramic views. The open-air viewing carriage offers a unique perspective, making it easy to capture unforgettable photos and immerse yourself in New Zealand's spectacular landscapes.",
+   "Discover the flavours of the South Island aboard the TranzAlpine Scenic Plus experience, with a seasonal menu inspired by the Canterbury Plains, Southern Alps and West Coast.",
+   "Our menu is subject to seasonal change. Please advise us of any dietary requirements at the time of booking."
+  ]
+ },
+ {
+  "url": "https://www.greatjourneysnz.com/scenic-trains/tranzalpine-train/timetable/",
+  "fetchedAt": "2026-11-10T01:18:28.615Z",
+  "status": 200,
+  "finalUrl": "https://www.greatjourneysnz.com/scenic-trains/tranzalpine-train/timetable/",
+  "title": "TranzAlpine Timetable | Great Journeys NZ | Official",
+  "lines": [
+   "TranzAlpine Timetable | Great Journeys NZ | Official",
+   "Until 20 November, the TranzAlpine is running between Christchurch and Arthur’s Pass, with a bus connection to Greymouth while we repair track damage. If you’re booked, we have options available for you.",
+   "Book a seat and travel throughout New Zealand aboard our world-class scenic trains.",
+   "Train timetables",
+   "How to book",
+   "Timetable",
+   "TranzAlpine Timetable",
+   "View the timetables for our Christchurch to Greymouth and Greymouth to Christchurch train services",
+   "If you wish to travel with us, then you must book in advance. Our trains are seating only, and we are not able to take walk-on passengers once the train is fully booked.",
+   "Check Arrival and Departure times",
+   "If you are already booked, then please ensure you view the relevant station page for your departure. There you will find directions and check-in information. Please note that check-in times and procedures vary from station to station.",
+   "Book your TranzAlpine experience"
+  ]
+ }
+]

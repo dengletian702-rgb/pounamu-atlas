@@ -1,0 +1,22 @@
+{
+  "_about": "Official closures shown at the top of route pages, on cards and in the DOC directory. Each quote must appear word for word in data/evidence/<route>.json, or the build stops. Dates: annual = MM-DD each year; dated = YYYY-MM-DD. All judged on New Zealand date (Pacific/Auckland). An official closure overrides the DOC Tracks open-data status.",
+  "closures": [
+    {"route": "roys-peak", "kind": "annual", "scope": "whole", "from": "10-01", "to": "11-10",
+     "reason": {"en": "lambing", "zh": "产羔期"},
+     "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/otago/places/wanaka-area/things-to-do/roys-peak-track/",
+     "quote": "The track is closed for lambing from 1 October to 10 November each year. It reopens on 11 November.",
+     "checkedAt": "2026-11-10"},
+    {"route": "isthmus-peak", "kind": "annual", "scope": "whole", "from": "11-20", "to": "12-20",
+     "reason": {"en": "fawning", "zh": "鹿产仔期"},
+     "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/otago/places/wanaka-area/things-to-do/isthmus-peak-track/",
+     "quote": "Track annually closed for fawning between 20 November and 20 December.",
+     "checkedAt": "2026-11-10"},
+    {"route": "tongariro-northern-circuit", "kind": "dated", "scope": "section", "from": "2026-10-23", "to": "2027-04-30",
+     "section": {"en": "Whakapapa Village to Mangatepopo Hut", "zh": "Whakapapa 村至 Mangatepopo 小屋段"},
+     "reason": {"en": "the 2025 Tongariro fire", "zh": "2025 年汤加里罗山火"},
+     "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/central-north-island/places/tongariro-national-park/things-to-do/tracks/tongariro-northern-circuit/",
+     "quote": "This section of track is closed due to the 2025 Tongariro fire and will not be available for the 2026/27 Great Walk season.",
+     "dateNote": {"en": "Dates are the 2026/27 Great Walks season on the same DOC page (23 October 2026 – 30 April 2027).", "zh": "日期取自同一 DOC 页面的 2026/27 大步道季（2026 年 10 月 23 日至 2027 年 4 月 30 日）。"},
+     "checkedAt": "2026-11-10"}
+  ]
+}

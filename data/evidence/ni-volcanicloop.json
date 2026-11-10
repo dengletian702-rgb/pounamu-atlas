@@ -1,0 +1,16 @@
+[
+ {
+  "url": "https://www.visitruapehu.com/getting-here/the-volcanic-loop-highway",
+  "fetchedAt": "2026-11-10T00:58:11.654Z",
+  "status": 200,
+  "finalUrl": "https://www.visitruapehu.com/getting-here/the-volcanic-loop-highway",
+  "title": "The Volcanic Loop Highway Visit Ruapehu",
+  "lines": [
+   "0' class=\"section__alert container-fluid \" id=\"alertHeight\" style=\"background: #3ca5bd;\">",
+   "{{alert.message}}",
+   "{{alert.linkText}}",
+   "Access to the Tongariro Alpine Crossing via Mangatepopo Road is open to all vehicles, though booking a shuttle is recommended.",
+   "Tongariro Alpine Crossing bookings are now open via the DOC website ."
+  ]
+ }
+]

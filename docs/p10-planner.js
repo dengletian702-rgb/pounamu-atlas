@@ -1,7 +1,9 @@
 (function(){
 // The road and transport network the trip finder plans on: towns, the roads between them, and the places people
-// ask for. Hours and km are typical summer driving times without stops, rounded, from NZTA Journey Planner-style
-// values are used by the planning model; road conditions vary.
+// ask for. Driving hours were read segment by segment from NZTA Journey Planner on 2026-11-10 (one query each,
+// with the traffic at that moment) and rounded to the nearest quarter hour; the raw reading for every segment is in
+// EDGE_SOURCES below and in data/nzta/. NZTA shows no distance, so km is still a planning estimate (except
+// Te Anau–Milford, 120 km from the DOC brochure). The page labels every leg "Estimate (NZTA query <date>)".
 // `pt`: how to do the leg without a car — coach (InterCity), train (KiwiRail Great Journeys), ferry, shuttle, or
 // null where there is no regular public service.
 // `ptH`: hours by that service where it differs a lot from driving.
@@ -23,7 +25,7 @@ const NODES = {
   nelson: { at: [-41.27, 173.28], en: 'Nelson', zh: '纳尔逊', hub: true },
   picton: { at: [-41.29, 174.0], en: 'Picton', zh: '皮克顿', hub: true },
   akaroa: { at: [-43.8, 172.97], en: 'Akaroa', zh: '阿卡罗阿' },
-  'arthurs-pass': { at: [-42.94, 171.56], en: 'Arthur’s Pass', zh: '亚瑟隘口' },
+  'arthurs-pass': { at: [-42.94, 171.56], en: 'Arthur’s Pass', zh: '亚瑟通道' },
   greymouth: { at: [-42.45, 171.21], en: 'Greymouth', zh: '格雷茅斯' },
   hokitika: { at: [-42.72, 170.97], en: 'Hokitika', zh: '霍基蒂卡' },
   punakaiki: { at: [-42.11, 171.33], en: 'Punakaiki', zh: '普纳凯基' },
@@ -36,7 +38,7 @@ const NODES = {
   wanaka: { at: [-44.7, 169.13], en: 'Wānaka', zh: '瓦纳卡' },
   'te-anau': { at: [-45.41, 167.72], en: 'Te Anau', zh: '蒂阿瑙' },
   milford: { at: [-44.67, 167.93], en: 'Milford Sound', zh: '米尔福德峡湾' },
-  tekapo: { at: [-44.0, 170.48], en: 'Lake Tekapo', zh: '特卡波' },
+  tekapo: { at: [-44.0, 170.48], en: 'Lake Tekapo', zh: '蒂卡普' },
   twizel: { at: [-44.26, 170.1], en: 'Twizel', zh: '特威泽尔' },
   aoraki: { at: [-43.73, 170.1], en: 'Aoraki/Mount Cook Village', zh: '库克山村' },
   oamaru: { at: [-45.1, 170.97], en: 'Ōamaru', zh: '奥马鲁' },
@@ -55,7 +57,7 @@ const NODES = {
   rotorua: { at: [-38.14, 176.25], en: 'Rotorua', zh: '罗托鲁瓦', hub: true },
   taupo: { at: [-38.69, 176.07], en: 'Taupō', zh: '陶波' },
   'national-park': { at: [-39.18, 175.4], en: 'National Park Village (Tongariro)', zh: '国家公园村（汤加里罗）' },
-  napier: { at: [-39.49, 176.91], en: 'Napier', zh: '纳皮尔' },
+  napier: { at: [-39.49, 176.91], en: 'Napier', zh: '内皮尔' },
   'new-plymouth': { at: [-39.06, 174.08], en: 'New Plymouth', zh: '新普利茅斯' },
 };
 
@@ -63,63 +65,142 @@ const R = (en, zh) => ({ en, zh });
 // [from, to, hours, km, road, pt, ptH]
 const EDGES = [
   ['christchurch', 'akaroa', 1.5, 82, R('SH75 over Banks Peninsula', 'SH75 翻越班克斯半岛'), 'shuttle'],
-  ['christchurch', 'arthurs-pass', 2, 150, R('SH73 across the Canterbury Plains to Arthur’s Pass', 'SH73 穿过坎特伯雷平原上亚瑟隘口'), 'train'],
-  ['arthurs-pass', 'greymouth', 1.5, 98, R('SH73 down the Ōtira Viaduct to the West Coast', 'SH73 经奥蒂拉高架桥下到西海岸'), 'train'],
+  ['christchurch', 'arthurs-pass', 2, 150, R('SH73 across the Canterbury Plains to Arthur’s Pass', 'SH73 穿过坎特伯雷平原上亚瑟通道'), 'train'],
+  ['arthurs-pass', 'greymouth', 1.25, 98, R('SH73 down the Ōtira Viaduct to the West Coast', 'SH73 经奥蒂拉高架桥下到西海岸'), 'train'],
   ['greymouth', 'hokitika', 0.5, 40, R('SH6 along the coast', 'SH6 沿海岸'), 'coach'],
   ['greymouth', 'punakaiki', 0.75, 45, R('SH6 Great Coast Road', 'SH6 大海岸公路'), 'coach'],
   ['punakaiki', 'westport', 0.75, 57, R('SH6 Great Coast Road', 'SH6 大海岸公路'), 'coach'],
-  ['westport', 'nelson', 3.25, 225, R('SH6 through the Buller Gorge', 'SH6 穿过布勒峡谷'), 'coach'],
+  ['westport', 'nelson', 3, 225, R('SH6 through the Buller Gorge', 'SH6 穿过布勒峡谷'), 'coach'],
   ['nelson', 'marahau', 1, 67, R('SH60 to the Abel Tasman', 'SH60 到亚伯塔斯曼'), 'shuttle'],
   ['nelson', 'picton', 2, 110, R('SH6 via Havelock (or Queen Charlotte Drive)', 'SH6 经哈夫洛克（或夏洛特皇后公路）'), 'coach'],
   ['picton', 'kaikoura', 2, 155, R('SH1 down the Kaikōura coast', 'SH1 沿凯库拉海岸南下'), 'train'],
   ['kaikoura', 'christchurch', 2.5, 180, R('SH1', 'SH1'), 'train'],
   ['hokitika', 'franz-josef', 2, 135, R('SH6 south through the rainforest', 'SH6 穿雨林南下'), 'coach'],
   ['franz-josef', 'fox', 0.5, 25, R('SH6', 'SH6'), 'coach'],
-  ['fox', 'haast', 2, 120, R('SH6 along the glacier coast', 'SH6 沿冰川海岸'), 'coach'],
-  ['haast', 'wanaka', 2.25, 140, R('SH6 over the Haast Pass', 'SH6 翻越哈斯特隘口'), 'coach'],
-  ['wanaka', 'queenstown', 1, 67, R('Crown Range Road (coaches use SH6)', '皇冠山脉公路（大巴绕 SH6）'), 'coach', 1.5],
+  ['fox', 'haast', 1.5, 120, R('SH6 along the glacier coast', 'SH6 沿冰川海岸'), 'coach'],
+  ['haast', 'wanaka', 2, 140, R('SH6 over the Haast Pass', 'SH6 翻越哈斯特隘口'), 'coach'],
+  ['wanaka', 'queenstown', 1.25, 67, R('Crown Range Road (coaches use SH6)', '皇冠山脉公路（大巴绕 SH6）'), 'coach', 1.5],
   ['wanaka', 'twizel', 1.75, 143, R('SH8 over the Lindis Pass', 'SH8 翻越林迪斯隘口'), 'coach'],
-  ['queenstown', 'twizel', 2.25, 185, R('SH6 and SH8 via Cromwell and the Lindis Pass', 'SH6、SH8 经克伦威尔和林迪斯隘口'), 'coach'],
+  ['queenstown', 'twizel', 2.5, 185, R('SH6 and SH8 via Cromwell and the Lindis Pass', 'SH6、SH8 经克伦威尔和林迪斯隘口'), 'coach'],
   ['twizel', 'tekapo', 0.75, 58, R('SH8 past Lake Pukaki', 'SH8 经普卡基湖'), 'coach'],
-  ['twizel', 'aoraki', 0.75, 65, R('SH80 along Lake Pukaki to Aoraki/Mount Cook', 'SH80 沿普卡基湖到库克山'), 'shuttle'],
+  ['twizel', 'aoraki', 0.75, 65, R('SH80 along Lake Pukaki to Aoraki/Mount Cook', 'SH80 沿普卡基湖到奥拉基／库克山'), 'shuttle'],
   ['christchurch', 'tekapo', 3, 226, R('SH1, SH79 and SH8 via Geraldine and Fairlie', 'SH1、SH79、SH8 经杰拉尔丁和费尔利'), 'coach'],
-  ['queenstown', 'te-anau', 2, 170, R('SH6 and SH94', 'SH6、SH94'), 'coach'],
-  ['te-anau', 'milford', 2, 118, R('SH94 Milford Road (check NZTA for avalanche closures)', 'SH94 米尔福德公路（冬季注意雪崩封路）'), 'coach'],
-  ['te-anau', 'invercargill', 2, 150, R('SH94 and SH1', 'SH94、SH1'), 'coach'],
-  ['invercargill', 'bluff', 0.5, 30, R('SH1', 'SH1'), 'shuttle'],
+  ['queenstown', 'te-anau', 2.25, 170, R('SH6 and SH94', 'SH6、SH94'), 'coach'],
+  ['te-anau', 'milford', 1.75, 120, R('SH94 Milford Road (check NZTA for avalanche closures)', 'SH94 米尔福德公路（冬季注意雪崩封路）'), 'coach'],
+  ['te-anau', 'invercargill', 1.75, 150, R('SH94 and SH1', 'SH94、SH1'), 'coach'],
+  ['invercargill', 'bluff', 0.25, 30, R('SH1', 'SH1'), 'shuttle'],
   ['bluff', 'oban', 1, 0, R('Foveaux Express ferry across Foveaux Strait', 'Foveaux Express 渡轮穿过福沃海峡'), 'ferry'],
-  ['invercargill', 'owaka', 2, 150, R('Southern Scenic Route through the Catlins', '南部风景公路穿过卡特林斯'), null],
+  ['invercargill', 'owaka', 1.75, 150, R('Southern Scenic Route through the Catlins', '南部风景公路穿过卡特林斯'), null],
   ['owaka', 'dunedin', 1.5, 115, R('Southern Scenic Route and SH1', '南部风景公路、SH1'), null],
-  ['invercargill', 'dunedin', 2.75, 205, R('SH1', 'SH1'), 'coach'],
+  ['invercargill', 'dunedin', 2.5, 205, R('SH1', 'SH1'), 'coach'],
   ['dunedin', 'queenstown', 3.5, 280, R('SH8 through Central Otago', 'SH8 穿过中奥塔哥'), 'coach'],
-  ['dunedin', 'oamaru', 1.25, 113, R('SH1 past Moeraki', 'SH1 经莫埃拉基'), 'coach'],
+  ['dunedin', 'oamaru', 1.5, 113, R('SH1 past Moeraki', 'SH1 经莫埃拉基'), 'coach'],
   ['oamaru', 'christchurch', 3, 245, R('SH1', 'SH1'), 'coach'],
   ['oamaru', 'twizel', 1.75, 130, R('SH83 up the Waitaki Valley', 'SH83 沿怀塔基河谷'), null],
   ['picton', 'wellington', 3.5, 0, R('Cook Strait ferry (Interislander or Bluebridge)', '库克海峡渡轮（Interislander 或 Bluebridge）'), 'ferry'],
   // North Island
-  ['auckland', 'paihia', 3.25, 230, R('SH1 north', 'SH1 北上'), 'coach'],
-  ['auckland', 'hahei', 2.5, 175, R('SH2 and SH25 to the Coromandel', 'SH2、SH25 到科罗曼德'), null],
-  ['auckland', 'hamilton', 1.5, 125, R('SH1 Waikato Expressway', 'SH1 怀卡托高速'), 'coach'],
+  ['auckland', 'paihia', 3, 230, R('SH1 north', 'SH1 北上'), 'coach'],
+  ['auckland', 'hahei', 2.25, 175, R('SH2 and SH25 to the Coromandel', 'SH2、SH25 到科罗曼德'), null],
+  ['auckland', 'hamilton', 1.25, 125, R('SH1 Waikato Expressway', 'SH1 怀卡托高速'), 'coach'],
   ['hamilton', 'matamata', 0.75, 60, R('SH26 and SH27', 'SH26、SH27'), 'coach'],
   ['hamilton', 'waitomo', 1, 75, R('SH39 and SH3', 'SH39、SH3'), 'coach'],
   ['hamilton', 'rotorua', 1.5, 110, R('SH1 and SH5 via Tīrau', 'SH1、SH5 经蒂劳'), 'coach'],
   ['hamilton', 'taupo', 2, 150, R('SH1 via Tokoroa', 'SH1 经托科罗阿'), 'coach'],
   ['auckland', 'matamata', 2, 160, R('SH1 and SH27', 'SH1、SH27'), 'coach'],
   ['matamata', 'rotorua', 1, 65, R('SH27 and SH5 via Tīrau', 'SH27、SH5 经蒂劳'), 'coach'],
-  ['auckland', 'waitomo', 2.5, 195, R('SH1 and SH3', 'SH1、SH3'), 'coach'],
+  ['auckland', 'waitomo', 2.25, 195, R('SH1 and SH3', 'SH1、SH3'), 'coach'],
   ['waitomo', 'rotorua', 2, 150, R('SH3, SH39 and SH5', 'SH3、SH39、SH5'), null],
-  ['hahei', 'rotorua', 2.5, 175, R('SH25 and SH2 via Tauranga', 'SH25、SH2 经陶朗加'), null],
+  ['hahei', 'rotorua', 3, 175, R('SH25 and SH2 via Tauranga', 'SH25、SH2 经陶朗加'), null],
   ['rotorua', 'taupo', 1, 80, R('SH5 past Wai-O-Tapu', 'SH5 经怀奥塔普'), 'coach'],
   ['taupo', 'national-park', 1.5, 105, R('SH1 and SH47 past Tūrangi', 'SH1、SH47 经图朗伊'), 'shuttle'],
-  ['auckland', 'national-park', 4.5, 330, R('SH1 and SH4 (or the Northern Explorer train)', 'SH1、SH4（或北方探索者火车）'), 'train', 5.5],
-  ['national-park', 'wellington', 4.75, 330, R('SH4 and SH1 (or the Northern Explorer train)', 'SH4、SH1（或北方探索者火车）'), 'train', 5.5],
-  ['taupo', 'napier', 2, 140, R('SH5 over the Napier–Taupō Road', 'SH5 纳皮尔—陶波公路'), 'coach'],
-  ['napier', 'wellington', 4.25, 320, R('SH2 via the Wairarapa', 'SH2 经怀拉拉帕'), 'coach'],
-  ['taupo', 'wellington', 4.5, 375, R('SH1 over the Desert Road', 'SH1 经沙漠公路'), 'coach'],
+  ['auckland', 'national-park', 4, 330, R('SH1 and SH4 (or the Northern Explorer train)', 'SH1、SH4（或北方探索者火车）'), 'train', 5.5],
+  ['national-park', 'wellington', 3.75, 330, R('SH4 and SH1 (or the Northern Explorer train)', 'SH4、SH1（或北方探索者火车）'), 'train', 5.5],
+  ['taupo', 'napier', 1.75, 140, R('SH5 over the Napier–Taupō Road', 'SH5 内皮尔—陶波公路'), 'coach'],
+  ['napier', 'wellington', 3.75, 320, R('SH2 via the Wairarapa', 'SH2 经怀拉拉帕'), 'coach'],
+  ['taupo', 'wellington', 4.75, 375, R('SH1 over the Desert Road', 'SH1 经沙漠公路'), 'coach'],
   ['national-park', 'new-plymouth', 3.5, 230, R('SH4 and SH3', 'SH4、SH3'), null],
   ['new-plymouth', 'wellington', 4.5, 350, R('SH3 and SH1', 'SH3、SH1'), 'coach'],
   ['auckland', 'new-plymouth', 4.5, 350, R('SH1 and SH3 via Te Kūiti', 'SH1、SH3 经蒂库伊蒂'), 'coach'],
 ];
+
+
+// One source record per road segment (review items 1.2 and v3.1 B8). Written by
+// scripts/authoring/apply-nzta-readings.mjs from data/nzta/readings-<date>.txt. 'nzta-time-read' = driving time read
+// in NZTA Journey Planner on `checkedAt` (raw text in `nzta`, the planner's previous figure in `hoursBefore`); km not
+// shown by NZTA. Ferry legs have no NZTA record and keep the default ('estimate').
+const EDGE_SOURCE_DEFAULT = { status: 'estimate', check: 'NZTA Journey Planner', url: 'https://www.journeys.nzta.govt.nz/journey-planner', checkedAt: null };
+const EDGE_SOURCES = {
+  "christchurch|akaroa": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJAe3FY0gvMm0RRZl5hIbvAAU&b=ChIJE95FCQrMM20RoFp5hIbvAAU", checkedAt: "2026-11-10", nzta: { from: "基督城, 新西兰", to: "阿卡罗阿, 新西兰", route: "State Hwy 75", time: "1h 25m", minutes: 85, traffic: null, readAt: "2026-11-10T05:37:48.797Z" }, hoursBefore: 1.5 },
+  "christchurch|arthurs-pass": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJAe3FY0gvMm0RRZl5hIbvAAU&b=ChIJdfshttlFLm0RF8W10-BJv7Q", checkedAt: "2026-11-10", nzta: { from: "基督城, 新西兰", to: "Arthur's Pass Village, 新西兰", route: "State Hwy 73", time: "2h 4m", minutes: 124, traffic: "1 min slower than normal", readAt: "2026-11-10T05:37:53.751Z" }, hoursBefore: 2 },
+  "arthurs-pass|greymouth": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJdfshttlFLm0RF8W10-BJv7Q&b=ChIJUxDVTdk_L20RoHJ5hIbvAAU", checkedAt: "2026-11-10", nzta: { from: "Arthur's Pass Village, 新西兰", to: "格雷茅斯, 新西兰", route: "State Hwy 73", time: "1h 18m", minutes: 78, traffic: "5 min slower than normal", readAt: "2026-11-10T05:37:58.340Z" }, hoursBefore: 1.5 },
+  "greymouth|hokitika": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJUxDVTdk_L20RoHJ5hIbvAAU&b=ChIJc79FEBc7L20RgHd5hIbvAAU", checkedAt: "2026-11-10", nzta: { from: "格雷茅斯, 新西兰", to: "霍基蒂卡, 新西兰", route: "State Hwy 6", time: "29 mins", minutes: 29, traffic: "1 min slower than normal", readAt: "2026-11-10T05:38:03.208Z" }, hoursBefore: 0.5 },
+  "greymouth|punakaiki": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJUxDVTdk_L20RoHJ5hIbvAAU&b=ChIJr6gS1juFJW0RgKV5hIbvAAU", checkedAt: "2026-11-10", nzta: { from: "格雷茅斯, 新西兰", to: "普纳凯基, 新西兰", route: "State Hwy 6", time: "44 mins", minutes: 44, traffic: "4 min slower than normal", readAt: "2026-11-10T05:38:07.955Z" }, hoursBefore: 0.75 },
+  "punakaiki|westport": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJr6gS1juFJW0RgKV5hIbvAAU&b=ChIJ9SsJQ8hsJW0R0MN5hIbvAAU", checkedAt: "2026-11-10", nzta: { from: "普纳凯基, 新西兰", to: "Westport, 新西兰", route: "State Hwy 6", time: "52 mins", minutes: 52, traffic: "5 min slower than normal", readAt: "2026-11-10T05:38:12.544Z" }, hoursBefore: 0.75 },
+  "westport|nelson": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJ9SsJQ8hsJW0R0MN5hIbvAAU&b=ChIJfS63kcTsO20RgKSW54jvAAo", checkedAt: "2026-11-10", nzta: { from: "Westport, 新西兰", to: "尼爾遜, 新西兰", route: "State Hwy 6", time: "3h 1m", minutes: 181, traffic: "7 min slower than normal", readAt: "2026-11-10T05:38:17.155Z" }, hoursBefore: 3.25 },
+  "nelson|marahau": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJfS63kcTsO20RgKSW54jvAAo&b=ChIJDX3UOqx-PG0RcNB5hIbvAAU", checkedAt: "2026-11-10", nzta: { from: "尼爾遜, 新西兰", to: "Mārahau, 新西兰", route: "State Hwy 60", time: "59 mins", minutes: 59, traffic: "1 min slower than normal", readAt: "2026-11-10T05:38:22.013Z" }, hoursBefore: 1 },
+  "nelson|picton": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJfS63kcTsO20RgKSW54jvAAo&b=ChIJBTjUpOomOW0RYKF5hIbvAAU", checkedAt: "2026-11-10", nzta: { from: "尼爾遜, 新西兰", to: "Picton, 新西兰", route: "State Hwy 6", time: "1h 56m", minutes: 116, traffic: "3 min slower than normal", readAt: "2026-11-10T05:39:04.696Z" }, hoursBefore: 2 },
+  "picton|kaikoura": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJBTjUpOomOW0RYKF5hIbvAAU&b=ChIJdXyRNDogOm0RNpl5hIbvAAU", checkedAt: "2026-11-10", nzta: { from: "Picton, 新西兰", to: "凯库拉, 新西兰", route: "SH 1", time: "2h 3m", minutes: 123, traffic: "5 min slower than normal", readAt: "2026-11-10T05:39:09.881Z" }, hoursBefore: 2 },
+  "kaikoura|christchurch": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJdXyRNDogOm0RNpl5hIbvAAU&b=ChIJAe3FY0gvMm0RRZl5hIbvAAU", checkedAt: "2026-11-10", nzta: { from: "凯库拉, 新西兰", to: "基督城, 新西兰", route: "SH 1", time: "2h 26m", minutes: 146, traffic: null, readAt: "2026-11-10T05:39:14.819Z" }, hoursBefore: 2.5 },
+  "hokitika|franz-josef": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJc79FEBc7L20RgHd5hIbvAAU&b=ChIJHWUmvV_RK20RaxSyBZVTB70", checkedAt: "2026-11-10", nzta: { from: "霍基蒂卡, 新西兰", to: "法兰士·约瑟夫冰川, West Coast Region 7886, 新西兰", route: "State Hwy 6", time: "1h 53m", minutes: 113, traffic: "5 min slower than normal", readAt: "2026-11-10T05:39:19.488Z" }, hoursBefore: 2 },
+  "franz-josef|fox": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJHWUmvV_RK20RaxSyBZVTB70&b=ChIJ_epAj4UvKm0RcG55hIbvAAU", checkedAt: "2026-11-10", nzta: { from: "法兰士·约瑟夫冰川, West Coast Region 7886, 新西兰", to: "Fox Glacier, 新西兰", route: "State Hwy 6", time: "33 mins", minutes: 33, traffic: "2 min slower than normal", readAt: "2026-11-10T05:39:24.176Z" }, hoursBefore: 0.5 },
+  "fox|haast": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJ_epAj4UvKm0RcG55hIbvAAU&b=ChIJZ5vYbCWd1WwR0HJ5hIbvAAU", checkedAt: "2026-11-10", nzta: { from: "Fox Glacier, 新西兰", to: "Haast, 新西兰", route: "State Hwy 6", time: "1h 37m", minutes: 97, traffic: "6 min slower than normal", readAt: "2026-11-10T05:39:28.831Z" }, hoursBefore: 2 },
+  "haast|wanaka": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJZ5vYbCWd1WwR0HJ5hIbvAAU&b=ChIJby3suR1G1akR4MF5hIbvAAU", checkedAt: "2026-11-10", nzta: { from: "Haast, 新西兰", to: "瓦纳卡, 新西兰", route: "State Hwy 6", time: "2h 1m", minutes: 121, traffic: "1 min faster than normal", readAt: "2026-11-10T05:39:33.539Z" }, hoursBefore: 2.25 },
+  "wanaka|queenstown": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJby3suR1G1akR4MF5hIbvAAU&b=ChIJX96o1_Ed1akRAKZ5hIbvAAU", checkedAt: "2026-11-10", nzta: { from: "瓦纳卡, 新西兰", to: "皇后镇, 新西兰", route: "Cardrona Valley Rd和Crown Range Rd", time: "1h 10m", minutes: 70, traffic: "2 min slower than normal", readAt: "2026-11-10T05:39:38.427Z" }, hoursBefore: 1 },
+  "wanaka|twizel": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJby3suR1G1akR4MF5hIbvAAU&b=ChIJv-27KHPgKm0RALt5hIbvAAU", checkedAt: "2026-11-10", nzta: { from: "瓦纳卡, 新西兰", to: "Twizel, 新西兰", route: "State Hwy 8", time: "1h 45m", minutes: 105, traffic: "2 min slower than normal", readAt: "2026-11-10T05:40:09.148Z" }, hoursBefore: 1.75 },
+  "queenstown|twizel": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJX96o1_Ed1akRAKZ5hIbvAAU&b=ChIJv-27KHPgKm0RALt5hIbvAAU", checkedAt: "2026-11-10", nzta: { from: "皇后镇, 新西兰", to: "Twizel, 新西兰", route: "State Hwy 6和State Hwy 8", time: "2h 31m", minutes: 151, traffic: "1 min slower than normal", readAt: "2026-11-10T05:40:14.018Z" }, hoursBefore: 2.25 },
+  "twizel|tekapo": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJv-27KHPgKm0RALt5hIbvAAU&b=ChIJmawxwRqZK20RwIJ5hIbvAAU", checkedAt: "2026-11-10", nzta: { from: "Twizel, 新西兰", to: "Lake Tekapo, 新西兰", route: "State Hwy 8", time: "42 mins", minutes: 42, traffic: "1 min slower than normal", readAt: "2026-11-10T05:40:18.823Z" }, hoursBefore: 0.75 },
+  "twizel|aoraki": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJv-27KHPgKm0RALt5hIbvAAU&b=ChIJFWw41lJLKm0R3YsgAVilIgA", checkedAt: "2026-11-10", nzta: { from: "Twizel, 新西兰", to: "Aoraki Mount Cook Village, Mount Cook National Park 7999, 新西兰", route: "State Hwy 80", time: "51 mins", minutes: 51, traffic: "2 min slower than normal", readAt: "2026-11-10T05:40:23.666Z" }, hoursBefore: 0.75 },
+  "christchurch|tekapo": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJAe3FY0gvMm0RRZl5hIbvAAU&b=ChIJmawxwRqZK20RwIJ5hIbvAAU", checkedAt: "2026-11-10", nzta: { from: "基督城, 新西兰", to: "Lake Tekapo, 新西兰", route: "SH 1和State Hwy 79", time: "2h 53m", minutes: 173, traffic: "2 min faster than normal", readAt: "2026-11-10T05:40:28.286Z" }, hoursBefore: 3 },
+  "queenstown|te-anau": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJX96o1_Ed1akRAKZ5hIbvAAU&b=ChIJa15mlSBt1KkRULR5hIbvAAU", checkedAt: "2026-11-10", nzta: { from: "皇后镇, 新西兰", to: "蒂阿瑙, 新西兰", route: "State Hwy 6和State Hwy 94", time: "2h 11m", minutes: 131, traffic: "4 min slower than normal", readAt: "2026-11-10T05:40:32.966Z" }, hoursBefore: 2 },
+  "te-anau|milford": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJa15mlSBt1KkRULR5hIbvAAU&b=ChIJ4UlLuk3g1akRAN5kq4bvACo", checkedAt: "2026-11-10", nzta: { from: "蒂阿瑙, 新西兰", to: "米爾福德峽灣, 南地大區, 新西兰", route: "State Hwy 94", time: "1h 51m", minutes: 111, traffic: "8 min slower than normal", readAt: "2026-11-10T05:40:37.941Z" }, hoursBefore: 2, km: { status: 'checked', source: 'DOC — Te Anau–Milford Highway brochure (120 km)', url: 'https://www.doc.govt.nz/globalassets/documents/parks-and-recreation/tracks-and-walks/fiordland/te-anau-milford-highway-brochure.pdf', checkedAt: '2026-11-10' } },
+  "te-anau|invercargill": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJa15mlSBt1KkRULR5hIbvAAU&b=ChIJ12kUrJTE0qkRIKSW54jvAAo", checkedAt: "2026-11-10", nzta: { from: "蒂阿瑙, 新西兰", to: "因弗卡吉尔, 新西兰", route: "State Hwy 94和State Hwy 6", time: "1h 50m", minutes: 110, traffic: "1 min faster than normal", readAt: "2026-11-10T05:40:42.673Z" }, hoursBefore: 2 },
+  "invercargill|bluff": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJ12kUrJTE0qkRIKSW54jvAAo&b=ChIJu0c6TmS40qkRkGF5hIbvAAU", checkedAt: "2026-11-10", nzta: { from: "因弗卡吉尔, 新西兰", to: "布拉夫, 新西兰", route: "SH 1", time: "20 mins", minutes: 20, traffic: "1 min faster than normal", readAt: "2026-11-10T05:41:12.652Z" }, hoursBefore: 0.5 },
+  "invercargill|owaka": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJ12kUrJTE0qkRIKSW54jvAAo&b=ChIJCZC19cOxLagRkJx5hIbvAAU", checkedAt: "2026-11-10", nzta: { from: "因弗卡吉尔, 新西兰", to: "Owaka, 新西兰", route: "SH 1、State Hwy 93和Owaka Valley Rd", time: "1h 38m", minutes: 98, traffic: "1 min faster than normal", readAt: "2026-11-10T05:41:17.307Z" }, hoursBefore: 2 },
+  "owaka|dunedin": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJCZC19cOxLagRkJx5hIbvAAU&b=ChIJPVFfD-DkK6gRQZl5hIbvAAU", checkedAt: "2026-11-10", nzta: { from: "Owaka, 新西兰", to: "达尼丁, 新西兰", route: "Southern Scenic Rte", time: "1h 27m", minutes: 87, traffic: "3 min slower than normal", readAt: "2026-11-10T05:41:22.287Z" }, hoursBefore: 1.5 },
+  "invercargill|dunedin": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJ12kUrJTE0qkRIKSW54jvAAo&b=ChIJPVFfD-DkK6gRQZl5hIbvAAU", checkedAt: "2026-11-10", nzta: { from: "因弗卡吉尔, 新西兰", to: "达尼丁, 新西兰", route: "SH 1和SH 1", time: "2h 35m", minutes: 155, traffic: "2 min slower than normal", readAt: "2026-11-10T05:41:27.323Z" }, hoursBefore: 2.75 },
+  "dunedin|queenstown": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJPVFfD-DkK6gRQZl5hIbvAAU&b=ChIJX96o1_Ed1akRAKZ5hIbvAAU", checkedAt: "2026-11-10", nzta: { from: "达尼丁, 新西兰", to: "皇后镇, 新西兰", route: "State Hwy 8", time: "3h 37m", minutes: 217, traffic: "1 min slower than normal", readAt: "2026-11-10T05:41:31.969Z" }, hoursBefore: 3.5 },
+  "dunedin|oamaru": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJPVFfD-DkK6gRQZl5hIbvAAU&b=ChIJeQZQVPd1KagR4O95hIbvAAU", checkedAt: "2026-11-10", nzta: { from: "达尼丁, 新西兰", to: "Oamaru, 新西兰", route: "SH 1", time: "1h 28m", minutes: 88, traffic: "1 min slower than normal", readAt: "2026-11-10T05:41:36.983Z" }, hoursBefore: 1.25 },
+  "oamaru|christchurch": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJeQZQVPd1KagR4O95hIbvAAU&b=ChIJAe3FY0gvMm0RRZl5hIbvAAU", checkedAt: "2026-11-10", nzta: { from: "Oamaru, 新西兰", to: "基督城, 新西兰", route: "SH 1", time: "3h 6m", minutes: 186, traffic: "5 min faster than normal", readAt: "2026-11-10T05:41:41.668Z" }, hoursBefore: 3 },
+  "oamaru|twizel": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJeQZQVPd1KagR4O95hIbvAAU&b=ChIJv-27KHPgKm0RALt5hIbvAAU", checkedAt: "2026-11-10", nzta: { from: "Oamaru, 新西兰", to: "Twizel, 新西兰", route: "State Hwy 83", time: "1h 46m", minutes: 106, traffic: "5 min slower than normal", readAt: "2026-11-10T05:41:46.644Z" }, hoursBefore: 1.75 },
+  "auckland|paihia": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJ--acWvtHDW0RF5miQ2HvAAU&b=ChIJTx6ROraiC20RgPOiQ2HvAAU", checkedAt: "2026-11-10", nzta: { from: "奥克兰, 新西兰", to: "派希亚, 新西兰", route: "SH 1和SH 1", time: "3h 1m", minutes: 181, traffic: "1 min slower than normal", readAt: "2026-11-10T05:43:47.658Z" }, hoursBefore: 3.25 },
+  "auckland|hahei": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJ--acWvtHDW0RF5miQ2HvAAU&b=ChIJb6g_wXVCcm0R8MiiQ2HvAAU", checkedAt: "2026-11-10", nzta: { from: "奥克兰, 新西兰", to: "Hahei, 新西兰", route: "SH 1和State Hwy 25", time: "2h 19m", minutes: 139, traffic: "1 min faster than normal", readAt: "2026-11-10T05:43:52.364Z" }, hoursBefore: 2.5 },
+  "auckland|hamilton": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJ--acWvtHDW0RF5miQ2HvAAU&b=ChIJITamh3QibW0RA5miQ2HvAAU", checkedAt: "2026-11-10", nzta: { from: "奥克兰, 新西兰", to: "汉密尔顿, 新西兰", route: "SH 1", time: "1h 19m", minutes: 79, traffic: "2 min faster than normal", readAt: "2026-11-10T05:43:56.918Z" }, hoursBefore: 1.5 },
+  "hamilton|matamata": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJITamh3QibW0RA5miQ2HvAAU&b=ChIJqRZ64SdObG0RsOGiQ2HvAAU", checkedAt: "2026-11-10", nzta: { from: "汉密尔顿, 新西兰", to: "Matamata, 新西兰", route: "SH 1", time: "51 mins", minutes: 51, traffic: "3 min faster than normal", readAt: "2026-11-10T05:44:01.478Z" }, hoursBefore: 0.75 },
+  "hamilton|waitomo": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJITamh3QibW0RA5miQ2HvAAU&b=ChIJA5pCFbK3bG0RsBajQ2HvAAU", checkedAt: "2026-11-10", nzta: { from: "汉密尔顿, 新西兰", to: "怀托摩洞穴, 新西兰", route: "Pokuru Rd", time: "1h 4m", minutes: 64, traffic: null, readAt: "2026-11-10T05:44:06.182Z" }, hoursBefore: 1 },
+  "hamilton|rotorua": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJITamh3QibW0RA5miQ2HvAAU&b=ChIJK7L2gj2Ybm0RMZmjQ2HvAAU", checkedAt: "2026-11-10", nzta: { from: "汉密尔顿, 新西兰", to: "罗托路亚, 新西兰", route: "SH 1和State Hwy 5", time: "1h 27m", minutes: 87, traffic: "3 min faster than normal", readAt: "2026-11-10T05:44:10.838Z" }, hoursBefore: 1.5 },
+  "hamilton|taupo": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJITamh3QibW0RA5miQ2HvAAU&b=ChIJWxZLFHfva20R4AmjQ2HvAAU", checkedAt: "2026-11-10", nzta: { from: "汉密尔顿, 新西兰", to: "陶波, 新西兰", route: "SH 1", time: "1h 55m", minutes: 115, traffic: "1 min faster than normal", readAt: "2026-11-10T05:44:15.643Z" }, hoursBefore: 2 },
+  "auckland|matamata": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJ--acWvtHDW0RF5miQ2HvAAU&b=ChIJqRZ64SdObG0RsOGiQ2HvAAU", checkedAt: "2026-11-10", nzta: { from: "奥克兰, 新西兰", to: "Matamata, 新西兰", route: "SH 1", time: "1h 54m", minutes: 114, traffic: "3 min faster than normal", readAt: "2026-11-10T05:44:20.304Z" }, hoursBefore: 2 },
+  "matamata|rotorua": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJqRZ64SdObG0RsOGiQ2HvAAU&b=ChIJK7L2gj2Ybm0RMZmjQ2HvAAU", checkedAt: "2026-11-10", nzta: { from: "Matamata, 新西兰", to: "罗托路亚, 新西兰", route: "State Hwy 5", time: "55 mins", minutes: 55, traffic: null, readAt: "2026-11-10T05:44:48.741Z" }, hoursBefore: 1 },
+  "auckland|waitomo": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJ--acWvtHDW0RF5miQ2HvAAU&b=ChIJA5pCFbK3bG0RsBajQ2HvAAU", checkedAt: "2026-11-10", nzta: { from: "奥克兰, 新西兰", to: "怀托摩洞穴, 新西兰", route: "SH 1和SH 3", time: "2h 20m", minutes: 140, traffic: "1 min faster than normal", readAt: "2026-11-10T05:44:54.300Z" }, hoursBefore: 2.5 },
+  "waitomo|rotorua": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJA5pCFbK3bG0RsBajQ2HvAAU&b=ChIJK7L2gj2Ybm0RMZmjQ2HvAAU", checkedAt: "2026-11-10", nzta: { from: "怀托摩洞穴, 新西兰", to: "罗托路亚, 新西兰", route: "State Hwy 5", time: "1h 56m", minutes: 116, traffic: "1 min faster than normal", readAt: "2026-11-10T05:44:59.128Z" }, hoursBefore: 2 },
+  "hahei|rotorua": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJb6g_wXVCcm0R8MiiQ2HvAAU&b=ChIJK7L2gj2Ybm0RMZmjQ2HvAAU", checkedAt: "2026-11-10", nzta: { from: "Hahei, 新西兰", to: "罗托路亚, 新西兰", route: "State Hwy 5", time: "2h 58m", minutes: 178, traffic: "2 min slower than normal", readAt: "2026-11-10T05:45:03.871Z" }, hoursBefore: 2.5 },
+  "rotorua|taupo": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJK7L2gj2Ybm0RMZmjQ2HvAAU&b=ChIJWxZLFHfva20R4AmjQ2HvAAU", checkedAt: "2026-11-10", nzta: { from: "罗托路亚, 新西兰", to: "陶波, 新西兰", route: "State Hwy 5", time: "59 mins", minutes: 59, traffic: null, readAt: "2026-11-10T05:45:09.083Z" }, hoursBefore: 1 },
+  "taupo|national-park": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJWxZLFHfva20R4AmjQ2HvAAU&b=ChIJHVFNwkYca20RkOiiQ2HvAAU", checkedAt: "2026-11-10", nzta: { from: "陶波, 新西兰", to: "國家公園村, 新西兰", route: "SH 1和State Hwy 47", time: "1h 23m", minutes: 83, traffic: "1 min slower than normal", readAt: "2026-11-10T05:45:13.760Z" }, hoursBefore: 1.5 },
+  "auckland|national-park": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJ--acWvtHDW0RF5miQ2HvAAU&b=ChIJHVFNwkYca20RkOiiQ2HvAAU", checkedAt: "2026-11-10", nzta: { from: "奥克兰, 新西兰", to: "國家公園村, 新西兰", route: "SH 1和State Hwy 4", time: "3h 59m", minutes: 239, traffic: "4 min slower than normal", readAt: "2026-11-10T05:45:20.001Z" }, hoursBefore: 4.5 },
+  "national-park|wellington": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJHVFNwkYca20RkOiiQ2HvAAU&b=ChIJy3TpSfyxOG0RcLQTomPvAAo", checkedAt: "2026-11-10", nzta: { from: "國家公園村, 新西兰", to: "惠灵顿, 新西兰", route: "SH 1和SH 1", time: "3h 50m", minutes: 230, traffic: null, readAt: "2026-11-10T05:45:25.251Z" }, hoursBefore: 4.75 },
+  "taupo|napier": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJWxZLFHfva20R4AmjQ2HvAAU&b=ChIJmcqxT9bJaW0RUOiiQ2HvAAU", checkedAt: "2026-11-10", nzta: { from: "陶波, 新西兰", to: "内皮尔, 新西兰", route: "State Hwy 5", time: "1h 51m", minutes: 111, traffic: "5 min faster than normal", readAt: "2026-11-10T05:45:49.330Z" }, hoursBefore: 2 },
+  "napier|wellington": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJmcqxT9bJaW0RUOiiQ2HvAAU&b=ChIJy3TpSfyxOG0RcLQTomPvAAo", checkedAt: "2026-11-10", nzta: { from: "内皮尔, 新西兰", to: "惠灵顿, 新西兰", route: "State Hwy 2和SH 1", time: "3h 52m", minutes: 232, traffic: "2 min faster than normal", readAt: "2026-11-10T05:45:54.361Z" }, hoursBefore: 4.25 },
+  "taupo|wellington": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJWxZLFHfva20R4AmjQ2HvAAU&b=ChIJy3TpSfyxOG0RcLQTomPvAAo", checkedAt: "2026-11-10", nzta: { from: "陶波, 新西兰", to: "惠灵顿, 新西兰", route: "SH 1和SH 1", time: "4h 41m", minutes: 281, traffic: "4 min slower than normal", readAt: "2026-11-10T05:45:59.008Z" }, hoursBefore: 4.5 },
+  "national-park|new-plymouth": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJHVFNwkYca20RkOiiQ2HvAAU&b=ChIJDc5kI-b5FG0RoOmiQ2HvAAU", checkedAt: "2026-11-10", nzta: { from: "國家公園村, 新西兰", to: "新普利茅斯, 新西兰", route: "State Hwy 4和SH 3", time: "3h 25m", minutes: 205, traffic: "3 min slower than normal", readAt: "2026-11-10T05:46:03.659Z" }, hoursBefore: 3.5 },
+  "new-plymouth|wellington": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJDc5kI-b5FG0RoOmiQ2HvAAU&b=ChIJy3TpSfyxOG0RcLQTomPvAAo", checkedAt: "2026-11-10", nzta: { from: "新普利茅斯, 新西兰", to: "惠灵顿, 新西兰", route: "SH 3和SH 1", time: "4h 28m", minutes: 268, traffic: "1 min faster than normal", readAt: "2026-11-10T05:46:08.399Z" }, hoursBefore: 4.5 },
+  "auckland|new-plymouth": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJ--acWvtHDW0RF5miQ2HvAAU&b=ChIJDc5kI-b5FG0RoOmiQ2HvAAU", checkedAt: "2026-11-10", nzta: { from: "奥克兰, 新西兰", to: "新普利茅斯, 新西兰", route: "SH 1和SH 3", time: "4h 30m", minutes: 270, traffic: "2 min faster than normal", readAt: "2026-11-10T05:46:13.138Z" }, hoursBefore: 4.5 },
+};
+const P10_NZTA_DATE = Object.values(EDGE_SOURCES).map(s => s.checkedAt).sort().pop();
+// The tag after each leg: car legs show the NZTA query date and the raw reading on hover; other modes are estimates.
+function p10LegTag(l, zh) {
+  const s = l.src || EDGE_SOURCE_DEFAULT, nz = l.mode === 'car' && s.nzta;
+  // NZTA route names were read with a Chinese joiner (browser locale); show it in the reader's language.
+  const road = nz ? (zh ? s.nzta.route : s.nzta.route.replace(/和/g, ' and ').replace(/、/g, ', ')) : '';
+  const label = nz ? (zh ? `估算值（NZTA 查询 ${s.checkedAt}）` : `Estimate (NZTA query ${s.checkedAt})`) : (zh ? '估算值' : 'Estimate');
+  const title = nz
+    ? (zh ? `NZTA Journey Planner ${s.checkedAt} 读数：${road}，${s.nzta.time}${s.nzta.traffic ? '（' + s.nzta.traffic + '）' : ''}；取整到 15 分钟。NZTA 不显示里程，里程为规划估算。`
+          : `NZTA Journey Planner reading on ${s.checkedAt}: ${road}, ${s.nzta.time}${s.nzta.traffic ? ' (' + s.nzta.traffic + ')' : ''}; rounded to 15 minutes. NZTA shows no distance; km is a planning estimate.`)
+    : (zh ? '规划用估算值；公共交通和渡轮以运营商时刻表为准。' : 'Planning estimate; for coaches, trains and ferries check the operator’s timetable.');
+  const esc = v => String(v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  return `<abbr class="v3-tv" title="${esc(title)}">${label}</abbr>`;
+}
+globalThis.P10_ROAD_SOURCES = ROAD_SOURCES;
+globalThis.P10_EDGE_SOURCES = EDGES.map(e => ({ from: e[0], to: e[1], hours: e[2], km: e[3], ...(EDGE_SOURCES[e[0] + '|' + e[1]] || EDGE_SOURCE_DEFAULT) }));
 
 // What people ask for. `base` is where they sleep; `days` the time it needs there (0.5 fits on a travel day);
 // `routes` and `places` are what they do (each has its own reasons in why.js); `pt` false where the place itself
@@ -128,8 +209,8 @@ const WISHES = [
   { id: 'christchurch', island: 'south', base: 'christchurch', days: 1, en: 'Christchurch', zh: '基督城', routes: ['bridle-path'], places: ['chch-gardens'] },
   { id: 'nelson', island: 'south', base: 'nelson', days: 1, en: 'Nelson', zh: '纳尔逊', routes: [], places: [] },
   { id: 'picton', island: 'south', base: 'picton', days: 1, en: 'Picton', zh: '皮克顿', routes: [], places: [] },
-  { id: 'tekapo', island: 'south', base: 'tekapo', days: 0.5, en: 'Lake Tekapo and the dark-sky reserve', zh: '特卡波湖与暗夜星空', routes: ['mackenzie-route'], places: ['good-shepherd', 'dark-sky'] },
-  { id: 'aoraki', island: 'south', base: 'aoraki', days: 1, en: 'Aoraki/Mount Cook', zh: '库克山', routes: ['hooker-valley'], places: ['tasman-lake'] },
+  { id: 'tekapo', island: 'south', base: 'tekapo', days: 0.5, en: 'Lake Tekapo and the dark-sky reserve', zh: '蒂卡普湖与暗夜星空', routes: ['mackenzie-route'], places: ['good-shepherd', 'dark-sky'] },
+  { id: 'aoraki', island: 'south', base: 'aoraki', days: 1, en: 'Aoraki/Mount Cook', zh: '奥拉基／库克山', routes: ['hooker-valley'], places: ['tasman-lake'] },
   { id: 'wanaka', island: 'south', base: 'wanaka', days: 1, en: 'Wānaka', zh: '瓦纳卡', routes: ['roys-peak'], places: ['wanaka-tree'] },
   { id: 'queenstown', island: 'south', base: 'queenstown', days: 2, en: 'Queenstown', zh: '皇后镇', routes: ['queenstown-trail'], places: ['skyline-qt', 'shotover-jet', 'kawarau-bungy', 'arrowtown', 'glenorchy'] },
   { id: 'milford', island: 'south', base: 'te-anau', days: 1, en: 'Milford Sound', zh: '米尔福德峡湾', routes: ['milford-road'], ptRoutes: ['milford-coach'], places: ['milford-cruise'], weather: true },
@@ -138,7 +219,7 @@ const WISHES = [
   { id: 'haast', island: 'south', base: 'haast', days: 0.5, en: 'Haast and the Haast Pass', zh: '哈斯特与哈斯特隘口', routes: ['haast-pass'], places: [] },
   { id: 'hokitika', island: 'south', base: 'hokitika', days: 0.5, en: 'Hokitika Gorge', zh: '霍基蒂卡峡谷', routes: [], places: ['hokitika-gorge'], pt: false },
   { id: 'punakaiki', island: 'south', base: 'punakaiki', days: 0.5, en: 'Punakaiki Pancake Rocks', zh: '普纳凯基千层岩', routes: ['paparoa-track'], places: ['pancake-rocks'] },
-  { id: 'arthurs-pass', island: 'south', base: 'arthurs-pass', days: 0.5, en: 'Arthur’s Pass', zh: '亚瑟隘口', routes: ['devils-punchbowl', 'arthurs-pass'], ptRoutes: ['tranzalpine', 'devils-punchbowl'], places: [] },
+  { id: 'arthurs-pass', island: 'south', base: 'arthurs-pass', days: 0.5, en: 'Arthur’s Pass', zh: '亚瑟通道', routes: ['devils-punchbowl', 'arthurs-pass'], ptRoutes: ['tranzalpine', 'devils-punchbowl'], places: [] },
   { id: 'kaikoura', island: 'south', base: 'kaikoura', days: 1, en: 'Kaikōura whales', zh: '凯库拉看鲸', routes: ['kaikoura-coast'], ptRoutes: ['coastal-pacific'], places: ['whale-watch'] },
   { id: 'abel-tasman', island: 'south', base: 'marahau', days: 1, en: 'Abel Tasman coast', zh: '亚伯塔斯曼海岸', routes: ['abel-tasman'], places: [] },
   { id: 'akaroa', island: 'south', base: 'akaroa', days: 1, en: 'Akaroa and Hector’s dolphins', zh: '阿卡罗阿与赫氏海豚', routes: ['akaroa-road'], places: ['akaroa-dolphins'] },
@@ -154,45 +235,47 @@ const WISHES = [
   { id: 'rotorua', island: 'north', base: 'rotorua', days: 1, en: 'Rotorua geothermal and Māori culture', zh: '罗托鲁瓦地热与毛利文化', routes: [], places: ['te-puia', 'wai-o-tapu', 'redwoods', 'polynesian-spa'] },
   { id: 'taupo', island: 'north', base: 'taupo', days: 0.5, en: 'Lake Taupō and Huka Falls', zh: '陶波湖与胡卡瀑布', routes: ['huka-falls'], places: ['huka'] },
   { id: 'tongariro', island: 'north', base: 'national-park', days: 1, en: 'Tongariro Alpine Crossing', zh: '汤加里罗高山穿越', routes: ['tongariro-crossing', 'taranaki-falls'], places: [], weather: true },
-  { id: 'napier', island: 'north', base: 'napier', days: 1, en: 'Napier art deco', zh: '纳皮尔装饰艺术小城', routes: [], places: [], whyFrom: 'wellington-napier' },
+  { id: 'napier', island: 'north', base: 'napier', days: 1, en: 'Napier art deco', zh: '内皮尔装饰艺术小城', routes: [], places: [], whyFrom: 'wellington-napier' },
   { id: 'wellington', island: 'north', base: 'wellington', days: 1, en: 'Wellington', zh: '惠灵顿', routes: ['escarpment-track'], places: ['te-papa', 'zealandia', 'cable-car'] },
   { id: 'taranaki', island: 'north', base: 'new-plymouth', days: 1, en: 'Taranaki and the Pouākai Crossing', zh: '塔拉纳基与波阿凯穿越', routes: ['pouakai-crossing'], places: ['three-sisters'], weather: true },
 ];
 
 // One plain line on what to do there, for places without a route guide and for the Milford day trip.
+// Generated by scripts/check-wish-tips.mjs from data/wish-tips.json (v3.1 C12): `src` = official pages whose quotes
+// were found; `verify` = no official source found yet, shown as 待核实 / To verify.
 const P10_WISH_TIPS = {
-  milford:{zh:'米尔福德住宿极少，通常住蒂阿瑙，当天往返（SH94 单程约 2 小时，118 km），游船需预订。',en:'There are very few beds at Milford Sound; most visitors stay in Te Anau and go out and back (SH94, about 2 h, 118 km each way). Book the cruise ahead.'},
-  rotorua:{zh:'地热公园和毛利文化表演选一两处即可，多数需预订。',en:'Pick one or two geothermal parks or a Māori cultural evening; most need booking.'},
-  hobbiton:{zh:'霍比特村只能跟团参观，约 2 小时，需提前预订。',en:'Hobbiton is by guided tour only, about 2 hours; book ahead.'},
-  waitomo:{zh:'萤火虫洞游览约 45 分钟，需预订。',en:'The glowworm cave tour takes about 45 minutes; book ahead.'},
-  tekapo:{zh:'傍晚去好牧羊人教堂，晚上看星空（观星团需预订）。',en:'Visit the Church of the Good Shepherd at dusk and stay for the stars (stargazing tours need booking).'},
-  kaikoura:{zh:'观鲸船约 3 小时，受海况影响，建议安排在上午。',en:'Whale-watching boats take about 3 hours and depend on the sea; go in the morning.'},
-  stewart:{zh:'奥本镇周边步道和乌尔瓦岛观鸟，可按天气安排。',en:'Short walks around Oban and birdwatching on Ulva Island, arranged around the weather.'},
-  catlins:{zh:'沿南部风景公路看瀑布、灯塔和海岸，需要自驾。',en:'Waterfalls, lighthouses and coast along the Southern Scenic Route; you need a car.'},
-  christchurch:{zh:'可逛植物园和河畔，也可搭乘缆车欣赏港湾景色。',en:'Visit the Botanic Gardens and riverfront, or take the gondola for harbour views.'},
-  nelson:{zh:'可逛市中心与海滨，或骑行大味道骑行道的一段。',en:'Explore the town and waterfront, or ride a section of the Great Taste Trail.'},
-  picton:{zh:'沿海滨散步，或乘船探索夏洛特皇后峡湾。',en:'Walk the waterfront or take a boat into Queen Charlotte Sound.'},
-  aoraki:{zh:'从库克山村出发，按天气和步道开放情况选择胡克谷或塔斯曼湖步道。',en:'From Aoraki/Mount Cook Village, choose the Hooker Valley or Tasman Lake walk according to weather and track conditions.'},
-  wanaka:{zh:'沿瓦纳卡湖步道散步，或查看罗伊峰步道的季节性关闭信息。',en:'Walk along Lake Wānaka or check seasonal closures before attempting Roys Peak.'},
-  queenstown:{zh:'可沿湖散步、乘缆车或到箭镇，热门活动宜提前预订。',en:'Walk the lakefront, take the gondola or visit Arrowtown; book popular activities ahead.'},
-  'te-anau':{zh:'可参加萤火虫洞游览，或沿蒂阿瑙湖边散步。',en:'Visit the glowworm caves or walk along Lake Te Anau.'},
-  glaciers:{zh:'查看冰川地区的步道开放和天气信息，按现场条件选择观景步道。',en:'Check track openings and weather, then choose a glacier-area viewpoint walk for the conditions.'},
-  haast:{zh:'可沿哈斯特隘口公路停看瀑布与短步道，留意路况。',en:'Stop for waterfalls and short walks along the Haast Pass road; check road conditions.'},
-  hokitika:{zh:'可到霍基蒂卡峡谷看蓝绿色河水，再回镇上海滩散步。',en:'Visit Hokitika Gorge for turquoise river views, then walk the town beach.'},
-  punakaiki:{zh:'可走千层岩与喷水洞环道，潮汐会影响喷水洞的观赏效果。',en:'Walk the Pancake Rocks and blowholes loop; tides affect the blowholes.'},
-  'arthurs-pass':{zh:'在亚瑟隘口村附近选择短步道，出发前查看天气和步道情况。',en:'Choose a short walk near Arthur’s Pass village and check weather and track conditions first.'},
-  'abel-tasman':{zh:'从马拉豪或凯特里特里安排海岸步道、皮划艇或水上出租船。',en:'Arrange a coastal walk, kayak or water taxi from Mārahau or Kaiteriteri.'},
-  akaroa:{zh:'在海港村散步，或预订出海观赏赫氏海豚。',en:'Walk around the harbour village or book a cruise to see Hector’s dolphins.'},
-  dunedin:{zh:'可逛市中心历史建筑，或去奥塔哥半岛看野生动物。',en:'Explore the city’s historic buildings or visit the Otago Peninsula for wildlife.'},
-  oamaru:{zh:'参观奥马鲁历史街区，或安排傍晚企鹅观赏；圆石可结合潮汐前往。',en:'Visit Ōamaru’s historic precinct or see penguins in the evening; plan the boulders around the tide.'},
-  auckland:{zh:'可乘渡轮到德文波特，或预订船票去朗伊托托步行登顶。',en:'Take the ferry to Devonport, or book a boat to walk up Rangitoto.'},
-  'bay-of-islands':{zh:'从派希亚乘船游览海湾，也可参观怀唐伊条约签署地。',en:'Take a boat trip from Paihia or visit the Waitangi Treaty Grounds.'},
-  coromandel:{zh:'查看教堂湾步道开放情况；热水海滩需按潮汐安排。',en:'Check access to Cathedral Cove; visit Hot Water Beach around low tide.'},
-  taupo:{zh:'可到胡卡瀑布观景，再沿陶波湖畔散步。',en:'Visit Huka Falls and walk along the Lake Taupō waterfront.'},
-  tongariro:{zh:'汤加里罗高山穿越全程单程 20.2 km；11 月至次年 4 月约 7–8 小时，5–10 月约 9 小时。建议提前预订接驳车，乘接驳车须预订步道；5–10 月需高山技能，接驳车通常停运。天气不好时不要上山，用机动日改期。',en:'The Tongariro Alpine Crossing is 20.2 km one way: 7–8 hours from November to April and around 9 hours from May to October. Book a shuttle ahead; a track booking is required to use it. May–October requires alpine skills and shuttles generally do not operate. Avoid the mountain in bad weather and use a buffer day to reschedule.'},
-  napier:{zh:'1931 年地震后重建的装饰艺术小城，可沿 Marine Parade 散步、参加装饰艺术建筑导览，或去附近的霍克斯湾酒庄。',en:'Rebuilt after the 1931 earthquake, Napier is known for Art Deco architecture. Walk Marine Parade, join an architecture tour or visit nearby Hawke’s Bay wineries.'},
-  wellington:{zh:'可参观蒂帕帕博物馆、乘缆车，或沿海滨散步。',en:'Visit Te Papa museum, ride the cable car or walk the waterfront.'},
-  taranaki:{zh:'按天气选择新普利茅斯海滨或塔拉纳基山区步道，山区出发前查看警报。',en:'Choose the New Plymouth waterfront or a Taranaki mountain walk for the weather, and check alpine alerts first.'},
+  "milford": {"zh":"从蒂阿瑙到米尔福德峡湾的米尔福德公路（SH94）全程 120 km；2026-11-10 在 NZTA 查询车程约 1 小时 51 分（含当时路况）。","en":"The Milford Road (SH94) from Te Anau is a 120 km journey; NZTA Journey Planner gave 1 h 51 min on 2026-11-10 (traffic at the time).","src":[{"url":"https://www.doc.govt.nz/globalassets/documents/parks-and-recreation/tracks-and-walks/fiordland/te-anau-milford-highway-brochure.pdf","checkedAt":"2026-11-10"},{"url":"https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJa15mlSBt1KkRULR5hIbvAAU&b=ChIJ4UlLuk3g1akRAN5kq4bvACo","checkedAt":"2026-11-10"}]},
+  "rotorua": {"zh":"地热公园和毛利文化表演选一两处即可，多数需预订。","en":"Pick one or two geothermal parks or a Māori cultural evening; most need booking.","verify":true,"check":"https://www.rotoruanz.com/"},
+  "hobbiton": {"zh":"霍比特村电影片场是全程导览的步行游览，约 2.5 小时，需凭预订号取票。","en":"The Hobbiton Movie Set tour is fully guided on foot and takes about 2.5 hours; bring your booking reference.","src":[{"url":"https://www.hobbitontours.com/experiences/hobbiton-movie-set-tour/","checkedAt":"2026-11-10"}]},
+  "waitomo": {"zh":"怀托摩萤火虫洞游览约 45 分钟，官方建议提前预订。","en":"The Waitomo Glowworm Caves tour takes about 45 minutes; the operator recommends booking ahead.","src":[{"url":"https://www.waitomo.com/waitomo-glowworm-caves","checkedAt":"2026-11-10"}]},
+  "tekapo": {"zh":"蒂卡普可看好牧羊人教堂、泡温泉，或参加观星团。","en":"In Tekapo, see the Church of the Good Shepherd, soak in the hot pools or join a stargazing tour.","src":[{"url":"https://www.mackenzienz.com/","checkedAt":"2026-11-10"}]},
+  "kaikoura": {"zh":"观鲸船出海受海况影响，出发前查看运营商信息。","en":"Whale-watching trips depend on the sea; check with the operator before you go.","verify":true,"check":"https://www.whalewatch.co.nz/"},
+  "stewart": {"zh":"奥本镇周边短步道和乌尔瓦岛观鸟，可按天气安排。","en":"Short walks around Oban and birdwatching on Ulva Island, arranged around the weather.","verify":true,"check":"https://www.doc.govt.nz/parks-and-recreation/places-to-go/southland/places/stewart-island-rakiura/"},
+  "catlins": {"zh":"沿南部风景公路看瀑布、灯塔和海岸，需要自驾。","en":"Waterfalls, lighthouses and coast along the Southern Scenic Route; you need a car.","verify":true,"check":"https://www.southernscenicroute.co.nz/"},
+  "christchurch": {"zh":"可逛基督城植物园，或乘缆车看城市、利特尔顿港和太平洋的全景。","en":"Visit the Christchurch Botanic Gardens, or ride the gondola for views of the city, Lyttelton Harbour and the Pacific.","src":[{"url":"https://ccc.govt.nz/parks-and-gardens/christchurch-botanic-gardens","checkedAt":"2026-11-10"},{"url":"https://www.christchurchattractions.nz/christchurch-gondola/","checkedAt":"2026-11-10"}]},
+  "nelson": {"zh":"可骑塔斯曼美味骑行步道的一段；这条环线可以只骑短程或一日骑行。","en":"Ride part of Tasman's Great Taste Trail; the loop can be done in short hops and day rides.","src":[{"url":"https://www.nzcycletrail.com/find-your-ride/23-great-rides/tasmans-great-taste-trail","checkedAt":"2026-11-10"}]},
+  "picton": {"zh":"可走夏洛特皇后步道的一段；起点船湾（Meretoto/Ship Cove）没有公路，需要乘船前往。","en":"Walk part of the Queen Charlotte Track; there is no road to the start at Meretoto/Ship Cove, so you need a boat.","src":[{"url":"https://www.doc.govt.nz/parks-and-recreation/places-to-go/marlborough/places/queen-charlotte-sound-totaranui-area/things-to-do/tracks/queen-charlotte-track/","checkedAt":"2026-11-10"}]},
+  "aoraki": {"zh":"从库克山村出发，可走胡克谷步道到奥拉基／库克山脚下，或走塔斯曼冰川观景步道（往返约 30 分钟）。","en":"From Aoraki/Mount Cook Village, walk the Hooker Valley to the foot of the mountain, or take the Tasman Glacier View Track (30 min return).","src":[{"url":"https://www.doc.govt.nz/parks-and-recreation/places-to-go/canterbury/places/aoraki-mount-cook-national-park/things-to-do/tracks/hooker-valley-track/","checkedAt":"2026-11-10"},{"url":"https://www.doc.govt.nz/parks-and-recreation/places-to-go/canterbury/places/aoraki-mount-cook-national-park/things-to-do/tracks/tasman-glacier-view-track/","checkedAt":"2026-11-10"}]},
+  "wanaka": {"zh":"罗伊峰步道每年 10 月 1 日至 11 月 10 日因产羔关闭；关闭期间 DOC 推荐伊斯穆斯峰步道。","en":"Roys Peak Track is closed for lambing from 1 October to 10 November each year; DOC suggests Isthmus Peak Track during the closure.","src":[{"url":"https://www.doc.govt.nz/parks-and-recreation/places-to-go/otago/places/wanaka-area/things-to-do/roys-peak-track/","checkedAt":"2026-11-10"}]},
+  "queenstown": {"zh":"可沿瓦卡蒂普湖散步，或去附近的箭镇。","en":"Walk by Lake Whakatipu or visit nearby Arrowtown.","src":[{"url":"https://www.queenstownnz.co.nz/","checkedAt":"2026-11-10"}]},
+  "te-anau": {"zh":"可参加萤火虫洞游览，或沿蒂阿瑙湖边散步。","en":"Visit the glowworm caves or walk along Lake Te Anau.","verify":true,"check":"https://www.realnz.com/"},
+  "glaciers": {"zh":"可走短程雨林步道看弗朗茨约瑟夫冰川谷，或环马西森湖看雪山倒影。","en":"Take the short rainforest walk to view the Franz Josef Glacier valley, or loop Lake Matheson for its mountain reflections.","src":[{"url":"https://www.doc.govt.nz/parks-and-recreation/places-to-go/west-coast/places/westland-tai-poutini-national-park/things-to-do/tracks/franz-josef-glacierka--roimata-o-hine-hukatere-walk/","checkedAt":"2026-11-10"},{"url":"https://www.doc.govt.nz/parks-and-recreation/places-to-go/west-coast/places/westland-tai-poutini-national-park/things-to-do/tracks/lake-matheson-te-ara-kairaumati-walk/","checkedAt":"2026-11-10"}]},
+  "haast": {"zh":"哈斯特隘口公路沿途有多处值得停车的短步道，可看蓝池和瀑布；留意路况。","en":"The Haast Pass Highway has short walks worth stopping for, to blue pools and waterfalls; check road conditions.","src":[{"url":"https://westcoast.co.nz/visit/discover/highlights/haast-world-heritage-area/","checkedAt":"2026-11-10"}]},
+  "hokitika": {"zh":"霍基蒂卡峡谷距镇上约 30 分钟车程，可看蓝绿色河水，有适合各种体力的步道。","en":"Hokitika Gorge is 30 min by car from Hokitika: turquoise water and walks for everyone.","src":[{"url":"https://www.doc.govt.nz/parks-and-recreation/places-to-go/west-coast/places/hokitika-gorge-scenic-reserve/things-to-do/tracks/hokitika-gorge-walk/","checkedAt":"2026-11-10"}]},
+  "punakaiki": {"zh":"千层岩是一条铺装短步道；喷水洞在涨潮前后最壮观。","en":"The Pancake Rocks walk is short and paved; the blowholes are at their best around high tide.","src":[{"url":"https://www.doc.govt.nz/parks-and-recreation/places-to-go/west-coast/places/paparoa-national-park/things-to-do/tracks/pancake-rocks-and-blowholes-walk/","checkedAt":"2026-11-10"}]},
+  "arthurs-pass": {"zh":"可走魔鬼酒碗瀑布步道，穿过山毛榉林到瀑布，往返约 1 小时。","en":"Walk to Devils Punchbowl Falls through beech forest, about 1 hr return.","src":[{"url":"https://www.doc.govt.nz/parks-and-recreation/places-to-go/canterbury/places/arthurs-pass-national-park/things-to-do/tracks/devils-punchbowl-walking-track/","checkedAt":"2026-11-10"}]},
+  "abel-tasman": {"zh":"从马拉豪走海岸步道，可从托塔拉努伊乘水上出租船返回；预订前先核对接驳时间。","en":"Walk the coast track from Mārahau and take a water taxi back from Tōtaranui; check transport times before booking.","src":[{"url":"https://www.doc.govt.nz/parks-and-recreation/places-to-go/nelson-tasman/places/abel-tasman-national-park/things-to-do/tracks/abel-tasman-coast-track/","checkedAt":"2026-11-10"}]},
+  "akaroa": {"zh":"在海港村散步，或预订出海观赏赫氏海豚。","en":"Walk around the harbour village or book a cruise to see Hector’s dolphins.","verify":true,"check":"https://www.doc.govt.nz/nature/native-animals/marine-mammals/dolphins/hectors-dolphin/"},
+  "dunedin": {"zh":"可逛市中心历史建筑，或去奥塔哥半岛看野生动物。","en":"Explore the city’s historic buildings or visit the Otago Peninsula for wildlife.","verify":true,"check":"https://www.dunedinnz.com/"},
+  "oamaru": {"zh":"可到奥马鲁蓝企鹅栖息地参加傍晚观赏。","en":"Join the evening viewing at the Ōamaru Blue Penguin Colony.","src":[{"url":"https://www.penguins.co.nz/","checkedAt":"2026-11-10"}]},
+  "auckland": {"zh":"可乘公共渡轮去朗伊托托岛步行登顶；岛上不能过夜，别错过回程渡轮。","en":"Take the public ferry to Rangitoto and walk to the summit; there is no overnight accommodation, so don't miss the ferry back.","src":[{"url":"https://www.doc.govt.nz/parks-and-recreation/places-to-go/auckland/places/rangitoto-island/","checkedAt":"2026-11-10"}]},
+  "bay-of-islands": {"zh":"可参观怀唐伊条约签署地。","en":"Visit the Waitangi Treaty Grounds.","src":[{"url":"https://www.waitangi.org.nz/","checkedAt":"2026-11-10"}]},
+  "coromandel": {"zh":"教堂湾步道往返约 1 小时 30 分，终点是著名的岩石拱门。","en":"The Cathedral Cove walk is 1 hr 30 min return and ends at the famous rock archway.","src":[{"url":"https://www.doc.govt.nz/parks-and-recreation/places-to-go/coromandel/places/hahei-area/tracks/mautohe-cathedral-cove-walk/","checkedAt":"2026-11-10"}]},
+  "taupo": {"zh":"可从陶波沿怀卡托河步行到胡卡瀑布。","en":"Walk from Taupō along the Waikato River to Huka Falls.","src":[{"url":"https://www.doc.govt.nz/parks-and-recreation/places-to-go/central-north-island/places/taupo-area/things-to-do/spa-park-to-huka-falls-walk/","checkedAt":"2026-11-10"}]},
+  "tongariro": {"zh":"汤加里罗高山穿越单程 20.2 km；11–4 月约 7–8 小时，5–10 月约 9 小时，5–10 月必须具备高山技能。乘接驳车或跟团须先预订步道。天气不好时不要上山，用机动日改期。","en":"The Tongariro Alpine Crossing is 20.2 km one way: 7–8 hr from November to April, 9 hr from May to October, when alpine skills are essential. A track booking is needed to use a shuttle or guided walk. Don't go up in bad weather; use a buffer day.","src":[{"url":"https://www.doc.govt.nz/tongariroalpinecrossing","checkedAt":"2026-11-10"}]},
+  "napier": {"zh":"1931 年霍克斯湾地震后，内皮尔按装饰艺术风格重建；可参加装饰艺术步行导览。","en":"Napier was rebuilt in Art Deco style after the 1931 Hawke’s Bay earthquake; join a guided Art Deco walking tour.","src":[{"url":"https://www.artdeconapier.com/","checkedAt":"2026-11-10"}]},
+  "wellington": {"zh":"可参观蒂帕帕博物馆，或乘缆车上凯尔本，顺路去惠灵顿植物园。","en":"Visit Te Papa, or ride the cable car up to Kelburn for the Wellington Botanic Garden.","src":[{"url":"https://www.tepapa.govt.nz/visit","checkedAt":"2026-11-10"},{"url":"https://www.wellingtoncablecar.co.nz/","checkedAt":"2026-11-10"}]},
+  "taranaki": {"zh":"塔拉纳基山天气多变，上山前查看天气预报；天气不好就选新普利茅斯海滨。","en":"Taranaki's weather is changeable; check the forecast before going up, and choose the New Plymouth waterfront if it turns.","src":[{"url":"https://www.doc.govt.nz/parks-and-recreation/places-to-go/taranaki/places/te-papa-kura-o-taranaki/","checkedAt":"2026-11-10"}]},
 };
 
 // Suggestions link to existing guides. These are ideas for independent planning, not scheduled activities.
@@ -207,8 +290,8 @@ const P10_GUIDES = {
   greattaste:['Great Taste Trail','塔斯曼美味骑行'], alps2ocean:['Alps 2 Ocean','Alps 2 Ocean 骑行'],
   queenstowncycle:['Queenstown cycling route','皇后镇河谷骑行'], wilderness:['West Coast Wilderness Trail','西海岸荒野骑行'],
   'ni-k2k':['Great Lake Trail K2K','陶波大湖骑行道 K2K'], 'ni-hauraki':['Hauraki Rail Trail','豪拉基铁路骑行道'],
-  haast:['Haast Pass road','哈斯特隘口公路'], milford:['Milford Road','米尔福德公路'], arthurs:['Arthur’s Pass road','亚瑟隘口公路'],
-  aorakidrive:['Christchurch to Aoraki road','基督城至库克山公路'], coastroad:['Picton to Christchurch road','皮克顿至基督城公路'],
+  haast:['Haast Pass road','哈斯特隘口公路'], milford:['Milford Road','米尔福德公路'], arthurs:['Arthur’s Pass road','亚瑟通道公路'],
+  aorakidrive:['Christchurch to Aoraki road','基督城至奥拉基／库克山公路'], coastroad:['Picton to Christchurch road','皮克顿至基督城公路'],
   'ni-volcanicloop':['Volcanic loop road','北岛火山环线'], 'ni-thermalexplorer':['Rotorua and Taupō road','罗托鲁瓦与陶波公路'],
   'ni-coromandel':['Coromandel loop road','科罗曼德环线'], 'ni-twincoast-drive':['Twin Coast road','北地双海岸公路'],
   'ni-martinborough':['Martinborough road','马丁堡公路'], catlins:['Catlins coastal road','卡特林斯海岸公路'],
@@ -217,7 +300,7 @@ const P10_GUIDES = {
   dunedinbus:['Dunedin to Christchurch coach','但尼丁至基督城巴士'], 'ni-northernexplorer':['Northern Explorer train','北方探索者火车'],
   'ni-devonportferry':['Devonport ferry','德文波特渡轮'], 'ni-aucklandpaihia':['Auckland to Paihia coach','奥克兰至派希亚巴士'],
   'ni-rotoruataupo':['Rotorua to Taupō coach','罗托鲁瓦至陶波巴士'], 'ni-kapitirail':['Kāpiti train','卡皮蒂火车'],
-  'ni-wellingtonnapier':['Wellington to Napier coach','惠灵顿至纳皮尔巴士']
+  'ni-wellingtonnapier':['Wellington to Napier coach','惠灵顿至内皮尔巴士']
 };
 const P10_WISH_GUIDES = {
   christchurch:{walk:['bridle'],transit:['tranzalpine']}, nelson:{cycle:['greattaste'],transit:['pictonnelson']},
@@ -267,7 +350,8 @@ function p10Net(car) {
     if ((!car && !pt) || (car && (a === 'oban' || b === 'oban'))) continue;
     const mode = pt === 'ferry' ? 'ferry' : car ? 'car' : pt;
     const time = mode === 'ferry' && (a === 'picton' || b === 'picton') ? h + 1 : car ? h : ptH ?? Math.round(h * 1.3 * 4) / 4;
-    graph[a].push({a,b,h:time,km,road,mode}); graph[b].push({a:b,b:a,h:time,km,road,mode});
+    const src = EDGE_SOURCES[a + '|' + b] || EDGE_SOURCE_DEFAULT;
+    graph[a].push({a,b,h:time,km,road,mode,src}); graph[b].push({a:b,b:a,h:time,km,road,mode,src});
   }
   const memo = {};
   function shortest(start) {
@@ -418,7 +502,7 @@ if (typeof window !== 'undefined') {
     }).join('');
     const names=[...dots].map(([id,p])=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2.5"><title>${p10Esc(p10Name(id))}</title></circle>`).join('');
     const selectors=days.map(d=>`<button type="button" data-p10-map-day="${d.n}" aria-pressed="false" style="--day-color:${P10_DAY_COLORS[(d.n-1)%P10_DAY_COLORS.length]}">${zh?'第 '+d.n+' 天':'Day '+d.n}</button>`).join('');
-    return `<section class="p10-map-panel" id="p10-trip-map" aria-label="${zh?'行程地图':'Itinerary map'}"><div class="p10-map-heading"><div><p>${zh?'逐日路线':'DAY BY DAY'}</p><h2>${zh?'行程地图':'Your trip map'}</h2></div><p>${zh?'选择某一天，查看当天经过的地点。':'Choose a day to focus on its stops.'}</p></div><div class="p10-map-day-list" aria-label="${zh?'选择日期':'Choose a day'}"><button type="button" data-p10-map-day="all" aria-pressed="true">${zh?'全部':'All days'}</button>${selectors}</div><p class="p10-map-selection" role="status" aria-live="polite">${zh?'显示全部行程地点':'Showing all itinerary stops'}</p><svg class="p10-trip-svg" viewBox="0 0 680 820" role="img" aria-label="${zh?'行程地点与每日路段示意图':'Schematic map of itinerary stops and daily connections'}"><rect width="680" height="820" fill="#e2ece8"/><path class="p10-coast" d="${P10_COAST}"/><g class="p10-map-lines">${lines}</g><g class="p10-map-dots">${names}</g></svg><p class="p10-map-note">${zh?'地点之间的连线为示意，不能用于导航。':'Connections between places are schematic, not for navigation.'} <a href="https://www.naturalearthdata.com/about/terms-of-use/" target="_blank" rel="noopener noreferrer">Natural Earth</a> · <a href="https://data.linz.govt.nz/layer/51153-nz-coastlines-and-islands-polygons-topo-150k/" target="_blank" rel="noopener noreferrer">LINZ</a> / <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a></p></section>`;
+    return `<section class="p10-map-panel" id="p10-trip-map" aria-label="${zh?'行程地图':'Itinerary map'}"><div class="p10-map-heading"><div><p>${zh?'逐日路线':'DAY BY DAY'}</p><h2>${zh?'行程地图':'Your trip map'}</h2></div><p>${zh?'选择某一天，查看当天经过的地点。':'Choose a day to focus on its stops.'}</p></div><div class="p10-map-day-list" aria-label="${zh?'选择日期':'Choose a day'}"><button type="button" data-p10-map-day="all" aria-pressed="true">${zh?'全部':'All days'}</button>${selectors}</div><p class="p10-map-selection" role="status" aria-live="polite">${zh?'显示全部行程地点':'Showing all itinerary stops'}</p><svg class="p10-trip-svg" viewBox="0 0 680 820" role="img" aria-label="${zh?'行程地点与每日路段示意图':'Schematic map of itinerary stops and daily connections'}"><rect width="680" height="820" fill="#e2ece8"/><path class="p10-coast" d="${P10_COAST}"/><g class="p10-map-lines">${lines}</g><g class="p10-map-dots">${names}</g></svg><p class="p10-map-note">${zh?'地点之间的连线为示意，不能用于导航。':'Connections between places are schematic, not for navigation.'} <a href="https://www.naturalearthdata.com/about/terms-of-use/" target="_blank" rel="noopener noreferrer">Natural Earth</a> · ${zh?'海岸线包含取自':'Coastline contains data sourced from the'} <a href="https://data.linz.govt.nz/layer/51153-nz-coastlines-and-islands-polygons-topo-150k/" target="_blank" rel="noopener noreferrer">LINZ Data Service</a> ${zh?'并按':'licensed for reuse under'} <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>${zh?' 许可再利用的数据':''}</p></section>`;
   }
   function p10FocusDay(day){
     const panel=p10$('#p10-trip-map'),svg=panel?.querySelector('.p10-trip-svg');if(!svg)return;
@@ -456,18 +540,18 @@ if (typeof window !== 'undefined') {
         return `<article class="plan-day"><button class="p10-day-focus" type="button" data-p10-focus="${number}">${x.day}${number}${x.dayEnd} <span aria-hidden="true">↗</span></button><span class="plan-day-title">${title}</span><p>${description}</p><p>${x.night}：${p10Esc(p10Name(d.at))}</p></article>`;
       }
       const heading=d.kind==='arrive'?`${x.arrive} ${p10Esc(p10Name(d.at))}`:d.kind==='depart'?`${x.depart} ${p10Esc(p10Name(d.at))}`:d.legs.length?`${p10Esc(p10Name(d.legs[0].a))} → ${p10Esc(p10Name(d.at))}`:`${x.activity} ${d.activities.map(a=>p10Esc(a.wish[p10Lang()])).join('、')}`;
-      const legs=d.legs.map(l=>{const road=p10LegDescription(l,p10Lang());const mode=x[l.mode]||x.road;const duration=p10Duration(l.h,p10Lang());return `<li>${p10Esc(p10Name(l.a))} → ${p10Esc(p10Name(l.b))} · ${p10Esc(road)} · ${mode}${zh?'约':' about '}${duration}${l.km>0?` · ${l.km} km`:''}</li>`;}).join('');
+      const legs=d.legs.map(l=>{const road=p10LegDescription(l,p10Lang());const mode=x[l.mode]||x.road;const duration=p10Duration(l.h,p10Lang());return `<li>${p10Esc(p10Name(l.a))} → ${p10Esc(p10Name(l.b))} · ${p10Esc(road)} · ${mode}${zh?'约':' about '}${duration}${l.km>0?` · ${l.km} km`:''} ${p10LegTag(l,zh)}</li>`;}).join('');
       const travel=d.legs.reduce((sum,l)=>sum+l.h,0),driving=d.legs.filter(l=>l.mode==='car').reduce((sum,l)=>sum+l.h,0),pace=Number(result.input.pace)||5;
       const total=travel>0?`<p class="p10-daily-total">${zh?'当天路上约':'Travel today: about '}${p10DailyTime(travel,p10Lang())}${zh?'（不含当地接驳）':' (local connections excluded)'}</p>`:'';
       const stops=p10BreakStops(d),names=stops.map(id=>p10Esc(p10Name(id))).join(zh?'或':' or ');
       const longDay=driving>pace?`<p class="p10-warning p10-long-day">${zh?'这天开车较长':'This is a long driving day'}${names?(zh?`，可以在${names}多住一晚并调整行程。`:`; consider an overnight stop in ${names} and adjust the itinerary.`):(zh?'，可以在途中多住一晚并调整行程。':'; consider an overnight stop and adjust the itinerary.')}</p>`:'';
-      const activities=d.activities.map(a=>{const suggested=p10Suggestions(a.wish.id,result.input.preference);const guides=suggested.map(g=>`<a href="route.html?id=${encodeURIComponent(g.id)}&amp;lang=${p10Lang()}">${p10Esc(g[p10Lang()])}</a>`).join(' · ');const note=zh?'当天线路：':'Route for the day: ';const tip=P10_WISH_TIPS[a.wish.id]?.[p10Lang()]||'';return `<p>${x.activity}：${p10Esc(a.wish[p10Lang()])}${a.total>1?` (${a.part}/${a.total})`:''}。${tip?' '+p10Esc(tip):''} ${x.localTransport}</p>${suggested.length?`<p class="p10-suggestions">${note}${guides}</p>`:''}`;}).join('');
+      const activities=d.activities.map(a=>{const suggested=p10Suggestions(a.wish.id,result.input.preference);const guides=suggested.map(g=>`<a href="route.html?id=${encodeURIComponent(g.id)}&amp;lang=${p10Lang()}">${p10Esc(g[p10Lang()])}</a>`).join(' · ');const note=zh?'当天线路：':'Route for the day: ';const tipRec=P10_WISH_TIPS[a.wish.id],tip=tipRec?.[p10Lang()]||'',tipSrc=tipRec?(tipRec.src?` <span class="p10-tip-src">${zh?'来源：':'Source: '}${tipRec.src.map(s=>`<a href="${p10Esc(s.url)}" target="_blank" rel="noopener noreferrer">${p10Esc(new URL(s.url).hostname.replace(/^www\./,''))}</a>${s.checkedAt?(zh?`（${s.checkedAt} 核）`:` (checked ${s.checkedAt})`):''}`).join(zh?'；':'; ')}</span>`:` <abbr class="v3-tv" title="${zh?'这条提示尚未找到官方原文，出发前请自行核对。':'No official source found for this tip yet; check before you go.'}">${zh?'待核实':'To verify'}</abbr>`):'';return `<p>${x.activity}：${p10Esc(a.wish[p10Lang()])}${a.total>1?` (${a.part}/${a.total})`:''}。${tip?' '+p10Esc(tip)+tipSrc:''} ${x.localTransport}</p>${suggested.length?`<p class="p10-suggestions">${note}${guides}</p>`:''}`;}).join('');
       const arrivalTip=d.kind==='arrive'?(zh?'抵达后建议休息，避免落地当天长途驾驶。':'Rest after arrival and avoid a long drive on the first day.') : '';
       return `<article class="plan-day"><button class="p10-day-focus" type="button" data-p10-focus="${number}">${x.day}${number}${x.dayEnd} <span aria-hidden="true">↗</span></button><span class="plan-day-title">${heading}</span>${arrivalTip?`<p>${arrivalTip}</p>`:''}${legs?`<ul class="p10-legs">${legs}</ul>`:''}${total}${longDay}${activities}${d.kind==='depart'?'':`<p>${x.night}：${p10Esc(p10Name(d.at))}</p>`}</article>`;
     }).join('');
     const recoName=p10JevRouteName(p10Recommendation,p10Lang(),typeof routes==='undefined'?[]:routes);
     const reco=recoName?`<p>${x.reco}：<a href="route.html?id=${encodeURIComponent(p10Recommendation)}&amp;lang=${p10Lang()}">${p10Esc(recoName)}</a></p>`:'';
-    el.innerHTML=`${notices.join('')}${reco}${p10TripMap(timeline)}${rows}<p class="planner-small">${x.sources}: <a href="https://www.journeys.nzta.govt.nz/" target="_blank" rel="noopener noreferrer">NZTA</a> · <a href="https://www.intercity.co.nz/" target="_blank" rel="noopener noreferrer">InterCity</a> · <a href="https://www.greatjourneysnz.com/" target="_blank" rel="noopener noreferrer">KiwiRail</a></p>`;
+    el.innerHTML=`${notices.join('')}${reco}${p10TripMap(timeline)}${rows}<p class="planner-small"><strong>${zh?'路段时间和里程都是估算值':'Segment times and distances are estimates'}</strong>${zh?`：自驾时间是 ${P10_NZTA_DATE} 在 NZTA Journey Planner 逐段查询的读数（含查询当时的路况），取整到 15 分钟，不含停留；NZTA 不显示里程，里程仍是规划估算。巴士、火车和渡轮时间是估算，以运营商时刻表为准。出发前请在下列官方来源核对。`:`: driving times are readings taken segment by segment in NZTA Journey Planner on ${P10_NZTA_DATE} (with the traffic at that moment), rounded to 15 minutes, without stops; NZTA shows no distances, so km are planning estimates. Coach, train and ferry times are estimates; check the operator's timetable. Check the official sources below before you go.`} ${x.sources}: ${(globalThis.P10_ROAD_SOURCES||[]).map(r=>`<a href="${r.url}" target="_blank" rel="noopener noreferrer">${p10Esc(r.label)}</a>`).join(' · ')}</p>`;
     p10FocusDay('all');
   }
   window.renderP10Planner=function(){

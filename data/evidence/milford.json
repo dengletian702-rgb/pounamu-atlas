@@ -1,0 +1,47 @@
+[
+ {
+  "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/fiordland/places/fiordland-national-park/things-to-do/scenic-driving/milford-road/",
+  "fetchedAt": "2026-11-10T01:26:51.737Z",
+  "status": 200,
+  "finalUrl": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/fiordland/places/fiordland-national-park",
+  "title": "Fiordland National Park: Places to go in Fiordland",
+  "overview": [
+   "=\"doc-standard-overview__intro reverse\">",
+   "Fiordland National Park (established in 1952) has spectacular ice-carved fiords, lakes and valleys, rugged granite tops and pristine mountain to sea vistas.",
+   "Dog access",
+   "No dogs. Other pets on conservation land rules.",
+   "Brochures",
+   "Fiordland day walks brochure (PDF, 5,867K)",
+   "<doc-things-to-do data=\"[{\"recreationType\":2,\"tabName\":\"Walking and tramping\",\"tabId\":\"50578\",\"search\":{\"searchBlockId\":165894,\"fields\":[{\"selectableValues\":[{\"epiFindPropertyName\":\"Duration.List\",\"display\":\"Under 1 hour\",\"value\":\"Under 1 hour\",\"id\":1501000,\"isSelected\":false,\"sortOrder\":100,\"fieldId\":1696808602},{\"epiFindPropertyName\":\"Duration.List\",\"display\":\"1-4 hours\",\"value\":\"1-4 hours\",\"id\":1502000,\"isSelected\":false,\"sortOrder\":200,\"fieldId\":1696808602},{\"epiFindPropertyName\":\"Duration.List\",\"display\":\"Over 4 hours\",\"value\":\"Over 4 hours\",\"id\":1503000,\"isSelected\":false,\"sortOrder\":300,\"fieldId\":1696808602},{\"epiFindPropertyName\":\"Duration.List\",\"display\":\"Overnight\",\"value\":\"Overnight\",\"id\":1504000,\"isSelected\":false,\"sortOrder\":400,\"fieldId\":1696808602},{\"epiFindPropertyName\":\"Duration.List\",\"display\":\"Multi-night\",\"value\":\"Multi-night\",\"id\":1505000,\"isSelected\":false,\"sortOrder\":500,\"fieldId\":1696808602}],\"fieldName\":\"Duration\",\"isCheckbox\":false,\"linkUrl\":\"\",\"linkText\":\"\"},{\"selectableValues\":[{\"epiFindPropertyName\":\"Difficulty.List\",\"display\":\"Easiest\",\"value\":\"Easiest\",\"id\":1601000,\"isSelected\":false,\"sortOrder\":100,\"fieldId\":619807820},{\"epiFindPropertyName\":\"Difficulty.List\",\"display\":\"Easy\",\"value\":\"Easy\",\"id\":1602000,\"isSelected\":false,\"sortOrder\":200,\"fieldId\":619807820},{\"epiFindPropertyName\":\"Difficulty.List\",\"display\":\"Intermediate\",\"value\":\"Intermediate\",\"id\":1603000,\"isSelected\":false,\"sortOrder\":300,\"fieldId\":619807820},{\"epiFindPropertyName\":\"Difficulty.List\",\"display\":\"Advanced\",\"value\":\"Advanced\",\"id\":1604000,\"isSelected\":false,\"sortOrder\":400,\"fieldId\":619807820},{\"epiFindPropertyName\":\"Difficulty.List\",\"display\":\"Expert\",\"value\":\"Expert\",\"id\":1605000,\"isSelected\":false,\"sortOrder\":500,\"fieldId\":619807820}],\"fieldName\":\"Difficulty\",\"isCheckbox\":false,\"linkUrl\":\"/parks-and-recreation/things-to-do/walking-and-tramping/track-categories/\",\"linkText\":\"About track difficulties\"},{\"selectableValues\":[{\"epiFindPropertyName\":\"DogAccess\",\"display\":\"Dogs allowed\",\"value\":\"true\",\"id\":0,\"isSelected\":false,\"sortOrder\":0,\"fieldId\":1153495591},{\"epiFindPropertyName\":\"EasyAccess$$bool\",\"display\":\"Wheelchairs and buggies\",\"value\":\"true\",\"id\":0,\"isSelected\":false,\"sortOrder\":0,\"fieldId\":1153495591}],\"fieldName\":\"Options\",\"isCheckbox\":true,\"linkUrl\":\"\",\"linkText\":\"\"}],\"header\":\"Walking and tramping\",\"resultsHeader\":\"walking and tramping tracks\",\"initialSearchResults\":{\"sections\":[{\"name\":&quo"
+  ],
+  "stages": [],
+  "lines": [
+   "Department of Conservation Te Papa Atawhai",
+   "Department of Conservation | Te Papa Atawhai",
+   "Use established access points and tracks only. Additional tracking is not permitted.",
+   "Fiordland was well known to the Māori, and many legends recount its formation and naming. Demigod Tuterakiwhanoa is said to have carved the rugged landscape from formless rock. Few Māori were permanent residents of the region but seasonal food-gathering camps were linked by well worn trails. Takiwai, a translucent greenstone, was sought from Anita Bay and elsewhere near the mouth of Milford Sound/Piopiotahi.",
+   "Caswell Sound Hut – the only physical feature remaining from the New Zealand–American Fiordland expedition of 1949.",
+   "Clark Hut – built in 1941 and used for deer cullers by the New Zealand government.",
+   "Freeman Burn Hut – build in the 1930s for people walking the Bradshaw Sound – Lake Manapouri Track.",
+   "Take a journey through the heart of Fiordland during the November to April Great Walks season. Hike along valleys carved by glaciers, through ancient rainforests and past cascading waterfalls.",
+   "Page-level feedback"
+  ]
+ },
+ {
+  "url": "https://www.nzta.govt.nz/projects/sh94-milford-road/faqs",
+  "fetchedAt": "2026-11-10T01:26:52.636Z",
+  "status": 403,
+  "finalUrl": "https://www.nzta.govt.nz/projects/sh94-milford-road/faqs",
+  "note": "text/html"
+ },
+ {
+  "url": "https://www.doc.govt.nz/globalassets/documents/parks-and-recreation/tracks-and-walks/fiordland/te-anau-milford-highway-brochure.pdf",
+  "fetchedAt": "2026-11-10T00:45:00.000Z",
+  "status": 200,
+  "manual": true,
+  "via": "PDF opened 2026-11-10 (HTTP 200); full sentence read from the PDF text layer with macOS PDFKit on 2026-11-10 (v3.1): \"…a memorable 120 km journey into the heart of Fiordland National Park and Te Wāhipounamu – South-West New Zealand World Heritage Area.\"",
+  "lines": [
+   "120 km journey into the heart of Fiordland National Park"
+  ]
+ }
+]

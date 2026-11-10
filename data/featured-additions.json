@@ -1,0 +1,4034 @@
+[
+ {
+  "id": "kepler-track",
+  "island": "south",
+  "mode": "walk",
+  "name": "Kepler Track",
+  "zh": "凯普勒步道",
+  "region": [
+   "Fiordland",
+   "峡湾地区"
+  ],
+  "summary": [
+   "A loop Great Walk from Te Anau: beech-forest lakeshore, then tussock ridgelines above Lake Te Anau and Lake Manapōuri.",
+   "从蒂阿瑙出发的环线大步道：先走山毛榉林间的湖岸，再登上俯瞰蒂阿瑙湖和马纳普里湖的草丛山脊。"
+  ],
+  "ends": [
+   "Kepler Track car park → Luxmore Hut → Iris Burn Hut → Moturau Hut → car park (loop)",
+   "Kepler Track 停车场 → Luxmore Hut → Iris Burn Hut → Moturau Hut → 停车场（环线）"
+  ],
+  "time": [
+   "",
+   ""
+  ],
+  "distance": [
+   "",
+   ""
+  ],
+  "level": [
+   "",
+   ""
+  ],
+  "season": [
+   "Check the DOC page for the current season, alerts and closures.",
+   "当前季节、公告和封闭信息请查 DOC 页面。"
+  ],
+  "gear": [
+   "Multi-day pack, sleeping bag, cooker and food for every day plus a spare, warm and waterproof layers. Follow DOC's gear list for this track.",
+   "多日背包、睡袋、炉具、每天的食物外加一天备用、保暖和防雨衣物。请按 DOC 给这条步道的装备清单准备。"
+  ],
+  "intro": [
+   "A loop Great Walk from Te Anau: beech-forest lakeshore, then tussock ridgelines above Lake Te Anau and Lake Manapōuri.",
+   "从蒂阿瑙出发的环线大步道：先走山毛榉林间的湖岸，再登上俯瞰蒂阿瑙湖和马纳普里湖的草丛山脊。"
+  ],
+  "planTitle": [
+   "Stages from the DOC track description",
+   "DOC 步道说明中的分段"
+  ],
+  "timeline": [
+   {
+    "at": [
+     "Stage 1",
+     "第 1 段"
+    ],
+    "title": [
+     "Kepler Track carpark to Brod Bay",
+     "Kepler Track carpark → Brod Bay"
+    ],
+    "text": [
+     "Time: 1 hr 30 min; Distance: 5.6 km (DOC).",
+     "用时：1 小时 30 分钟；距离：5.6 公里（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 2",
+     "第 2 段"
+    ],
+    "title": [
+     "Brod Bay to Luxmore Hut",
+     "Brod Bay → Luxmore Hut"
+    ],
+    "text": [
+     "Time: 3 hr 30 min – 4 hr 30 min; Distance: 8.2 km (DOC).",
+     "用时：3 小时 30 分钟–4 小时 30 分钟；距离：8.2 公里（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Side trip",
+     "支线"
+    ],
+    "title": [
+     "Side trip: Luxmore Cave",
+     "支线：Luxmore Cave"
+    ],
+    "text": [
+     "Time: 20 min return (DOC).",
+     "用时：20 分钟 往返（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 4",
+     "第 4 段"
+    ],
+    "title": [
+     "Luxmore Hut to Iris Burn Hut",
+     "Luxmore Hut → Iris Burn Hut"
+    ],
+    "text": [
+     "Time: 5 – 6 hr; Distance: 14.6 km (DOC).",
+     "用时：5–6 小时；距离：14.6 公里（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Side trip",
+     "支线"
+    ],
+    "title": [
+     "Side trip: Luxmore summit",
+     "支线：Luxmore summit"
+    ],
+    "text": [
+     "Time: 30 min return (DOC).",
+     "用时：30 分钟 往返（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 6",
+     "第 6 段"
+    ],
+    "title": [
+     "Iris Burn Hut to Moturau Hut",
+     "Iris Burn Hut → Moturau Hut"
+    ],
+    "text": [
+     "Time: 5–6 hr; Distance: 16.2 km (DOC).",
+     "用时：5–6 小时；距离：16.2 公里（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 7",
+     "第 7 段"
+    ],
+    "title": [
+     "Moturau Hut to Rainbow Reach",
+     "Moturau Hut → Rainbow Reach"
+    ],
+    "text": [
+     "Time: 1 hr 30 min – 2 hr; Distance: 6 km (DOC).",
+     "用时：1 小时 30 分钟–2 小时；距离：6 公里（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 8",
+     "第 8 段"
+    ],
+    "title": [
+     "Rainbow Reach to Kepler Track carpark",
+     "Rainbow Reach → Kepler Track carpark"
+    ],
+    "text": [
+     "Time: 2 hr 30 min – 3 hr 30 min; Distance: 9.5 km (DOC).",
+     "用时：2 小时 30 分钟–3 小时 30 分钟；距离：9.5 公里（DOC）。"
+    ]
+   }
+  ],
+  "pacing": [
+   "Times are DOC's figures. Leave extra for rests, photos and a change in the weather.",
+   "用时取自 DOC。休息、拍照和天气变化请另留余量。"
+  ],
+  "access": [
+   "How to reach the start: see the DOC page.",
+   "前往起点的方式见 DOC 页面。"
+  ],
+  "food": [
+   "Carry food for every day plus a spare day; check the DOC page for hut cooking facilities and water.",
+   "带足每天的食物，另备一天余量；小屋炊事设施和饮水情况见 DOC 页面。"
+  ],
+  "tips": [
+   {
+    "title": [
+     "Check conditions",
+     "查看路况与天气"
+    ],
+    "text": [
+     "Read the DOC alerts for this track and the MetService forecast on the day you go.",
+     "出发当天查看这条步道的 DOC 公告和 MetService 天气预报。"
+    ]
+   },
+   {
+    "title": [
+     "Leave your plans",
+     "留下行程"
+    ],
+    "text": [
+     "Tell a trusted contact where you are going and when you will be back. In an emergency call 111.",
+     "把去向和返回时间告诉可靠的联系人。紧急情况拨 111。"
+    ]
+   }
+  ],
+  "alternatives": [
+   "If the weather or the time does not suit, choose a shorter walk nearby from the DOC page.",
+   "天气或时间不合适时，可在 DOC 页面上另选附近的短途步道。"
+  ],
+  "addedIn": "v3",
+  "sources": [
+   {
+    "label": "Department of Conservation (DOC)",
+    "labelZh": "新西兰保护部（DOC）",
+    "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/fiordland/places/fiordland-national-park/things-to-do/tracks/kepler-track/"
+   }
+  ],
+  "photoId": "te-anau-lake",
+  "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/fiordland/places/fiordland-national-park/things-to-do/tracks/kepler-track/",
+  "planDays": 4
+ },
+ {
+  "id": "heaphy-track",
+  "island": "south",
+  "mode": "walk",
+  "name": "Heaphy Track",
+  "zh": "希菲步道",
+  "region": [
+   "Kahurangi National Park, Nelson / West Coast",
+   "卡胡朗伊国家公园，纳尔逊／西海岸"
+  ],
+  "summary": [
+   "The longest Great Walk: tussock downs, forest and nīkau palms, ending on the wild West Coast.",
+   "最长的大步道：穿过草丛高地、森林和尼考棕榈，终点在西海岸的海边。"
+  ],
+  "ends": [
+   "Brown Hut → Perry Saddle → James Mackay Hut → Heaphy Hut → Kōhaihai",
+   "Brown Hut → Perry Saddle → James Mackay Hut → Heaphy Hut → Kōhaihai"
+  ],
+  "time": [
+   "",
+   ""
+  ],
+  "distance": [
+   "",
+   ""
+  ],
+  "level": [
+   "",
+   ""
+  ],
+  "season": [
+   "Check the DOC page for the current season, alerts and closures.",
+   "当前季节、公告和封闭信息请查 DOC 页面。"
+  ],
+  "gear": [
+   "Multi-day pack, sleeping bag, cooker and food for every day plus a spare, warm and waterproof layers. Follow DOC's gear list for this track.",
+   "多日背包、睡袋、炉具、每天的食物外加一天备用、保暖和防雨衣物。请按 DOC 给这条步道的装备清单准备。"
+  ],
+  "intro": [
+   "The longest Great Walk: tussock downs, forest and nīkau palms, ending on the wild West Coast.",
+   "最长的大步道：穿过草丛高地、森林和尼考棕榈，终点在西海岸的海边。"
+  ],
+  "planTitle": [
+   "Stages from the DOC track description",
+   "DOC 步道说明中的分段"
+  ],
+  "timeline": [
+   {
+    "at": [
+     "Stage 1",
+     "第 1 段"
+    ],
+    "title": [
+     "Brown Hut to Perry Saddle Hut",
+     "Brown Hut → Perry Saddle Hut"
+    ],
+    "text": [
+     "Time: 5 hr walking, 2 hr 30 min–3 hr 30 min mountain biking; Distance: 17.5 km (DOC).",
+     "用时：5 小时 步行, 2 小时 30 分钟–3 小时 30 分钟 山地车；距离：17.5 公里（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 2",
+     "第 2 段"
+    ],
+    "title": [
+     "Perry Saddle to Gouland Downs Hut",
+     "Perry Saddle → Gouland Downs Hut"
+    ],
+    "text": [
+     "Time: 2 hr walking, 1-2 hr mountain biking; Distance: 7 km (DOC).",
+     "用时：2 小时 步行, 1–2 小时 山地车；距离：7 公里（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 3",
+     "第 3 段"
+    ],
+    "title": [
+     "Gouland Downs Hut to Saxon Hut",
+     "Gouland Downs Hut → Saxon Hut"
+    ],
+    "text": [
+     "Time: 1 hr 30 min, 1-2 hr mountain biking; Distance: 5.4 km (DOC).",
+     "用时：1 小时 30 分钟, 1–2 小时 山地车；距离：5.4 公里（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 4",
+     "第 4 段"
+    ],
+    "title": [
+     "Saxon Hut to James Mackay Hut",
+     "Saxon Hut → James Mackay Hut"
+    ],
+    "text": [
+     "Time: 3 hr walking, 2-3 hr mountain biking; Distance: 11.8 km (DOC).",
+     "用时：3 小时 步行, 2–3 小时 山地车；距离：11.8 公里（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 5",
+     "第 5 段"
+    ],
+    "title": [
+     "James Mackay Hut to Heaphy Hut via Lewis Shelter",
+     "James Mackay Hut → Heaphy Hut via Lewis Shelter"
+    ],
+    "text": [
+     "Time: 6 hr walking, 2.5 hr - 4.5 hr mountain biking; Distance: 20.5 km (DOC).",
+     "用时：6 小时 步行, 2.5 小时–4.5 小时 山地车；距离：20.5 公里（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 6",
+     "第 6 段"
+    ],
+    "title": [
+     "Heaphy Hut to Kohaihai River Mouth",
+     "Heaphy Hut → Kohaihai River Mouth"
+    ],
+    "text": [
+     "Time: 5 hr walking, 3-4 hr mountain biking; Distance: 16.2 km (DOC).",
+     "用时：5 小时 步行, 3–4 小时 山地车；距离：16.2 公里（DOC）。"
+    ]
+   }
+  ],
+  "pacing": [
+   "Times are DOC's figures. Leave extra for rests, photos and a change in the weather.",
+   "用时取自 DOC。休息、拍照和天气变化请另留余量。"
+  ],
+  "access": [
+   "How to reach the start: see the DOC page.",
+   "前往起点的方式见 DOC 页面。"
+  ],
+  "food": [
+   "Carry food for every day plus a spare day; check the DOC page for hut cooking facilities and water.",
+   "带足每天的食物，另备一天余量；小屋炊事设施和饮水情况见 DOC 页面。"
+  ],
+  "tips": [
+   {
+    "title": [
+     "Check conditions",
+     "查看路况与天气"
+    ],
+    "text": [
+     "Read the DOC alerts for this track and the MetService forecast on the day you go.",
+     "出发当天查看这条步道的 DOC 公告和 MetService 天气预报。"
+    ]
+   },
+   {
+    "title": [
+     "Leave your plans",
+     "留下行程"
+    ],
+    "text": [
+     "Tell a trusted contact where you are going and when you will be back. In an emergency call 111.",
+     "把去向和返回时间告诉可靠的联系人。紧急情况拨 111。"
+    ]
+   }
+  ],
+  "alternatives": [
+   "If the weather or the time does not suit, choose a shorter walk nearby from the DOC page.",
+   "天气或时间不合适时，可在 DOC 页面上另选附近的短途步道。"
+  ],
+  "addedIn": "v3",
+  "sources": [
+   {
+    "label": "Department of Conservation (DOC)",
+    "labelZh": "新西兰保护部（DOC）",
+    "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/nelson-tasman/places/kahurangi-national-park/things-to-do/tracks/heaphy-track/"
+   }
+  ],
+  "photoId": null,
+  "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/nelson-tasman/places/kahurangi-national-park/things-to-do/tracks/heaphy-track/",
+  "planDays": 5
+ },
+ {
+  "id": "paparoa-track",
+  "island": "south",
+  "mode": "walk",
+  "name": "Paparoa Track",
+  "zh": "帕帕罗瓦步道",
+  "region": [
+   "Paparoa National Park, West Coast",
+   "帕帕罗瓦国家公园，西海岸"
+  ],
+  "summary": [
+   "Across the Paparoa Range from Blackball to Punakaiki: alpine tops, limestone karst and rainforest.",
+   "从 Blackball 翻越帕帕罗瓦山脉到普纳凯基：高山山顶、石灰岩喀斯特和雨林。"
+  ],
+  "ends": [
+   "Smoke-ho car park → Ces Clark Hut → Moonlight Tops Hut → Pororari Hut → Pororari River car park",
+   "Smoke-ho 停车场 → Ces Clark Hut → Moonlight Tops Hut → Pororari Hut → Pororari River 停车场"
+  ],
+  "time": [
+   "",
+   ""
+  ],
+  "distance": [
+   "",
+   ""
+  ],
+  "level": [
+   "",
+   ""
+  ],
+  "season": [
+   "Check the DOC page for the current season, alerts and closures.",
+   "当前季节、公告和封闭信息请查 DOC 页面。"
+  ],
+  "gear": [
+   "Multi-day pack, sleeping bag, cooker and food for every day plus a spare, warm and waterproof layers. Follow DOC's gear list for this track.",
+   "多日背包、睡袋、炉具、每天的食物外加一天备用、保暖和防雨衣物。请按 DOC 给这条步道的装备清单准备。"
+  ],
+  "intro": [
+   "Across the Paparoa Range from Blackball to Punakaiki: alpine tops, limestone karst and rainforest.",
+   "从 Blackball 翻越帕帕罗瓦山脉到普纳凯基：高山山顶、石灰岩喀斯特和雨林。"
+  ],
+  "planTitle": [
+   "Stages from the DOC track description",
+   "DOC 步道说明中的分段"
+  ],
+  "timeline": [
+   {
+    "at": [
+     "Stage 1",
+     "第 1 段"
+    ],
+    "title": [
+     "Smoke-ho car park to Ces Clark Hut",
+     "Smoke-ho car park → Ces Clark Hut"
+    ],
+    "text": [
+     "Time: 4–5 hr; Distance: 10.3 km (DOC).",
+     "用时：4–5 小时；距离：10.3 公里（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 2",
+     "第 2 段"
+    ],
+    "title": [
+     "Ces Clark Hut to Moonlight Tops Hut",
+     "Ces Clark Hut → Moonlight Tops Hut"
+    ],
+    "text": [
+     "Time: 3 hr; Distance: 9.7 km (DOC).",
+     "用时：3 小时；距离：9.7 公里（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Side trip",
+     "支线"
+    ],
+    "title": [
+     "Side trip: Croesus Knob",
+     "支线：Croesus Knob"
+    ],
+    "text": [
+     "Time: : 1 hr 10 min return (DOC).",
+     "用时：: 1 小时 10 分钟 往返（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 4",
+     "第 4 段"
+    ],
+    "title": [
+     "Moonlight Tops Hut to Pororari Hut",
+     "Moonlight Tops Hut → Pororari Hut"
+    ],
+    "text": [
+     "Time: 5–7 hr; Distance: 19.1 km (DOC).",
+     "用时：5–7 小时；距离：19.1 公里（DOC）。"
+    ]
+   }
+  ],
+  "pacing": [
+   "Times are DOC's figures. Leave extra for rests, photos and a change in the weather.",
+   "用时取自 DOC。休息、拍照和天气变化请另留余量。"
+  ],
+  "access": [
+   "How to reach the start: see the DOC page.",
+   "前往起点的方式见 DOC 页面。"
+  ],
+  "food": [
+   "Carry food for every day plus a spare day; check the DOC page for hut cooking facilities and water.",
+   "带足每天的食物，另备一天余量；小屋炊事设施和饮水情况见 DOC 页面。"
+  ],
+  "tips": [
+   {
+    "title": [
+     "Check conditions",
+     "查看路况与天气"
+    ],
+    "text": [
+     "Read the DOC alerts for this track and the MetService forecast on the day you go.",
+     "出发当天查看这条步道的 DOC 公告和 MetService 天气预报。"
+    ]
+   },
+   {
+    "title": [
+     "Leave your plans",
+     "留下行程"
+    ],
+    "text": [
+     "Tell a trusted contact where you are going and when you will be back. In an emergency call 111.",
+     "把去向和返回时间告诉可靠的联系人。紧急情况拨 111。"
+    ]
+   }
+  ],
+  "alternatives": [
+   "If the weather or the time does not suit, choose a shorter walk nearby from the DOC page.",
+   "天气或时间不合适时，可在 DOC 页面上另选附近的短途步道。"
+  ],
+  "addedIn": "v3",
+  "sources": [
+   {
+    "label": "Department of Conservation (DOC)",
+    "labelZh": "新西兰保护部（DOC）",
+    "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/west-coast/places/paparoa-national-park/things-to-do/tracks/paparoa-track/"
+   }
+  ],
+  "photoId": null,
+  "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/west-coast/places/paparoa-national-park/things-to-do/tracks/paparoa-track/",
+  "planDays": 3
+ },
+ {
+  "id": "rakiura-track",
+  "island": "south",
+  "mode": "walk",
+  "name": "Rakiura Track",
+  "zh": "拉奇乌拉步道",
+  "region": [
+   "Rakiura / Stewart Island",
+   "拉奇乌拉／斯图尔特岛"
+  ],
+  "summary": [
+   "A three-day island loop from Oban through bush, bird life and quiet beaches.",
+   "从奥本出发的三天海岛环线，一路是丛林、鸟鸣和安静的海滩。"
+  ],
+  "ends": [
+   "Oban → Lee Bay → Port William Hut → North Arm Hut → Fern Gully car park",
+   "Oban → Lee Bay → Port William Hut → North Arm Hut → Fern Gully 停车场"
+  ],
+  "time": [
+   "",
+   ""
+  ],
+  "distance": [
+   "",
+   ""
+  ],
+  "level": [
+   "",
+   ""
+  ],
+  "season": [
+   "Check the DOC page for the current season, alerts and closures.",
+   "当前季节、公告和封闭信息请查 DOC 页面。"
+  ],
+  "gear": [
+   "Multi-day pack, sleeping bag, cooker and food for every day plus a spare, warm and waterproof layers. Follow DOC's gear list for this track.",
+   "多日背包、睡袋、炉具、每天的食物外加一天备用、保暖和防雨衣物。请按 DOC 给这条步道的装备清单准备。"
+  ],
+  "intro": [
+   "A three-day island loop from Oban through bush, bird life and quiet beaches.",
+   "从奥本出发的三天海岛环线，一路是丛林、鸟鸣和安静的海滩。"
+  ],
+  "planTitle": [
+   "Stages from the DOC track description",
+   "DOC 步道说明中的分段"
+  ],
+  "timeline": [
+   {
+    "at": [
+     "Stage 1",
+     "第 1 段"
+    ],
+    "title": [
+     "Oban township to Lee Bay",
+     "Oban township → Lee Bay"
+    ],
+    "text": [
+     "Time: 1 hr 30 mins; Distance: 5 km (DOC).",
+     "用时：1 小时 30 分钟；距离：5 公里（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 2",
+     "第 2 段"
+    ],
+    "title": [
+     "Lee Bay to Port William Hut",
+     "Lee Bay → Port William Hut"
+    ],
+    "text": [
+     "Time: 3 to 4 hr; Distance: 8 km (DOC).",
+     "用时：3–4 小时；距离：8 公里（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 3",
+     "第 3 段"
+    ],
+    "title": [
+     "Port William Hut to North Arm Hut",
+     "Port William Hut → North Arm Hut"
+    ],
+    "text": [
+     "Time: 6 hr; Distance: 13 km (DOC).",
+     "用时：6 小时；距离：13 公里（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 4",
+     "第 4 段"
+    ],
+    "title": [
+     "North Arm Hut to Fern Gully car park",
+     "North Arm Hut → Fern Gully car park"
+    ],
+    "text": [
+     "Time: 4 to 4 hr 30 min; Distance: 11 km (DOC).",
+     "用时：4–4 小时 30 分钟；距离：11 公里（DOC）。"
+    ]
+   }
+  ],
+  "pacing": [
+   "Times are DOC's figures. Leave extra for rests, photos and a change in the weather.",
+   "用时取自 DOC。休息、拍照和天气变化请另留余量。"
+  ],
+  "access": [
+   "How to reach the start: see the DOC page.",
+   "前往起点的方式见 DOC 页面。"
+  ],
+  "food": [
+   "Carry food for every day plus a spare day; check the DOC page for hut cooking facilities and water.",
+   "带足每天的食物，另备一天余量；小屋炊事设施和饮水情况见 DOC 页面。"
+  ],
+  "tips": [
+   {
+    "title": [
+     "Check conditions",
+     "查看路况与天气"
+    ],
+    "text": [
+     "Read the DOC alerts for this track and the MetService forecast on the day you go.",
+     "出发当天查看这条步道的 DOC 公告和 MetService 天气预报。"
+    ]
+   },
+   {
+    "title": [
+     "Leave your plans",
+     "留下行程"
+    ],
+    "text": [
+     "Tell a trusted contact where you are going and when you will be back. In an emergency call 111.",
+     "把去向和返回时间告诉可靠的联系人。紧急情况拨 111。"
+    ]
+   }
+  ],
+  "alternatives": [
+   "If the weather or the time does not suit, choose a shorter walk nearby from the DOC page.",
+   "天气或时间不合适时，可在 DOC 页面上另选附近的短途步道。"
+  ],
+  "addedIn": "v3",
+  "sources": [
+   {
+    "label": "Department of Conservation (DOC)",
+    "labelZh": "新西兰保护部（DOC）",
+    "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/southland/places/stewart-island-rakiura/rakiura-national-park/things-to-do/rakiura-track/"
+   }
+  ],
+  "photoId": null,
+  "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/southland/places/stewart-island-rakiura/rakiura-national-park/things-to-do/rakiura-track/",
+  "planDays": 3
+ },
+ {
+  "id": "hump-ridge-track",
+  "island": "south",
+  "mode": "walk",
+  "name": "Hump Ridge Track",
+  "zh": "驼峰岭步道",
+  "region": [
+   "Southern Fiordland",
+   "峡湾地区南部"
+  ],
+  "summary": [
+   "A three-day loop over sub-alpine tops and along rugged coast; it became the 11th Great Walk in October 2024.",
+   "三天环线，翻越亚高山山顶，再沿崎岖海岸返回；2024 年 10 月成为第 11 条大步道。"
+  ],
+  "ends": [
+   "Loop in southern Fiordland (start point: see DOC and the Hump Ridge Trust)",
+   "峡湾地区南部环线（起点见 DOC 和 Hump Ridge Trust）"
+  ],
+  "time": [
+   "",
+   ""
+  ],
+  "distance": [
+   "",
+   ""
+  ],
+  "level": [
+   "",
+   ""
+  ],
+  "season": [
+   "Check the DOC page for the current season, alerts and closures.",
+   "当前季节、公告和封闭信息请查 DOC 页面。"
+  ],
+  "gear": [
+   "Multi-day pack, sleeping bag, cooker and food for every day plus a spare, warm and waterproof layers. Follow DOC's gear list for this track.",
+   "多日背包、睡袋、炉具、每天的食物外加一天备用、保暖和防雨衣物。请按 DOC 给这条步道的装备清单准备。"
+  ],
+  "intro": [
+   "A three-day loop over sub-alpine tops and along rugged coast; it became the 11th Great Walk in October 2024.",
+   "三天环线，翻越亚高山山顶，再沿崎岖海岸返回；2024 年 10 月成为第 11 条大步道。"
+  ],
+  "planTitle": [
+   "How the walk goes",
+   "怎么走"
+  ],
+  "timeline": [
+   {
+    "at": [
+     "Before",
+     "出发前"
+    ],
+    "title": [
+     "Check the track status",
+     "确认步道状态"
+    ],
+    "text": [
+     "Open the DOC page for alerts and closures, and check the forecast.",
+     "打开 DOC 页面查看公告和封闭信息，并查看天气预报。"
+    ]
+   },
+   {
+    "at": [
+     "On the track",
+     "途中"
+    ],
+    "title": [
+     "Loop in southern Fiordland (start point: see DOC and the Hump Ridge Trust)",
+     "峡湾地区南部环线（起点见 DOC 和 Hump Ridge Trust）"
+    ],
+    "text": [
+     "Follow the marked track. DOC does not publish stage times for this walk; use the total time above.",
+     "沿有标记的步道行走。DOC 没有给出这条步道的分段用时，请以上面的总用时为准。"
+    ]
+   },
+   {
+    "at": [
+     "After",
+     "返回后"
+    ],
+    "title": [
+     "Let your contact know you are back",
+     "告诉联系人你已返回"
+    ],
+    "text": [
+     "Close the loop with whoever holds your plans.",
+     "向掌握你行程的人报个平安。"
+    ]
+   }
+  ],
+  "pacing": [
+   "Times are DOC's figures. Leave extra for rests, photos and a change in the weather.",
+   "用时取自 DOC。休息、拍照和天气变化请另留余量。"
+  ],
+  "access": [
+   "How to reach the start: see the DOC page.",
+   "前往起点的方式见 DOC 页面。"
+  ],
+  "food": [
+   "Carry food for every day plus a spare day; check the DOC page for hut cooking facilities and water.",
+   "带足每天的食物，另备一天余量；小屋炊事设施和饮水情况见 DOC 页面。"
+  ],
+  "tips": [
+   {
+    "title": [
+     "Check conditions",
+     "查看路况与天气"
+    ],
+    "text": [
+     "Read the DOC alerts for this track and the MetService forecast on the day you go.",
+     "出发当天查看这条步道的 DOC 公告和 MetService 天气预报。"
+    ]
+   },
+   {
+    "title": [
+     "Leave your plans",
+     "留下行程"
+    ],
+    "text": [
+     "Tell a trusted contact where you are going and when you will be back. In an emergency call 111.",
+     "把去向和返回时间告诉可靠的联系人。紧急情况拨 111。"
+    ]
+   }
+  ],
+  "alternatives": [
+   "If the weather or the time does not suit, choose a shorter walk nearby from the DOC page.",
+   "天气或时间不合适时，可在 DOC 页面上另选附近的短途步道。"
+  ],
+  "addedIn": "v3",
+  "sources": [
+   {
+    "label": "Department of Conservation (DOC)",
+    "labelZh": "新西兰保护部（DOC）",
+    "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/fiordland/places/fiordland-national-park/things-to-do/tracks/hump-ridge-track/"
+   }
+  ],
+  "photoId": null,
+  "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/fiordland/places/fiordland-national-park/things-to-do/tracks/hump-ridge-track/",
+  "planDays": 3
+ },
+ {
+  "id": "queen-charlotte-track",
+  "island": "south",
+  "mode": "walk",
+  "name": "Queen Charlotte Track",
+  "zh": "夏洛特女王步道",
+  "region": [
+   "Marlborough Sounds",
+   "马尔堡峡湾"
+  ],
+  "summary": [
+   "73.5 km through the Marlborough Sounds from Meretoto / Ship Cove to Anakiwa, on foot or by bike.",
+   "从 Meretoto / Ship Cove 到 Anakiwa，全长 73.5 公里，穿过马尔堡峡湾，可徒步也可骑行。"
+  ],
+  "ends": [
+   "Meretoto / Ship Cove → Endeavour Inlet → Camp Bay → Torea Saddle → Anakiwa",
+   "Meretoto / Ship Cove → Endeavour Inlet → Camp Bay → Torea Saddle → Anakiwa"
+  ],
+  "time": [
+   "",
+   ""
+  ],
+  "distance": [
+   "",
+   ""
+  ],
+  "level": [
+   "",
+   ""
+  ],
+  "season": [
+   "Check the DOC page for the current season, alerts and closures.",
+   "当前季节、公告和封闭信息请查 DOC 页面。"
+  ],
+  "gear": [
+   "Multi-day pack, sleeping bag, cooker and food for every day plus a spare, warm and waterproof layers. Follow DOC's gear list for this track.",
+   "多日背包、睡袋、炉具、每天的食物外加一天备用、保暖和防雨衣物。请按 DOC 给这条步道的装备清单准备。"
+  ],
+  "intro": [
+   "73.5 km through the Marlborough Sounds from Meretoto / Ship Cove to Anakiwa, on foot or by bike.",
+   "从 Meretoto / Ship Cove 到 Anakiwa，全长 73.5 公里，穿过马尔堡峡湾，可徒步也可骑行。"
+  ],
+  "planTitle": [
+   "Stages from the DOC track description",
+   "DOC 步道说明中的分段"
+  ],
+  "timeline": [
+   {
+    "at": [
+     "Stage 1",
+     "第 1 段"
+    ],
+    "title": [
+     "Meretoto/Ship Cove to Resolution Bay",
+     "Meretoto/Ship Cove → Resolution Bay"
+    ],
+    "text": [
+     "Distance: 4.5 km (DOC).",
+     "距离：4.5 公里（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 2",
+     "第 2 段"
+    ],
+    "title": [
+     "Resolution Bay to (the head of) Endeavour Inlet",
+     "Resolution Bay → (the head of) Endeavour Inlet"
+    ],
+    "text": [
+     "Distance: 10.5 km (DOC).",
+     "距离：10.5 公里（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 3",
+     "第 3 段"
+    ],
+    "title": [
+     "Endeavour Inlet to Camp Bay",
+     "Endeavour Inlet → Camp Bay"
+    ],
+    "text": [
+     "Distance: 11.5 km (DOC).",
+     "距离：11.5 公里（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 4",
+     "第 4 段"
+    ],
+    "title": [
+     "Camp Bay to Torea Saddle",
+     "Camp Bay → Torea Saddle"
+    ],
+    "text": [
+     "Distance: 24.5 km (DOC).",
+     "距离：24.5 公里（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 5",
+     "第 5 段"
+    ],
+    "title": [
+     "Torea Saddle to Mistletoe Bay",
+     "Torea Saddle → Mistletoe Bay"
+    ],
+    "text": [
+     "Distance: 7.5 km (DOC).",
+     "距离：7.5 公里（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 6",
+     "第 6 段"
+    ],
+    "title": [
+     "Mistletoe Bay to Anakiwa",
+     "Mistletoe Bay → Anakiwa"
+    ],
+    "text": [
+     "Distance: 12.5 km (DOC).",
+     "距离：12.5 公里（DOC）。"
+    ]
+   }
+  ],
+  "pacing": [
+   "Times are DOC's figures. Leave extra for rests, photos and a change in the weather.",
+   "用时取自 DOC。休息、拍照和天气变化请另留余量。"
+  ],
+  "access": [
+   "How to reach the start: see the DOC page.",
+   "前往起点的方式见 DOC 页面。"
+  ],
+  "food": [
+   "Carry food for every day plus a spare day; check the DOC page for hut cooking facilities and water.",
+   "带足每天的食物，另备一天余量；小屋炊事设施和饮水情况见 DOC 页面。"
+  ],
+  "tips": [
+   {
+    "title": [
+     "Check conditions",
+     "查看路况与天气"
+    ],
+    "text": [
+     "Read the DOC alerts for this track and the MetService forecast on the day you go.",
+     "出发当天查看这条步道的 DOC 公告和 MetService 天气预报。"
+    ]
+   },
+   {
+    "title": [
+     "Leave your plans",
+     "留下行程"
+    ],
+    "text": [
+     "Tell a trusted contact where you are going and when you will be back. In an emergency call 111.",
+     "把去向和返回时间告诉可靠的联系人。紧急情况拨 111。"
+    ]
+   }
+  ],
+  "alternatives": [
+   "If the weather or the time does not suit, choose a shorter walk nearby from the DOC page.",
+   "天气或时间不合适时，可在 DOC 页面上另选附近的短途步道。"
+  ],
+  "addedIn": "v3",
+  "sources": [
+   {
+    "label": "Department of Conservation (DOC)",
+    "labelZh": "新西兰保护部（DOC）",
+    "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/marlborough/places/queen-charlotte-sound-totaranui-area/things-to-do/tracks/queen-charlotte-track/"
+   }
+  ],
+  "photoId": "picton-harbour",
+  "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/marlborough/places/queen-charlotte-sound-totaranui-area/things-to-do/tracks/queen-charlotte-track/",
+  "planDays": 4
+ },
+ {
+  "id": "mueller-hut",
+  "island": "south",
+  "mode": "walk",
+  "name": "Mueller Hut Route",
+  "zh": "穆勒小屋路线",
+  "region": [
+   "Aoraki / Mount Cook National Park",
+   "奥拉基／库克山国家公园"
+  ],
+  "summary": [
+   "A steep alpine route to a hut with a full circle of glaciers, ice cliffs and the highest peaks in the country.",
+   "一条陡峭的高山路线，通往一间被冰川、冰崖和全国最高群峰环抱的小屋。"
+  ],
+  "ends": [
+   "Aoraki / Mount Cook Village → Sealy Tarns → Mueller Hut",
+   "Aoraki / Mount Cook Village → Sealy Tarns → Mueller Hut"
+  ],
+  "time": [
+   "",
+   ""
+  ],
+  "distance": [
+   "",
+   ""
+  ],
+  "level": [
+   "",
+   ""
+  ],
+  "season": [
+   "Check the DOC page for the current season, alerts and closures.",
+   "当前季节、公告和封闭信息请查 DOC 页面。"
+  ],
+  "gear": [
+   "Full alpine day kit: boots with good grip, warm layers, waterproof shell, hat and gloves, food, water, head torch. Winter needs alpine equipment and the skills to use it.",
+   "完整的高山一日装备：抓地好的登山鞋、保暖层、防水外壳、帽子手套、食物、饮水、头灯。冬季需要高山装备，并且会用。"
+  ],
+  "intro": [
+   "A steep alpine route to a hut with a full circle of glaciers, ice cliffs and the highest peaks in the country.",
+   "一条陡峭的高山路线，通往一间被冰川、冰崖和全国最高群峰环抱的小屋。"
+  ],
+  "planTitle": [
+   "Stages from the DOC track description",
+   "DOC 步道说明中的分段"
+  ],
+  "timeline": [
+   {
+    "at": [
+     "Stage 1",
+     "第 1 段"
+    ],
+    "title": [
+     "Aoraki/Mount Cook Village to Sealy Tarns",
+     "Aoraki/Mount Cook Village → Sealy Tarns"
+    ],
+    "text": [
+     "Time: 2 hr (DOC).",
+     "用时：2 小时（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 2",
+     "第 2 段"
+    ],
+    "title": [
+     "Sealy Tarns to Mueller Hut",
+     "Sealy Tarns → Mueller Hut"
+    ],
+    "text": [
+     "Time: 2 hr (DOC).",
+     "用时：2 小时（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Side trip",
+     "支线"
+    ],
+    "title": [
+     "Side trip: Mueller Hut to Mt Ollivier",
+     "支线：Mueller Hut → Mt Ollivier"
+    ],
+    "text": [
+     "Time: 30 min (DOC).",
+     "用时：30 分钟（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 4",
+     "第 4 段"
+    ],
+    "title": [
+     "Mueller Hut to Aoraki/Mount Cook Village",
+     "Mueller Hut → Aoraki/Mount Cook Village"
+    ],
+    "text": [
+     "Time: 3 hr (DOC).",
+     "用时：3 小时（DOC）。"
+    ]
+   }
+  ],
+  "pacing": [
+   "Times are DOC's figures. Leave extra for rests, photos and a change in the weather.",
+   "用时取自 DOC。休息、拍照和天气变化请另留余量。"
+  ],
+  "access": [
+   "How to reach the start: see the DOC page.",
+   "前往起点的方式见 DOC 页面。"
+  ],
+  "food": [
+   "Carry all the food and water you need for the day.",
+   "带足当天所需的食物和饮水。"
+  ],
+  "tips": [
+   {
+    "title": [
+     "Check conditions",
+     "查看路况与天气"
+    ],
+    "text": [
+     "Read the DOC alerts for this track and the MetService forecast on the day you go.",
+     "出发当天查看这条步道的 DOC 公告和 MetService 天气预报。"
+    ]
+   },
+   {
+    "title": [
+     "Leave your plans",
+     "留下行程"
+    ],
+    "text": [
+     "Tell a trusted contact where you are going and when you will be back. In an emergency call 111.",
+     "把去向和返回时间告诉可靠的联系人。紧急情况拨 111。"
+    ]
+   }
+  ],
+  "alternatives": [
+   "If the weather or the time does not suit, choose a shorter walk nearby from the DOC page.",
+   "天气或时间不合适时，可在 DOC 页面上另选附近的短途步道。"
+  ],
+  "addedIn": "v3",
+  "sources": [
+   {
+    "label": "Department of Conservation (DOC)",
+    "labelZh": "新西兰保护部（DOC）",
+    "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/canterbury/places/aoraki-mount-cook-national-park/things-to-do/tracks/mueller-hut-route/"
+   }
+  ],
+  "photoId": "hooker-valley",
+  "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/canterbury/places/aoraki-mount-cook-national-park/things-to-do/tracks/mueller-hut-route/",
+  "planDays": 2
+ },
+ {
+  "id": "tasman-glacier-view",
+  "island": "south",
+  "mode": "walk",
+  "name": "Tasman Glacier View Track",
+  "zh": "塔斯曼冰川观景步道",
+  "region": [
+   "Aoraki / Mount Cook National Park",
+   "奥拉基／库克山国家公园"
+  ],
+  "summary": [
+   "A short, steep climb to look over Tasman Lake and Haupapa / Tasman Glacier, the longest glacier in New Zealand.",
+   "一段短而陡的上坡，俯瞰塔斯曼湖和新西兰最长的冰川 Haupapa / 塔斯曼冰川。"
+  ],
+  "ends": [
+   "Return walk to the Tasman Glacier viewpoint",
+   "往返塔斯曼冰川观景点"
+  ],
+  "time": [
+   "",
+   ""
+  ],
+  "distance": [
+   "",
+   ""
+  ],
+  "level": [
+   "",
+   ""
+  ],
+  "season": [
+   "Check the DOC page for the current season, alerts and closures.",
+   "当前季节、公告和封闭信息请查 DOC 页面。"
+  ],
+  "gear": [
+   "Comfortable walking shoes, a rain layer and water.",
+   "舒适的步行鞋、防雨外套和饮水。"
+  ],
+  "intro": [
+   "A short, steep climb to look over Tasman Lake and Haupapa / Tasman Glacier, the longest glacier in New Zealand.",
+   "一段短而陡的上坡，俯瞰塔斯曼湖和新西兰最长的冰川 Haupapa / 塔斯曼冰川。"
+  ],
+  "planTitle": [
+   "How the walk goes",
+   "怎么走"
+  ],
+  "timeline": [
+   {
+    "at": [
+     "Before",
+     "出发前"
+    ],
+    "title": [
+     "Check the track status",
+     "确认步道状态"
+    ],
+    "text": [
+     "Open the DOC page for alerts and closures, and check the forecast.",
+     "打开 DOC 页面查看公告和封闭信息，并查看天气预报。"
+    ]
+   },
+   {
+    "at": [
+     "On the track",
+     "途中"
+    ],
+    "title": [
+     "Return walk to the Tasman Glacier viewpoint",
+     "往返塔斯曼冰川观景点"
+    ],
+    "text": [
+     "Follow the marked track. DOC does not publish stage times for this walk; use the total time above.",
+     "沿有标记的步道行走。DOC 没有给出这条步道的分段用时，请以上面的总用时为准。"
+    ]
+   },
+   {
+    "at": [
+     "After",
+     "返回后"
+    ],
+    "title": [
+     "Let your contact know you are back",
+     "告诉联系人你已返回"
+    ],
+    "text": [
+     "Close the loop with whoever holds your plans.",
+     "向掌握你行程的人报个平安。"
+    ]
+   }
+  ],
+  "pacing": [
+   "Times are DOC's figures. Leave extra for rests, photos and a change in the weather.",
+   "用时取自 DOC。休息、拍照和天气变化请另留余量。"
+  ],
+  "access": [
+   "How to reach the start: see the DOC page.",
+   "前往起点的方式见 DOC 页面。"
+  ],
+  "food": [
+   "Carry all the food and water you need for the day.",
+   "带足当天所需的食物和饮水。"
+  ],
+  "tips": [
+   {
+    "title": [
+     "Check conditions",
+     "查看路况与天气"
+    ],
+    "text": [
+     "Read the DOC alerts for this track and the MetService forecast on the day you go.",
+     "出发当天查看这条步道的 DOC 公告和 MetService 天气预报。"
+    ]
+   },
+   {
+    "title": [
+     "Leave your plans",
+     "留下行程"
+    ],
+    "text": [
+     "Tell a trusted contact where you are going and when you will be back. In an emergency call 111.",
+     "把去向和返回时间告诉可靠的联系人。紧急情况拨 111。"
+    ]
+   }
+  ],
+  "alternatives": [
+   "If the weather or the time does not suit, choose a shorter walk nearby from the DOC page.",
+   "天气或时间不合适时，可在 DOC 页面上另选附近的短途步道。"
+  ],
+  "addedIn": "v3",
+  "sources": [
+   {
+    "label": "Department of Conservation (DOC)",
+    "labelZh": "新西兰保护部（DOC）",
+    "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/canterbury/places/aoraki-mount-cook-national-park/things-to-do/tracks/tasman-glacier-view-track/"
+   }
+  ],
+  "photoId": null,
+  "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/canterbury/places/aoraki-mount-cook-national-park/things-to-do/tracks/tasman-glacier-view-track/",
+  "planDays": 1
+ },
+ {
+  "id": "lake-marian",
+  "island": "south",
+  "mode": "walk",
+  "name": "Lake Marian Track",
+  "zh": "玛丽安湖步道",
+  "region": [
+   "Fiordland National Park",
+   "峡湾国家公园"
+  ],
+  "summary": [
+   "From Hollyford Road past a run of waterfalls to an alpine lake in a hanging valley.",
+   "从 Hollyford Road 出发，经过一连串瀑布，走到悬谷里的高山湖。"
+  ],
+  "ends": [
+   "Lake Marian car park, Hollyford Road → waterfalls → Lake Marian → return",
+   "Hollyford Road 的 Lake Marian 停车场 → 瀑布 → Lake Marian → 原路返回"
+  ],
+  "time": [
+   "",
+   ""
+  ],
+  "distance": [
+   "",
+   ""
+  ],
+  "level": [
+   "",
+   ""
+  ],
+  "season": [
+   "Check the DOC page for the current season, alerts and closures.",
+   "当前季节、公告和封闭信息请查 DOC 页面。"
+  ],
+  "gear": [
+   "Full alpine day kit: boots with good grip, warm layers, waterproof shell, hat and gloves, food, water, head torch. Winter needs alpine equipment and the skills to use it.",
+   "完整的高山一日装备：抓地好的登山鞋、保暖层、防水外壳、帽子手套、食物、饮水、头灯。冬季需要高山装备，并且会用。"
+  ],
+  "intro": [
+   "From Hollyford Road past a run of waterfalls to an alpine lake in a hanging valley.",
+   "从 Hollyford Road 出发，经过一连串瀑布，走到悬谷里的高山湖。"
+  ],
+  "planTitle": [
+   "How the walk goes",
+   "怎么走"
+  ],
+  "timeline": [
+   {
+    "at": [
+     "Before",
+     "出发前"
+    ],
+    "title": [
+     "Check the track status",
+     "确认步道状态"
+    ],
+    "text": [
+     "Open the DOC page for alerts and closures, and check the forecast.",
+     "打开 DOC 页面查看公告和封闭信息，并查看天气预报。"
+    ]
+   },
+   {
+    "at": [
+     "On the track",
+     "途中"
+    ],
+    "title": [
+     "Lake Marian car park, Hollyford Road → waterfalls → Lake Marian → return",
+     "Hollyford Road 的 Lake Marian 停车场 → 瀑布 → Lake Marian → 原路返回"
+    ],
+    "text": [
+     "Follow the marked track. DOC does not publish stage times for this walk; use the total time above.",
+     "沿有标记的步道行走。DOC 没有给出这条步道的分段用时，请以上面的总用时为准。"
+    ]
+   },
+   {
+    "at": [
+     "After",
+     "返回后"
+    ],
+    "title": [
+     "Let your contact know you are back",
+     "告诉联系人你已返回"
+    ],
+    "text": [
+     "Close the loop with whoever holds your plans.",
+     "向掌握你行程的人报个平安。"
+    ]
+   }
+  ],
+  "pacing": [
+   "Times are DOC's figures. Leave extra for rests, photos and a change in the weather.",
+   "用时取自 DOC。休息、拍照和天气变化请另留余量。"
+  ],
+  "access": [
+   "How to reach the start: see the DOC page.",
+   "前往起点的方式见 DOC 页面。"
+  ],
+  "food": [
+   "Carry all the food and water you need for the day.",
+   "带足当天所需的食物和饮水。"
+  ],
+  "tips": [
+   {
+    "title": [
+     "Check conditions",
+     "查看路况与天气"
+    ],
+    "text": [
+     "Read the DOC alerts for this track and the MetService forecast on the day you go.",
+     "出发当天查看这条步道的 DOC 公告和 MetService 天气预报。"
+    ]
+   },
+   {
+    "title": [
+     "Leave your plans",
+     "留下行程"
+    ],
+    "text": [
+     "Tell a trusted contact where you are going and when you will be back. In an emergency call 111.",
+     "把去向和返回时间告诉可靠的联系人。紧急情况拨 111。"
+    ]
+   }
+  ],
+  "alternatives": [
+   "If the weather or the time does not suit, choose a shorter walk nearby from the DOC page.",
+   "天气或时间不合适时，可在 DOC 页面上另选附近的短途步道。"
+  ],
+  "addedIn": "v3",
+  "sources": [
+   {
+    "label": "Department of Conservation (DOC)",
+    "labelZh": "新西兰保护部（DOC）",
+    "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/fiordland/places/fiordland-national-park/things-to-do/tracks/lake-marian-track/"
+   }
+  ],
+  "photoId": null,
+  "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/fiordland/places/fiordland-national-park/things-to-do/tracks/lake-marian-track/",
+  "planDays": 1
+ },
+ {
+  "id": "franz-josef-glacier-walk",
+  "island": "south",
+  "mode": "walk",
+  "name": "Franz Josef Glacier/Kā Roimata o Hine Hukatere Walk",
+  "zh": "弗朗兹·约瑟夫冰川步道",
+  "region": [
+   "Westland Tai Poutini National Park, West Coast",
+   "西部泰普提尼国家公园，西海岸"
+  ],
+  "summary": [
+   "A short rainforest walk to a viewing area over the Franz Josef Glacier valley.",
+   "穿过雨林的短途步道，走到观景点眺望弗朗兹·约瑟夫冰川谷。"
+  ],
+  "ends": [
+   "Return walk to the glacier valley viewing area",
+   "往返冰川谷观景点"
+  ],
+  "time": [
+   "",
+   ""
+  ],
+  "distance": [
+   "",
+   ""
+  ],
+  "level": [
+   "",
+   ""
+  ],
+  "season": [
+   "Check the DOC page for the current season, alerts and closures.",
+   "当前季节、公告和封闭信息请查 DOC 页面。"
+  ],
+  "gear": [
+   "Comfortable walking shoes, a rain layer and water.",
+   "舒适的步行鞋、防雨外套和饮水。"
+  ],
+  "intro": [
+   "A short rainforest walk to a viewing area over the Franz Josef Glacier valley.",
+   "穿过雨林的短途步道，走到观景点眺望弗朗兹·约瑟夫冰川谷。"
+  ],
+  "planTitle": [
+   "How the walk goes",
+   "怎么走"
+  ],
+  "timeline": [
+   {
+    "at": [
+     "Before",
+     "出发前"
+    ],
+    "title": [
+     "Check the track status",
+     "确认步道状态"
+    ],
+    "text": [
+     "Open the DOC page for alerts and closures, and check the forecast.",
+     "打开 DOC 页面查看公告和封闭信息，并查看天气预报。"
+    ]
+   },
+   {
+    "at": [
+     "On the track",
+     "途中"
+    ],
+    "title": [
+     "Return walk to the glacier valley viewing area",
+     "往返冰川谷观景点"
+    ],
+    "text": [
+     "Follow the marked track. DOC does not publish stage times for this walk; use the total time above.",
+     "沿有标记的步道行走。DOC 没有给出这条步道的分段用时，请以上面的总用时为准。"
+    ]
+   },
+   {
+    "at": [
+     "After",
+     "返回后"
+    ],
+    "title": [
+     "Let your contact know you are back",
+     "告诉联系人你已返回"
+    ],
+    "text": [
+     "Close the loop with whoever holds your plans.",
+     "向掌握你行程的人报个平安。"
+    ]
+   }
+  ],
+  "pacing": [
+   "Times are DOC's figures. Leave extra for rests, photos and a change in the weather.",
+   "用时取自 DOC。休息、拍照和天气变化请另留余量。"
+  ],
+  "access": [
+   "How to reach the start: see the DOC page.",
+   "前往起点的方式见 DOC 页面。"
+  ],
+  "food": [
+   "Carry all the food and water you need for the day.",
+   "带足当天所需的食物和饮水。"
+  ],
+  "tips": [
+   {
+    "title": [
+     "Check conditions",
+     "查看路况与天气"
+    ],
+    "text": [
+     "Read the DOC alerts for this track and the MetService forecast on the day you go.",
+     "出发当天查看这条步道的 DOC 公告和 MetService 天气预报。"
+    ]
+   },
+   {
+    "title": [
+     "Leave your plans",
+     "留下行程"
+    ],
+    "text": [
+     "Tell a trusted contact where you are going and when you will be back. In an emergency call 111.",
+     "把去向和返回时间告诉可靠的联系人。紧急情况拨 111。"
+    ]
+   }
+  ],
+  "alternatives": [
+   "If the weather or the time does not suit, choose a shorter walk nearby from the DOC page.",
+   "天气或时间不合适时，可在 DOC 页面上另选附近的短途步道。"
+  ],
+  "addedIn": "v3",
+  "sources": [
+   {
+    "label": "Department of Conservation (DOC)",
+    "labelZh": "新西兰保护部（DOC）",
+    "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/west-coast/places/westland-tai-poutini-national-park/things-to-do/tracks/franz-josef-glacierka--roimata-o-hine-hukatere-walk/"
+   }
+  ],
+  "photoId": null,
+  "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/west-coast/places/westland-tai-poutini-national-park/things-to-do/tracks/franz-josef-glacierka--roimata-o-hine-hukatere-walk/",
+  "planDays": 1
+ },
+ {
+  "id": "pancake-rocks",
+  "island": "south",
+  "mode": "walk",
+  "name": "Punakaiki Pancake Rocks and Blowholes Walk",
+  "zh": "普纳凯基千层岩与喷水洞步道",
+  "region": [
+   "Paparoa National Park, West Coast",
+   "帕帕罗瓦国家公园，西海岸"
+  ],
+  "summary": [
+   "A paved loop around layered limestone stacks, blowholes and surge pools; good for children.",
+   "铺装环线，绕行层叠的石灰岩、喷水洞和涌浪池，适合带孩子。"
+  ],
+  "ends": [
+   "Loop walk at Punakaiki",
+   "普纳凯基环线"
+  ],
+  "time": [
+   "",
+   ""
+  ],
+  "distance": [
+   "",
+   ""
+  ],
+  "level": [
+   "",
+   ""
+  ],
+  "season": [
+   "Check the DOC page for the current season, alerts and closures.",
+   "当前季节、公告和封闭信息请查 DOC 页面。"
+  ],
+  "gear": [
+   "Comfortable walking shoes, a rain layer and water.",
+   "舒适的步行鞋、防雨外套和饮水。"
+  ],
+  "intro": [
+   "A paved loop around layered limestone stacks, blowholes and surge pools; good for children.",
+   "铺装环线，绕行层叠的石灰岩、喷水洞和涌浪池，适合带孩子。"
+  ],
+  "planTitle": [
+   "How the walk goes",
+   "怎么走"
+  ],
+  "timeline": [
+   {
+    "at": [
+     "Before",
+     "出发前"
+    ],
+    "title": [
+     "Check the track status",
+     "确认步道状态"
+    ],
+    "text": [
+     "Open the DOC page for alerts and closures, and check the forecast.",
+     "打开 DOC 页面查看公告和封闭信息，并查看天气预报。"
+    ]
+   },
+   {
+    "at": [
+     "On the track",
+     "途中"
+    ],
+    "title": [
+     "Loop walk at Punakaiki",
+     "普纳凯基环线"
+    ],
+    "text": [
+     "Follow the marked track. DOC does not publish stage times for this walk; use the total time above.",
+     "沿有标记的步道行走。DOC 没有给出这条步道的分段用时，请以上面的总用时为准。"
+    ]
+   },
+   {
+    "at": [
+     "After",
+     "返回后"
+    ],
+    "title": [
+     "Let your contact know you are back",
+     "告诉联系人你已返回"
+    ],
+    "text": [
+     "Close the loop with whoever holds your plans.",
+     "向掌握你行程的人报个平安。"
+    ]
+   }
+  ],
+  "pacing": [
+   "Times are DOC's figures. Leave extra for rests, photos and a change in the weather.",
+   "用时取自 DOC。休息、拍照和天气变化请另留余量。"
+  ],
+  "access": [
+   "How to reach the start: see the DOC page.",
+   "前往起点的方式见 DOC 页面。"
+  ],
+  "food": [
+   "Carry all the food and water you need for the day.",
+   "带足当天所需的食物和饮水。"
+  ],
+  "tips": [
+   {
+    "title": [
+     "Check conditions",
+     "查看路况与天气"
+    ],
+    "text": [
+     "Read the DOC alerts for this track and the MetService forecast on the day you go.",
+     "出发当天查看这条步道的 DOC 公告和 MetService 天气预报。"
+    ]
+   },
+   {
+    "title": [
+     "Leave your plans",
+     "留下行程"
+    ],
+    "text": [
+     "Tell a trusted contact where you are going and when you will be back. In an emergency call 111.",
+     "把去向和返回时间告诉可靠的联系人。紧急情况拨 111。"
+    ]
+   }
+  ],
+  "alternatives": [
+   "If the weather or the time does not suit, choose a shorter walk nearby from the DOC page.",
+   "天气或时间不合适时，可在 DOC 页面上另选附近的短途步道。"
+  ],
+  "addedIn": "v3",
+  "sources": [
+   {
+    "label": "Department of Conservation (DOC)",
+    "labelZh": "新西兰保护部（DOC）",
+    "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/west-coast/places/paparoa-national-park/things-to-do/tracks/pancake-rocks-and-blowholes-walk/"
+   }
+  ],
+  "photoId": null,
+  "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/west-coast/places/paparoa-national-park/things-to-do/tracks/pancake-rocks-and-blowholes-walk/",
+  "planDays": 1
+ },
+ {
+  "id": "hokitika-gorge",
+  "island": "south",
+  "mode": "walk",
+  "name": "Hokitika Gorge Walk",
+  "zh": "霍基蒂卡峡谷步道",
+  "region": [
+   "Hokitika Gorge Scenic Reserve, West Coast",
+   "霍基蒂卡峡谷风景保护区，西海岸"
+  ],
+  "summary": [
+   "Turquoise water under rainforest, with walking options for most abilities.",
+   "雨林之下的蓝绿色河水，有适合多数人的走法。"
+  ],
+  "ends": [
+   "Loop walk in Hokitika Gorge Scenic Reserve",
+   "霍基蒂卡峡谷风景保护区环线"
+  ],
+  "time": [
+   "",
+   ""
+  ],
+  "distance": [
+   "",
+   ""
+  ],
+  "level": [
+   "",
+   ""
+  ],
+  "season": [
+   "Check the DOC page for the current season, alerts and closures.",
+   "当前季节、公告和封闭信息请查 DOC 页面。"
+  ],
+  "gear": [
+   "Comfortable walking shoes, a rain layer and water.",
+   "舒适的步行鞋、防雨外套和饮水。"
+  ],
+  "intro": [
+   "Turquoise water under rainforest, with walking options for most abilities.",
+   "雨林之下的蓝绿色河水，有适合多数人的走法。"
+  ],
+  "planTitle": [
+   "How the walk goes",
+   "怎么走"
+  ],
+  "timeline": [
+   {
+    "at": [
+     "Before",
+     "出发前"
+    ],
+    "title": [
+     "Check the track status",
+     "确认步道状态"
+    ],
+    "text": [
+     "Open the DOC page for alerts and closures, and check the forecast.",
+     "打开 DOC 页面查看公告和封闭信息，并查看天气预报。"
+    ]
+   },
+   {
+    "at": [
+     "On the track",
+     "途中"
+    ],
+    "title": [
+     "Loop walk in Hokitika Gorge Scenic Reserve",
+     "霍基蒂卡峡谷风景保护区环线"
+    ],
+    "text": [
+     "Follow the marked track. DOC does not publish stage times for this walk; use the total time above.",
+     "沿有标记的步道行走。DOC 没有给出这条步道的分段用时，请以上面的总用时为准。"
+    ]
+   },
+   {
+    "at": [
+     "After",
+     "返回后"
+    ],
+    "title": [
+     "Let your contact know you are back",
+     "告诉联系人你已返回"
+    ],
+    "text": [
+     "Close the loop with whoever holds your plans.",
+     "向掌握你行程的人报个平安。"
+    ]
+   }
+  ],
+  "pacing": [
+   "Times are DOC's figures. Leave extra for rests, photos and a change in the weather.",
+   "用时取自 DOC。休息、拍照和天气变化请另留余量。"
+  ],
+  "access": [
+   "How to reach the start: see the DOC page.",
+   "前往起点的方式见 DOC 页面。"
+  ],
+  "food": [
+   "Carry all the food and water you need for the day.",
+   "带足当天所需的食物和饮水。"
+  ],
+  "tips": [
+   {
+    "title": [
+     "Check conditions",
+     "查看路况与天气"
+    ],
+    "text": [
+     "Read the DOC alerts for this track and the MetService forecast on the day you go.",
+     "出发当天查看这条步道的 DOC 公告和 MetService 天气预报。"
+    ]
+   },
+   {
+    "title": [
+     "Leave your plans",
+     "留下行程"
+    ],
+    "text": [
+     "Tell a trusted contact where you are going and when you will be back. In an emergency call 111.",
+     "把去向和返回时间告诉可靠的联系人。紧急情况拨 111。"
+    ]
+   }
+  ],
+  "alternatives": [
+   "If the weather or the time does not suit, choose a shorter walk nearby from the DOC page.",
+   "天气或时间不合适时，可在 DOC 页面上另选附近的短途步道。"
+  ],
+  "addedIn": "v3",
+  "sources": [
+   {
+    "label": "Department of Conservation (DOC)",
+    "labelZh": "新西兰保护部（DOC）",
+    "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/west-coast/places/hokitika-gorge-scenic-reserve/things-to-do/tracks/hokitika-gorge-walk/"
+   }
+  ],
+  "photoId": null,
+  "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/west-coast/places/hokitika-gorge-scenic-reserve/things-to-do/tracks/hokitika-gorge-walk/",
+  "planDays": 1
+ },
+ {
+  "id": "ben-lomond",
+  "island": "south",
+  "mode": "walk",
+  "name": "Ben Lomond Track",
+  "zh": "本洛蒙德步道",
+  "region": [
+   "Queenstown, Otago",
+   "皇后镇，奥塔哥"
+  ],
+  "summary": [
+   "A demanding full-day climb from Queenstown, with 1,438 m of elevation gain and a wide summit panorama.",
+   "从皇后镇出发的全天硬爬，爬升 1,438 米，山顶视野开阔。"
+  ],
+  "ends": [
+   "Queenstown (Tiki Trail) → Ben Lomond Saddle → summit → return",
+   "皇后镇（Tiki Trail）→ Ben Lomond Saddle → 山顶 → 原路返回"
+  ],
+  "time": [
+   "",
+   ""
+  ],
+  "distance": [
+   "",
+   ""
+  ],
+  "level": [
+   "",
+   ""
+  ],
+  "season": [
+   "Check the DOC page for the current season, alerts and closures.",
+   "当前季节、公告和封闭信息请查 DOC 页面。"
+  ],
+  "gear": [
+   "Full alpine day kit: boots with good grip, warm layers, waterproof shell, hat and gloves, food, water, head torch. Winter needs alpine equipment and the skills to use it.",
+   "完整的高山一日装备：抓地好的登山鞋、保暖层、防水外壳、帽子手套、食物、饮水、头灯。冬季需要高山装备，并且会用。"
+  ],
+  "intro": [
+   "A demanding full-day climb from Queenstown, with 1,438 m of elevation gain and a wide summit panorama.",
+   "从皇后镇出发的全天硬爬，爬升 1,438 米，山顶视野开阔。"
+  ],
+  "planTitle": [
+   "Stages from the DOC track description",
+   "DOC 步道说明中的分段"
+  ],
+  "timeline": [
+   {
+    "at": [
+     "Stage 1",
+     "第 1 段"
+    ],
+    "title": [
+     "Tiki Trail to Ben Lomond Summit",
+     "Tiki Trail → Ben Lomond Summit"
+    ],
+    "text": [
+     "Time: 6-8 hr return; Distance: 14 km return (DOC).",
+     "用时：6–8 小时 往返；距离：14 公里 往返（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 2",
+     "第 2 段"
+    ],
+    "title": [
+     "Tiki Trail to Ben Lomond Saddle",
+     "Tiki Trail → Ben Lomond Saddle"
+    ],
+    "text": [
+     "Time: 5 hr return; Distance: 10 km return (DOC).",
+     "用时：5 小时 往返；距离：10 公里 往返（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 3",
+     "第 3 段"
+    ],
+    "title": [
+     "Skyline Gondola top complex to Ben Lomond Saddle",
+     "Skyline Gondola top complex → Ben Lomond Saddle"
+    ],
+    "text": [
+     "Time: 3-4 hr return; Distance: 7 km return (DOC).",
+     "用时：3–4 小时 往返；距离：7 公里 往返（DOC）。"
+    ]
+   }
+  ],
+  "pacing": [
+   "Times are DOC's figures. Leave extra for rests, photos and a change in the weather.",
+   "用时取自 DOC。休息、拍照和天气变化请另留余量。"
+  ],
+  "access": [
+   "How to reach the start: see the DOC page.",
+   "前往起点的方式见 DOC 页面。"
+  ],
+  "food": [
+   "Carry all the food and water you need for the day.",
+   "带足当天所需的食物和饮水。"
+  ],
+  "tips": [
+   {
+    "title": [
+     "Check conditions",
+     "查看路况与天气"
+    ],
+    "text": [
+     "Read the DOC alerts for this track and the MetService forecast on the day you go.",
+     "出发当天查看这条步道的 DOC 公告和 MetService 天气预报。"
+    ]
+   },
+   {
+    "title": [
+     "Leave your plans",
+     "留下行程"
+    ],
+    "text": [
+     "Tell a trusted contact where you are going and when you will be back. In an emergency call 111.",
+     "把去向和返回时间告诉可靠的联系人。紧急情况拨 111。"
+    ]
+   }
+  ],
+  "alternatives": [
+   "If the weather or the time does not suit, choose a shorter walk nearby from the DOC page.",
+   "天气或时间不合适时，可在 DOC 页面上另选附近的短途步道。"
+  ],
+  "addedIn": "v3",
+  "sources": [
+   {
+    "label": "Department of Conservation (DOC)",
+    "labelZh": "新西兰保护部（DOC）",
+    "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/otago/places/queenstown-area/things-to-do/ben-lomond-track/"
+   }
+  ],
+  "photoId": null,
+  "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/otago/places/queenstown-area/things-to-do/ben-lomond-track/",
+  "planDays": 1
+ },
+ {
+  "id": "isthmus-peak",
+  "island": "south",
+  "mode": "walk",
+  "name": "Isthmus Peak Track",
+  "zh": "地峡峰步道",
+  "region": [
+   "Wānaka / Lake Hāwea, Otago",
+   "瓦纳卡／哈威亚湖，奥塔哥"
+  ],
+  "summary": [
+   "Steep and steady between Lake Wānaka and Lake Hāwea, with both lakes and the Southern Alps in view.",
+   "在瓦纳卡湖和哈威亚湖之间一路陡升，两座湖和南阿尔卑斯山尽收眼底。"
+  ],
+  "ends": [
+   "Isthmus Peak Track car park → Isthmus Peak → return",
+   "Isthmus Peak Track 停车场 → Isthmus Peak → 原路返回"
+  ],
+  "time": [
+   "",
+   ""
+  ],
+  "distance": [
+   "",
+   ""
+  ],
+  "level": [
+   "",
+   ""
+  ],
+  "season": [
+   "Check the DOC page for the current season, alerts and closures.",
+   "当前季节、公告和封闭信息请查 DOC 页面。"
+  ],
+  "gear": [
+   "Full alpine day kit: boots with good grip, warm layers, waterproof shell, hat and gloves, food, water, head torch. Winter needs alpine equipment and the skills to use it.",
+   "完整的高山一日装备：抓地好的登山鞋、保暖层、防水外壳、帽子手套、食物、饮水、头灯。冬季需要高山装备，并且会用。"
+  ],
+  "intro": [
+   "Steep and steady between Lake Wānaka and Lake Hāwea, with both lakes and the Southern Alps in view.",
+   "在瓦纳卡湖和哈威亚湖之间一路陡升，两座湖和南阿尔卑斯山尽收眼底。"
+  ],
+  "planTitle": [
+   "How the walk goes",
+   "怎么走"
+  ],
+  "timeline": [
+   {
+    "at": [
+     "Before",
+     "出发前"
+    ],
+    "title": [
+     "Check the track status",
+     "确认步道状态"
+    ],
+    "text": [
+     "Open the DOC page for alerts and closures, and check the forecast.",
+     "打开 DOC 页面查看公告和封闭信息，并查看天气预报。"
+    ]
+   },
+   {
+    "at": [
+     "On the track",
+     "途中"
+    ],
+    "title": [
+     "Isthmus Peak Track car park → Isthmus Peak → return",
+     "Isthmus Peak Track 停车场 → Isthmus Peak → 原路返回"
+    ],
+    "text": [
+     "Follow the marked track. DOC does not publish stage times for this walk; use the total time above.",
+     "沿有标记的步道行走。DOC 没有给出这条步道的分段用时，请以上面的总用时为准。"
+    ]
+   },
+   {
+    "at": [
+     "After",
+     "返回后"
+    ],
+    "title": [
+     "Let your contact know you are back",
+     "告诉联系人你已返回"
+    ],
+    "text": [
+     "Close the loop with whoever holds your plans.",
+     "向掌握你行程的人报个平安。"
+    ]
+   }
+  ],
+  "pacing": [
+   "Times are DOC's figures. Leave extra for rests, photos and a change in the weather.",
+   "用时取自 DOC。休息、拍照和天气变化请另留余量。"
+  ],
+  "access": [
+   "How to reach the start: see the DOC page.",
+   "前往起点的方式见 DOC 页面。"
+  ],
+  "food": [
+   "Carry all the food and water you need for the day.",
+   "带足当天所需的食物和饮水。"
+  ],
+  "tips": [
+   {
+    "title": [
+     "Check conditions",
+     "查看路况与天气"
+    ],
+    "text": [
+     "Read the DOC alerts for this track and the MetService forecast on the day you go.",
+     "出发当天查看这条步道的 DOC 公告和 MetService 天气预报。"
+    ]
+   },
+   {
+    "title": [
+     "Leave your plans",
+     "留下行程"
+    ],
+    "text": [
+     "Tell a trusted contact where you are going and when you will be back. In an emergency call 111.",
+     "把去向和返回时间告诉可靠的联系人。紧急情况拨 111。"
+    ]
+   }
+  ],
+  "alternatives": [
+   "If the weather or the time does not suit, choose a shorter walk nearby from the DOC page.",
+   "天气或时间不合适时，可在 DOC 页面上另选附近的短途步道。"
+  ],
+  "addedIn": "v3",
+  "sources": [
+   {
+    "label": "Department of Conservation (DOC)",
+    "labelZh": "新西兰保护部（DOC）",
+    "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/otago/places/wanaka-area/things-to-do/isthmus-peak-track/"
+   }
+  ],
+  "photoId": null,
+  "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/otago/places/wanaka-area/things-to-do/isthmus-peak-track/",
+  "planDays": 1
+ },
+ {
+  "id": "avalanche-peak",
+  "island": "south",
+  "mode": "walk",
+  "name": "Avalanche Peak Route",
+  "zh": "雪崩峰路线",
+  "region": [
+   "Arthur's Pass National Park, Canterbury",
+   "亚瑟通道国家公园，坎特伯雷"
+  ],
+  "summary": [
+   "The only peak at Arthur's Pass with a poled route to the top: 1,100 m straight up from the village.",
+   "亚瑟通道唯一有标杆路线通顶的山峰：从村子直上 1,100 米。"
+  ],
+  "ends": [
+   "Arthur's Pass village → Avalanche Peak (up Avalanche Peak Track or Scotts Track)",
+   "亚瑟通道村 → Avalanche Peak（走 Avalanche Peak Track 或 Scotts Track 上山）"
+  ],
+  "time": [
+   "",
+   ""
+  ],
+  "distance": [
+   "",
+   ""
+  ],
+  "level": [
+   "",
+   ""
+  ],
+  "season": [
+   "Check the DOC page for the current season, alerts and closures.",
+   "当前季节、公告和封闭信息请查 DOC 页面。"
+  ],
+  "gear": [
+   "Full alpine day kit: boots with good grip, warm layers, waterproof shell, hat and gloves, food, water, head torch. Winter needs alpine equipment and the skills to use it.",
+   "完整的高山一日装备：抓地好的登山鞋、保暖层、防水外壳、帽子手套、食物、饮水、头灯。冬季需要高山装备，并且会用。"
+  ],
+  "intro": [
+   "The only peak at Arthur's Pass with a poled route to the top: 1,100 m straight up from the village.",
+   "亚瑟通道唯一有标杆路线通顶的山峰：从村子直上 1,100 米。"
+  ],
+  "planTitle": [
+   "Stages from the DOC track description",
+   "DOC 步道说明中的分段"
+  ],
+  "timeline": [
+   {
+    "at": [
+     "Stage 1",
+     "第 1 段"
+    ],
+    "title": [
+     "Avalanche Peak Track",
+     "Avalanche Peak Track"
+    ],
+    "text": [
+     "Time: 1 hour 30 minutes (DOC).",
+     "用时：1 小时 30 分钟（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 2",
+     "第 2 段"
+    ],
+    "title": [
+     "Avalanche Peak Route",
+     "Avalanche Peak Route"
+    ],
+    "text": [
+     "Time: 1 hour 30 minutes – 2 hours (DOC).",
+     "用时：1 小时 30 分钟–2 小时（DOC）。"
+    ]
+   }
+  ],
+  "pacing": [
+   "Times are DOC's figures. Leave extra for rests, photos and a change in the weather.",
+   "用时取自 DOC。休息、拍照和天气变化请另留余量。"
+  ],
+  "access": [
+   "How to reach the start: see the DOC page.",
+   "前往起点的方式见 DOC 页面。"
+  ],
+  "food": [
+   "Carry all the food and water you need for the day.",
+   "带足当天所需的食物和饮水。"
+  ],
+  "tips": [
+   {
+    "title": [
+     "Check conditions",
+     "查看路况与天气"
+    ],
+    "text": [
+     "Read the DOC alerts for this track and the MetService forecast on the day you go.",
+     "出发当天查看这条步道的 DOC 公告和 MetService 天气预报。"
+    ]
+   },
+   {
+    "title": [
+     "Leave your plans",
+     "留下行程"
+    ],
+    "text": [
+     "Tell a trusted contact where you are going and when you will be back. In an emergency call 111.",
+     "把去向和返回时间告诉可靠的联系人。紧急情况拨 111。"
+    ]
+   }
+  ],
+  "alternatives": [
+   "If the weather or the time does not suit, choose a shorter walk nearby from the DOC page.",
+   "天气或时间不合适时，可在 DOC 页面上另选附近的短途步道。"
+  ],
+  "addedIn": "v3",
+  "sources": [
+   {
+    "label": "Department of Conservation (DOC)",
+    "labelZh": "新西兰保护部（DOC）",
+    "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/canterbury/places/arthurs-pass-national-park/things-to-do/tracks/avalanche-peak-route/"
+   }
+  ],
+  "photoId": "arthurs-pass",
+  "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/canterbury/places/arthurs-pass-national-park/things-to-do/tracks/avalanche-peak-route/",
+  "planDays": 1
+ },
+ {
+  "id": "waikoropupu-springs",
+  "island": "south",
+  "mode": "walk",
+  "name": "Te Waikoropupū Springs Walk",
+  "zh": "蒂怀科罗普普泉步道",
+  "region": [
+   "Tākaka, Golden Bay",
+   "塔卡卡，黄金湾"
+  ],
+  "summary": [
+   "A short accessible loop to the largest freshwater springs in New Zealand, with some of the clearest water measured anywhere.",
+   "无障碍短环线，通往新西兰最大的淡水泉，水质清澈度居世界前列。"
+  ],
+  "ends": [
+   "Loop walk to the springs viewing platform",
+   "环线，至泉水观景台"
+  ],
+  "time": [
+   "",
+   ""
+  ],
+  "distance": [
+   "",
+   ""
+  ],
+  "level": [
+   "",
+   ""
+  ],
+  "season": [
+   "Check the DOC page for the current season, alerts and closures.",
+   "当前季节、公告和封闭信息请查 DOC 页面。"
+  ],
+  "gear": [
+   "Comfortable walking shoes, a rain layer and water.",
+   "舒适的步行鞋、防雨外套和饮水。"
+  ],
+  "intro": [
+   "A short accessible loop to the largest freshwater springs in New Zealand, with some of the clearest water measured anywhere.",
+   "无障碍短环线，通往新西兰最大的淡水泉，水质清澈度居世界前列。"
+  ],
+  "planTitle": [
+   "How the walk goes",
+   "怎么走"
+  ],
+  "timeline": [
+   {
+    "at": [
+     "Before",
+     "出发前"
+    ],
+    "title": [
+     "Check the track status",
+     "确认步道状态"
+    ],
+    "text": [
+     "Open the DOC page for alerts and closures, and check the forecast.",
+     "打开 DOC 页面查看公告和封闭信息，并查看天气预报。"
+    ]
+   },
+   {
+    "at": [
+     "On the track",
+     "途中"
+    ],
+    "title": [
+     "Loop walk to the springs viewing platform",
+     "环线，至泉水观景台"
+    ],
+    "text": [
+     "Follow the marked track. DOC does not publish stage times for this walk; use the total time above.",
+     "沿有标记的步道行走。DOC 没有给出这条步道的分段用时，请以上面的总用时为准。"
+    ]
+   },
+   {
+    "at": [
+     "After",
+     "返回后"
+    ],
+    "title": [
+     "Let your contact know you are back",
+     "告诉联系人你已返回"
+    ],
+    "text": [
+     "Close the loop with whoever holds your plans.",
+     "向掌握你行程的人报个平安。"
+    ]
+   }
+  ],
+  "pacing": [
+   "Times are DOC's figures. Leave extra for rests, photos and a change in the weather.",
+   "用时取自 DOC。休息、拍照和天气变化请另留余量。"
+  ],
+  "access": [
+   "How to reach the start: see the DOC page.",
+   "前往起点的方式见 DOC 页面。"
+  ],
+  "food": [
+   "Carry all the food and water you need for the day.",
+   "带足当天所需的食物和饮水。"
+  ],
+  "tips": [
+   {
+    "title": [
+     "Check conditions",
+     "查看路况与天气"
+    ],
+    "text": [
+     "Read the DOC alerts for this track and the MetService forecast on the day you go.",
+     "出发当天查看这条步道的 DOC 公告和 MetService 天气预报。"
+    ]
+   },
+   {
+    "title": [
+     "Leave your plans",
+     "留下行程"
+    ],
+    "text": [
+     "Tell a trusted contact where you are going and when you will be back. In an emergency call 111.",
+     "把去向和返回时间告诉可靠的联系人。紧急情况拨 111。"
+    ]
+   }
+  ],
+  "alternatives": [
+   "If the weather or the time does not suit, choose a shorter walk nearby from the DOC page.",
+   "天气或时间不合适时，可在 DOC 页面上另选附近的短途步道。"
+  ],
+  "addedIn": "v3",
+  "sources": [
+   {
+    "label": "Department of Conservation (DOC)",
+    "labelZh": "新西兰保护部（DOC）",
+    "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/nelson-tasman/places/takaka-area/things-to-do/tracks/te-waikoropupu-springs-walk/"
+   }
+  ],
+  "photoId": null,
+  "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/nelson-tasman/places/takaka-area/things-to-do/tracks/te-waikoropupu-springs-walk/",
+  "planDays": 1
+ },
+ {
+  "id": "mount-robert-circuit",
+  "island": "south",
+  "mode": "walk",
+  "name": "Mount Robert Circuit",
+  "zh": "罗伯特山环线",
+  "region": [
+   "Nelson Lakes National Park",
+   "纳尔逊湖国家公园"
+  ],
+  "summary": [
+   "A loop on the northern face of Pourangahau / Mount Robert, looking down on Lake Rotoiti.",
+   "绕行 Pourangahau / 罗伯特山北坡的环线，俯瞰罗托伊蒂湖。"
+  ],
+  "ends": [
+   "Loop on Pourangahau / Mount Robert above Lake Rotoiti",
+   "Pourangahau / 罗伯特山环线，罗托伊蒂湖上方"
+  ],
+  "time": [
+   "",
+   ""
+  ],
+  "distance": [
+   "",
+   ""
+  ],
+  "level": [
+   "",
+   ""
+  ],
+  "season": [
+   "Check the DOC page for the current season, alerts and closures.",
+   "当前季节、公告和封闭信息请查 DOC 页面。"
+  ],
+  "gear": [
+   "Full alpine day kit: boots with good grip, warm layers, waterproof shell, hat and gloves, food, water, head torch. Winter needs alpine equipment and the skills to use it.",
+   "完整的高山一日装备：抓地好的登山鞋、保暖层、防水外壳、帽子手套、食物、饮水、头灯。冬季需要高山装备，并且会用。"
+  ],
+  "intro": [
+   "A loop on the northern face of Pourangahau / Mount Robert, looking down on Lake Rotoiti.",
+   "绕行 Pourangahau / 罗伯特山北坡的环线，俯瞰罗托伊蒂湖。"
+  ],
+  "planTitle": [
+   "How the walk goes",
+   "怎么走"
+  ],
+  "timeline": [
+   {
+    "at": [
+     "Before",
+     "出发前"
+    ],
+    "title": [
+     "Check the track status",
+     "确认步道状态"
+    ],
+    "text": [
+     "Open the DOC page for alerts and closures, and check the forecast.",
+     "打开 DOC 页面查看公告和封闭信息，并查看天气预报。"
+    ]
+   },
+   {
+    "at": [
+     "On the track",
+     "途中"
+    ],
+    "title": [
+     "Loop on Pourangahau / Mount Robert above Lake Rotoiti",
+     "Pourangahau / 罗伯特山环线，罗托伊蒂湖上方"
+    ],
+    "text": [
+     "Follow the marked track. DOC does not publish stage times for this walk; use the total time above.",
+     "沿有标记的步道行走。DOC 没有给出这条步道的分段用时，请以上面的总用时为准。"
+    ]
+   },
+   {
+    "at": [
+     "After",
+     "返回后"
+    ],
+    "title": [
+     "Let your contact know you are back",
+     "告诉联系人你已返回"
+    ],
+    "text": [
+     "Close the loop with whoever holds your plans.",
+     "向掌握你行程的人报个平安。"
+    ]
+   }
+  ],
+  "pacing": [
+   "Times are DOC's figures. Leave extra for rests, photos and a change in the weather.",
+   "用时取自 DOC。休息、拍照和天气变化请另留余量。"
+  ],
+  "access": [
+   "How to reach the start: see the DOC page.",
+   "前往起点的方式见 DOC 页面。"
+  ],
+  "food": [
+   "Carry all the food and water you need for the day.",
+   "带足当天所需的食物和饮水。"
+  ],
+  "tips": [
+   {
+    "title": [
+     "Check conditions",
+     "查看路况与天气"
+    ],
+    "text": [
+     "Read the DOC alerts for this track and the MetService forecast on the day you go.",
+     "出发当天查看这条步道的 DOC 公告和 MetService 天气预报。"
+    ]
+   },
+   {
+    "title": [
+     "Leave your plans",
+     "留下行程"
+    ],
+    "text": [
+     "Tell a trusted contact where you are going and when you will be back. In an emergency call 111.",
+     "把去向和返回时间告诉可靠的联系人。紧急情况拨 111。"
+    ]
+   }
+  ],
+  "alternatives": [
+   "If the weather or the time does not suit, choose a shorter walk nearby from the DOC page.",
+   "天气或时间不合适时，可在 DOC 页面上另选附近的短途步道。"
+  ],
+  "addedIn": "v3",
+  "sources": [
+   {
+    "label": "Department of Conservation (DOC)",
+    "labelZh": "新西兰保护部（DOC）",
+    "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/nelson-tasman/places/nelson-lakes-national-park/things-to-do/tracks/mount-robert-circuit/"
+   }
+  ],
+  "photoId": null,
+  "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/nelson-tasman/places/nelson-lakes-national-park/things-to-do/tracks/mount-robert-circuit/",
+  "planDays": 1
+ },
+ {
+  "id": "tongariro-northern-circuit",
+  "island": "north",
+  "mode": "walk",
+  "name": "Tongariro Northern Circuit",
+  "zh": "汤加里罗北环线",
+  "region": [
+   "Tongariro National Park",
+   "汤加里罗国家公园"
+  ],
+  "summary": [
+   "A Great Walk around the volcanic heart of Tongariro National Park. One section is closed after the 2025 fire, so the walk is currently 35.5 km.",
+   "环绕汤加里罗国家公园火山核心地带的大步道。2025 年山火后有一段关闭，目前全程 35.5 公里。"
+  ],
+  "ends": [
+   "Whakapapa Village → Mangatepopo Hut → Oturere Hut → Waihohonu Hut → Whakapapa Village",
+   "Whakapapa Village → Mangatepopo Hut → Oturere Hut → Waihohonu Hut → Whakapapa Village"
+  ],
+  "time": [
+   "",
+   ""
+  ],
+  "distance": [
+   "",
+   ""
+  ],
+  "level": [
+   "",
+   ""
+  ],
+  "season": [
+   "Check the DOC page for the current season, alerts and closures.",
+   "当前季节、公告和封闭信息请查 DOC 页面。"
+  ],
+  "gear": [
+   "Multi-day pack, sleeping bag, cooker and food for every day plus a spare, warm and waterproof layers. Follow DOC's gear list for this track.",
+   "多日背包、睡袋、炉具、每天的食物外加一天备用、保暖和防雨衣物。请按 DOC 给这条步道的装备清单准备。"
+  ],
+  "intro": [
+   "A Great Walk around the volcanic heart of Tongariro National Park. One section is closed after the 2025 fire, so the walk is currently 35.5 km.",
+   "环绕汤加里罗国家公园火山核心地带的大步道。2025 年山火后有一段关闭，目前全程 35.5 公里。"
+  ],
+  "planTitle": [
+   "Stages from the DOC track description",
+   "DOC 步道说明中的分段"
+  ],
+  "timeline": [
+   {
+    "at": [
+     "Stage 1",
+     "第 1 段"
+    ],
+    "title": [
+     "Whakapapa Village to Mangatepopo Hut",
+     "Whakapapa Village → Mangatepopo Hut"
+    ],
+    "text": [
+     "Time: 3-5 hr, weather dependent; Distance: 9.4 km (DOC).",
+     "用时：3–5 小时，视天气而定；距离：9.4 公里（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 2",
+     "第 2 段"
+    ],
+    "title": [
+     "Mangatepopo Carpark to Mangatepopo Hut",
+     "Mangatepopo Carpark → Mangatepopo Hut"
+    ],
+    "text": [
+     "Time: 25 min; Distance: 1.7 km (DOC).",
+     "用时：25 分钟；距离：1.7 公里（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 3",
+     "第 3 段"
+    ],
+    "title": [
+     "Mangatepopo Hut to Emerald Lakes",
+     "Mangatepopo Hut → Emerald Lakes"
+    ],
+    "text": [
+     "Time: 3 hr 30 min; Distance: 8 km (DOC).",
+     "用时：3 小时 30 分钟；距离：8 公里（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 4",
+     "第 4 段"
+    ],
+    "title": [
+     "Emerald Lakes to Oturere Hut",
+     "Emerald Lakes → Oturere Hut"
+    ],
+    "text": [
+     "Time: 1 hr 30 min; Distance: 4 km (DOC).",
+     "用时：1 小时 30 分钟；距离：4 公里（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 5",
+     "第 5 段"
+    ],
+    "title": [
+     "Oturere Hut to Waihohonu Hut",
+     "Oturere Hut → Waihohonu Hut"
+    ],
+    "text": [
+     "Time: 3 hr; Distance: 8.1 km (DOC).",
+     "用时：3 小时；距离：8.1 公里（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 6",
+     "第 6 段"
+    ],
+    "title": [
+     "Waihohonu Hut to Whakapapa Village",
+     "Waihohonu Hut → Whakapapa Village"
+    ],
+    "text": [
+     "Time: 5 hr; Distance: 15.4 km (DOC).",
+     "用时：5 小时；距离：15.4 公里（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Side trip",
+     "支线"
+    ],
+    "title": [
+     "Side trip: Ohinepango Springs",
+     "支线：Ohinepango Springs"
+    ],
+    "text": [
+     "Time: 1 hr return from Waihohonu Hut (DOC).",
+     "用时：1 小时 往返 自 Waihohonu Hut（DOC）。"
+    ]
+   }
+  ],
+  "pacing": [
+   "Times are DOC's figures. Leave extra for rests, photos and a change in the weather.",
+   "用时取自 DOC。休息、拍照和天气变化请另留余量。"
+  ],
+  "access": [
+   "How to reach the start: see the DOC page.",
+   "前往起点的方式见 DOC 页面。"
+  ],
+  "food": [
+   "Carry food for every day plus a spare day; check the DOC page for hut cooking facilities and water.",
+   "带足每天的食物，另备一天余量；小屋炊事设施和饮水情况见 DOC 页面。"
+  ],
+  "tips": [
+   {
+    "title": [
+     "Check conditions",
+     "查看路况与天气"
+    ],
+    "text": [
+     "Read the DOC alerts for this track and the MetService forecast on the day you go.",
+     "出发当天查看这条步道的 DOC 公告和 MetService 天气预报。"
+    ]
+   },
+   {
+    "title": [
+     "Leave your plans",
+     "留下行程"
+    ],
+    "text": [
+     "Tell a trusted contact where you are going and when you will be back. In an emergency call 111.",
+     "把去向和返回时间告诉可靠的联系人。紧急情况拨 111。"
+    ]
+   }
+  ],
+  "alternatives": [
+   "If the weather or the time does not suit, choose a shorter walk nearby from the DOC page.",
+   "天气或时间不合适时，可在 DOC 页面上另选附近的短途步道。"
+  ],
+  "addedIn": "v3",
+  "sources": [
+   {
+    "label": "Department of Conservation (DOC)",
+    "labelZh": "新西兰保护部（DOC）",
+    "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/central-north-island/places/tongariro-national-park/things-to-do/tracks/tongariro-northern-circuit/"
+   }
+  ],
+  "photoId": "ni-tongariro",
+  "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/central-north-island/places/tongariro-national-park/things-to-do/tracks/tongariro-northern-circuit/",
+  "planDays": 4
+ },
+ {
+  "id": "lake-waikaremoana",
+  "island": "north",
+  "mode": "walk",
+  "name": "Lake Waikaremoana Great Walk",
+  "zh": "怀卡雷莫阿纳湖大步道",
+  "region": [
+   "Te Urewera",
+   "蒂乌雷韦拉"
+  ],
+  "summary": [
+   "A backcountry Great Walk along the lake in Te Urewera, the homeland of Ngāi Tūhoe.",
+   "沿湖而行的偏远大步道，位于 Ngāi Tūhoe 的家园蒂乌雷韦拉。"
+  ],
+  "ends": [
+   "Onepoto → Panekire Hut → Waiopaoa Hut → Marauiti Hut → Hopuruahine Landing",
+   "Onepoto → Panekire Hut → Waiopaoa Hut → Marauiti Hut → Hopuruahine Landing"
+  ],
+  "time": [
+   "",
+   ""
+  ],
+  "distance": [
+   "",
+   ""
+  ],
+  "level": [
+   "",
+   ""
+  ],
+  "season": [
+   "Check the DOC page for the current season, alerts and closures.",
+   "当前季节、公告和封闭信息请查 DOC 页面。"
+  ],
+  "gear": [
+   "Multi-day pack, sleeping bag, cooker and food for every day plus a spare, warm and waterproof layers. Follow DOC's gear list for this track.",
+   "多日背包、睡袋、炉具、每天的食物外加一天备用、保暖和防雨衣物。请按 DOC 给这条步道的装备清单准备。"
+  ],
+  "intro": [
+   "A backcountry Great Walk along the lake in Te Urewera, the homeland of Ngāi Tūhoe.",
+   "沿湖而行的偏远大步道，位于 Ngāi Tūhoe 的家园蒂乌雷韦拉。"
+  ],
+  "planTitle": [
+   "Stages from the DOC track description",
+   "DOC 步道说明中的分段"
+  ],
+  "timeline": [
+   {
+    "at": [
+     "Stage 1",
+     "第 1 段"
+    ],
+    "title": [
+     "Onepoto to Panekire Hut",
+     "Onepoto → Panekire Hut"
+    ],
+    "text": [
+     "Time: 4–6 hr; Distance: 8.8 km (DOC).",
+     "用时：4–6 小时；距离：8.8 公里（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 2",
+     "第 2 段"
+    ],
+    "title": [
+     "Panekire Hut to Waiopaoa Hut and Campsite",
+     "Panekire Hut → Waiopaoa Hut and Campsite"
+    ],
+    "text": [
+     "Time: 3–4 hr; Distance: 7.6 km (DOC).",
+     "用时：3–4 小时；距离：7.6 公里（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 3",
+     "第 3 段"
+    ],
+    "title": [
+     "Waiopaoa Hut to Korokoro Campsite",
+     "Waiopaoa Hut → Korokoro Campsite"
+    ],
+    "text": [
+     "Time: 1 hr 30 min; Distance: 3.6 km (DOC).",
+     "用时：1 小时 30 分钟；距离：3.6 公里（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Side trip",
+     "支线"
+    ],
+    "title": [
+     "Side trip: Korokoro Falls",
+     "支线：Korokoro Falls"
+    ],
+    "text": [
+     "Time: 1 hr return from Korokoro Campsite (DOC).",
+     "用时：1 小时 往返 自 Korokoro Campsite（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 5",
+     "第 5 段"
+    ],
+    "title": [
+     "Korokoro Campsite to Maraunui Campsite",
+     "Korokoro Campsite → Maraunui Campsite"
+    ],
+    "text": [
+     "Time: 2 hr 30 min; Distance: 6.8 km (DOC).",
+     "用时：2 小时 30 分钟；距离：6.8 公里（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 6",
+     "第 6 段"
+    ],
+    "title": [
+     "Maraunui Campsite to Marauiti Hut",
+     "Maraunui Campsite → Marauiti Hut"
+    ],
+    "text": [
+     "Time: 30 min; Distance: 1.7 km (DOC).",
+     "用时：30 分钟；距离：1.7 公里（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 7",
+     "第 7 段"
+    ],
+    "title": [
+     "Marauiti Hut to Waiharuru Hut and Campsite",
+     "Marauiti Hut → Waiharuru Hut and Campsite"
+    ],
+    "text": [
+     "Time: 2 hr; Distance: 6.2 km (DOC).",
+     "用时：2 小时；距离：6.2 公里（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 8",
+     "第 8 段"
+    ],
+    "title": [
+     "Waiharuru Hut and Campsite to Hopuruahine Landing (track start/end)",
+     "Waiharuru Hut and Campsite → Hopuruahine Landing (track start/end)"
+    ],
+    "text": [
+     "Time: 4 hr 30 min; Distance: 9.5 km (DOC).",
+     "用时：4 小时 30 分钟；距离：9.5 公里（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 9",
+     "第 9 段"
+    ],
+    "title": [
+     "2. Decide what huts or campsites you want to stay at.",
+     "2. Decide what huts or campsites you want → stay at."
+    ],
+    "text": [
+     "Distance: s and walking times between huts/campsites . (DOC).",
+     "距离：s and 步行 times between huts/campsites .（DOC）。"
+    ]
+   }
+  ],
+  "pacing": [
+   "Times are DOC's figures. Leave extra for rests, photos and a change in the weather.",
+   "用时取自 DOC。休息、拍照和天气变化请另留余量。"
+  ],
+  "access": [
+   "How to reach the start: see the DOC page.",
+   "前往起点的方式见 DOC 页面。"
+  ],
+  "food": [
+   "Carry food for every day plus a spare day; check the DOC page for hut cooking facilities and water.",
+   "带足每天的食物，另备一天余量；小屋炊事设施和饮水情况见 DOC 页面。"
+  ],
+  "tips": [
+   {
+    "title": [
+     "Check conditions",
+     "查看路况与天气"
+    ],
+    "text": [
+     "Read the DOC alerts for this track and the MetService forecast on the day you go.",
+     "出发当天查看这条步道的 DOC 公告和 MetService 天气预报。"
+    ]
+   },
+   {
+    "title": [
+     "Leave your plans",
+     "留下行程"
+    ],
+    "text": [
+     "Tell a trusted contact where you are going and when you will be back. In an emergency call 111.",
+     "把去向和返回时间告诉可靠的联系人。紧急情况拨 111。"
+    ]
+   }
+  ],
+  "alternatives": [
+   "If the weather or the time does not suit, choose a shorter walk nearby from the DOC page.",
+   "天气或时间不合适时，可在 DOC 页面上另选附近的短途步道。"
+  ],
+  "addedIn": "v3",
+  "sources": [
+   {
+    "label": "Department of Conservation (DOC)",
+    "labelZh": "新西兰保护部（DOC）",
+    "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/east-coast/places/te-urewera/things-to-do/tracks/lake-waikaremoana-great-walk/"
+   }
+  ],
+  "photoId": null,
+  "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/east-coast/places/te-urewera/things-to-do/tracks/lake-waikaremoana-great-walk/",
+  "planDays": 4
+ },
+ {
+  "id": "pouakai-crossing",
+  "island": "north",
+  "mode": "walk",
+  "name": "Pouākai Crossing",
+  "zh": "波阿凯穿越",
+  "region": [
+   "Te Papa-Kura-o-Taranaki, Taranaki",
+   "Te Papa-Kura-o-Taranaki，塔拉纳基"
+  ],
+  "summary": [
+   "A long day across the lower slopes of Taranaki Maunga: cliffs, a big waterfall, a moss swamp and the Pouākai tarns.",
+   "在塔拉纳基山低坡上走一整天：悬崖、大瀑布、苔藓沼泽和 Pouākai 小湖。"
+  ],
+  "ends": [
+   "North Taranaki Visitor Centre → Holly Hut → Pouākai tarns → Pouākai Hut → Mangorei Road end",
+   "North Taranaki Visitor Centre → Holly Hut → Pouākai tarns → Pouākai Hut → Mangorei Road 尽头"
+  ],
+  "time": [
+   "",
+   ""
+  ],
+  "distance": [
+   "",
+   ""
+  ],
+  "level": [
+   "",
+   ""
+  ],
+  "season": [
+   "Check the DOC page for the current season, alerts and closures.",
+   "当前季节、公告和封闭信息请查 DOC 页面。"
+  ],
+  "gear": [
+   "Full alpine day kit: boots with good grip, warm layers, waterproof shell, hat and gloves, food, water, head torch. Winter needs alpine equipment and the skills to use it.",
+   "完整的高山一日装备：抓地好的登山鞋、保暖层、防水外壳、帽子手套、食物、饮水、头灯。冬季需要高山装备，并且会用。"
+  ],
+  "intro": [
+   "A long day across the lower slopes of Taranaki Maunga: cliffs, a big waterfall, a moss swamp and the Pouākai tarns.",
+   "在塔拉纳基山低坡上走一整天：悬崖、大瀑布、苔藓沼泽和 Pouākai 小湖。"
+  ],
+  "planTitle": [
+   "Stages from the DOC track description",
+   "DOC 步道说明中的分段"
+  ],
+  "timeline": [
+   {
+    "at": [
+     "Stage 1",
+     "第 1 段"
+    ],
+    "title": [
+     "North Taranaki Visitor Centre to Holly Hut",
+     "North Taranaki Visitor Centre → Holly Hut"
+    ],
+    "text": [
+     "Time: 3–4 hr (DOC).",
+     "用时：3–4 小时（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Side trip",
+     "支线"
+    ],
+    "title": [
+     "Side trip: Holly Hut to Te Rere-o-Tahurangi Falls",
+     "支线：Holly Hut → Te Rere-o-Tahurangi Falls"
+    ],
+    "text": [
+     "Time: 1 hr return (DOC).",
+     "用时：1 小时 往返（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 3",
+     "第 3 段"
+    ],
+    "title": [
+     "Holly Hut to Pouākai tarns",
+     "Holly Hut → Pouākai tarns"
+    ],
+    "text": [
+     "Time: 2 hr (DOC).",
+     "用时：2 小时（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Side trip",
+     "支线"
+    ],
+    "title": [
+     "Side trip: Pouākai Trig",
+     "支线：Pouākai Trig"
+    ],
+    "text": [
+     "Time: 1 hr 30 min return (DOC).",
+     "用时：1 小时 30 分钟 往返（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 5",
+     "第 5 段"
+    ],
+    "title": [
+     "Pouākai tarns to Pouākai Hut",
+     "Pouākai tarns → Pouākai Hut"
+    ],
+    "text": [
+     "Time: 20 min (DOC).",
+     "用时：20 分钟（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 6",
+     "第 6 段"
+    ],
+    "title": [
+     "Pouākai Hut to Mangorei Road end",
+     "Pouākai Hut → Mangorei Road end"
+    ],
+    "text": [
+     "Time: 2 hr (DOC).",
+     "用时：2 小时（DOC）。"
+    ]
+   }
+  ],
+  "pacing": [
+   "Times are DOC's figures. Leave extra for rests, photos and a change in the weather.",
+   "用时取自 DOC。休息、拍照和天气变化请另留余量。"
+  ],
+  "access": [
+   "How to reach the start: see the DOC page.",
+   "前往起点的方式见 DOC 页面。"
+  ],
+  "food": [
+   "Carry all the food and water you need for the day.",
+   "带足当天所需的食物和饮水。"
+  ],
+  "tips": [
+   {
+    "title": [
+     "Check conditions",
+     "查看路况与天气"
+    ],
+    "text": [
+     "Read the DOC alerts for this track and the MetService forecast on the day you go.",
+     "出发当天查看这条步道的 DOC 公告和 MetService 天气预报。"
+    ]
+   },
+   {
+    "title": [
+     "Leave your plans",
+     "留下行程"
+    ],
+    "text": [
+     "Tell a trusted contact where you are going and when you will be back. In an emergency call 111.",
+     "把去向和返回时间告诉可靠的联系人。紧急情况拨 111。"
+    ]
+   }
+  ],
+  "alternatives": [
+   "If the weather or the time does not suit, choose a shorter walk nearby from the DOC page.",
+   "天气或时间不合适时，可在 DOC 页面上另选附近的短途步道。"
+  ],
+  "addedIn": "v3",
+  "sources": [
+   {
+    "label": "Department of Conservation (DOC)",
+    "labelZh": "新西兰保护部（DOC）",
+    "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/taranaki/places/te-papa-kura-o-taranaki/things-to-do/tracks/pouakai-crossing/"
+   }
+  ],
+  "photoId": null,
+  "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/taranaki/places/te-papa-kura-o-taranaki/things-to-do/tracks/pouakai-crossing/",
+  "planDays": 1
+ },
+ {
+  "id": "cathedral-cove",
+  "island": "north",
+  "mode": "walk",
+  "name": "Mautohe Cathedral Cove Track",
+  "zh": "教堂湾步道",
+  "region": [
+   "Hahei, Coromandel",
+   "哈黑，科罗曼德"
+  ],
+  "summary": [
+   "A coastal walk above Te Whanganui-o-Hei Marine Reserve to the rock archway at Mautohe Cathedral Cove.",
+   "沿 Te Whanganui-o-Hei 海洋保护区上方的海岸步行，走到 Mautohe 教堂湾的岩石拱门。"
+  ],
+  "ends": [
+   "Return walk to Mautohe Cathedral Cove",
+   "往返 Mautohe 教堂湾"
+  ],
+  "time": [
+   "",
+   ""
+  ],
+  "distance": [
+   "",
+   ""
+  ],
+  "level": [
+   "",
+   ""
+  ],
+  "season": [
+   "Check the DOC page for the current season, alerts and closures.",
+   "当前季节、公告和封闭信息请查 DOC 页面。"
+  ],
+  "gear": [
+   "Sturdy footwear, warm and waterproof layers, water, food and sun protection. DOC's day hikes gear list has the full set.",
+   "结实的鞋、保暖和防雨衣物、饮水、食物和防晒用品。完整清单见 DOC 一日徒步装备清单。"
+  ],
+  "intro": [
+   "A coastal walk above Te Whanganui-o-Hei Marine Reserve to the rock archway at Mautohe Cathedral Cove.",
+   "沿 Te Whanganui-o-Hei 海洋保护区上方的海岸步行，走到 Mautohe 教堂湾的岩石拱门。"
+  ],
+  "planTitle": [
+   "How the walk goes",
+   "怎么走"
+  ],
+  "timeline": [
+   {
+    "at": [
+     "Before",
+     "出发前"
+    ],
+    "title": [
+     "Check the track status",
+     "确认步道状态"
+    ],
+    "text": [
+     "Open the DOC page for alerts and closures, and check the forecast.",
+     "打开 DOC 页面查看公告和封闭信息，并查看天气预报。"
+    ]
+   },
+   {
+    "at": [
+     "On the track",
+     "途中"
+    ],
+    "title": [
+     "Return walk to Mautohe Cathedral Cove",
+     "往返 Mautohe 教堂湾"
+    ],
+    "text": [
+     "Follow the marked track. DOC does not publish stage times for this walk; use the total time above.",
+     "沿有标记的步道行走。DOC 没有给出这条步道的分段用时，请以上面的总用时为准。"
+    ]
+   },
+   {
+    "at": [
+     "After",
+     "返回后"
+    ],
+    "title": [
+     "Let your contact know you are back",
+     "告诉联系人你已返回"
+    ],
+    "text": [
+     "Close the loop with whoever holds your plans.",
+     "向掌握你行程的人报个平安。"
+    ]
+   }
+  ],
+  "pacing": [
+   "Times are DOC's figures. Leave extra for rests, photos and a change in the weather.",
+   "用时取自 DOC。休息、拍照和天气变化请另留余量。"
+  ],
+  "access": [
+   "How to reach the start: see the DOC page.",
+   "前往起点的方式见 DOC 页面。"
+  ],
+  "food": [
+   "Carry all the food and water you need for the day.",
+   "带足当天所需的食物和饮水。"
+  ],
+  "tips": [
+   {
+    "title": [
+     "Check conditions",
+     "查看路况与天气"
+    ],
+    "text": [
+     "Read the DOC alerts for this track and the MetService forecast on the day you go.",
+     "出发当天查看这条步道的 DOC 公告和 MetService 天气预报。"
+    ]
+   },
+   {
+    "title": [
+     "Leave your plans",
+     "留下行程"
+    ],
+    "text": [
+     "Tell a trusted contact where you are going and when you will be back. In an emergency call 111.",
+     "把去向和返回时间告诉可靠的联系人。紧急情况拨 111。"
+    ]
+   }
+  ],
+  "alternatives": [
+   "If the weather or the time does not suit, choose a shorter walk nearby from the DOC page.",
+   "天气或时间不合适时，可在 DOC 页面上另选附近的短途步道。"
+  ],
+  "addedIn": "v3",
+  "sources": [
+   {
+    "label": "Department of Conservation (DOC)",
+    "labelZh": "新西兰保护部（DOC）",
+    "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/coromandel/places/hahei-area/tracks/mautohe-cathedral-cove-walk/"
+   }
+  ],
+  "photoId": null,
+  "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/coromandel/places/hahei-area/tracks/mautohe-cathedral-cove-walk/",
+  "planDays": 1
+ },
+ {
+  "id": "tane-mahuta",
+  "island": "north",
+  "mode": "walk",
+  "name": "Tāne Mahuta Walk",
+  "zh": "Tāne Mahuta 步道",
+  "region": [
+   "Waipoua Forest, Northland",
+   "怀波瓦森林，北地"
+  ],
+  "summary": [
+   "A few minutes on a boardwalk to Tāne Mahuta, the largest known living kauri tree.",
+   "沿木栈道走几分钟，到已知最大的在世贝壳杉 Tāne Mahuta 跟前。"
+  ],
+  "ends": [
+   "Short walk to Tāne Mahuta, Waipoua Forest",
+   "怀波瓦森林内，短途步行至 Tāne Mahuta"
+  ],
+  "time": [
+   "",
+   ""
+  ],
+  "distance": [
+   "",
+   ""
+  ],
+  "level": [
+   "",
+   ""
+  ],
+  "season": [
+   "Check the DOC page for the current season, alerts and closures.",
+   "当前季节、公告和封闭信息请查 DOC 页面。"
+  ],
+  "gear": [
+   "Comfortable walking shoes, a rain layer and water.",
+   "舒适的步行鞋、防雨外套和饮水。"
+  ],
+  "intro": [
+   "A few minutes on a boardwalk to Tāne Mahuta, the largest known living kauri tree.",
+   "沿木栈道走几分钟，到已知最大的在世贝壳杉 Tāne Mahuta 跟前。"
+  ],
+  "planTitle": [
+   "How the walk goes",
+   "怎么走"
+  ],
+  "timeline": [
+   {
+    "at": [
+     "Before",
+     "出发前"
+    ],
+    "title": [
+     "Check the track status",
+     "确认步道状态"
+    ],
+    "text": [
+     "Open the DOC page for alerts and closures, and check the forecast.",
+     "打开 DOC 页面查看公告和封闭信息，并查看天气预报。"
+    ]
+   },
+   {
+    "at": [
+     "On the track",
+     "途中"
+    ],
+    "title": [
+     "Short walk to Tāne Mahuta, Waipoua Forest",
+     "怀波瓦森林内，短途步行至 Tāne Mahuta"
+    ],
+    "text": [
+     "Follow the marked track. DOC does not publish stage times for this walk; use the total time above.",
+     "沿有标记的步道行走。DOC 没有给出这条步道的分段用时，请以上面的总用时为准。"
+    ]
+   },
+   {
+    "at": [
+     "After",
+     "返回后"
+    ],
+    "title": [
+     "Let your contact know you are back",
+     "告诉联系人你已返回"
+    ],
+    "text": [
+     "Close the loop with whoever holds your plans.",
+     "向掌握你行程的人报个平安。"
+    ]
+   }
+  ],
+  "pacing": [
+   "Times are DOC's figures. Leave extra for rests, photos and a change in the weather.",
+   "用时取自 DOC。休息、拍照和天气变化请另留余量。"
+  ],
+  "access": [
+   "How to reach the start: see the DOC page.",
+   "前往起点的方式见 DOC 页面。"
+  ],
+  "food": [
+   "Carry all the food and water you need for the day.",
+   "带足当天所需的食物和饮水。"
+  ],
+  "tips": [
+   {
+    "title": [
+     "Check conditions",
+     "查看路况与天气"
+    ],
+    "text": [
+     "Read the DOC alerts for this track and the MetService forecast on the day you go.",
+     "出发当天查看这条步道的 DOC 公告和 MetService 天气预报。"
+    ]
+   },
+   {
+    "title": [
+     "Leave your plans",
+     "留下行程"
+    ],
+    "text": [
+     "Tell a trusted contact where you are going and when you will be back. In an emergency call 111.",
+     "把去向和返回时间告诉可靠的联系人。紧急情况拨 111。"
+    ]
+   }
+  ],
+  "alternatives": [
+   "If the weather or the time does not suit, choose a shorter walk nearby from the DOC page.",
+   "天气或时间不合适时，可在 DOC 页面上另选附近的短途步道。"
+  ],
+  "addedIn": "v3",
+  "sources": [
+   {
+    "label": "Department of Conservation (DOC)",
+    "labelZh": "新西兰保护部（DOC）",
+    "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/northland/places/waipoua-forest/things-to-do/tane-mahuta-walk/"
+   }
+  ],
+  "photoId": null,
+  "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/northland/places/waipoua-forest/things-to-do/tane-mahuta-walk/",
+  "planDays": 1
+ },
+ {
+  "id": "pinnacles-kauaeranga",
+  "island": "north",
+  "mode": "walk",
+  "name": "Kauaeranga Kauri Trail (Pinnacles Walk)",
+  "zh": "考埃兰加贝壳杉步道（Pinnacles）",
+  "region": [
+   "Coromandel Forest Park",
+   "科罗曼德森林公园"
+  ],
+  "summary": [
+   "The classic Coromandel climb to Pinnacles Hut and the summit, as a day or an overnight walk.",
+   "科罗曼德的经典上山路线，到 Pinnacles Hut 再登顶，可当天往返，也可住一晚。"
+  ],
+  "ends": [
+   "Kauaeranga Road end → Pinnacles Hut → the Pinnacles",
+   "Kauaeranga Road 尽头 → Pinnacles Hut → Pinnacles"
+  ],
+  "time": [
+   "",
+   ""
+  ],
+  "distance": [
+   "",
+   ""
+  ],
+  "level": [
+   "",
+   ""
+  ],
+  "season": [
+   "Check the DOC page for the current season, alerts and closures.",
+   "当前季节、公告和封闭信息请查 DOC 页面。"
+  ],
+  "gear": [
+   "Sturdy footwear, warm and waterproof layers, water, food and sun protection. DOC's day hikes gear list has the full set.",
+   "结实的鞋、保暖和防雨衣物、饮水、食物和防晒用品。完整清单见 DOC 一日徒步装备清单。"
+  ],
+  "intro": [
+   "The classic Coromandel climb to Pinnacles Hut and the summit, as a day or an overnight walk.",
+   "科罗曼德的经典上山路线，到 Pinnacles Hut 再登顶，可当天往返，也可住一晚。"
+  ],
+  "planTitle": [
+   "Stages from the DOC track description",
+   "DOC 步道说明中的分段"
+  ],
+  "timeline": [
+   {
+    "at": [
+     "Stage 1",
+     "第 1 段"
+    ],
+    "title": [
+     "Kauaeranga Road end – Hydro Camp via Webb Creek Track – Pinnacles Hut",
+     "Kauaeranga Road end – Hydro Camp via Webb Creek Track – Pinnacles Hut"
+    ],
+    "text": [
+     "Time: 2 hr 30 min – 3 hr one way; Distance: 6 km (DOC).",
+     "用时：2 小时 30 分钟–3 小时 单程；距离：6 公里（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Side trip",
+     "支线"
+    ],
+    "title": [
+     "Side trip: Pinnacles Hut – Pinnacles",
+     "支线：Pinnacles Hut – Pinnacles"
+    ],
+    "text": [
+     "Time: 40 min one way; Distance: 1 km (DOC).",
+     "用时：40 分钟 单程；距离：1 公里（DOC）。"
+    ]
+   }
+  ],
+  "pacing": [
+   "Times are DOC's figures. Leave extra for rests, photos and a change in the weather.",
+   "用时取自 DOC。休息、拍照和天气变化请另留余量。"
+  ],
+  "access": [
+   "How to reach the start: see the DOC page.",
+   "前往起点的方式见 DOC 页面。"
+  ],
+  "food": [
+   "Carry all the food and water you need for the day.",
+   "带足当天所需的食物和饮水。"
+  ],
+  "tips": [
+   {
+    "title": [
+     "Check conditions",
+     "查看路况与天气"
+    ],
+    "text": [
+     "Read the DOC alerts for this track and the MetService forecast on the day you go.",
+     "出发当天查看这条步道的 DOC 公告和 MetService 天气预报。"
+    ]
+   },
+   {
+    "title": [
+     "Leave your plans",
+     "留下行程"
+    ],
+    "text": [
+     "Tell a trusted contact where you are going and when you will be back. In an emergency call 111.",
+     "把去向和返回时间告诉可靠的联系人。紧急情况拨 111。"
+    ]
+   }
+  ],
+  "alternatives": [
+   "If the weather or the time does not suit, choose a shorter walk nearby from the DOC page.",
+   "天气或时间不合适时，可在 DOC 页面上另选附近的短途步道。"
+  ],
+  "addedIn": "v3",
+  "sources": [
+   {
+    "label": "Department of Conservation (DOC)",
+    "labelZh": "新西兰保护部（DOC）",
+    "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/coromandel/places/coromandel-forest-park/things-to-do/kauaeranga-kauri-trail/"
+   }
+  ],
+  "photoId": null,
+  "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/coromandel/places/coromandel-forest-park/things-to-do/kauaeranga-kauri-trail/",
+  "planDays": 1
+ },
+ {
+  "id": "tama-lakes",
+  "island": "north",
+  "mode": "walk",
+  "name": "Tama Lakes Track",
+  "zh": "塔马湖步道",
+  "region": [
+   "Tongariro National Park",
+   "汤加里罗国家公园"
+  ],
+  "summary": [
+   "A day walk past Taranaki Falls to Lower Tama Lake, with Ruapehu and Ngāuruhoe on either side.",
+   "一日步道，经过 Taranaki 瀑布到下塔马湖，鲁阿佩胡和瑙鲁霍伊两座火山分列两侧。"
+  ],
+  "ends": [
+   "Return walk to Lower Tama Lake, passing Taranaki Falls",
+   "往返下塔马湖，途经 Taranaki 瀑布"
+  ],
+  "time": [
+   "",
+   ""
+  ],
+  "distance": [
+   "",
+   ""
+  ],
+  "level": [
+   "",
+   ""
+  ],
+  "season": [
+   "Check the DOC page for the current season, alerts and closures.",
+   "当前季节、公告和封闭信息请查 DOC 页面。"
+  ],
+  "gear": [
+   "Full alpine day kit: boots with good grip, warm layers, waterproof shell, hat and gloves, food, water, head torch. Winter needs alpine equipment and the skills to use it.",
+   "完整的高山一日装备：抓地好的登山鞋、保暖层、防水外壳、帽子手套、食物、饮水、头灯。冬季需要高山装备，并且会用。"
+  ],
+  "intro": [
+   "A day walk past Taranaki Falls to Lower Tama Lake, with Ruapehu and Ngāuruhoe on either side.",
+   "一日步道，经过 Taranaki 瀑布到下塔马湖，鲁阿佩胡和瑙鲁霍伊两座火山分列两侧。"
+  ],
+  "planTitle": [
+   "Stages from the DOC track description",
+   "DOC 步道说明中的分段"
+  ],
+  "timeline": [
+   {
+    "at": [
+     "Side trip",
+     "支线"
+    ],
+    "title": [
+     "Side trip to Upper Tama Lake viewpoint",
+     "Side trip → Upper Tama Lake viewpoint"
+    ],
+    "text": [
+     "Time: 35 minutes (one way); Distance: 1.4 km (DOC).",
+     "用时：35 分钟 （单程）；距离：1.4 公里（DOC）。"
+    ]
+   }
+  ],
+  "pacing": [
+   "Times are DOC's figures. Leave extra for rests, photos and a change in the weather.",
+   "用时取自 DOC。休息、拍照和天气变化请另留余量。"
+  ],
+  "access": [
+   "How to reach the start: see the DOC page.",
+   "前往起点的方式见 DOC 页面。"
+  ],
+  "food": [
+   "Carry all the food and water you need for the day.",
+   "带足当天所需的食物和饮水。"
+  ],
+  "tips": [
+   {
+    "title": [
+     "Check conditions",
+     "查看路况与天气"
+    ],
+    "text": [
+     "Read the DOC alerts for this track and the MetService forecast on the day you go.",
+     "出发当天查看这条步道的 DOC 公告和 MetService 天气预报。"
+    ]
+   },
+   {
+    "title": [
+     "Leave your plans",
+     "留下行程"
+    ],
+    "text": [
+     "Tell a trusted contact where you are going and when you will be back. In an emergency call 111.",
+     "把去向和返回时间告诉可靠的联系人。紧急情况拨 111。"
+    ]
+   }
+  ],
+  "alternatives": [
+   "If the weather or the time does not suit, choose a shorter walk nearby from the DOC page.",
+   "天气或时间不合适时，可在 DOC 页面上另选附近的短途步道。"
+  ],
+  "addedIn": "v3",
+  "sources": [
+   {
+    "label": "Department of Conservation (DOC)",
+    "labelZh": "新西兰保护部（DOC）",
+    "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/central-north-island/places/tongariro-national-park/things-to-do/tracks/tama-lakes-track/"
+   }
+  ],
+  "photoId": "ni-taranaki-falls",
+  "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/central-north-island/places/tongariro-national-park/things-to-do/tracks/tama-lakes-track/",
+  "planDays": 1
+ },
+ {
+  "id": "te-paki-coastal",
+  "island": "north",
+  "mode": "walk",
+  "name": "Te Paki Coastal Track",
+  "zh": "蒂帕基海岸步道",
+  "region": [
+   "Te Paki, Northland",
+   "蒂帕基，北地"
+  ],
+  "summary": [
+   "Several days along the far-north coast past Cape Reinga / Te Rerenga Wairua, over headlands, beaches and dunes.",
+   "沿最北端海岸走上几天，经过雷因加角 / Te Rerenga Wairua，翻岬角、走海滩、过沙丘。"
+  ],
+  "ends": [
+   "Kapowairua (Spirits Bay) → Cape Reinga / Te Rerenga Wairua → Te Paki Stream",
+   "Kapowairua（Spirits Bay）→ 雷因加角 / Te Rerenga Wairua → Te Paki Stream"
+  ],
+  "time": [
+   "",
+   ""
+  ],
+  "distance": [
+   "",
+   ""
+  ],
+  "level": [
+   "",
+   ""
+  ],
+  "season": [
+   "Check the DOC page for the current season, alerts and closures.",
+   "当前季节、公告和封闭信息请查 DOC 页面。"
+  ],
+  "gear": [
+   "Multi-day pack, sleeping bag, cooker and food for every day plus a spare, warm and waterproof layers. Follow DOC's gear list for this track.",
+   "多日背包、睡袋、炉具、每天的食物外加一天备用、保暖和防雨衣物。请按 DOC 给这条步道的装备清单准备。"
+  ],
+  "intro": [
+   "Several days along the far-north coast past Cape Reinga / Te Rerenga Wairua, over headlands, beaches and dunes.",
+   "沿最北端海岸走上几天，经过雷因加角 / Te Rerenga Wairua，翻岬角、走海滩、过沙丘。"
+  ],
+  "planTitle": [
+   "Stages from the DOC track description",
+   "DOC 步道说明中的分段"
+  ],
+  "timeline": [
+   {
+    "at": [
+     "Stage 1",
+     "第 1 段"
+    ],
+    "title": [
+     "Kapowairua (Spirits Bay) to Pandora",
+     "Kapowairua (Spirits Bay) → Pandora"
+    ],
+    "text": [
+     "Time: 3 hr; Distance: 9km one way (DOC).",
+     "用时：3 小时；距离：9 公里 单程（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 2",
+     "第 2 段"
+    ],
+    "title": [
+     "Pandora to Tapotupotu Bay",
+     "Pandora → Tapotupotu Bay"
+    ],
+    "text": [
+     "Time: 3 hr; Distance: 9 km one way (DOC).",
+     "用时：3 小时；距离：9 公里 单程（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 3",
+     "第 3 段"
+    ],
+    "title": [
+     "Tapotupotu to Cape Reinga/Te Rerenga Wairua",
+     "Tapotupotu → Cape Reinga/Te Rerenga Wairua"
+    ],
+    "text": [
+     "Time: 3 hr; Distance: 5 km one way (DOC).",
+     "用时：3 小时；距离：5 公里 单程（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 4",
+     "第 4 段"
+    ],
+    "title": [
+     "Cape Reinga to Te Werahi Beach Track",
+     "Cape Reinga → Te Werahi Beach Track"
+    ],
+    "text": [
+     "Time: 45 min return; Distance: 2 km return (DOC).",
+     "用时：45 分钟 往返；距离：2 公里 往返（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 5",
+     "第 5 段"
+    ],
+    "title": [
+     "Te Werahi Beach to Twilight Beach",
+     "Te Werahi Beach → Twilight Beach"
+    ],
+    "text": [
+     "Time: 3 hr; Distance: 7.25 km one way (DOC).",
+     "用时：3 小时；距离：7.25 公里 单程（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 6",
+     "第 6 段"
+    ],
+    "title": [
+     "Twilight Beach to Te Paki Stream",
+     "Twilight Beach → Te Paki Stream"
+    ],
+    "text": [
+     "Time: 4 hr 30 min; Distance: 11 km one way (DOC).",
+     "用时：4 小时 30 分钟；距离：11 公里 单程（DOC）。"
+    ]
+   }
+  ],
+  "pacing": [
+   "Times are DOC's figures. Leave extra for rests, photos and a change in the weather.",
+   "用时取自 DOC。休息、拍照和天气变化请另留余量。"
+  ],
+  "access": [
+   "How to reach the start: see the DOC page.",
+   "前往起点的方式见 DOC 页面。"
+  ],
+  "food": [
+   "Carry food for every day plus a spare day; check the DOC page for hut cooking facilities and water.",
+   "带足每天的食物，另备一天余量；小屋炊事设施和饮水情况见 DOC 页面。"
+  ],
+  "tips": [
+   {
+    "title": [
+     "Check conditions",
+     "查看路况与天气"
+    ],
+    "text": [
+     "Read the DOC alerts for this track and the MetService forecast on the day you go.",
+     "出发当天查看这条步道的 DOC 公告和 MetService 天气预报。"
+    ]
+   },
+   {
+    "title": [
+     "Leave your plans",
+     "留下行程"
+    ],
+    "text": [
+     "Tell a trusted contact where you are going and when you will be back. In an emergency call 111.",
+     "把去向和返回时间告诉可靠的联系人。紧急情况拨 111。"
+    ]
+   }
+  ],
+  "alternatives": [
+   "If the weather or the time does not suit, choose a shorter walk nearby from the DOC page.",
+   "天气或时间不合适时，可在 DOC 页面上另选附近的短途步道。"
+  ],
+  "addedIn": "v3",
+  "sources": [
+   {
+    "label": "Department of Conservation (DOC)",
+    "labelZh": "新西兰保护部（DOC）",
+    "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/northland/places/te-paki-recreation-reserve/things-to-do/tracks/te-paki-coastal-track/"
+   }
+  ],
+  "photoId": null,
+  "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/northland/places/te-paki-recreation-reserve/things-to-do/tracks/te-paki-coastal-track/",
+  "planDays": 4
+ },
+ {
+  "id": "whanganui-journey",
+  "island": "north",
+  "mode": "paddle",
+  "name": "Whanganui Journey",
+  "zh": "旺格努伊河之旅",
+  "region": [
+   "Whanganui National Park",
+   "旺格努伊国家公园"
+  ],
+  "summary": [
+   "A Great Walk done by canoe: down the Whanganui River through remote hills and bush-clad valleys, with nights in riverside huts, campsites and a marae.",
+   "用独木舟完成的大步道：沿旺格努伊河顺流而下，穿过偏远的山丘和林木覆盖的河谷，夜宿河边小屋、营地和一处毛利会堂（marae）。"
+  ],
+  "ends": [
+   "Taumarunui or Whakahoro → John Coull Hut → Tīeke Kāinga → Pipiriki (downstream by canoe)",
+   "Taumarunui 或 Whakahoro → John Coull Hut → Tīeke Kāinga → Pipiriki（乘独木舟顺流而下）"
+  ],
+  "time": [
+   "",
+   ""
+  ],
+  "distance": [
+   "",
+   ""
+  ],
+  "level": [
+   "",
+   ""
+  ],
+  "season": [
+   "Check the DOC page for the current season, alerts and closures.",
+   "当前季节、公告和封闭信息请查 DOC 页面。"
+  ],
+  "gear": [
+   "Canoe, paddles and waterproof barrels (usually from a hire operator), a 3–4 season sleeping bag, cooking gear, a way to treat water, toilet paper and emergency food. Follow DOC's gear list for this trip.",
+   "独木舟、桨和防水桶（一般向租船商租用）、3–4 季睡袋、炊具、净水手段、厕纸和应急食物。请按 DOC 给这条线路的装备清单准备。"
+  ],
+  "intro": [
+   "A Great Walk done by canoe: down the Whanganui River through remote hills and bush-clad valleys, with nights in riverside huts, campsites and a marae.",
+   "用独木舟完成的大步道：沿旺格努伊河顺流而下，穿过偏远的山丘和林木覆盖的河谷，夜宿河边小屋、营地和一处毛利会堂（marae）。"
+  ],
+  "planTitle": [
+   "Stages from the DOC track description",
+   "DOC 步道说明中的分段"
+  ],
+  "timeline": [
+   {
+    "at": [
+     "Stage 1",
+     "第 1 段"
+    ],
+    "title": [
+     "Taumarunui to Ohinepane Campsite",
+     "Taumarunui → Ohinepane Campsite"
+    ],
+    "text": [
+     "Time: 3–5 hours; Distance: 22 km (DOC).",
+     "用时：3–5 小时；距离：22 公里（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 2",
+     "第 2 段"
+    ],
+    "title": [
+     "Ohinepane Campsite to Whakahoro",
+     "Ohinepane Campsite → Whakahoro"
+    ],
+    "text": [
+     "Time: 6–8 hours; Distance: 35 km (DOC).",
+     "用时：6–8 小时；距离：35 公里（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 3",
+     "第 3 段"
+    ],
+    "title": [
+     "Whakahoro to John Coull Hut",
+     "Whakahoro → John Coull Hut"
+    ],
+    "text": [
+     "Time: 7–9 hours; Distance: 37.5 km (DOC).",
+     "用时：7–9 小时；距离：37.5 公里（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 4",
+     "第 4 段"
+    ],
+    "title": [
+     "John Coull Hut to Tīeke Kāinga",
+     "John Coull Hut → Tīeke Kāinga"
+    ],
+    "text": [
+     "Time: 7–9 hours; Distance: 29 km (DOC).",
+     "用时：7–9 小时；距离：29 公里（DOC）。"
+    ]
+   },
+   {
+    "at": [
+     "Stage 5",
+     "第 5 段"
+    ],
+    "title": [
+     "Tīeke Kāinga to Pipiriki",
+     "Tīeke Kāinga → Pipiriki"
+    ],
+    "text": [
+     "Time: 4–6 hours; Distance: 21.5 km (DOC).",
+     "用时：4–6 小时；距离：21.5 公里（DOC）。"
+    ]
+   }
+  ],
+  "pacing": [
+   "Times are DOC's figures. Leave extra for rests, photos and a change in the weather.",
+   "用时取自 DOC。休息、拍照和天气变化请另留余量。"
+  ],
+  "access": [
+   "How to reach the start: see the DOC page.",
+   "前往起点的方式见 DOC 页面。"
+  ],
+  "food": [
+   "Carry food for every day plus a spare day; check the DOC page for hut cooking facilities and water.",
+   "带足每天的食物，另备一天余量；小屋炊事设施和饮水情况见 DOC 页面。"
+  ],
+  "tips": [
+   {
+    "title": [
+     "Check conditions",
+     "查看路况与天气"
+    ],
+    "text": [
+     "Read the DOC alerts for this track and the MetService forecast on the day you go.",
+     "出发当天查看这条步道的 DOC 公告和 MetService 天气预报。"
+    ]
+   },
+   {
+    "title": [
+     "Leave your plans",
+     "留下行程"
+    ],
+    "text": [
+     "Tell a trusted contact where you are going and when you will be back. In an emergency call 111.",
+     "把去向和返回时间告诉可靠的联系人。紧急情况拨 111。"
+    ]
+   }
+  ],
+  "alternatives": [
+   "If the weather or the time does not suit, choose a shorter walk nearby from the DOC page.",
+   "天气或时间不合适时，可在 DOC 页面上另选附近的短途步道。"
+  ],
+  "addedIn": "v3.1",
+  "sources": [
+   {
+    "label": "Department of Conservation (DOC)",
+    "labelZh": "新西兰保护部（DOC）",
+    "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/manawatu-whanganui/places/whanganui-national-park/things-to-do/tracks/whanganui-journey/"
+   }
+  ],
+  "photoId": null,
+  "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/manawatu-whanganui/places/whanganui-national-park/things-to-do/tracks/whanganui-journey/",
+  "planDays": 5
+ }
+]

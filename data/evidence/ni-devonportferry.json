@@ -1,0 +1,31 @@
+[
+ {
+  "url": "https://at.govt.nz/bus-train-ferry/ferry-services/auckland-ferry-destinations",
+  "fetchedAt": "2026-11-10T01:18:25.587Z",
+  "status": 200,
+  "finalUrl": "https://at.govt.nz/bus-train-ferry/ferry-services/auckland-ferry-destinations",
+  "title": "Auckland's ferry destinations",
+  "lines": [
+   "Timetables",
+   "Planned rail closures",
+   "Cruise ship arrivals and departures",
+   "Timetable changes to multiple bus routes from 13 September",
+   "Map & timetables",
+   "Group ferry bookings",
+   "Train timetables",
+   "Planned closures on the train network",
+   "Group train bookings",
+   "School bus timetables",
+   "NZSL AT Mobile app alerts pilot",
+   "Road closures in Auckland",
+   "easy connections to Beachlands and Maraetai on the 738 and 739 buses."
+  ]
+ },
+ {
+  "url": "https://at.govt.nz/bus-train-ferry/ferry-services/devonport-ferry-services",
+  "fetchedAt": "2026-11-10T01:18:26.194Z",
+  "status": 404,
+  "finalUrl": "https://at.govt.nz/bus-train-ferry/ferry-services/devonport-ferry-services",
+  "note": "text/html; charset=utf-8"
+ }
+]

@@ -1,0 +1,2222 @@
+{
+ "ni-rangitoto": {
+  "distance": {
+   "en": "7 km return",
+   "zh": "往返 7 公里",
+   "quote": [
+    "7 km return via same track"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/auckland/places/rangitoto-island/tracks/rangitoto-summit-track/"
+  },
+  "time": {
+   "en": "2 hr return",
+   "zh": "往返 2 小时",
+   "quote": [
+    "2 hr return"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/auckland/places/rangitoto-island/tracks/rangitoto-summit-track/"
+  },
+  "level": {
+   "en": "Easy to intermediate walking track",
+   "zh": "简易至中级步道（DOC 分级）",
+   "quote": [
+    "Easy to intermediate walking track"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/auckland/places/rangitoto-island/tracks/rangitoto-summit-track/"
+  },
+  "booking": {
+   "en": "No booking is required for the walk.",
+   "zh": "步道本身无需预订。",
+   "quote": [
+    "Bookings are not required for Rangitoto Summit Walk."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/auckland/places/rangitoto-island/tracks/rangitoto-summit-track/"
+  }
+ },
+ "ni-taranaki-falls": {
+  "distance": {
+   "en": "6 km loop",
+   "zh": "环线 6 公里",
+   "quote": [
+    "6 km loop"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/central-north-island/places/tongariro-national-park/things-to-do/tracks/taranaki-falls-walking-track"
+  },
+  "time": {
+   "en": "2 hr",
+   "zh": "2 小时",
+   "quote": [
+    "2 hr"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/central-north-island/places/tongariro-national-park/things-to-do/tracks/taranaki-falls-walking-track"
+  },
+  "level": {
+   "en": "Easy to intermediate walking track",
+   "zh": "简易至中级步道（DOC 分级）",
+   "quote": [
+    "Easy to intermediate walking track"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/central-north-island/places/tongariro-national-park/things-to-do/tracks/taranaki-falls-walking-track"
+  }
+ },
+ "ni-huka": {
+  "distance": {
+   "en": "3 km one way",
+   "zh": "单程 3 公里",
+   "quote": [
+    "3 km one way"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/central-north-island/places/taupo-area/things-to-do/spa-park-to-huka-falls-walk/"
+  },
+  "time": {
+   "en": "1 hr 30 min",
+   "zh": "1 小时 30 分钟",
+   "quote": [
+    "1 hr 30 min"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/central-north-island/places/taupo-area/things-to-do/spa-park-to-huka-falls-walk/"
+  },
+  "level": {
+   "en": "Easy short walk",
+   "zh": "简易短途步道（DOC 分级）",
+   "quote": [
+    "Easy short walk"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/central-north-island/places/taupo-area/things-to-do/spa-park-to-huka-falls-walk/"
+  },
+  "safety": {
+   "en": "Parts of the track run beside a cliff edge: stay on the formed track and supervise children.",
+   "zh": "部分路段紧邻崖边：请走在成形步道上，并看护好儿童。",
+   "quote": [
+    "Sections of the walking track run adjacent to a cliff edge. Stay on the formed track and away from the edge. Children should be supervised at all times."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/central-north-island/places/taupo-area/things-to-do/spa-park-to-huka-falls-walk/"
+  }
+ },
+ "ni-manaia": {
+  "distance": {
+   "en": "4 km return",
+   "zh": "往返 4 公里",
+   "quote": [
+    "4 km return via same track"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/northland/places/whangarei-heads-area/things-to-do/mount-manaia-track/"
+  },
+  "time": {
+   "en": "2 hr",
+   "zh": "2 小时",
+   "quote": [
+    "2 hr"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/northland/places/whangarei-heads-area/things-to-do/mount-manaia-track/"
+  },
+  "level": {
+   "en": "Easy to intermediate walking track",
+   "zh": "简易至中级步道（DOC 分级）",
+   "quote": [
+    "Easy to intermediate walking track"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/northland/places/whangarei-heads-area/things-to-do/mount-manaia-track/"
+  }
+ },
+ "ni-rotopounamu": {
+  "distance": {
+   "en": "5 km loop",
+   "zh": "环线 5 公里",
+   "quote": [
+    "5 km loop"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/central-north-island/places/tongariro-national-park/things-to-do/tracks/rotopounamu-track/"
+  },
+  "time": {
+   "en": "2 hr loop",
+   "zh": "环线 2 小时",
+   "quote": [
+    "2 hr loop"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/central-north-island/places/tongariro-national-park/things-to-do/tracks/rotopounamu-track/"
+  },
+  "level": {
+   "en": "Easy to intermediate walking track",
+   "zh": "简易至中级步道（DOC 分级）",
+   "quote": [
+    "Easy to intermediate walking track"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/central-north-island/places/tongariro-national-park/things-to-do/tracks/rotopounamu-track/"
+  }
+ },
+ "hooker": {
+  "distance": {
+   "en": "10 km return",
+   "zh": "往返 10 公里",
+   "quote": [
+    "10 km return via same track"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/canterbury/places/aoraki-mount-cook-national-park/things-to-do/tracks/hooker-valley-track/"
+  },
+  "time": {
+   "en": "3 hr return",
+   "zh": "往返 3 小时",
+   "quote": [
+    "3 hr return"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/canterbury/places/aoraki-mount-cook-national-park/things-to-do/tracks/hooker-valley-track/"
+  },
+  "level": {
+   "en": "Easy to intermediate walking track",
+   "zh": "简易至中级步道（DOC 分级）",
+   "quote": [
+    "Easy to intermediate walking track"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/canterbury/places/aoraki-mount-cook-national-park/things-to-do/tracks/hooker-valley-track/"
+  },
+  "access": {
+   "en": "Start from White Horse Hill car park; DOC charges for parking there.",
+   "zh": "从 White Horse Hill 停车场出发；DOC 在此收取停车费。",
+   "quote": [
+    "DOC charges fees for car parking at White Horse Hill."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/canterbury/places/aoraki-mount-cook-national-park/things-to-do/tracks/hooker-valley-track/"
+  }
+ },
+ "keysummit": {
+  "distance": {
+   "en": "3.4 km one way, return the same way",
+   "zh": "单程 3.4 公里，原路返回",
+   "quote": [
+    "3.4 km one way, return via same track"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/fiordland/places/fiordland-national-park/things-to-do/tracks/routeburn-track-key-summit-track/"
+  },
+  "time": {
+   "en": "3 hr return",
+   "zh": "往返 3 小时",
+   "quote": [
+    "3 hr"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/fiordland/places/fiordland-national-park/things-to-do/tracks/routeburn-track-key-summit-track/",
+   "note": "DOC overview prints \"3 hr\" beside \"3.4 km one way, return via same track\"."
+  },
+  "level": {
+   "en": "Intermediate tramping track",
+   "zh": "中级徒步道（DOC 分级）",
+   "quote": [
+    "Intermediate tramping track"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/fiordland/places/fiordland-national-park/things-to-do/tracks/routeburn-track-key-summit-track/"
+  }
+ },
+ "gunn": {
+  "distance": {
+   "en": "1.4 km loop",
+   "zh": "环线 1.4 公里",
+   "quote": [
+    "1.4 km loop"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/fiordland/places/fiordland-national-park/things-to-do/tracks/lake-gunn-nature-walk/"
+  },
+  "time": {
+   "en": "45 min loop",
+   "zh": "环线 45 分钟",
+   "quote": [
+    "45 min loop"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/fiordland/places/fiordland-national-park/things-to-do/tracks/lake-gunn-nature-walk/"
+  },
+  "level": {
+   "en": "Easy short walk",
+   "zh": "简易短途步道（DOC 分级）",
+   "quote": [
+    "Easy short walk"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/fiordland/places/fiordland-national-park/things-to-do/tracks/lake-gunn-nature-walk/"
+  }
+ },
+ "matheson": {
+  "distance": {
+   "en": "4.4 km loop",
+   "zh": "环线 4.4 公里",
+   "quote": [
+    "4.4 km loop"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/west-coast/places/westland-tai-poutini-national-park/things-to-do/tracks/lake-matheson-te-ara-kairaumati-walk/"
+  },
+  "time": {
+   "en": "1 hr 30 min",
+   "zh": "1 小时 30 分钟",
+   "quote": [
+    "1 hr 30 min"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/west-coast/places/westland-tai-poutini-national-park/things-to-do/tracks/lake-matheson-te-ara-kairaumati-walk/"
+  },
+  "level": {
+   "en": "Wheelchair accessible short walk; Easy to intermediate walking track",
+   "zh": "无障碍短途步道；简易至中级步道（DOC 分级）",
+   "quote": [
+    "Wheelchair accessible short walk",
+    "Easy to intermediate walking track"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/west-coast/places/westland-tai-poutini-national-park/things-to-do/tracks/lake-matheson-te-ara-kairaumati-walk/"
+  },
+  "booking": {
+   "en": "No booking is required for the walk.",
+   "zh": "步道本身无需预订。",
+   "quote": [
+    "Bookings are not required for Lake Matheson/Te Ara Kairaumati Walk."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/west-coast/places/westland-tai-poutini-national-park/things-to-do/tracks/lake-matheson-te-ara-kairaumati-walk/"
+  }
+ },
+ "punchbowl": {
+  "distance": {
+   "en": "2 km return",
+   "zh": "往返 2 公里",
+   "quote": [
+    "2 km return via same track"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/canterbury/places/arthurs-pass-national-park/things-to-do/tracks/devils-punchbowl-walking-track/"
+  },
+  "time": {
+   "en": "1 hr return",
+   "zh": "往返 1 小时",
+   "quote": [
+    "1 hr return"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/canterbury/places/arthurs-pass-national-park/things-to-do/tracks/devils-punchbowl-walking-track/"
+  },
+  "level": {
+   "en": "Easy to intermediate walking track",
+   "zh": "简易至中级步道（DOC 分级）",
+   "quote": [
+    "Easy to intermediate walking track"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/canterbury/places/arthurs-pass-national-park/things-to-do/tracks/devils-punchbowl-walking-track/"
+  },
+  "booking": {
+   "en": "No booking is required for the walk.",
+   "zh": "步道本身无需预订。",
+   "quote": [
+    "Bookings are not required for Devils Punchbowl Walking Track."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/canterbury/places/arthurs-pass-national-park/things-to-do/tracks/devils-punchbowl-walking-track/"
+  }
+ },
+ "tongariro-crossing": {
+  "distance": {
+   "en": "20.2 km one way",
+   "zh": "单程 20.2 公里",
+   "quote": [
+    "20.2 km one way"
+   ],
+   "url": "https://www.doc.govt.nz/tongariroalpinecrossing"
+  },
+  "time": {
+   "en": "Nov–Apr: 7–8 hr; May–Oct: 9 hr",
+   "zh": "11–4 月 7–8 小时；5–10 月约 9 小时",
+   "quote": [
+    "Nov-Apr: 7-8 hr | May-Oct: 9 hr"
+   ],
+   "url": "https://www.doc.govt.nz/tongariroalpinecrossing"
+  },
+  "level": {
+   "en": "Intermediate tramping track (late Oct–30 Apr); Expert route (May–Oct winter season)",
+   "zh": "中级徒步道（10 月下旬至 4 月 30 日）；专家级路线（5–10 月冬季）（DOC 分级）",
+   "quote": [
+    "Intermediate tramping track",
+    "Expert route",
+    "Parking restrictions (4 hr maximum) are in place at the road-ends – we suggest you book a shuttle. Intermediate track category.",
+    "Expert route category."
+   ],
+   "url": "https://www.doc.govt.nz/tongariroalpinecrossing"
+  },
+  "booking": {
+   "en": "Booking is recommended for everyone and required if you use a shuttle or a guided walk.",
+   "zh": "建议所有人预订；乘接驳车或参加向导团必须预订步道。",
+   "quote": [
+    "Bookings are recommended for all visitors using any part of the Tongariro Alpine Crossing track. A track booking is needed to use a shuttle or guided walk service."
+   ],
+   "url": "https://www.doc.govt.nz/tongariroalpinecrossing"
+  },
+  "season": {
+   "en": "Main season: Labour weekend (late October) to 30 April. May–October is the winter season, when the track is an expert route.",
+   "zh": "主要季节：劳动节周末（10 月下旬）至 4 月 30 日。5–10 月为冬季，届时属专家级路线。",
+   "quote": [
+    "Labour weekend (late October) - 30 April",
+    "May - October (winter season)"
+   ],
+   "url": "https://www.doc.govt.nz/tongariroalpinecrossing"
+  },
+  "access": {
+   "en": "Road-end parking is limited to 4 hours; DOC suggests booking a shuttle.",
+   "zh": "路口停车限 4 小时；DOC 建议预订接驳车。",
+   "quote": [
+    "Parking restrictions (4 hr maximum) are in place at the road-ends – we suggest you book a shuttle."
+   ],
+   "url": "https://www.doc.govt.nz/tongariroalpinecrossing"
+  },
+  "safety": {
+   "en": "In winter (May–October) expect snow and ice, avalanche risk and sub-zero temperatures; alpine skills are essential.",
+   "zh": "冬季（5–10 月）有冰雪、雪崩风险和零下低温，必须具备高山技能。",
+   "quote": [
+    "Additional hazards are present including snow and ice, avalanche risk, and sub-zero temperatures.",
+    "From May to October, alpine skills are essential for this track"
+   ],
+   "url": "https://www.doc.govt.nz/tongariroalpinecrossing"
+  }
+ },
+ "abel-tasman": {
+  "distance": {
+   "en": "60 km one way",
+   "zh": "单程 60 公里",
+   "quote": [
+    "60 km one way"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/nelson-tasman/places/abel-tasman-national-park/things-to-do/tracks/abel-tasman-coast-track/"
+  },
+  "time": {
+   "en": "3–5 days one way",
+   "zh": "单程 3–5 天",
+   "quote": [
+    "3–5 days one way"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/nelson-tasman/places/abel-tasman-national-park/things-to-do/tracks/abel-tasman-coast-track/"
+  },
+  "level": {
+   "en": "Intermediate tramping track",
+   "zh": "中级徒步道（DOC 分级）",
+   "quote": [
+    "Intermediate tramping track"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/nelson-tasman/places/abel-tasman-national-park/things-to-do/tracks/abel-tasman-coast-track/"
+  },
+  "booking": {
+   "en": "The 4 huts and 18 campsites must be booked in advance all year round.",
+   "zh": "沿途 4 间小屋和 18 处营地全年都须提前预订。",
+   "quote": [
+    "There are 4 huts and 18 campsites along the Abel Tasman Coast Track, which must be booked in advance all year round."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/nelson-tasman/places/abel-tasman-national-park/things-to-do/tracks/abel-tasman-coast-track/"
+  },
+  "access": {
+   "en": "Water taxis run all year and must be booked in advance.",
+   "zh": "水上出租车全年运营，须提前预订。",
+   "quote": [
+    "Water taxis operate year round and must be booked in advance."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/nelson-tasman/places/abel-tasman-national-park/things-to-do/tracks/abel-tasman-coast-track/"
+  },
+  "safety": {
+   "en": "Awaroa Inlet can only be crossed in daylight, from 1 hr 30 min before to 2 hr after low tide. Check the tide tables before you book.",
+   "zh": "Awaroa 河口只能在白天、低潮前 1 小时 30 分钟至低潮后 2 小时之间通过。预订前先查潮汐表。",
+   "quote": [
+    "You can only cross Awaroa Inlet in daylight, and within 1 hour 30 minutes before and 2 hours after low tide."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/nelson-tasman/places/abel-tasman-national-park/things-to-do/tracks/abel-tasman-coast-track/"
+  }
+ },
+ "roys-peak": {
+  "distance": {
+   "en": "16 km return",
+   "zh": "往返 16 公里",
+   "quote": [
+    "16 km return via same track"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/otago/places/wanaka-area/things-to-do/roys-peak-track/"
+  },
+  "time": {
+   "en": "5–6 hr return",
+   "zh": "往返 5–6 小时",
+   "quote": [
+    "5-6 hr return"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/otago/places/wanaka-area/things-to-do/roys-peak-track/"
+  },
+  "level": {
+   "en": "Easy to intermediate walking track",
+   "zh": "简易至中级步道（DOC 分级）",
+   "quote": [
+    "Easy to intermediate walking track"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/otago/places/wanaka-area/things-to-do/roys-peak-track/"
+  },
+  "season": {
+   "en": "Closed for lambing from 1 October to 10 November every year; reopens 11 November.",
+   "zh": "每年 10 月 1 日至 11 月 10 日因产羔封闭，11 月 11 日重新开放。",
+   "quote": [
+    "The track is closed for lambing from 1 October to 10 November each year. It reopens on 11 November."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/otago/places/wanaka-area/things-to-do/roys-peak-track/"
+  },
+  "safety": {
+   "en": "Snow and ice in winter; the upper track is alpine, with avalanche terrain above 1,000 m.",
+   "zh": "冬季有冰雪；上段属高山环境，海拔 1,000 米以上有雪崩地形。",
+   "quote": [
+    "Snow and ice are present during winter.",
+    "Roys Peak Track has challenging avalanche terrain above 1, 000 metres."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/otago/places/wanaka-area/things-to-do/roys-peak-track/"
+  },
+  "access": {
+   "en": "From Wānaka, drive west on the Wānaka – Mount Aspiring Road for about 6 km to the Roys Peak car park on the left.",
+   "zh": "从瓦纳卡沿 Wānaka – Mount Aspiring Road 向西约 6 公里，Roys Peak 停车场在左侧。",
+   "quote": [
+    "From Wānaka, drive west along the Wānaka – Mount Aspiring Road for about 6 km until you reach the large Roys Peak car park on your left."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/otago/places/wanaka-area/things-to-do/roys-peak-track/"
+  }
+ },
+ "routeburn-track": {
+  "distance": {
+   "en": "33 km one way",
+   "zh": "单程 33 公里",
+   "quote": [
+    "33 km one way"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/fiordland/places/fiordland-national-park/things-to-do/tracks/routeburn-track/"
+  },
+  "time": {
+   "en": "2–4 days",
+   "zh": "2–4 天",
+   "quote": [
+    "2-4 days"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/fiordland/places/fiordland-national-park/things-to-do/tracks/routeburn-track/"
+  },
+  "level": {
+   "en": "Intermediate tramping track; Advanced tramping track (DOC lists both categories)",
+   "zh": "中级徒步道；高级徒步道（DOC 页面同时列出两个等级）",
+   "quote": [
+    "Intermediate tramping track",
+    "Advanced tramping track",
+    "Expert route"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/fiordland/places/fiordland-national-park/things-to-do/tracks/routeburn-track/"
+  },
+  "season": {
+   "en": "Great Walks season: 1 November 2026 – 30 April 2027. Outside it (1 May – 31 October) only for people with alpine skills, equipment and experience.",
+   "zh": "大步道季：2026 年 11 月 1 日至 2027 年 4 月 30 日。季外（5 月 1 日至 10 月 31 日）仅适合具备高山技能、装备和经验的人。",
+   "quote": [
+    "In the Great Walks season (1 November 2026 – 30 April 2027)",
+    "Walking the track outside the Great Walks season should only be attempted if you have alpine skills, equipment and experience."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/fiordland/places/fiordland-national-park/things-to-do/tracks/routeburn-track/"
+  },
+  "booking": {
+   "en": "Three huts and two campsites; all must be booked well in advance in the Great Walks season.",
+   "zh": "沿途 3 间小屋、2 处营地，大步道季须尽早预订。",
+   "quote": [
+    "There are three huts and two campsites, which must be booked well in advance during the Great Walks season."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/fiordland/places/fiordland-national-park/things-to-do/tracks/routeburn-track/"
+  },
+  "safety": {
+   "en": "Snow and ice can make the trip hazardous early and late in the season.",
+   "zh": "季初和季末，冰雪可能使行程变得危险。",
+   "quote": [
+    "Snow and ice can sometimes make this trip hazardous early and late into the Great Walks season."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/fiordland/places/fiordland-national-park/things-to-do/tracks/routeburn-track/"
+  },
+  "access": {
+   "en": "Two ends: Routeburn Shelter (25 km from Glenorchy, partly unsealed road) and The Divide Shelter (85 km from Te Anau). They are 325 km apart by road, so transport is needed at each end.",
+   "zh": "两端分别是 Routeburn Shelter（距格林诺奇 25 公里，部分为砂石路）和 The Divide Shelter（距蒂阿瑙 85 公里）。两端公路相距 325 公里，都需要安排交通。",
+   "quote": [
+    "Routeburn Track can be accessed from both ends: Routeburn Shelter, 25 km from Glenorchy along a partially unsealed road, and The Divide Shelter, 85 km from Te Anau.",
+    "The road distance between each end of the track is 325 km – transport is needed at each end."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/fiordland/places/fiordland-national-park/things-to-do/tracks/routeburn-track/"
+  }
+ },
+ "milford-track": {
+  "distance": {
+   "en": "53.5 km one way",
+   "zh": "单程 53.5 公里",
+   "quote": [
+    "53.5 km one way"
+   ],
+   "url": "https://www.doc.govt.nz/milfordtrack"
+  },
+  "time": {
+   "en": "4 days",
+   "zh": "4 天",
+   "quote": [
+    "4 days"
+   ],
+   "url": "https://www.doc.govt.nz/milfordtrack"
+  },
+  "level": {
+   "en": "Intermediate tramping track; Advanced tramping track (DOC lists both categories)",
+   "zh": "中级徒步道；高级徒步道（DOC 页面同时列出两个等级）",
+   "quote": [
+    "Intermediate tramping track",
+    "Advanced tramping track",
+    "Expert route"
+   ],
+   "url": "https://www.doc.govt.nz/milfordtrack"
+  },
+  "season": {
+   "en": "Great Walks season: 1 November 2026 – 30 April 2027 (last departure 28 April 2027).",
+   "zh": "大步道季：2026 年 11 月 1 日至 2027 年 4 月 30 日（最后出发日 2027 年 4 月 28 日）。",
+   "quote": [
+    "In the Great Walks season (1 November 2026 – 30 April 2027 last departure 28 April 2027)"
+   ],
+   "url": "https://www.doc.govt.nz/milfordtrack"
+  },
+  "booking": {
+   "en": "Three huts, booked well in advance in the Great Walks season. Camping is not permitted.",
+   "zh": "沿途 3 间小屋，大步道季须尽早预订。全程禁止露营。",
+   "quote": [
+    "There are three huts on the Milford Track, which must be booked well in advance during the Great Walks season. Camping is not permitted on the Milford Track."
+   ],
+   "url": "https://www.doc.govt.nz/milfordtrack"
+  },
+  "access": {
+   "en": "Transport must be booked in advance; there is no vehicle or private access to either end.",
+   "zh": "交通须提前预订；步道两端都没有车辆或私人通行方式。",
+   "quote": [
+    "Transport must be booked in advance. There is no vehicle or private access to the start/end of the track."
+   ],
+   "url": "https://www.doc.govt.nz/milfordtrack"
+  },
+  "safety": {
+   "en": "Avalanche risk can extend into December.",
+   "zh": "雪崩风险可能持续到 12 月。",
+   "quote": [
+    "The risk of avalanche can extend into December."
+   ],
+   "url": "https://www.doc.govt.nz/milfordtrack"
+  }
+ },
+ "kepler-track": {
+  "distance": {
+   "en": "60 km loop",
+   "zh": "环线 60 公里",
+   "quote": [
+    "60 km loop"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/fiordland/places/fiordland-national-park/things-to-do/tracks/kepler-track/"
+  },
+  "time": {
+   "en": "3–4 days",
+   "zh": "3–4 天",
+   "quote": [
+    "3-4 days"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/fiordland/places/fiordland-national-park/things-to-do/tracks/kepler-track/"
+  },
+  "level": {
+   "en": "Intermediate tramping track; Advanced tramping track (DOC lists both categories)",
+   "zh": "中级徒步道；高级徒步道（DOC 页面同时列出两个等级）",
+   "quote": [
+    "Intermediate tramping track",
+    "Advanced tramping track",
+    "Expert route"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/fiordland/places/fiordland-national-park/things-to-do/tracks/kepler-track/"
+  },
+  "season": {
+   "en": "Great Walks season: 27 October 2026 – 30 April 2027.",
+   "zh": "大步道季：2026 年 10 月 27 日至 2027 年 4 月 30 日。",
+   "quote": [
+    "In the Great Walks season (27 October 2026 – 30 April 2027)"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/fiordland/places/fiordland-national-park/things-to-do/tracks/kepler-track/"
+  },
+  "booking": {
+   "en": "Three huts and two campsites; bookings are required.",
+   "zh": "沿途 3 间小屋、2 处营地，须预订。",
+   "quote": [
+    "There are three huts and two campsites along the Kepler Track, which must be booked well in advance during the Great Walks season.",
+    "Bookings are required for huts and campsites."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/fiordland/places/fiordland-national-park/things-to-do/tracks/kepler-track/"
+  },
+  "access": {
+   "en": "Kepler Track car park is 5 km from Te Anau; Rainbow Reach car park is 12 km. In the Great Walks season shuttle buses run daily to both, and a boat serves Brod Bay.",
+   "zh": "Kepler Track 停车场距蒂阿瑙 5 公里，Rainbow Reach 停车场距蒂阿瑙 12 公里。大步道季每天有接驳巴士到这两处，另有船到 Brod Bay。",
+   "quote": [
+    "Kepler Track car park: 5 km from Te Anau.",
+    "Rainbow Reach car park: 12 km from Te Anau.",
+    "Shuttle buses provide a daily service to the entry and exit points on the track during the Great Walks season. A scheduled boat service also offers transport to Brod Bay."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/fiordland/places/fiordland-national-park/things-to-do/tracks/kepler-track/"
+  },
+  "safety": {
+   "en": "Avalanche risk can last into December; DOC may close the alpine section between Luxmore Hut and Iris Burn Hut.",
+   "zh": "雪崩风险可能持续到 12 月；DOC 可能关闭 Luxmore Hut 至 Iris Burn Hut 的高山段。",
+   "quote": [
+    "The risk of avalanche can extend into December. During the Great Walks season, DOC manages avalanche risk and may close the alpine section between Luxmore Hut and Iris Burn Hut if there is avalanche hazard."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/fiordland/places/fiordland-national-park/things-to-do/tracks/kepler-track/"
+  }
+ },
+ "heaphy-track": {
+  "distance": {
+   "en": "78.4 km one way",
+   "zh": "单程 78.4 公里",
+   "quote": [
+    "78.4 km one way"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/nelson-tasman/places/kahurangi-national-park/things-to-do/tracks/heaphy-track/"
+  },
+  "time": {
+   "en": "4–6 days on foot",
+   "zh": "步行 4–6 天",
+   "quote": [
+    "4-6 days"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/nelson-tasman/places/kahurangi-national-park/things-to-do/tracks/heaphy-track/"
+  },
+  "level": {
+   "en": "Intermediate tramping track",
+   "zh": "中级徒步道（DOC 分级）",
+   "quote": [
+    "Intermediate tramping track"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/nelson-tasman/places/kahurangi-national-park/things-to-do/tracks/heaphy-track/"
+  },
+  "booking": {
+   "en": "Six huts and nine campsites, booked well in advance all year round.",
+   "zh": "沿途 6 间小屋、9 处营地，全年都须尽早预订。",
+   "quote": [
+    "There are 6 huts and 9 campsites, which must be booked well in advance all year round."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/nelson-tasman/places/kahurangi-national-park/things-to-do/tracks/heaphy-track/"
+  },
+  "season": {
+   "en": "Walkable all year with bookings; mountain bikes share the track from 1 May to 30 November.",
+   "zh": "凭预订全年可走；5 月 1 日至 11 月 30 日与山地车共用步道。",
+   "quote": [
+    "All huts and campsites on the Heaphy Track must be booked in advance all year round.",
+    "Mountain bikes are allowed between 1 May and 30 November."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/nelson-tasman/places/kahurangi-national-park/things-to-do/tracks/heaphy-track/"
+  },
+  "access": {
+   "en": "Brown Hut in Golden Bay is 156 km from Nelson; Kōhaihai on the West Coast is 110 km from Westport.",
+   "zh": "黄金湾一端的 Brown Hut 距纳尔逊 156 公里；西海岸一端的 Kōhaihai 距韦斯特波特 110 公里。",
+   "quote": [
+    "Brown Hut in Golden Bay – 156 km from Nelson – at the end of Aorere Valley Rd, or",
+    "Kohaihai on the West Coast – 110 km from Westport – at the end of Kohaihai Rd."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/nelson-tasman/places/kahurangi-national-park/things-to-do/tracks/heaphy-track/"
+  },
+  "safety": {
+   "en": "The section between Saxon and James Mackay huts floods. Do not go on when the track is flooded: wait at Lewis Shelter or Heaphy Hut.",
+   "zh": "Saxon Hut 至 James Mackay Hut 一段容易淹水。步道被淹时不要前进，在 Lewis Shelter 或 Heaphy Hut 等候。",
+   "quote": [
+    "Flood prone area between Saxon and James Mackay huts",
+    "It's not safe to proceed when the track is flooded – you should wait in either Lewis Shelter or Heaphy Hut."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/nelson-tasman/places/kahurangi-national-park/things-to-do/tracks/heaphy-track/"
+  }
+ },
+ "paparoa-track": {
+  "distance": {
+   "en": "55 km one way",
+   "zh": "单程 55 公里",
+   "quote": [
+    "55 km one way"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/west-coast/places/paparoa-national-park/things-to-do/tracks/paparoa-track/"
+  },
+  "time": {
+   "en": "3 days one way",
+   "zh": "单程 3 天",
+   "quote": [
+    "3 days one way"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/west-coast/places/paparoa-national-park/things-to-do/tracks/paparoa-track/"
+  },
+  "level": {
+   "en": "Intermediate tramping track",
+   "zh": "中级徒步道（DOC 分级）",
+   "quote": [
+    "Intermediate tramping track"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/west-coast/places/paparoa-national-park/things-to-do/tracks/paparoa-track/"
+  },
+  "booking": {
+   "en": "All three huts must be booked in advance; there are no campsites on the track.",
+   "zh": "3 间小屋都须提前预订；步道上没有营地。",
+   "quote": [
+    "All three huts must be booked in advance.",
+    "There are no campsites on the track."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/west-coast/places/paparoa-national-park/things-to-do/tracks/paparoa-track/"
+  }
+ },
+ "rakiura-track": {
+  "distance": {
+   "en": "32 km loop",
+   "zh": "环线 32 公里",
+   "quote": [
+    "32 km loop"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/southland/places/stewart-island-rakiura/rakiura-national-park/things-to-do/rakiura-track/"
+  },
+  "time": {
+   "en": "3 days",
+   "zh": "3 天",
+   "quote": [
+    "3 days"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/southland/places/stewart-island-rakiura/rakiura-national-park/things-to-do/rakiura-track/"
+  },
+  "level": {
+   "en": "Intermediate tramping track",
+   "zh": "中级徒步道（DOC 分级）",
+   "quote": [
+    "Intermediate tramping track"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/southland/places/stewart-island-rakiura/rakiura-national-park/things-to-do/rakiura-track/"
+  },
+  "booking": {
+   "en": "All huts and campsites must be booked in advance all year round.",
+   "zh": "所有小屋和营地全年都须提前预订。",
+   "quote": [
+    "All huts and campsites on the Rakiura Track must be booked in advance all year round."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/southland/places/stewart-island-rakiura/rakiura-national-park/things-to-do/rakiura-track/"
+  },
+  "access": {
+   "en": "From Oban you can walk to the start, take a shuttle to Lee Bay, or use a water taxi to the huts.",
+   "zh": "可从奥本步行到起点，也可乘接驳车到 Lee Bay，或乘水上出租车到小屋。",
+   "quote": [
+    "If you prefer not to walk from Oban, shuttles can be used for drop-offs at Lee Bay or water taxis can be used for access to Rakiura Track huts."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/southland/places/stewart-island-rakiura/rakiura-national-park/things-to-do/rakiura-track/"
+  },
+  "safety": {
+   "en": "Muddy stretches up to 500 m long between Port William Hut and North Arm Hut. Carry emergency food in case weather delays you.",
+   "zh": "Port William Hut 至 North Arm Hut 之间有长达 500 米的泥泞路段。请带应急食物，以防天气耽搁行程。",
+   "quote": [
+    "This occurs between Port William Hut to North Arm Hut. The muddy areas can be up to 500 m long and also in smaller sections.",
+    "You will need to carry emergency food supplies in case you are delayed by weather."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/southland/places/stewart-island-rakiura/rakiura-national-park/things-to-do/rakiura-track/"
+  }
+ },
+ "hump-ridge-track": {
+  "distance": {
+   "en": "61.5 km loop",
+   "zh": "环线 61.5 公里",
+   "quote": [
+    "61.5 km loop"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/fiordland/places/fiordland-national-park/things-to-do/tracks/hump-ridge-track/"
+  },
+  "time": {
+   "en": "3 days / 2 nights",
+   "zh": "3 天 2 晚",
+   "quote": [
+    "3 days/2 nights"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/fiordland/places/fiordland-national-park/things-to-do/tracks/hump-ridge-track/"
+  },
+  "level": {
+   "en": "Intermediate tramping track",
+   "zh": "中级徒步道（DOC 分级）",
+   "quote": [
+    "Intermediate tramping track"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/fiordland/places/fiordland-national-park/things-to-do/tracks/hump-ridge-track/"
+  },
+  "booking": {
+   "en": "Bookings are made through the Hump Ridge Trust, not the DOC booking system.",
+   "zh": "通过 Hump Ridge Trust 网站预订，不走 DOC 预订系统。",
+   "quote": [
+    "Hump Ridge Track bookings are made through Hump Ridge Trust website"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/fiordland/places/fiordland-national-park/things-to-do/tracks/hump-ridge-track/"
+  }
+ },
+ "queen-charlotte-track": {
+  "distance": {
+   "en": "73.5 km one way",
+   "zh": "单程 73.5 公里",
+   "quote": [
+    "73.5 km one way"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/marlborough/places/queen-charlotte-sound-totaranui-area/things-to-do/tracks/queen-charlotte-track/"
+  },
+  "time": {
+   "en": "3–5 days",
+   "zh": "3–5 天",
+   "quote": [
+    "3-5 days"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/marlborough/places/queen-charlotte-sound-totaranui-area/things-to-do/tracks/queen-charlotte-track/"
+  },
+  "level": {
+   "en": "Intermediate tramping track",
+   "zh": "中级徒步道（DOC 分级）",
+   "quote": [
+    "Intermediate tramping track"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/marlborough/places/queen-charlotte-sound-totaranui-area/things-to-do/tracks/queen-charlotte-track/"
+  },
+  "booking": {
+   "en": "DOC campsites on the track must be booked at all times of year.",
+   "zh": "步道上的 DOC 营地全年都须预订。",
+   "quote": [
+    "Queen Charlotte Track campsites need to be booked at all times of the year."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/marlborough/places/queen-charlotte-sound-totaranui-area/things-to-do/tracks/queen-charlotte-track/"
+  },
+  "access": {
+   "en": "There is no road to Meretoto / Ship Cove: arrange boat transport to start there.",
+   "zh": "Meretoto / Ship Cove 不通公路，须安排船只前往起点。",
+   "quote": [
+    "There is no road to Meretoto/Ship Cove so you will need to arrange boat transport to start your walk there."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/marlborough/places/queen-charlotte-sound-totaranui-area/things-to-do/tracks/queen-charlotte-track/"
+  },
+  "season": {
+   "en": "The track may close during extreme drought and high fire risk.",
+   "zh": "极端干旱、火险高时步道可能关闭。",
+   "quote": [
+    "During periods of extreme drought and high fire risk, the track may be closed."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/marlborough/places/queen-charlotte-sound-totaranui-area/things-to-do/tracks/queen-charlotte-track/"
+  },
+  "safety": {
+   "en": "Treat, filter or boil all water for 3 minutes: giardia and other waterborne diseases may be present.",
+   "zh": "所有饮水都要处理、过滤或煮沸 3 分钟：水中可能有贾第虫等病原体。",
+   "quote": [
+    "Giardia and other waterborne diseases may be present in the water at the campsites or in the streams. All water should be treated, filtered or boiled for 3 minutes to make it safe to drink."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/marlborough/places/queen-charlotte-sound-totaranui-area/things-to-do/tracks/queen-charlotte-track/"
+  }
+ },
+ "mueller-hut": {
+  "distance": {
+   "en": "5.2 km one way",
+   "zh": "单程 5.2 公里",
+   "quote": [
+    "5.2 km one way"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/canterbury/places/aoraki-mount-cook-national-park/things-to-do/tracks/mueller-hut-route/"
+  },
+  "time": {
+   "en": "4 hr one way",
+   "zh": "单程 4 小时",
+   "quote": [
+    "4 hr one way"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/canterbury/places/aoraki-mount-cook-national-park/things-to-do/tracks/mueller-hut-route/"
+  },
+  "level": {
+   "en": "Advanced tramping track",
+   "zh": "高级徒步道（DOC 分级）",
+   "quote": [
+    "Advanced tramping track"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/canterbury/places/aoraki-mount-cook-national-park/things-to-do/tracks/mueller-hut-route/"
+  },
+  "booking": {
+   "en": "Mueller Hut must be booked.",
+   "zh": "Mueller Hut 须预订。",
+   "quote": [
+    "Bookings are required for Mueller Hut."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/canterbury/places/aoraki-mount-cook-national-park/things-to-do/tracks/mueller-hut-route/"
+  },
+  "safety": {
+   "en": "Snow and ice are possible from March to November; winter needs mountaineering experience. Register your intentions at the visitor centre.",
+   "zh": "3–11 月可能有冰雪；冬季需要登山经验。出发当天须在游客中心登记行程。",
+   "quote": [
+    "There can be snow and ice from March to November.",
+    "Register your intentions at the Aoraki/Mount Cook National Park Visitor Centre on the day you start."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/canterbury/places/aoraki-mount-cook-national-park/things-to-do/tracks/mueller-hut-route/"
+  },
+  "access": {
+   "en": "Starts near White Horse Hill car park; DOC charges for parking ($2.50 per half hour or $25 a day).",
+   "zh": "起点在 White Horse Hill 停车场附近；DOC 收取停车费（每半小时 2.5 纽币或每天 25 纽币）。",
+   "quote": [
+    "DOC charges fees for car parking at White Horse Hill.",
+    "The fees are $2.50 per half hour or $25 a day."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/canterbury/places/aoraki-mount-cook-national-park/things-to-do/tracks/mueller-hut-route/"
+  },
+  "season": {
+   "en": "Summer (December–February) suits people with moderate tramping experience. Winter and spring (April to mid November) bring considerable avalanche danger.",
+   "zh": "夏季（12–2 月）适合有一定徒步经验的人。冬春季（4 月至 11 月中旬）雪崩危险相当大。",
+   "quote": [
+    "Summer (December–February): The route to Mueller Hut offers a mountain experience for anyone with moderate tramping experience – as long as care is taken.",
+    "There is considerable avalanche danger on the Mueller Hut Route during winter and spring (April to mid November)."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/canterbury/places/aoraki-mount-cook-national-park/things-to-do/tracks/mueller-hut-route/"
+  }
+ },
+ "tasman-glacier-view": {
+  "distance": {
+   "en": "1.5 km return",
+   "zh": "往返 1.5 公里",
+   "quote": [
+    "1.5 km return via same track"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/canterbury/places/aoraki-mount-cook-national-park/things-to-do/tracks/tasman-glacier-view-track/"
+  },
+  "time": {
+   "en": "30 min return",
+   "zh": "往返 30 分钟",
+   "quote": [
+    "30 min return"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/canterbury/places/aoraki-mount-cook-national-park/things-to-do/tracks/tasman-glacier-view-track/"
+  },
+  "level": {
+   "en": "Easy to intermediate walking track",
+   "zh": "简易至中级步道（DOC 分级）",
+   "quote": [
+    "Easy to intermediate walking track"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/canterbury/places/aoraki-mount-cook-national-park/things-to-do/tracks/tasman-glacier-view-track/"
+  },
+  "booking": {
+   "en": "No booking is required for the walk.",
+   "zh": "步道本身无需预订。",
+   "quote": [
+    "Bookings are not required for Tasman Glacier View Track."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/canterbury/places/aoraki-mount-cook-national-park/things-to-do/tracks/tasman-glacier-view-track/"
+  }
+ },
+ "lake-marian": {
+  "distance": {
+   "en": "3.1 km one way",
+   "zh": "单程 3.1 公里",
+   "quote": [
+    "3.1 km one way"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/fiordland/places/fiordland-national-park/things-to-do/tracks/lake-marian-track/"
+  },
+  "time": {
+   "en": "1 hr 30 min one way",
+   "zh": "单程 1 小时 30 分钟",
+   "quote": [
+    "1 hr 30 min one way"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/fiordland/places/fiordland-national-park/things-to-do/tracks/lake-marian-track/"
+  },
+  "level": {
+   "en": "Advanced tramping track",
+   "zh": "高级徒步道（DOC 分级）",
+   "quote": [
+    "Advanced tramping track"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/fiordland/places/fiordland-national-park/things-to-do/tracks/lake-marian-track/"
+  },
+  "safety": {
+   "en": "Do not walk around the lake edge in the snow and avalanche season (winter and spring).",
+   "zh": "冰雪和雪崩季节（冬春）不要沿湖边行走。",
+   "quote": [
+    "Do not walk around the lake edge during the snow/avalanche season (winter and spring)."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/fiordland/places/fiordland-national-park/things-to-do/tracks/lake-marian-track/"
+  }
+ },
+ "franz-josef-glacier-walk": {
+  "distance": {
+   "en": "1.7 km return",
+   "zh": "往返 1.7 公里",
+   "quote": [
+    "1.7 km return via same track"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/west-coast/places/westland-tai-poutini-national-park/things-to-do/tracks/franz-josef-glacierka--roimata-o-hine-hukatere-walk/"
+  },
+  "time": {
+   "en": "30 min",
+   "zh": "30 分钟",
+   "quote": [
+    "30 min"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/west-coast/places/westland-tai-poutini-national-park/things-to-do/tracks/franz-josef-glacierka--roimata-o-hine-hukatere-walk/"
+  },
+  "level": {
+   "en": "Easy to intermediate walking track",
+   "zh": "简易至中级步道（DOC 分级）",
+   "quote": [
+    "Easy to intermediate walking track"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/west-coast/places/westland-tai-poutini-national-park/things-to-do/tracks/franz-josef-glacierka--roimata-o-hine-hukatere-walk/"
+  }
+ },
+ "pancake-rocks": {
+  "distance": {
+   "en": "1.1 km loop",
+   "zh": "环线 1.1 公里",
+   "quote": [
+    "1.1 km loop"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/west-coast/places/paparoa-national-park/things-to-do/tracks/pancake-rocks-and-blowholes-walk/"
+  },
+  "time": {
+   "en": "30 min loop",
+   "zh": "环线 30 分钟",
+   "quote": [
+    "30 min loop"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/west-coast/places/paparoa-national-park/things-to-do/tracks/pancake-rocks-and-blowholes-walk/"
+  },
+  "level": {
+   "en": "Wheelchair accessible short walk",
+   "zh": "无障碍短途步道（DOC 分级）",
+   "quote": [
+    "Wheelchair accessible short walk"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/west-coast/places/paparoa-national-park/things-to-do/tracks/pancake-rocks-and-blowholes-walk/"
+  },
+  "access": {
+   "en": "DOC charges for car parking at Punakaiki Pancake Rocks.",
+   "zh": "DOC 在普纳凯基千层岩收取停车费。",
+   "quote": [
+    "DOC charges fees for car parking at Punakaiki Pancake Rocks."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/west-coast/places/paparoa-national-park/things-to-do/tracks/pancake-rocks-and-blowholes-walk/"
+  }
+ },
+ "hokitika-gorge": {
+  "distance": {
+   "en": "1.6 km loop",
+   "zh": "环线 1.6 公里",
+   "quote": [
+    "1.6 km loop"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/west-coast/places/hokitika-gorge-scenic-reserve/things-to-do/tracks/hokitika-gorge-walk/"
+  },
+  "time": {
+   "en": "1 hr 30 min loop",
+   "zh": "环线 1 小时 30 分钟",
+   "quote": [
+    "1 hr 30 min loop"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/west-coast/places/hokitika-gorge-scenic-reserve/things-to-do/tracks/hokitika-gorge-walk/"
+  },
+  "level": {
+   "en": "Wheelchair accessible short walk; Easy to intermediate walking track",
+   "zh": "无障碍短途步道；简易至中级步道（DOC 分级）",
+   "quote": [
+    "Wheelchair accessible short walk",
+    "Easy to intermediate walking track"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/west-coast/places/hokitika-gorge-scenic-reserve/things-to-do/tracks/hokitika-gorge-walk/"
+  },
+  "booking": {
+   "en": "No booking is required for the walk.",
+   "zh": "步道本身无需预订。",
+   "quote": [
+    "Bookings are not required for Hokitika Gorge Track."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/west-coast/places/hokitika-gorge-scenic-reserve/things-to-do/tracks/hokitika-gorge-walk/"
+  }
+ },
+ "ben-lomond": {
+  "distance": {
+   "en": "11 km return",
+   "zh": "往返 11 公里",
+   "quote": [
+    "11 km return via same track"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/otago/places/queenstown-area/things-to-do/ben-lomond-track/"
+  },
+  "time": {
+   "en": "6–8 hr return to Ben Lomond summit from Queenstown",
+   "zh": "从皇后镇往返本洛蒙德山顶 6–8 小时",
+   "quote": [
+    "6-8 hr return to Ben Lomond Summit from Queenstown"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/otago/places/queenstown-area/things-to-do/ben-lomond-track/"
+  },
+  "level": {
+   "en": "Advanced tramping track",
+   "zh": "高级徒步道（DOC 分级）",
+   "quote": [
+    "Advanced tramping track"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/otago/places/queenstown-area/things-to-do/ben-lomond-track/"
+  },
+  "safety": {
+   "en": "In winter you must carry and know how to use alpine equipment (avalanche gear, ice axe, crampons).",
+   "zh": "冬季须携带并会使用高山装备（雪崩装备、冰镐、冰爪）。",
+   "quote": [
+    "In winter you will need to carry and be able to use alpine equipment such as avalanche equipment, ice axe and crampons."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/otago/places/queenstown-area/things-to-do/ben-lomond-track/"
+  }
+ },
+ "isthmus-peak": {
+  "distance": {
+   "en": "16 km return",
+   "zh": "往返 16 公里",
+   "quote": [
+    "16 km return via same track"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/otago/places/wanaka-area/things-to-do/isthmus-peak-track/"
+  },
+  "time": {
+   "en": "5–7 hr return from the Isthmus Peak Track car park",
+   "zh": "从步道停车场往返 5–7 小时",
+   "quote": [
+    "5 to 7 hr return from Isthmus Peak Track car park"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/otago/places/wanaka-area/things-to-do/isthmus-peak-track/"
+  },
+  "level": {
+   "en": "Advanced tramping track",
+   "zh": "高级徒步道（DOC 分级）",
+   "quote": [
+    "Advanced tramping track"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/otago/places/wanaka-area/things-to-do/isthmus-peak-track/"
+  },
+  "season": {
+   "en": "Closed for fawning every year from 20 November to 20 December.",
+   "zh": "每年 11 月 20 日至 12 月 20 日因产鹿季封闭。",
+   "quote": [
+    "Track annually closed for fawning between 20 November and 20 December."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/otago/places/wanaka-area/things-to-do/isthmus-peak-track/"
+  },
+  "safety": {
+   "en": "March to May: safari hunting on Glen Dene Station; stay alert and visible.",
+   "zh": "3–5 月 Glen Dene 牧场有狩猎活动，请保持警觉并穿着醒目。",
+   "quote": [
+    "Safari hunting takes place on Glen Dene Station. Be alert and stay visible, especially during the March to May roar hunting season."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/otago/places/wanaka-area/things-to-do/isthmus-peak-track/"
+  },
+  "access": {
+   "en": "The car park is off SH6, north of Lake Hāwea township, 30 minutes’ drive from Wānaka.",
+   "zh": "停车场在 SH6 旁、哈威亚湖镇以北，距瓦纳卡 30 分钟车程。",
+   "quote": [
+    "Isthmus Peak Track car park is off SH6, north of Lake Hāwea township and 30 minutes drive from Wanaka."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/otago/places/wanaka-area/things-to-do/isthmus-peak-track/"
+  }
+ },
+ "avalanche-peak": {
+  "distance": {
+   "en": "2.5 km one way, 1,100 m vertical climb",
+   "zh": "单程 2.5 公里，垂直爬升 1,100 米",
+   "quote": [
+    "2.5 km, 1,100 m vertical climb one way"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/canterbury/places/arthurs-pass-national-park/things-to-do/tracks/avalanche-peak-route/"
+  },
+  "time": {
+   "en": "3–4 hr to the summit (several route options)",
+   "zh": "登顶 3–4 小时（有多种走法）",
+   "quote": [
+    "Various options, 3-4 hr to summit"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/canterbury/places/arthurs-pass-national-park/things-to-do/tracks/avalanche-peak-route/"
+  },
+  "level": {
+   "en": "Advanced tramping track; Expert route",
+   "zh": "高级徒步道；专家级路线（DOC 分级）",
+   "quote": [
+    "Advanced tramping track",
+    "Expert route"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/canterbury/places/arthurs-pass-national-park/things-to-do/tracks/avalanche-peak-route/"
+  },
+  "season": {
+   "en": "DOC gives summer and autumn as the best season.",
+   "zh": "DOC 标注的最佳季节为夏季和秋季。",
+   "quote": [
+    "Best season: Summer, autumn"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/canterbury/places/arthurs-pass-national-park/things-to-do/tracks/avalanche-peak-route/"
+  }
+ },
+ "waikoropupu-springs": {
+  "distance": {
+   "en": "1 km loop",
+   "zh": "环线 1 公里",
+   "quote": [
+    "1 km loop"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/nelson-tasman/places/takaka-area/things-to-do/tracks/te-waikoropupu-springs-walk/"
+  },
+  "time": {
+   "en": "45 min loop",
+   "zh": "环线 45 分钟",
+   "quote": [
+    "45 min loop"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/nelson-tasman/places/takaka-area/things-to-do/tracks/te-waikoropupu-springs-walk/"
+  },
+  "level": {
+   "en": "Easy to intermediate walking track",
+   "zh": "简易至中级步道（DOC 分级）",
+   "quote": [
+    "Easy to intermediate walking track"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/nelson-tasman/places/takaka-area/things-to-do/tracks/te-waikoropupu-springs-walk/"
+  },
+  "safety": {
+   "en": "Boardwalks and viewing platforms over the springs are unfenced; supervise children.",
+   "zh": "泉水上方的木栈道和观景台没有护栏，请看护好儿童。",
+   "quote": [
+    "There are unfenced boardwalks and viewing platforms over the springs. Supervise children carefully."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/nelson-tasman/places/takaka-area/things-to-do/tracks/te-waikoropupu-springs-walk/"
+  }
+ },
+ "mount-robert-circuit": {
+  "distance": {
+   "en": "9 km loop",
+   "zh": "环线 9 公里",
+   "quote": [
+    "9 km loop"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/nelson-tasman/places/nelson-lakes-national-park/things-to-do/tracks/mount-robert-circuit/"
+  },
+  "time": {
+   "en": "5 hr return",
+   "zh": "往返 5 小时",
+   "quote": [
+    "5 hr return"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/nelson-tasman/places/nelson-lakes-national-park/things-to-do/tracks/mount-robert-circuit/"
+  },
+  "level": {
+   "en": "Advanced tramping track",
+   "zh": "高级徒步道（DOC 分级）",
+   "quote": [
+    "Advanced tramping track"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/nelson-tasman/places/nelson-lakes-national-park/things-to-do/tracks/mount-robert-circuit/"
+  }
+ },
+ "tongariro-northern-circuit": {
+  "distance": {
+   "en": "35.5 km one way",
+   "zh": "单程 35.5 公里",
+   "quote": [
+    "35.5 km one way"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/central-north-island/places/tongariro-national-park/things-to-do/tracks/tongariro-northern-circuit/"
+  },
+  "time": {
+   "en": "3–4 days",
+   "zh": "3–4 天",
+   "quote": [
+    "3-4 days"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/central-north-island/places/tongariro-national-park/things-to-do/tracks/tongariro-northern-circuit/"
+  },
+  "level": {
+   "en": "Intermediate tramping track in the Great Walks season; DOC also lists Advanced tramping track and Expert route",
+   "zh": "大步道季为中级徒步道；DOC 页面另列高级徒步道和专家级路线",
+   "quote": [
+    "Intermediate tramping track",
+    "Advanced tramping track",
+    "Expert route",
+    "Bookings are required for huts and campsites. Intermediate track category."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/central-north-island/places/tongariro-national-park/things-to-do/tracks/tongariro-northern-circuit/"
+  },
+  "season": {
+   "en": "Great Walks season: 23 October 2026 – 30 April 2027. One section is closed after the 2025 Tongariro fire and will not be available this season.",
+   "zh": "大步道季：2026 年 10 月 23 日至 2027 年 4 月 30 日。一段步道因 2025 年汤加里罗山火关闭，本季不开放。",
+   "quote": [
+    "In the Great Walks season (23 October 2026 – 30 April 2027)",
+    "This section of track is closed due to the 2025 Tongariro fire and will not be available for the 2026/27 Great Walk season."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/central-north-island/places/tongariro-national-park/things-to-do/tracks/tongariro-northern-circuit/"
+  },
+  "booking": {
+   "en": "Huts and campsites must be booked year-round.",
+   "zh": "小屋和营地全年都须预订。",
+   "quote": [
+    "Bookings are required for huts and campsites year-round."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/central-north-island/places/tongariro-national-park/things-to-do/tracks/tongariro-northern-circuit/"
+  },
+  "safety": {
+   "en": "Outside the season (May to late October) go only with alpine skills, equipment and experience.",
+   "zh": "季外（5 月至 10 月下旬）仅适合具备高山技能、装备和经验的人。",
+   "quote": [
+    "Walking the track outside the Great Walks season should only be attempted if you have alpine skills, equipment and experience."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/central-north-island/places/tongariro-national-park/things-to-do/tracks/tongariro-northern-circuit/"
+  },
+  "access": {
+   "en": "Parking at Mangatepopo car park is limited to 4 hours in the Great Walks season. DOC advises parking in Whakapapa Village and taking a shuttle.",
+   "zh": "大步道季 Mangatepopo 停车场限停 4 小时。DOC 建议把车停在 Whakapapa Village，再乘接驳车。",
+   "quote": [
+    "Parking at Mangatepopo Carpark is limited to 4 hours during the Great Walk season. It's best to park in Whakapapa Village and take a shuttle to the start or arrange a shuttle from a nearby town."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/central-north-island/places/tongariro-national-park/things-to-do/tracks/tongariro-northern-circuit/"
+  }
+ },
+ "lake-waikaremoana": {
+  "distance": {
+   "en": "46 km one way",
+   "zh": "单程 46 公里",
+   "quote": [
+    "46 km one way"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/east-coast/places/te-urewera/things-to-do/tracks/lake-waikaremoana-great-walk/"
+  },
+  "time": {
+   "en": "3–4 days",
+   "zh": "3–4 天",
+   "quote": [
+    "3 - 4 days"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/east-coast/places/te-urewera/things-to-do/tracks/lake-waikaremoana-great-walk/"
+  },
+  "level": {
+   "en": "Intermediate tramping track",
+   "zh": "中级徒步道（DOC 分级）",
+   "quote": [
+    "Intermediate tramping track"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/east-coast/places/te-urewera/things-to-do/tracks/lake-waikaremoana-great-walk/"
+  },
+  "booking": {
+   "en": "Four huts and five campsites; all must be booked in advance.",
+   "zh": "4 间小屋、5 处营地，都须提前预订。",
+   "quote": [
+    "There are four huts and five campsites on Lake Waikaremoana. These must be booked in advance."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/east-coast/places/te-urewera/things-to-do/tracks/lake-waikaremoana-great-walk/"
+  }
+ },
+ "pouakai-crossing": {
+  "distance": {
+   "en": "19 km one way",
+   "zh": "单程 19 公里",
+   "quote": [
+    "19 km one way"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/taranaki/places/te-papa-kura-o-taranaki/things-to-do/tracks/pouakai-crossing/"
+  },
+  "time": {
+   "en": "7 hr 30 min – 9 hr 30 min",
+   "zh": "7 小时 30 分钟 – 9 小时 30 分钟",
+   "quote": [
+    "7 hr 30 min - 9 hr 30 min"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/taranaki/places/te-papa-kura-o-taranaki/things-to-do/tracks/pouakai-crossing/"
+  },
+  "level": {
+   "en": "Advanced tramping track",
+   "zh": "高级徒步道（DOC 分级）",
+   "quote": [
+    "Advanced tramping track"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/taranaki/places/te-papa-kura-o-taranaki/things-to-do/tracks/pouakai-crossing/"
+  },
+  "access": {
+   "en": "A one-way track: arrange transport at one end. Shuttles are booked directly with operators.",
+   "zh": "单向步道，须安排一端的交通；接驳车直接向运营方预订。",
+   "quote": [
+    "This is a one-way track so you need to arrange transport to and from one end. Shuttle services are available – book directly with an operator."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/taranaki/places/te-papa-kura-o-taranaki/things-to-do/tracks/pouakai-crossing/"
+  },
+  "safety": {
+   "en": "Sections can become impassable in winter because of snow and ice.",
+   "zh": "冬季部分路段可能因冰雪无法通行。",
+   "quote": [
+    "Sections of this track can become impassable in winter conditions due to snow and ice."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/taranaki/places/te-papa-kura-o-taranaki/things-to-do/tracks/pouakai-crossing/"
+  }
+ },
+ "cathedral-cove": {
+  "distance": {
+   "en": "5 km return",
+   "zh": "往返 5 公里",
+   "quote": [
+    "5 km return via same track"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/coromandel/places/hahei-area/tracks/mautohe-cathedral-cove-walk/"
+  },
+  "time": {
+   "en": "1 hr 30 min return",
+   "zh": "往返 1 小时 30 分钟",
+   "quote": [
+    "1 hr 30 min return"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/coromandel/places/hahei-area/tracks/mautohe-cathedral-cove-walk/"
+  },
+  "level": {
+   "en": "Easy to intermediate walking track",
+   "zh": "简易至中级步道（DOC 分级）",
+   "quote": [
+    "Easy to intermediate walking track"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/coromandel/places/hahei-area/tracks/mautohe-cathedral-cove-walk/"
+  },
+  "booking": {
+   "en": "No booking is required for the walk.",
+   "zh": "步道本身无需预订。",
+   "quote": [
+    "Bookings are not required for Mautohe Cathedral Cove Track."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/coromandel/places/hahei-area/tracks/mautohe-cathedral-cove-walk/"
+  },
+  "safety": {
+   "en": "Do not visit during or immediately after heavy rain: landslide risk is high.",
+   "zh": "大雨期间和刚下过大雨后不要前往：滑坡风险高。",
+   "quote": [
+    "during or immediately after heavy rain",
+    "andslide risk is"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/coromandel/places/hahei-area/tracks/mautohe-cathedral-cove-walk/"
+  },
+  "access": {
+   "en": "Park at Hahei Visitor Car Park (1.2 km along Hahei Beach Road); it is a 30-minute walk from there to the track entrance.",
+   "zh": "把车停在 Hahei Visitor Car Park（沿 Hahei Beach Road 走 1.2 公里），从那里步行 30 分钟到步道入口。",
+   "quote": [
+    "Turn right onto Hahei Beach Road and continue for 1.2 km. Hahei Visitor Car Park is signposted on your right.",
+    "It takes 30 min to walk from the car park to the track entrance."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/coromandel/places/hahei-area/tracks/mautohe-cathedral-cove-walk/"
+  }
+ },
+ "tane-mahuta": {
+  "distance": {
+   "en": "166 m one way",
+   "zh": "单程 166 米",
+   "quote": [
+    "166 m one way"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/northland/places/waipoua-forest/things-to-do/tane-mahuta-walk/"
+  },
+  "time": {
+   "en": "5 min one way",
+   "zh": "单程 5 分钟",
+   "quote": [
+    "5 min one way"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/northland/places/waipoua-forest/things-to-do/tane-mahuta-walk/"
+  },
+  "level": {
+   "en": "Wheelchair accessible short walk",
+   "zh": "无障碍短途步道（DOC 分级）",
+   "quote": [
+    "Wheelchair accessible short walk"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/northland/places/waipoua-forest/things-to-do/tane-mahuta-walk/"
+  },
+  "season": {
+   "en": "Open 9 am to 4 pm daily.",
+   "zh": "每天上午 9 点至下午 4 点开放。",
+   "quote": [
+    "It is open 9 am to 4 pm daily."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/northland/places/waipoua-forest/things-to-do/tane-mahuta-walk/"
+  }
+ },
+ "pinnacles-kauaeranga": {
+  "distance": {
+   "en": "6 km one way",
+   "zh": "单程 6 公里",
+   "quote": [
+    "6 km one way"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/coromandel/places/coromandel-forest-park/things-to-do/kauaeranga-kauri-trail/"
+  },
+  "time": {
+   "en": "3 hr one way",
+   "zh": "单程 3 小时",
+   "quote": [
+    "3 hr one way"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/coromandel/places/coromandel-forest-park/things-to-do/kauaeranga-kauri-trail/"
+  },
+  "level": {
+   "en": "Intermediate tramping track",
+   "zh": "中级徒步道（DOC 分级）",
+   "quote": [
+    "Intermediate tramping track"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/coromandel/places/coromandel-forest-park/things-to-do/kauaeranga-kauri-trail/"
+  }
+ },
+ "tama-lakes": {
+  "distance": {
+   "en": "17.6 km return",
+   "zh": "往返 17.6 公里",
+   "quote": [
+    "17. 6 km return via same track"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/central-north-island/places/tongariro-national-park/things-to-do/tracks/tama-lakes-track/"
+  },
+  "time": {
+   "en": "5–6 hr return to Lower Tama Lake",
+   "zh": "往返下塔马湖 5–6 小时",
+   "quote": [
+    "5-6 hr (to Lower Tama Lake)"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/central-north-island/places/tongariro-national-park/things-to-do/tracks/tama-lakes-track/"
+  },
+  "level": {
+   "en": "Intermediate tramping track",
+   "zh": "中级徒步道（DOC 分级）",
+   "quote": [
+    "Intermediate tramping track"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/central-north-island/places/tongariro-national-park/things-to-do/tracks/tama-lakes-track/"
+  },
+  "safety": {
+   "en": "The side trip to the Upper Tama Lake lookout needs winter alpine skills and equipment when there is snow and ice.",
+   "zh": "有冰雪时，去上塔马湖观景点的支线需要冬季高山技能和装备。",
+   "quote": [
+    "Winter alpine skills and equipment needed for the side trip to the Upper Tama Lake lookout when snow and ice are present."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/central-north-island/places/tongariro-national-park/things-to-do/tracks/tama-lakes-track/"
+  }
+ },
+ "te-paki-coastal": {
+  "distance": {
+   "en": "48 km one way",
+   "zh": "单程 48 公里",
+   "quote": [
+    "48 km total one way"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/northland/places/te-paki-recreation-reserve/things-to-do/tracks/te-paki-coastal-track/"
+  },
+  "time": {
+   "en": "4–5 days",
+   "zh": "4–5 天",
+   "quote": [
+    "4-5 days, see individual track descriptions for times"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/northland/places/te-paki-recreation-reserve/things-to-do/tracks/te-paki-coastal-track/"
+  },
+  "level": {
+   "en": "Advanced tramping track",
+   "zh": "高级徒步道（DOC 分级）",
+   "quote": [
+    "Advanced tramping track"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/northland/places/te-paki-recreation-reserve/things-to-do/tracks/te-paki-coastal-track/"
+  },
+  "safety": {
+   "en": "Beaches along the track are dangerous for swimming (rough seas, strong currents); rescue is over an hour away.",
+   "zh": "沿途海滩不宜游泳（浪大、流急）；救援站点在一小时以外。",
+   "quote": [
+    "Be aware that the beaches along the track and at campsites are challenging place for swimming and can be dangerous.",
+    "The nearest surf lifesaving and coastguard stations are over an hour away"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/northland/places/te-paki-recreation-reserve/things-to-do/tracks/te-paki-coastal-track/"
+  }
+ },
+ "whanganui-journey": {
+  "distance": {
+   "en": "88 km or 145 km one way",
+   "zh": "单程 88 公里或 145 公里",
+   "quote": [
+    "88 km or 145 km one way"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/manawatu-whanganui/places/whanganui-national-park/things-to-do/tracks/whanganui-journey/"
+  },
+  "time": {
+   "en": "3 days (Whakahoro to Pipiriki) or 5 days (Taumarunui to Pipiriki), DOC average canoe times",
+   "zh": "3 天（Whakahoro 至 Pipiriki）或 5 天（Taumarunui 至 Pipiriki），为 DOC 给出的平均划行天数",
+   "quote": [
+    "3 or 5 days",
+    "The full Whanganui Journey is 145 km, from Taumarunui to Pipiriki. It takes an average of 5 days to canoe.",
+    "A popular shorter version is 88 km, from Whakahoro to Pipiriki. This is the most scenic section of the river and takes an average of 3 days to canoe."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/manawatu-whanganui/places/whanganui-national-park/things-to-do/tracks/whanganui-journey/"
+  },
+  "level": {
+   "en": "Suitable for people with good fitness and confidence with a canoe; be fit enough to paddle 6–7 hours a day (8+ in low river flows)",
+   "zh": "适合体能好、能熟练驾驭独木舟的人；需能每天划 6–7 小时（河水低时 8 小时以上）",
+   "quote": [
+    "This trip is suitable for people with good fitness and confidence with a canoe.",
+    "be fit enough to paddle for 6 to 7 hours in a day (in low river flows this will be 8+ hours)"
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/manawatu-whanganui/places/whanganui-national-park/things-to-do/tracks/whanganui-journey/",
+   "note": "DOC gives no track grade for a river journey; this is DOC's own fitness wording."
+  },
+  "season": {
+   "en": "Great Walks season 1 October – 30 April is the best time. From 1 May to 30 September go only if you are very experienced in canoeing remote New Zealand rivers in winter.",
+   "zh": "大步道季 10 月 1 日至 4 月 30 日是最佳时间。5 月 1 日至 9 月 30 日只有在冬季划行新西兰偏远河流经验非常丰富的人才应前往。",
+   "quote": [
+    "In the Great Walks season (1 October – 30 April)",
+    "Best time to experience the trip. Bookings are required for huts and campsites.",
+    "Outside the Great Walks season (1 May – 30 September)",
+    "Only attempt the trip at this time if you are very experienced in canoeing remote New Zealand rivers in winter."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/manawatu-whanganui/places/whanganui-national-park/things-to-do/tracks/whanganui-journey/"
+  },
+  "booking": {
+   "en": "In the Great Walks season huts and campsites must be booked in advance and paid at booking. Outside the season they cannot be booked: first come, first served.",
+   "zh": "大步道季小屋和营地须提前预订，预订时付费。季外不能预订，先到先得。",
+   "quote": [
+    "In the Great Walks season huts and campsites must be booked in advance. Fees are paid at the time of booking.",
+    "Outside the Great Walks season huts and campsites cannot be booked and are first come, first served."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/manawatu-whanganui/places/whanganui-national-park/things-to-do/tracks/whanganui-journey/"
+  },
+  "access": {
+   "en": "Start at Ohinepane Campsite (Whanganui River Road, SH43) or Whakahoro (about 43 km on rough, narrow Oio Road from SH4 near Ōwhango). Most trips end at Pipiriki: about 76 km from Whanganui by Whanganui River Road, or 27 km from Raetihi by Pipiriki Raetihi Road.",
+   "zh": "起点可选 Ohinepane 营地（Whanganui River Road，SH43）或 Whakahoro（从 Ōwhango 附近的 SH4 转入 Oio Road，约 43 公里，路窄且颠簸）。终点通常是 Pipiriki：从旺格努伊沿 Whanganui River Road 约 76 公里，或从 Raetihi 走 Pipiriki Raetihi Road 约 27 公里。",
+   "quote": [
+    "Ohinepane Campsite, accessed from Whanganui River Road (State Highway 43).",
+    "Whakahoro, accessed from Oio Road. Turn off State Highway 4 near Ōwhango onto Oio Road. Follow Oio Road for around 43km to Whakahoro. This road is rough, narrow and winding – drive with care and plan plenty of time.",
+    "Pipiriki is the usual end of the Whanganui Journey. Access Pipiriki from Whanganui by following Whanganui River Road (around 76km), or from Raetihi on State Highway 4 by following the Pipiriki Raetihi Road (around 27km)."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/manawatu-whanganui/places/whanganui-national-park/things-to-do/tracks/whanganui-journey/"
+  },
+  "safety": {
+   "en": "Not an experienced canoeist, or travelling alone: book a guided trip. If you cannot swim or are not fit enough, do not paddle. If the river rises or floods, stay at your hut or campsite until it drops.",
+   "zh": "没有独木舟经验或独自出行：请参加有向导的行程。不会游泳或体能不够，不要下水。河水上涨或发洪水时，留在小屋或营地等水位回落。",
+   "quote": [
+    "If you aren't an experienced canoe user or are travelling alone, book a guided trip instead. If you can't swim or aren't fit enough, don't risk paddling.",
+    "Keep an eye on the weather and the river. If the river starts rising or is in flood, stay at your campground or hut until the river levels drop."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/manawatu-whanganui/places/whanganui-national-park/things-to-do/tracks/whanganui-journey/"
+  }
+ },
+ "ni-escarpment": {
+  "distance": {
+   "en": "9.5 km one way",
+   "zh": "单程 9.5 公里",
+   "quote": [
+    "Paekakariki Escarpment Track - 9.5km"
+   ],
+   "url": "https://www.teararoa.org.nz/sections/escarpment-track/"
+  },
+  "time": {
+   "en": "3–4 hours",
+   "zh": "3–4 小时",
+   "quote": [
+    "3 to 4 hours"
+   ],
+   "url": "https://www.teararoa.org.nz/sections/escarpment-track/"
+  }
+ },
+ "ni-hauraki": {
+  "distance": {
+   "en": "34 km one way (includes the Thames–Kōpū spur)",
+   "zh": "单程 34 公里（含 Thames–Kōpū 支线）",
+   "quote": [
+    "34km, Grade 1/easiest, 3–4 hours",
+    "the total distance given above (34km) includes the spur section between Thames and Kopu"
+   ],
+   "url": "https://www.nzcycletrail.com/find-your-ride/23-great-rides/hauraki-rail-trail"
+  },
+  "time": {
+   "en": "3–4 hours",
+   "zh": "3–4 小时",
+   "quote": [
+    "34km, Grade 1/easiest, 3–4 hours",
+    "the total distance given above (34km) includes the spur section between Thames and Kopu"
+   ],
+   "url": "https://www.nzcycletrail.com/find-your-ride/23-great-rides/hauraki-rail-trail"
+  },
+  "level": {
+   "en": "Grade 1 / easiest",
+   "zh": "1 级：最简易（NZCT 分级）",
+   "quote": [
+    "34km, Grade 1/easiest, 3–4 hours",
+    "the total distance given above (34km) includes the spur section between Thames and Kopu"
+   ],
+   "url": "https://www.nzcycletrail.com/find-your-ride/23-great-rides/hauraki-rail-trail"
+  }
+ },
+ "ni-k2k": {
+  "distance": {
+   "en": "19.5 km one way",
+   "zh": "单程 19.5 公里",
+   "quote": [
+    "19.5km, Grade 3/intermediate, 2.5–3.5 hours"
+   ],
+   "url": "https://www.nzcycletrail.com/find-your-ride/23-great-rides/great-lake-trail"
+  },
+  "time": {
+   "en": "2.5–3.5 hours",
+   "zh": "2.5–3.5 小时",
+   "quote": [
+    "19.5km, Grade 3/intermediate, 2.5–3.5 hours"
+   ],
+   "url": "https://www.nzcycletrail.com/find-your-ride/23-great-rides/great-lake-trail"
+  },
+  "level": {
+   "en": "Grade 3 / intermediate",
+   "zh": "3 级：中级（NZCT 分级）",
+   "quote": [
+    "19.5km, Grade 3/intermediate, 2.5–3.5 hours"
+   ],
+   "url": "https://www.nzcycletrail.com/find-your-ride/23-great-rides/great-lake-trail"
+  }
+ },
+ "ni-timber": {
+  "distance": {
+   "en": "85 km one way (40 km + 45 km over two days)",
+   "zh": "单程 85 公里（两天分别 40、45 公里）",
+   "quote": [
+    "85km, intermediate, 8–14 hours",
+    "40km, Grade 3 intermediate, 4–7 hours",
+    "45km, Grade 3 intermediate, 4–7 hours"
+   ],
+   "url": "https://www.nzcycletrail.com/find-your-ride/23-great-rides/timber-trail"
+  },
+  "time": {
+   "en": "8–14 hours of riding over two days",
+   "zh": "两天共骑行 8–14 小时",
+   "quote": [
+    "85km, intermediate, 8–14 hours",
+    "40km, Grade 3 intermediate, 4–7 hours",
+    "45km, Grade 3 intermediate, 4–7 hours"
+   ],
+   "url": "https://www.nzcycletrail.com/find-your-ride/23-great-rides/timber-trail"
+  },
+  "level": {
+   "en": "Grade 3 / intermediate",
+   "zh": "3 级：中级（NZCT 分级）",
+   "quote": [
+    "85km, intermediate, 8–14 hours",
+    "40km, Grade 3 intermediate, 4–7 hours",
+    "45km, Grade 3 intermediate, 4–7 hours"
+   ],
+   "url": "https://www.nzcycletrail.com/find-your-ride/23-great-rides/timber-trail"
+  }
+ },
+ "ni-remutaka": {
+  "distance": {
+   "en": "25 km one way",
+   "zh": "单程 25 公里",
+   "quote": [
+    "25km, Grade 2–3/easy–intermediate, 3–4 hours"
+   ],
+   "url": "https://www.nzcycletrail.com/find-your-ride/23-great-rides/remutaka-cycle-trail"
+  },
+  "time": {
+   "en": "3–4 hours",
+   "zh": "3–4 小时",
+   "quote": [
+    "25km, Grade 2–3/easy–intermediate, 3–4 hours"
+   ],
+   "url": "https://www.nzcycletrail.com/find-your-ride/23-great-rides/remutaka-cycle-trail"
+  },
+  "level": {
+   "en": "Grade 2–3 / easy–intermediate",
+   "zh": "2–3 级：简易至中级（NZCT 分级）",
+   "quote": [
+    "25km, Grade 2–3/easy–intermediate, 3–4 hours"
+   ],
+   "url": "https://www.nzcycletrail.com/find-your-ride/23-great-rides/remutaka-cycle-trail"
+  },
+  "safety": {
+   "en": "Grade 3 hazards between Siberia Bridge and Western Lake Road: steep, narrow, two-way, loose gravel and drop-offs.",
+   "zh": "Siberia Bridge 至 Western Lake Road 一段为 3 级：坡陡、路窄、双向通行，有松散碎石和陡坎。",
+   "quote": [
+    "The trail is grade 3 between Siberia Bridge and Western Lake Rd – hazards include steep grade, narrow, two-way, loose gravel, drop-offs."
+   ],
+   "url": "https://www.nzcycletrail.com/find-your-ride/23-great-rides/remutaka-cycle-trail"
+  }
+ },
+ "ni-twincoast": {
+  "distance": {
+   "en": "42 km one way",
+   "zh": "单程 42 公里",
+   "quote": [
+    "42km, easy-intermediate, 3-5 hours"
+   ],
+   "url": "https://www.nzcycletrail.com/find-your-ride/23-great-rides/pou-herenga-tai-twin-coast-cycle-trail"
+  },
+  "time": {
+   "en": "3–5 hours",
+   "zh": "3–5 小时",
+   "quote": [
+    "42km, easy-intermediate, 3-5 hours"
+   ],
+   "url": "https://www.nzcycletrail.com/find-your-ride/23-great-rides/pou-herenga-tai-twin-coast-cycle-trail"
+  },
+  "level": {
+   "en": "Easy to intermediate",
+   "zh": "简易至中级（NZCT）",
+   "quote": [
+    "42km, easy-intermediate, 3-5 hours"
+   ],
+   "url": "https://www.nzcycletrail.com/find-your-ride/23-great-rides/pou-herenga-tai-twin-coast-cycle-trail"
+  }
+ },
+ "ni-motu-dunes": {
+  "distance": {
+   "en": "20 km return",
+   "zh": "往返 20 公里",
+   "quote": [
+    "20km return, Grade 2/easy, 1.5–3 hours"
+   ],
+   "url": "https://www.nzcycletrail.com/find-your-ride/23-great-rides/motu-trails"
+  },
+  "time": {
+   "en": "1.5–3 hours",
+   "zh": "1.5–3 小时",
+   "quote": [
+    "20km return, Grade 2/easy, 1.5–3 hours"
+   ],
+   "url": "https://www.nzcycletrail.com/find-your-ride/23-great-rides/motu-trails"
+  },
+  "level": {
+   "en": "Grade 2 / easy",
+   "zh": "2 级：简易（NZCT 分级）",
+   "quote": [
+    "20km return, Grade 2/easy, 1.5–3 hours"
+   ],
+   "url": "https://www.nzcycletrail.com/find-your-ride/23-great-rides/motu-trails"
+  }
+ },
+ "otago": {
+  "distance": {
+   "en": "152 km one way",
+   "zh": "单程 152 公里",
+   "quote": [
+    "152km"
+   ],
+   "url": "https://www.nzcycletrail.com/find-your-ride/23-great-rides/otago-central-rail-trail"
+  },
+  "time": {
+   "en": "1–5 days",
+   "zh": "1–5 天",
+   "quote": [
+    "/ 1–5 days"
+   ],
+   "url": "https://www.nzcycletrail.com/find-your-ride/23-great-rides/otago-central-rail-trail"
+  },
+  "level": {
+   "en": "Grade 1 / easiest",
+   "zh": "1 级：最简易（NZCT 分级）",
+   "quote": [
+    "25km, Grade 1/easiest, 2–2.5 hours"
+   ],
+   "url": "https://www.nzcycletrail.com/find-your-ride/23-great-rides/otago-central-rail-trail"
+  }
+ },
+ "wilderness": {
+  "distance": {
+   "en": "31 km one way",
+   "zh": "单程 31 公里",
+   "quote": [
+    "31km, Grade 2/easy, 2–4 hours"
+   ],
+   "url": "https://www.nzcycletrail.com/find-your-ride/23-great-rides/west-coast-wilderness-trail"
+  },
+  "time": {
+   "en": "2–4 hours",
+   "zh": "2–4 小时",
+   "quote": [
+    "31km, Grade 2/easy, 2–4 hours"
+   ],
+   "url": "https://www.nzcycletrail.com/find-your-ride/23-great-rides/west-coast-wilderness-trail"
+  },
+  "level": {
+   "en": "Grade 2 / easy",
+   "zh": "2 级：简易（NZCT 分级）",
+   "quote": [
+    "31km, Grade 2/easy, 2–4 hours"
+   ],
+   "url": "https://www.nzcycletrail.com/find-your-ride/23-great-rides/west-coast-wilderness-trail"
+  }
+ },
+ "greattaste": {
+  "distance": {
+   "en": "16 km one way (32 km return)",
+   "zh": "单程 16 公里（往返 32 公里）",
+   "quote": [
+    "16km, Grade 2/easy, 1–2 hours",
+    "32km, easy, 2–3 hours"
+   ],
+   "url": "https://www.nzcycletrail.com/find-your-ride/23-great-rides/tasmans-great-taste-trail"
+  },
+  "time": {
+   "en": "1–2 hours one way (2–3 hours return)",
+   "zh": "单程 1–2 小时（往返 2–3 小时）",
+   "quote": [
+    "16km, Grade 2/easy, 1–2 hours",
+    "32km, easy, 2–3 hours"
+   ],
+   "url": "https://www.nzcycletrail.com/find-your-ride/23-great-rides/tasmans-great-taste-trail"
+  },
+  "level": {
+   "en": "Grade 2 / easy",
+   "zh": "2 级：简易（NZCT 分级）",
+   "quote": [
+    "16km, Grade 2/easy, 1–2 hours",
+    "32km, easy, 2–3 hours"
+   ],
+   "url": "https://www.nzcycletrail.com/find-your-ride/23-great-rides/tasmans-great-taste-trail"
+  }
+ },
+ "alps2ocean": {
+  "distance": {
+   "en": "54 km one way",
+   "zh": "单程 54 公里",
+   "quote": [
+    "54km, Grade 2/easy, 4–5 hours"
+   ],
+   "url": "https://www.nzcycletrail.com/find-your-ride/23-great-rides/alps-2-ocean"
+  },
+  "time": {
+   "en": "4–5 hours",
+   "zh": "4–5 小时",
+   "quote": [
+    "54km, Grade 2/easy, 4–5 hours"
+   ],
+   "url": "https://www.nzcycletrail.com/find-your-ride/23-great-rides/alps-2-ocean"
+  },
+  "level": {
+   "en": "Grade 2 / easy",
+   "zh": "2 级：简易（NZCT 分级）",
+   "quote": [
+    "54km, Grade 2/easy, 4–5 hours"
+   ],
+   "url": "https://www.nzcycletrail.com/find-your-ride/23-great-rides/alps-2-ocean"
+  }
+ },
+ "queenstowncycle": {
+  "distance": {
+   "en": "9 km one way",
+   "zh": "单程 9 公里",
+   "quote": [
+    "9km, Grade 2/easy, 2 hours"
+   ],
+   "url": "https://www.nzcycletrail.com/find-your-ride/23-great-rides/queenstown-trail"
+  },
+  "time": {
+   "en": "2 hours",
+   "zh": "2 小时",
+   "quote": [
+    "9km, Grade 2/easy, 2 hours"
+   ],
+   "url": "https://www.nzcycletrail.com/find-your-ride/23-great-rides/queenstown-trail"
+  },
+  "level": {
+   "en": "Grade 2 / easy",
+   "zh": "2 级：简易（NZCT 分级）",
+   "quote": [
+    "9km, Grade 2/easy, 2 hours"
+   ],
+   "url": "https://www.nzcycletrail.com/find-your-ride/23-great-rides/queenstown-trail"
+  },
+  "safety": {
+   "en": "Steep drops beside the track in places, and two crossings of the 100 km/h Gibbston Highway: stop, give way and walk the bike across.",
+   "zh": "部分路段旁有陡坎；两次横穿限速 100 公里的 Gibbston Highway，须停车让行，建议下车推行。",
+   "quote": [
+    "Steep drops beside the track in places. Two road crossings of Gibbston Highway (100km/hr) — stop and give way to traffic. We recommend dismounting to cross."
+   ],
+   "url": "https://www.queenstowntrails.org.nz/trails/gibbston-river-trail"
+  },
+  "access": {
+   "en": "Main start: AJ Hackett Kawarau Bridge Bungy Centre, 23.3 km from Queenstown on SH6, with parking beside it.",
+   "zh": "主要起点：AJ Hackett 卡瓦劳大桥蹦极中心，沿 SH6 距皇后镇 23.3 公里，旁边可停车。",
+   "quote": [
+    "Main starting point: AJ Hackett Kawarau Bridge Bungy Centre, 23.3km from Queenstown on SH6. Parking available next to the Bungy Centre."
+   ],
+   "url": "https://www.queenstowntrails.org.nz/trails/gibbston-river-trail"
+  }
+ },
+ "dunstan": {
+  "distance": {
+   "en": "41 km one way",
+   "zh": "单程 41 公里",
+   "quote": [
+    "the full, one-way journey from Cromwell to Clyde (41km)"
+   ],
+   "url": "https://www.nzcycletrail.com/find-your-ride/23-great-rides/lake-dunstan-trail"
+  },
+  "level": {
+   "en": "Grade 2–3 / easy to intermediate; riders need to be confident on Grade 3 trails",
+   "zh": "2–3 级：简易至中级；须能应付 3 级越野路段（NZCT 分级）",
+   "quote": [
+    "11.3km, Grade 2–3/easy–intermediate, 1–1.5 hours",
+    "be confident biking off-road on grade 3 (intermediate) trails"
+   ],
+   "url": "https://www.nzcycletrail.com/find-your-ride/23-great-rides/lake-dunstan-trail"
+  }
+ },
+ "ni-wellingtonnapier": {
+  "time": {
+   "en": "About 6 hours (InterCity also quotes 6 hr 15 min)",
+   "zh": "约 6 小时（InterCity 另一处写 6 小时 15 分钟）",
+   "quote": [
+    "The journey from Wellington to Napier takes approximately 6 hours",
+    "in just 6 hours and 15 minutes"
+   ],
+   "url": "https://www.intercity.co.nz/north-island-buses/bus-wellington-to-napier"
+  },
+  "access": {
+   "en": "Departs from Platform 10 at Wellington Railway Station.",
+   "zh": "在惠灵顿火车站 10 号站台发车。",
+   "quote": [
+    "Buses to Napier depart from Platform 10 of the Wellington Railway Station"
+   ],
+   "url": "https://www.intercity.co.nz/north-island-buses/bus-wellington-to-napier"
+  }
+ },
+ "ni-rotoruataupo": {
+  "time": {
+   "en": "About 1 hr 15 min",
+   "zh": "约 1 小时 15 分钟",
+   "quote": [
+    "The bus journey from Rotorua to Taupo takes approximately one hour 15 minutes."
+   ],
+   "url": "https://www.intercity.co.nz/north-island-buses/bus-rotorua-to-taupo"
+  },
+  "access": {
+   "en": "Departs Tourism Rotorua, 1167 Fenton St; arrives outside the Taupō i-SITE, 30 Tongariro St.",
+   "zh": "从 Tourism Rotorua（1167 Fenton St）发车，到陶波 i-SITE（30 Tongariro St）门外。",
+   "quote": [
+    "Buses to Taupo depart from Tourism Rotorua, 1167 Fenton St,",
+    "and arrive in Taupo outside the i-SITE located at 30 Tongariro St."
+   ],
+   "url": "https://www.intercity.co.nz/north-island-buses/bus-rotorua-to-taupo"
+  }
+ },
+ "ni-aucklandpaihia": {
+  "time": {
+   "en": "About 4 hours",
+   "zh": "约 4 小时",
+   "quote": [
+    "The bus journey takes approximately 4 hours"
+   ],
+   "url": "https://www.intercity.co.nz/north-island-buses/bus-auckland-to-paihia"
+  },
+  "access": {
+   "en": "Daily from InterCity's SkyCity Terminal, 102 Hobson Street, Auckland, to the Paihia Maritime Building by the wharf.",
+   "zh": "每天从奥克兰 Hobson Street 102 号的 InterCity SkyCity 车站发车，到派希亚码头旁的 Maritime Building。",
+   "quote": [
+    "Buses depart daily from InterCity's SkyCity Terminal at 102 Hobson Street, Auckland City, and arrive at the Paihia Maritime Building right by the wharf."
+   ],
+   "url": "https://www.intercity.co.nz/north-island-buses/bus-auckland-to-paihia"
+  }
+ },
+ "bus": {
+  "time": {
+   "en": "About 8 hr 10 min",
+   "zh": "约 8 小时 10 分钟",
+   "quote": [
+    "The journey takes approximately 8 hours and 10 minutes."
+   ],
+   "url": "https://www.intercity.co.nz/south-island-buses/bus-christchurch-to-queenstown"
+  },
+  "access": {
+   "en": "Leaves from the Christchurch Bus Exchange on Lichfield St; arrives at Athol Street, Queenstown.",
+   "zh": "从基督城 Lichfield St 的 Bus Exchange 发车，到皇后镇 Athol Street。",
+   "quote": [
+    "Buses leave from the Christchurch Bus Exchange on Lichfield St and arrive in Queenstown at Athol Street"
+   ],
+   "url": "https://www.intercity.co.nz/south-island-buses/bus-christchurch-to-queenstown"
+  }
+ },
+ "pictonnelson": {
+  "time": {
+   "en": "About 2 hr 20 min",
+   "zh": "约 2 小时 20 分钟",
+   "quote": [
+    "The journey from Picton to Nelson takes approximately 2 hours and 20 minutes."
+   ],
+   "url": "https://www.intercity.co.nz/south-island-buses/bus-picton-to-nelson"
+  },
+  "access": {
+   "en": "Departs from outside the Picton ferry terminal and connects with Interislander ferries from Wellington.",
+   "zh": "在皮克顿渡轮码头外发车，可衔接从惠灵顿来的 Interislander 渡轮。",
+   "quote": [
+    "Buses depart from outside the Picton Ferry terminal and connect with Interislander ferry services from Wellington."
+   ],
+   "url": "https://www.intercity.co.nz/south-island-buses/bus-picton-to-nelson"
+  }
+ },
+ "teanaubus": {
+  "time": {
+   "en": "About 2 hr 30 min",
+   "zh": "约 2 小时 30 分钟",
+   "quote": [
+    "the journey will take approximately 2 hours and 30 minutes"
+   ],
+   "url": "https://www.intercity.co.nz/south-island-buses/bus-queenstown-to-te-anau"
+  },
+  "access": {
+   "en": "Departs from the Athol Street car park, Queenstown; arrives at Kiwi Country Cafe, 2 Miro Street, Te Anau.",
+   "zh": "从皇后镇 Athol Street 停车场发车，到蒂阿瑙 Miro Street 2 号的 Kiwi Country Cafe。",
+   "quote": [
+    "Buses to Te Anau depart from the carpark in Athol Street, Queenstown and arrive at the Kiwi Country Cafe, 2 Miro Street, Te Anau."
+   ],
+   "url": "https://www.intercity.co.nz/south-island-buses/bus-queenstown-to-te-anau"
+  }
+ },
+ "dunedinbus": {
+  "time": {
+   "en": "About 6 hours",
+   "zh": "约 6 小时",
+   "quote": [
+    "The bus journey takes approximately 6 hours"
+   ],
+   "url": "https://www.intercity.co.nz/south-island-buses/bus-dunedin-to-christchurch"
+  }
+ },
+ "coastal": {
+  "season": {
+   "en": "Daily seasonal service from 1 September to 30 April; does not run on Christmas Day.",
+   "zh": "季节性班次，9 月 1 日至 4 月 30 日每天开行；圣诞节当天停运。",
+   "quote": [
+    "It is a daily seasonal service from September 1st until April 30th. It does not run on Christmas Day."
+   ],
+   "url": "https://www.greatjourneysnz.com/scenic-trains/coastal-pacific-train/"
+  }
+ },
+ "ni-northernexplorer": {
+  "season": {
+   "en": "Southbound Monday, Thursday and Saturday; northbound Wednesday, Friday and Sunday. Check Great Journeys for non-operating dates.",
+   "zh": "南下：周一、周四、周六；北上：周三、周五、周日。停运日期请查 Great Journeys。",
+   "quote": [
+    "trains depart southbound on Monday, Thursday and Saturday.",
+    "trains depart northbound on Friday, Sunday, and Wednesday."
+   ],
+   "url": "https://www.greatjourneysnz.com/scenic-trains/northern-explorer-train/"
+  }
+ },
+ "aorakidrive": {
+  "time": {
+   "en": "About 4.5 hours' drive from Christchurch without stops (DOC)",
+   "zh": "从基督城出发，不含停留约 4.5 小时车程（DOC）",
+   "quote": [
+    "It is a 3.5 hour drive from Queenstown and a 4.5 hour drive from Christchurch."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/canterbury/places/aoraki-mount-cook-national-park"
+  },
+  "access": {
+   "en": "Reached by State Highway 8, then State Highway 80 to its end.",
+   "zh": "走 8 号国道，再沿 80 号国道到尽头。",
+   "quote": [
+    "It is accessed off State Highway 8 at the end of State Highway 80."
+   ],
+   "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/canterbury/places/aoraki-mount-cook-national-park"
+  }
+ },
+ "milford": {
+  "distance": {
+   "en": "120 km each way",
+   "zh": "单程 120 公里",
+   "quote": [
+    "120 km journey into the heart of Fiordland National Park"
+   ],
+   "url": "https://www.doc.govt.nz/globalassets/documents/parks-and-recreation/tracks-and-walks/fiordland/te-anau-milford-highway-brochure.pdf",
+   "note": "PDF brochure; sentence recorded by the Sentinel review, not machine-extracted."
+  }
+ },
+ "bridle": {
+  "time": {
+   "en": "1.5 hours one way",
+   "zh": "单程 1.5 小时",
+   "quote": [
+    "1.5 hours one way"
+   ],
+   "url": "https://ccc.govt.nz/parks-and-gardens/explore-parks/port-hills/bridle-path/bridle-path"
+  }
+ }
+}

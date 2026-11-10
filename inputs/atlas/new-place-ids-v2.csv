@@ -1,0 +1,180 @@
+﻿place_id,town,name_en,name_zh,lat,lon,notes
+si-ivc,Invercargill,Invercargill,因弗卡吉尔,-46.41185,168.34706,"NEW town row (route stop ""Invercargill"")"
+si-sti,Stewart Island,Stewart Island,斯图尔特岛／拉奇乌拉（奥本）,-46.89836,168.12682,"NEW town row (route stop ""Stewart Island"")"
+si-gmn,Greymouth,Greymouth,格雷茅斯,-42.44995,171.20799,"NEW town row (route stop ""Greymouth"")"
+si-twz,Twizel,Twizel,特威泽尔,-44.25748,170.09941,"NEW town row (route stop ""Twizel"")"
+si-mrh,Mārahau,Mārahau,玛拉豪,-41.00531,173.00977,"NEW town row (route stop ""Mārahau"")"
+si-mfd,Milford Sound,Milford Sound,米尔福德峡湾,-44.61902,167.86876,"NEW town row (route stop ""Milford Sound""); v1 si-tea-01/03 relate to Milford Sound but sit under Te Anau"
+si-crm,Cromwell,Cromwell,克伦威尔,-45.03713,169.19729,NEW town row (region fill: Central Otago; not one of the 16 route stops)
+si-owk,Owaka,Owaka,奥瓦卡（卡特林斯）,-46.45068,169.65952,NEW town row (region fill: Clutha; not one of the 16 route stops)
+ni-cor,Coromandel Town,Coromandel Town,科罗曼德镇,-36.76016,175.49727,"NEW town row (route stop ""Coromandel Town"")"
+ni-ktt,Kaitaia,Kaitaia,凯塔亚,-35.11413,173.26400,"NEW town row (route stop ""Kaitaia"")"
+ni-opo,Opononi,Opononi,奥波诺尼（霍基安加）,-35.51167,173.39173,"NEW town row (route stop ""Opononi"")"
+ni-whg,Whangārei,Whangārei,旺格雷,-35.72753,174.31942,"NEW town row (route stop ""Whangārei""); spelled Whangārei (official); Keystone list wrote ""Whāngarei"" — identical after macron stripping"
+ni-wmt,Whangamatā,Whangamatā,旺格玛塔,-37.20633,175.87197,"NEW town row (route stop ""Whangamatā"")"
+ni-pmn,Palmerston North,Palmerston North,北帕默斯顿,-40.35632,175.61124,"NEW town row (route stop ""Palmerston North"")"
+ni-str,Stratford,Stratford,斯特拉福德,-39.33969,174.28409,"NEW town row (route stop ""Stratford"")"
+ni-wmo,Whangamōmona,Whangamōmona,旺格摩摩纳,-39.14466,174.73563,"NEW town row (route stop ""Whangamōmona"")"
+ni-tmr,Taumarunui,Taumarunui,陶马鲁努依,-38.88295,175.26246,"NEW town row (route stop ""Taumarunui"")"
+ni-tga,Tauranga,Tauranga,陶朗加与芒格努伊山,-37.68299,176.16806,NEW town row (region fill: Bay of Plenty; not one of the 16 route stops)
+ni-gis,Gisborne,Gisborne,吉斯伯恩,-38.66133,178.02065,NEW town row (region fill: Gisborne; not one of the 16 route stops)
+ni-wag,Whanganui,Whanganui,旺格努伊,-39.93249,175.05193,NEW town row (region fill: Whanganui; not one of the 16 route stops)
+ni-mtb,Martinborough,Martinborough,马丁堡,-41.21833,175.45949,NEW town row (region fill: Wairarapa; not one of the 16 route stops)
+si-ivc-01,Invercargill,Bill Richardson Transport World,比尔·理查森交通世界博物馆,-46.40962,168.38045,new item under si-ivc
+si-ivc-02,Invercargill,Queens Park,女王公园,-46.40113,168.35620,new item under si-ivc
+si-ivc-03,Invercargill,E Hayes & Sons Motorworks Collection,E Hayes 机车收藏（五金店）,-46.40768,168.34650,new item under si-ivc
+si-ivc-04,Invercargill,Classic Motorcycle Mecca,经典摩托车博物馆,-46.41185,168.34706,new item under si-ivc
+si-ivc-05,Invercargill,Stirling Point (Bluff),斯特林角（布拉夫）,-46.61349,168.35731,new item under si-ivc
+si-ivc-06,Invercargill,Oreti Beach,奥雷蒂海滩,-46.42130,168.21957,new item under si-ivc
+si-ivc-07,Invercargill,Foveaux Walkway,福沃海峡步道（布拉夫）,-46.62429,168.34211,new item under si-ivc
+si-ivc-08,Invercargill,Waituna Lagoon Loop Track,怀图纳潟湖环线,-46.55660,168.62782,new item under si-ivc
+si-sti-01,Stewart Island,Ulva Island/Te Wharawhara walking tracks,乌尔瓦岛步道（鸟类保护岛）,-46.92767,168.12640,new item under si-sti
+si-sti-02,Stewart Island,Rakiura Track,拉奇乌拉步道（大步道）,-46.87555,168.05991,new item under si-sti
+si-sti-03,Stewart Island,North West Circuit Stewart Island/Rakiura,斯图尔特岛西北环线,-46.77290,167.98483,new item under si-sti
+si-sti-04,Stewart Island,Ocean Beach tracks,海洋海滩步道,-46.97102,168.17431,new item under si-sti
+si-sti-05,Stewart Island,Rakiura Museum,拉奇乌拉博物馆,-46.89825,168.12673,new item under si-sti
+si-sti-06,Stewart Island,Wild Kiwi Encounter (guided night tour),野生几维鸟夜观团,-46.89836,168.12682,new item under si-sti
+si-sti-07,Stewart Island,Stewart Island Experience ferry (Bluff–Oban),斯图尔特岛渡轮（布拉夫—奥本）,-46.89836,168.12682,new item under si-sti
+si-gmn-01,Greymouth,Point Elizabeth Walkway,伊丽莎白角步道,-42.38293,171.22266,new item under si-gmn
+si-gmn-02,Greymouth,Brunner Mine Site Walk,布伦纳煤矿遗址步道,-42.43217,171.32819,new item under si-gmn
+si-gmn-03,Greymouth,Coal Creek Track,煤溪瀑布步道,-42.40878,171.26234,new item under si-gmn
+si-gmn-04,Greymouth,Shantytown Heritage Park,棚户镇淘金遗产公园,-42.53489,171.18206,new item under si-gmn
+si-gmn-05,Greymouth,Monteith's Brewery,蒙蒂斯啤酒厂,-42.45402,171.20681,new item under si-gmn
+si-gmn-06,Greymouth,Lake Brunner (Moana),布伦纳湖（莫阿纳）,-42.61644,171.44007,new item under si-gmn
+si-gmn-07,Greymouth,Punakaiki Pancake Rocks and Blowholes Walk,普纳凯基千层饼岩与喷水洞步道,-42.11392,171.32750,new item under si-gmn
+si-twz-01,Twizel,Twizel River Trail,特威泽尔河步道,-44.28793,170.14584,new item under si-twz
+si-twz-02,Twizel,Pukaki Kettle Hole Track,普卡基冰壶穴步道,-44.18199,170.16122,new item under si-twz
+si-twz-03,Twizel,Benmore Peninsula Walk,本莫尔半岛步道,-44.55724,170.19726,new item under si-twz
+si-twz-04,Twizel,Lake Pukaki,普卡基湖,-44.04776,170.17423,new item under si-twz
+si-twz-05,Twizel,Lake Ruataniwha,鲁阿塔尼瓦湖,-44.27623,170.05445,new item under si-twz
+si-twz-06,Twizel,Lake Ōhau,奥豪湖,-44.23150,169.84908,new item under si-twz
+si-twz-07,Twizel,High Country Salmon,高原三文鱼养殖场,-44.28899,170.08355,new item under si-twz
+si-mrh-01,Mārahau,Mārahau Beach,玛拉豪海滩,-41.00531,173.00977,new item under si-mrh
+si-mrh-02,Mārahau,Split Apple Rock,裂苹果岩,-41.01832,173.02022,new item under si-mrh
+si-mrh-03,Mārahau,Abel Tasman AquaTaxi,阿贝尔·塔斯曼水上出租,-41.00531,173.00977,new item under si-mrh
+si-mrh-04,Mārahau,Marahau Sea Kayaks,玛拉豪海上皮划艇,-41.00531,173.00977,new item under si-mrh
+si-mrh-05,Mārahau,Hawkes Lookout Walk,霍克斯观景台步道,-41.02465,172.90581,new item under si-mrh
+si-mrh-06,Mārahau,Te Puna Wai o Riuwaka/Riuwaka Resurgence,里乌瓦卡泉涌步道,-41.03295,172.90084,new item under si-mrh
+si-mrh-07,Mārahau,Rawhiti Cave Track,拉希蒂洞步道,-40.88214,172.86275,new item under si-mrh
+si-mfd-01,Milford Sound,Milford Foreshore Walk,米尔福德海滨步道,-44.67124,167.92307,new item under si-mfd
+si-mfd-02,Milford Sound,Milford Sound Lookout Track,米尔福德峡湾观景台步道,-44.67296,167.92611,new item under si-mfd
+si-mfd-03,Milford Sound,Humboldt Falls Track,洪堡瀑布步道,-44.69475,168.12644,new item under si-mfd
+si-mfd-04,Milford Sound,Gertrude Saddle Route,格特鲁德鞍部路线,-44.75479,168.01593,new item under si-mfd
+si-mfd-05,Milford Sound,Milford Sound kayaking,米尔福德峡湾皮划艇,-44.61902,167.86876,new item under si-mfd
+si-mfd-06,Milford Sound,Milford Sound scenic flights,米尔福德峡湾观光飞行,-44.61902,167.86876,new item under si-mfd
+si-mfd-07,Milford Sound,Milford Road walks (Homer Tunnel area),米尔福德公路沿途短步道,-44.61902,167.86876,new item under si-mfd
+si-crm-01,Cromwell,Cromwell Heritage Precinct,克伦威尔历史街区,-45.04913,169.20660,new item under si-crm
+si-crm-02,Cromwell,Bannockburn Sluicings,班诺克本淘金冲刷遗址,-45.08023,169.13881,new item under si-crm
+si-crm-03,Cromwell,Quartz Reef Point Walk,石英礁角步道,-44.99697,169.24200,new item under si-crm
+si-crm-04,Cromwell,Mt Difficulty tracks,困难山步道,-45.08359,169.09304,new item under si-crm
+si-crm-05,Cromwell,Goldfields Mining Centre,金矿区采矿中心,-45.03999,169.12127,new item under si-crm
+si-crm-06,Cromwell,Central Otago wine trails (Cromwell/Bannockburn),中奥塔哥葡萄酒之路,-45.03713,169.19729,new item under si-crm
+si-crm-07,Cromwell,Highlands Motorsport Park,高地赛车公园,-45.05997,169.16917,new item under si-crm
+si-owk-01,Owaka,Nugget Point/Tokata walks,纽吉特角灯塔步道,-46.44632,169.81038,new item under si-owk
+si-owk-02,Owaka,Purakaunui Falls Walk,普拉考努伊瀑布步道,-46.51782,169.56150,new item under si-owk
+si-owk-03,Owaka,Matai Falls Walk,马泰瀑布步道,-46.50361,169.48711,new item under si-owk
+si-owk-04,Owaka,McLean Falls Walk,麦克莱恩瀑布步道,-46.57162,169.34898,new item under si-owk
+si-owk-05,Owaka,Cathedral Caves Walk,大教堂洞步道（潮汐限定）,-46.60722,169.37717,new item under si-owk
+si-owk-06,Owaka,Surat Bay Beach Walk,苏拉特湾海滩步道（海狮）,-46.47482,169.71819,new item under si-owk
+si-owk-07,Owaka,Historic Railway Tunnel Walk,历史铁路隧道步道,-46.41759,169.69432,new item under si-owk
+si-owk-08,Owaka,Owaka Museum,奥瓦卡博物馆,-46.44987,169.66113,new item under si-owk
+si-owk-09,Owaka,The Lost Gypsy,迷失吉普赛（机械艺术馆）,-46.56069,169.46825,new item under si-owk
+ni-cor-01,Coromandel Town,Kauri Block Track,考里林区步道,-36.75859,175.48942,new item under ni-cor
+ni-cor-02,Coromandel Town,Tokatea Lookout Walking Track,托卡蒂亚观景台步道,-36.72133,175.51351,new item under ni-cor
+ni-cor-03,Coromandel Town,Kaipawa Trig Track,凯帕瓦三角点步道,-36.73599,175.52595,new item under ni-cor
+ni-cor-04,Coromandel Town,Papa Aroha Walk,帕帕阿罗哈步道,-36.69906,175.43136,new item under ni-cor
+ni-cor-05,Coromandel Town,Coromandel Walkway and mountain bike track,科罗曼德半岛北端步道,-36.48872,175.41103,new item under ni-cor
+ni-cor-06,Coromandel Town,Coromandel School of Mines and Historical Museum,科罗曼德矿业学校博物馆,-36.75441,175.50227,new item under ni-cor
+ni-cor-07,Coromandel Town,309 Road,309 公路（老路风景线）,-36.76016,175.49727,new item under ni-cor
+ni-cor-08,Coromandel Town,Mussel Barge Snapper Safaris,贻贝驳船钓鲷鱼,-36.76016,175.49727,new item under ni-cor
+ni-ktt-01,Kaitaia,Te Ahu Museum,特阿胡博物馆,-35.11722,173.26845,new item under ni-ktt
+ni-ktt-02,Kaitaia,Lake Ngatu Track,恩加图湖步道,-35.03272,173.19622,new item under ni-ktt
+ni-ktt-03,Kaitaia,Kaitaia Walkway,凯塔亚步道,-35.17604,173.27241,new item under ni-ktt
+ni-ktt-04,Kaitaia,Cape Reinga/Te Rerenga Wairua Lighthouse Walk,雷因加角灯塔步道,-34.43020,172.68164,new item under ni-ktt
+ni-ktt-05,Kaitaia,Te Paki Coastal Track,特帕基海岸步道,-34.44095,172.71835,new item under ni-ktt
+ni-ktt-06,Kaitaia,Te Paki sand dunes,特帕基巨型沙丘,-34.52997,172.75345,new item under ni-ktt
+ni-ktt-07,Kaitaia,Cape Reinga & Ninety Mile Beach tour,雷因加角与九十英里海滩一日游,-35.11413,173.26400,new item under ni-ktt
+ni-opo-01,Opononi,Signal Station Track,信号站步道（霍基昂加岬）,-35.53553,173.36912,new item under ni-opo
+ni-opo-02,Opononi,Tāne Mahuta Walk,森林之王贝壳杉步道,-35.60069,173.52727,new item under ni-opo
+ni-opo-03,Opononi,Te Matua Ngahere Walk,森林之父贝壳杉步道,-35.60754,173.52907,new item under ni-opo
+ni-opo-04,Opononi,Waiotemarama Waterfall Walk,怀奥特马拉马瀑布步道,-35.53091,173.44018,new item under ni-opo
+ni-opo-05,Opononi,Trounson Kauri Park Loop Track,特朗森贝壳杉公园环线,-35.72101,173.64978,new item under ni-opo
+ni-opo-06,Opononi,Waimamaku Coastal Track,怀马马库海岸步道,-35.56337,173.38063,new item under ni-opo
+ni-opo-07,Opononi,Footprints Waipoua (guided forest tour),怀波瓦森林毛利向导夜游,-35.51167,173.39173,new item under ni-opo
+ni-opo-08,Opononi,Hokianga Harbour,霍基昂加港,-35.51167,173.39173,new item under ni-opo
+ni-whg-01,Whangārei,Otuihau Whangārei Falls,旺格雷瀑布,-35.68360,174.33565,new item under ni-whg
+ni-whg-02,Whangārei,Hātea River Walkway,哈蒂亚河步道,-35.72753,174.31942,new item under ni-whg
+ni-whg-03,Whangārei,Abbey Caves Reserve walkway,阿比洞保护区步道（洞穴暂闭）,-35.70832,174.35431,new item under ni-whg
+ni-whg-04,Whangārei,Hundertwasser Art Centre,百水艺术中心,-35.72426,174.32502,new item under ni-whg
+ni-whg-05,Whangārei,Mount Manaia Track,马奈亚山步道,-35.82041,174.51633,new item under ni-whg
+ni-whg-06,Whangārei,Smugglers Bay Loop Track,走私者湾环线,-35.85494,174.53240,new item under ni-whg
+ni-whg-07,Whangārei,Taheke Waterfall Track,塔赫克瀑布步道,-35.67915,174.41475,new item under ni-whg
+ni-whg-08,Whangārei,Waipū Caves Track,怀普洞步道,-35.92852,174.35248,new item under ni-whg
+ni-whg-09,Whangārei,Poor Knights Islands dive & snorkel,普尔奈茨群岛潜水/浮潜,-35.72753,174.31942,new item under ni-whg
+ni-wmt-01,Whangamatā,Whangamatā Beach,旺格马塔海滩（冲浪）,-37.19734,175.87275,new item under ni-wmt
+ni-wmt-02,Whangamatā,Wentworth Falls Walk,温特沃斯瀑布步道,-37.25456,175.80981,new item under ni-wmt
+ni-wmt-03,Whangamatā,Wentworth Mines Walk,温特沃斯矿区步道,-37.24471,175.82252,new item under ni-wmt
+ni-wmt-04,Whangamatā,Wharekirauponga Track,瓦雷基劳蓬加步道,-37.28419,175.83643,new item under ni-wmt
+ni-wmt-05,Whangamatā,Opoutere Beach Track,奥波特雷海滩步道,-37.10289,175.88309,new item under ni-wmt
+ni-wmt-06,Whangamatā,Broken Hills Battery Walk,布罗肯山矿场步道,-37.10115,175.73982,new item under ni-wmt
+ni-wmt-07,Whangamatā,Wentworth Valley,温特沃斯山谷,-37.24527,175.82160,new item under ni-wmt
+ni-pmn-01,Palmerston North,"Te Manawa Museum of Art, Science and Heritage",特马纳瓦博物馆,-40.35815,175.60803,new item under ni-pmn
+ni-pmn-02,Palmerston North,New Zealand Rugby Museum,新西兰橄榄球博物馆,-40.35836,175.60825,new item under ni-pmn
+ni-pmn-03,Palmerston North,Victoria Esplanade,维多利亚滨河公园,-40.37096,175.61448,new item under ni-pmn
+ni-pmn-04,Palmerston North,Manawatū River Pathway,马纳瓦图河步道/骑行道,-40.35632,175.61124,new item under ni-pmn
+ni-pmn-05,Palmerston North,Manawatu Gorge Track,特阿皮蒂/马纳瓦图峡谷步道,-40.32662,175.80985,new item under ni-pmn
+ni-pmn-06,Palmerston North,Tawa Loop Walk,塔瓦环线,-40.30991,175.77319,new item under ni-pmn
+ni-pmn-07,Palmerston North,Windfarm Ride,风电场骑行,-40.35632,175.61124,new item under ni-pmn
+ni-str-01,Stratford,Stratford Plateau Lookout,斯特拉特福德高原观景台,-39.30748,174.10052,new item under ni-str
+ni-str-02,Stratford,Track to Dawson Falls,道森瀑布步道,-39.32467,174.10640,new item under ni-str
+ni-str-03,Stratford,Wilkies Pools Loop Track,威尔基斯池环线,-39.31808,174.09717,new item under ni-str
+ni-str-04,Stratford,Kapuni Loop Track,卡普尼环线,-39.32467,174.10640,new item under ni-str
+ni-str-05,Stratford,Curtis Falls Track,柯蒂斯瀑布步道,-39.29807,174.11062,new item under ni-str
+ni-str-06,Stratford,Dawson Falls - Stratford Plateau tracks,道森瀑布—高原步道,-39.31577,174.10209,new item under ni-str
+ni-str-07,Stratford,Stratford Glockenspiel clock tower,斯特拉特福德钟琴塔,-39.33953,174.28495,new item under ni-str
+ni-wmo-01,Whangamōmona,Whangamōmona Hotel,旺格莫莫纳酒店（共和国小镇）,-39.14484,174.73588,new item under ni-wmo
+ni-wmo-02,Whangamōmona,Moki Tunnel,莫基隧道（'霍比特洞'）,-39.01883,174.80223,new item under ni-wmo
+ni-wmo-03,Whangamōmona,Tāngarākau Gorge,坦加拉考峡谷,-38.98051,174.83451,new item under ni-wmo
+ni-wmo-04,Whangamōmona,Mount Damper Falls Walk,丹珀山瀑布步道,-38.91252,174.82945,new item under ni-wmo
+ni-wmo-05,Whangamōmona,Matemateāonga Track,马特马特翁加步道,-39.31471,174.82256,new item under ni-wmo
+ni-wmo-06,Whangamōmona,Moki Track,莫基步道,-38.97578,174.68215,new item under ni-wmo
+ni-wmo-07,Whangamōmona,Rerekapa Track,雷雷卡帕步道,-38.94065,174.72282,new item under ni-wmo
+ni-tmr-01,Taumarunui,Te Maire Loop Track,特迈尔环线,-38.95155,175.19296,new item under ni-tmr
+ni-tmr-02,Taumarunui,Ohinetonga Track,奥希内通加步道,-38.88295,175.26246,new item under ni-tmr
+ni-tmr-03,Taumarunui,Tupapakurua Falls Track,图帕帕库鲁阿瀑布步道,-39.17766,175.36508,new item under ni-tmr
+ni-tmr-04,Taumarunui,Forgotten World Adventures rail carts,被遗忘世界铁轨车,-38.88295,175.26246,new item under ni-tmr
+ni-tmr-05,Taumarunui,"Whanganui Journey (canoe Great Walk, Taumarunui start)",旺格努伊河独木舟大步道,-38.88295,175.26246,new item under ni-tmr
+ni-tmr-06,Taumarunui,Canoe the Whanganui River,旺格努伊河独木舟,-38.88295,175.26246,new item under ni-tmr
+ni-tmr-07,Taumarunui,Raurimu Spiral,劳里穆螺旋铁路,-39.12044,175.40314,new item under ni-tmr
+ni-tga-01,Tauranga,Mauao (Mount Maunganui) summit & base tracks,毛奥山（芒格努伊山）步道,-37.63802,176.18388,new item under ni-tga
+ni-tga-02,Tauranga,Mount Maunganui Main Beach,芒格努伊主海滩,-37.63131,176.17851,new item under ni-tga
+ni-tga-03,Tauranga,Mount Hot Pools,芒特温泉（海水热泉）,-37.63216,176.17628,new item under ni-tga
+ni-tga-04,Tauranga,Kaiate Falls,凯阿特瀑布,-37.76010,176.23411,new item under ni-tga
+ni-tga-05,Tauranga,Te Puna Quarry Park,特普纳采石场公园,-37.70381,176.04752,new item under ni-tga
+ni-tga-06,Tauranga,Scenic Lake McLaren kayak tour,麦克拉伦湖皮划艇,-37.81329,176.04568,new item under ni-tga
+ni-tga-07,Tauranga,Otanewainuku Rimu Loop Walk,奥塔内怀努库罗汉松环线,-37.88812,176.21004,new item under ni-tga
+ni-tga-08,Tauranga,Kaituna Wetland Loop Track,凯图纳湿地环线,-37.75634,176.37851,new item under ni-tga
+ni-gis-01,Gisborne,Tītīrangi (Kaiti Hill),提提朗伊山（凯蒂山）观景,-38.67905,178.03263,new item under ni-gis
+ni-gis-02,Gisborne,Tairāwhiti Museum,泰拉怀蒂博物馆,-38.66365,178.02850,new item under ni-gis
+ni-gis-03,Gisborne,Eastwoodhill (National Arboretum of NZ),伊斯特伍德山国家树木园,-38.56380,177.71971,new item under ni-gis
+ni-gis-04,Gisborne,Rere Falls,雷雷瀑布,-38.53736,177.60958,new item under ni-gis
+ni-gis-05,Gisborne,Rere Rockslide,雷雷天然岩石滑梯,,,new item under ni-gis
+ni-gis-06,Gisborne,Tolaga Bay Wharf,托拉加湾长码头,-38.37831,178.32272,new item under ni-gis
+ni-gis-07,Gisborne,Okitu Bush Scenic Reserve Walk,奥基图灌木保护区步道,-38.66409,178.10067,new item under ni-gis
+ni-gis-08,Gisborne,Gray's Bush Scenic Reserve walks,格雷灌木保护区步道,-38.59669,177.96005,new item under ni-gis
+ni-wag-01,Whanganui,Durie Hill Elevator & War Memorial Tower,杜里山电梯与纪念塔,-39.93666,175.06081,new item under ni-wag
+ni-wag-02,Whanganui,Te Whare o Rehua Sarjeant Gallery,萨金特美术馆,-39.93103,175.05361,new item under ni-wag
+ni-wag-03,Whanganui,Whanganui Regional Museum,旺格努伊地区博物馆,-39.93165,175.05193,new item under ni-wag
+ni-wag-04,Whanganui,Rotokawau Virginia Lake,弗吉尼亚湖,-39.91357,175.03342,new item under ni-wag
+ni-wag-05,Whanganui,Paddle steamer Waimarie,怀马里明轮蒸汽船,-39.93249,175.05193,new item under ni-wag
+ni-wag-06,Whanganui,Whanganui River Road,旺格努伊河路,-39.93249,175.05193,new item under ni-wag
+ni-wag-07,Whanganui,Gordon Park Loop Track,戈登公园环线,-39.91307,175.10022,new item under ni-wag
+ni-wag-08,Whanganui,Bridge to Nowhere Walk,无名桥步道,-39.27898,174.97043,new item under ni-wag
+ni-mtb-01,Martinborough,Martinborough wineries,马丁伯勒酒庄,-41.21833,175.45949,new item under ni-mtb
+ni-mtb-02,Martinborough,Bike hire Martinborough (vineyard cycling),马丁伯勒骑行游酒庄,-41.21833,175.45949,new item under ni-mtb
+ni-mtb-03,Martinborough,Pinnacles Ridge Track (Putangirua Pinnacles),普唐吉鲁阿尖峰岩步道,-41.44863,175.23623,new item under ni-mtb
+ni-mtb-04,Martinborough,Cape Palliser,帕利泽角（灯塔）,-41.61198,175.29000,new item under ni-mtb
+ni-mtb-05,Martinborough,Ngawi,恩加维渔村（海狗）,-41.58767,175.23405,new item under ni-mtb
+ni-mtb-06,Martinborough,Lake Ferry,莱克费里（湖口村）,-41.39054,175.14571,new item under ni-mtb
+ni-mtb-07,Martinborough,Martinborough Fair,马丁伯勒集市,-41.21833,175.45949,new item under ni-mtb
+ni-wtm,Waitomo,Waitomo,怀托摩,-38.26109,175.11032,"NOT NEW — existing v1 id kept unchanged; route stop ""Waitomo Caves"" maps to ni-wtm (v1 name_en ""Waitomo""); no new row created"

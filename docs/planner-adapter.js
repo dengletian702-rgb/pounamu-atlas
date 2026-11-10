@@ -11,18 +11,23 @@ const jevEndpoint = (() => {
 })();
 // Check once per page load. Store a settled result so offline errors are handled
 // when the visitor requests a recommendation, without unhandled rejections.
-const jevCapabilities = jevEndpoint
-  ? fetch(`${jevEndpoint}/api/capabilities`, {cache:'no-store'})
+// Capabilities are fetched only when chooseWithJev runs. v4 hides that control
+// 乐天 11/11 04:34 定（经 Keystone 转）: keep the function, do not call the Worker on page load.
+let jevCapabilities = null;
+function loadJevCapabilities() {
+  if (!jevEndpoint) return Promise.resolve('not_enabled');
+  jevCapabilities ||= fetch(`${jevEndpoint}/api/capabilities`, {cache:'no-store'})
       .then(async response => response.ok && (await response.json()).version >= 2
         ? 'ok' : 'service_update_required')
-      .catch(() => 'local_service_unavailable')
-  : Promise.resolve('not_enabled');
+      .catch(() => 'local_service_unavailable');
+  return jevCapabilities;
+}
 window.TripPlanner = {
   jevEnabled: Boolean(jevEndpoint),
   createPlan({days, preference, island='south'}) { return {days, preference, island}; },
   async chooseWithJev({days, preference, island='south'}) {
     if (!jevEndpoint) throw new Error('not_enabled');
-    const capabilityStatus = await jevCapabilities;
+    const capabilityStatus = await loadJevCapabilities();
     if (capabilityStatus !== 'ok') throw new Error(capabilityStatus);
     let response;
     try {

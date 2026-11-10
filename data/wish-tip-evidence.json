@@ -1,0 +1,122 @@
+{
+ "https://www.hobbitontours.com/experiences/hobbiton-movie-set-tour/": {
+  "status": 200,
+  "finalUrl": "https://www.hobbitontours.com/experiences/hobbiton-movie-set-tour/",
+  "fetchedAt": "2026-11-10T05:54:31.022Z",
+  "found": [
+   "This is a fully guided walking tour",
+   "2.5 HOURS",
+   "have your booking reference number on hand"
+  ]
+ },
+ "https://www.waitomo.com/waitomo-glowworm-caves": {
+  "status": 200,
+  "finalUrl": "https://www.waitomo.com/waitomo-glowworm-caves",
+  "fetchedAt": "2026-11-10T05:54:31.449Z",
+  "found": [
+   "Waitomo Glowworm Caves 45 mins",
+   "We highly recommend booking in advance"
+  ]
+ },
+ "https://www.mackenzienz.com/": {
+  "status": 200,
+  "finalUrl": "https://www.mackenzienz.com/",
+  "fetchedAt": "2026-11-10T05:54:31.965Z",
+  "found": [
+   "See the famous Church of the Good Shepherd, soak in hot pools, join a stargazing tour"
+  ]
+ },
+ "https://ccc.govt.nz/parks-and-gardens/christchurch-botanic-gardens/": {
+  "status": 200,
+  "finalUrl": "https://ccc.govt.nz/parks-and-gardens/christchurch-botanic-gardens",
+  "fetchedAt": "2026-11-10T05:54:35.159Z",
+  "found": [
+   "Christchurch Botanic Gardens : Christchurch City Council"
+  ]
+ },
+ "https://www.christchurchattractions.nz/christchurch-gondola/": {
+  "status": 200,
+  "finalUrl": "https://www.christchurchattractions.nz/christchurch-gondola/",
+  "fetchedAt": "2026-11-10T05:54:35.414Z",
+  "found": [
+   "The Christchurch Gondola offers spectacular panoramic views of the city, Lyttelton Harbour, Pacific Ocean and beyond"
+  ]
+ },
+ "https://www.nzcycletrail.com/trails/tasmans-great-taste-trail/": {
+  "status": 200,
+  "finalUrl": "https://www.nzcycletrail.com/find-your-ride/23-great-rides/tasmans-great-taste-trail",
+  "fetchedAt": "2026-11-10T05:54:35.956Z",
+  "found": [
+   "Looping through the towns of Nelson, Wakefield, Richmond, Motueka and Kaiteriteri",
+   "dipped into on short hops and day rides"
+  ]
+ },
+ "https://www.queenstownnz.co.nz/": {
+  "status": 200,
+  "finalUrl": "https://www.queenstownnz.co.nz/",
+  "fetchedAt": "2026-11-10T05:54:36.128Z",
+  "found": [
+   "nestled on the shores of the stunning Lake Whakatipu",
+   "Arrowtown, New Zealand"
+  ]
+ },
+ "https://www.penguins.co.nz/": {
+  "status": 200,
+  "finalUrl": "https://www.penguins.co.nz/",
+  "fetchedAt": "2026-11-10T05:54:37.098Z",
+  "found": [
+   "Ōamaru Penguins",
+   "Evening viewing"
+  ]
+ },
+ "https://www.doc.govt.nz/parks-and-recreation/places-to-go/auckland/places/rangitoto-island/": {
+  "status": 200,
+  "finalUrl": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/auckland/places/rangitoto-island/",
+  "fetchedAt": "2026-11-10T05:54:37.606Z",
+  "found": [
+   "You can take a public passenger ferry or charter.",
+   "Take care not to miss your ferry. There is no overnight accommodation"
+  ]
+ },
+ "https://www.waitangi.org.nz/": {
+  "status": 200,
+  "finalUrl": "https://www.waitangi.org.nz/",
+  "fetchedAt": "2026-11-10T05:54:37.716Z",
+  "found": [
+   "Waitangi Treaty Grounds"
+  ]
+ },
+ "https://www.artdeconapier.com/": {
+  "status": 200,
+  "finalUrl": "https://www.artdeconapier.com/",
+  "fetchedAt": "2026-11-10T05:54:38.039Z",
+  "found": [
+   "Following the devastating 1931 Hawke’s Bay earthquake, Napier was rebuilt in the distinctive Art Deco style",
+   "Discover the fascinating story of Napier’s heritage on a guided walking tour."
+  ]
+ },
+ "https://www.tepapa.govt.nz/visit": {
+  "status": 200,
+  "finalUrl": "https://www.tepapa.govt.nz/visit",
+  "fetchedAt": "2026-11-10T05:54:38.244Z",
+  "found": [
+   "Te Papa Museum of New Zealand"
+  ]
+ },
+ "https://www.wellingtoncablecar.co.nz/": {
+  "status": 200,
+  "finalUrl": "https://www.wellingtoncablecar.co.nz/",
+  "fetchedAt": "2026-11-10T05:54:38.324Z",
+  "found": [
+   "Enjoy easy access to the Wellington Botanic Garden"
+  ]
+ },
+ "https://www.doc.govt.nz/parks-and-recreation/places-to-go/taranaki/places/egmont-national-park/": {
+  "status": 200,
+  "finalUrl": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/taranaki/places/te-papa-kura-o-taranaki/",
+  "fetchedAt": "2026-11-10T05:54:38.803Z",
+  "found": [
+   "has changeable and unpredictable weather. Check the forecast"
+  ]
+ }
+}

@@ -1,0 +1,29 @@
+[
+ {
+  "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/canterbury/places/aoraki-mount-cook-national-park",
+  "fetchedAt": "2026-11-10T01:04:42.007Z",
+  "status": 200,
+  "finalUrl": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/canterbury/places/aoraki-mount-cook-national-park",
+  "title": "Aoraki/Mount Cook National Park: Places to go in Canterbury",
+  "overview": [
+   "=\"doc-standard-overview__intro reverse\">",
+   "Aoraki/Mount Cook National Park is a rugged land of ice and rock, with 19 peaks over 3,000 metres including New Zealand's highest mountain, Aoraki/Mount Cook.",
+   "Dog access",
+   "No dogs. Other pets on conservation land rules.",
+   "Brochures",
+   "Walking tracks in Aoraki/Mount Cook National Park brochure (PDF, 2,768K)",
+   "<doc-things-to-do data=\"[{\"recreationType\":2,\"tabName\":\"Walking and tramping\",\"tabId\":\"50578\",\"search\":{\"searchBlockId\":165894,\"fields\":[{\"selectableValues\":[{\"epiFindPropertyName\":\"Duration.List\",\"display\":\"Under 1 hour\",\"value\":\"Under 1 hour\",\"id\":1501000,\"isSelected\":false,\"sortOrder\":100,\"fieldId\":1696808602},{\"epiFindPropertyName\":\"Duration.List\",\"display\":\"1-4 hours\",\"value\":\"1-4 hours\",\"id\":1502000,\"isSelected\":false,\"sortOrder\":200,\"fieldId\":1696808602},{\"epiFindPropertyName\":\"Duration.List\",\"display\":\"Over 4 hours\",\"value\":\"Over 4 hours\",\"id\":1503000,\"isSelected\":false,\"sortOrder\":300,\"fieldId\":1696808602},{\"epiFindPropertyName\":\"Duration.List\",\"display\":\"Overnight\",\"value\":\"Overnight\",\"id\":1504000,\"isSelected\":false,\"sortOrder\":400,\"fieldId\":1696808602},{\"epiFindPropertyName\":\"Duration.List\",\"display\":\"Multi-night\",\"value\":\"Multi-night\",\"id\":1505000,\"isSelected\":false,\"sortOrder\":500,\"fieldId\":1696808602}],\"fieldName\":\"Duration\",\"isCheckbox\":false,\"linkUrl\":\"\",\"linkText\":\"\"},{\"selectableValues\":[{\"epiFindPropertyName\":\"Difficulty.List\",\"display\":\"Easiest\",\"value\":\"Easiest\",\"id\":1601000,\"isSelected\":false,\"sortOrder\":100,\"fieldId\":619807820},{\"epiFindPropertyName\":\"Difficulty.List\",\"display\":\"Easy\",\"value\":\"Easy\",\"id\":1602000,\"isSelected\":false,\"sortOrder\":200,\"fieldId\":619807820},{\"epiFindPropertyName\":\"Difficulty.List\",\"display\":\"Intermediate\",\"value\":\"Intermediate\",\"id\":1603000,\"isSelected\":false,\"sortOrder\":300,\"fieldId\":619807820},{\"epiFindPropertyName\":\"Difficulty.List\",\"display\":\"Advanced\",\"value\":\"Advanced\",\"id\":1604000,\"isSelected\":false,\"sortOrder\":400,\"fieldId\":619807820},{\"epiFindPropertyName\":\"Difficulty.List\",\"display\":\"Expert\",\"value\":\"Expert\",\"id\":1605000,\"isSelected\":false,\"sortOrder\":500,\"fieldId\":619807820}],\"fieldName\":\"Difficulty\",\"isCheckbox\":false,\"linkUrl\":\"/parks-and-recreation/things-to-do/walking-and-tramping/track-categories/\",\"linkText\":\"About track difficulties\"},{\"selectableValues\":[{\"epiFindPropertyName\":\"DogAccess\",\"display\":\"Dogs allowed\",\"value\":\"true\",\"id\":0,\"isSelected\":false,\"sortOrder\":0,\"fieldId\":1153495591},{\"epiFindPropertyName\":\"EasyAccess$$bool\",\"display\":\"Wheelchairs and buggies\",\"value\":\"true\",\"id\":0,\"isSelected\":false,\"sortOrder\":0,\"fieldId\":1153495591}],\"fieldName\":\"Options\",\"isCheckbox\":true,\"linkUrl\":\"\",\"linkText\":\"\"}],\"header\":\"Walking and tramping\",\"resultsHeader\":\"walking and tramping tracks\",\"initialSearc"
+  ],
+  "stages": [],
+  "lines": [
+   "Department of Conservation Te Papa Atawhai",
+   "Department of Conservation | Te Papa Atawhai",
+   "Aoraki/Mount Cook National Park is located in the central South Island. It is accessed off State Highway 8 at the end of State Highway 80. It is a 3.5 hour drive from Queenstown and a 4.5 hour drive from Christchurch.",
+   "The nearest towns with supermarkets and services are Twizel (1 hour) and Tekapo (1.5 hour).",
+   "Be aware of avalanches",
+   "Avalanches can occur in Aoraki/Mount Cook National Park in any season. Find out about avalanche danger in Aoraki/Mount Cook .",
+   "Allow enough time (Hooker Valley Track: 3-4 hours return).",
+   "Page-level feedback"
+  ]
+ }
+]

@@ -59,3 +59,18 @@ Ngā Haerenga NZ Cycle Trails, NZTA, newzealand.com, MetService, Mountain Safety
 ## 4. If you reuse this site's content
 
 Credit “Pounamu Atlas / 绿石之地” with a link, keep the third-party attributions above for any DOC, LINZ or OpenStreetMap data you take with it, and do not present unverified facts (marked “To verify / 待核实”) as checked.
+
+## 5. v4 places, route legs and maps (field by field)
+
+Our own arrangement of the place and route tables, and the Chinese names we publish, stay under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). That licence does **not** cover the fields below.
+
+| Field | Where | Licence |
+|---|---|---|
+| Coordinates whose notes say they come from OSM Nominatim, including town-centre approximations based on those coordinates | `inputs/atlas/places-v2.csv`, `docs/data/v4-catalog.json` | [ODbL 1.0](https://opendatacommons.org/licenses/odbl/). Not this site's CC BY 4.0 |
+| Driving times and kilometres whose cell is marked OSRM | `inputs/meridian/routes-v2.csv` | OSRM is built on OpenStreetMap, so those readings stay under [ODbL 1.0](https://opendatacommons.org/licenses/odbl/). They are not an official NZTA or operator figure, and they are not a value checked by this site. Not CC BY 4.0 |
+| DOC track rows and summaries written from DOC open-data fields | `docs/data/doc-tracks.json`, DOC-sourced place rows | DOC data: “Sourced from the Department of Conservation Te Papa Atawhai and licensed for reuse under CC BY 4.0.” |
+| Itinerary order adapted from newzealand.com | route template notes and `source_url` on each day | 依据 newzealand.com 行程改编. Example: [South Island alpine lakes](https://www.newzealand.com/int/feature/south-island-alpine-lakes-itinerary/), accessed 2026-11-11. The pages are linked; their wording and pictures are not copied |
+| Wikimedia photographs | unchanged | Per-image credit in `outputs/IMAGE-CREDITS.md` and `outputs/SPORTS-IMAGE-CREDITS.md` |
+
+Pages and maps that use OSM coordinates or OSRM times show “© OpenStreetMap contributors” and link to https://www.openstreetmap.org/copyright.
+

@@ -191,7 +191,7 @@ function p10LegTag(l, zh) {
   const s = l.src || EDGE_SOURCE_DEFAULT, nz = l.mode === 'car' && s.nzta;
   // NZTA route names were read with a Chinese joiner (browser locale); show it in the reader's language.
   const road = nz ? (zh ? s.nzta.route : s.nzta.route.replace(/和/g, ' and ').replace(/、/g, ', ')) : '';
-  const label = nz ? (zh ? `估算值（NZTA 查询 ${s.checkedAt}）` : `Estimate (NZTA query ${s.checkedAt})`) : (zh ? '估算值' : 'Estimate');
+  const label = nz ? (zh ? `估算 · ${s.checkedAt} · 来源：NZTA Journey Planner` : `Estimate · ${s.checkedAt} · Source: NZTA Journey Planner`) : (s.checkedAt ? (zh ? `估算 · ${s.checkedAt} · 来源：规划估算` : `Estimate · ${s.checkedAt} · Source: planning estimate`) : (zh ? `估算 · 尚无逐段核验日期 · 来源：规划估算` : `Estimate · No per-leg check date yet · Source: planning estimate`));
   const title = nz
     ? (zh ? `NZTA Journey Planner ${s.checkedAt} 读数：${road}，${s.nzta.time}${s.nzta.traffic ? '（' + s.nzta.traffic + '）' : ''}；取整到 15 分钟。NZTA 不显示里程，里程为规划估算。`
           : `NZTA Journey Planner reading on ${s.checkedAt}: ${road}, ${s.nzta.time}${s.nzta.traffic ? ' (' + s.nzta.traffic + ')' : ''}; rounded to 15 minutes. NZTA shows no distance; km is a planning estimate.`)
@@ -449,6 +449,31 @@ function p10Timeline(plan) {
   staged.push(days[days.length-1]);
   return staged.map((d,i)=>({...d,n:i+1}));
 }
+function p10Project(at){
+  if(!at) return null;
+  return [392.5+(at[1]-174.76)*38.05, 189.7+(-at[0]-36.85)*50.5];
+}
+function p10Present(plan){
+  const days = plan && !plan.disconnected ? p10Timeline(plan) : [];
+  const points = [];
+  const seen = new Set();
+  for (const d of days) {
+    const ids = d.legs && d.legs.length ? [d.legs[0].a, ...d.legs.map(l => l.b)] : [d.at];
+    for (const id of ids) {
+      if (!id || seen.has(id)) continue;
+      const at = NODES[id] && NODES[id].at;
+      if (!at) continue;
+      seen.add(id);
+      points.push({ id, at, xy: p10Project(at) });
+    }
+  }
+  const tight = Boolean(plan && plan.input && plan.minimum > plan.input.days);
+  return {
+    days,
+    map: { points, schematic: true },
+    warning: tight ? { minimum: plan.minimum, selected: plan.input.days, suggestions: ['drop-or-swap', 'add-days', 'switch-template'] } : null,
+  };
+}
 function p10AlongWay(plan){
   if(plan.disconnected || plan.minimum>plan.input.days || !plan.spare) return [];
   const routeNodes=new Set(plan.days.flatMap(d=>d.legs.flatMap(l=>[l.a,l.b])));
@@ -470,10 +495,14 @@ function p10BreakStops(day){
   const priority=['haast','wanaka','arthurs-pass','hokitika'];
   return [...stops].sort((a,b)=>{const ai=priority.indexOf(a),bi=priority.indexOf(b);return (ai<0?100:ai)-(bi<0?100:bi);}).slice(0,2);
 }
-if (typeof module !== 'undefined' && module.exports) module.exports={p10Plan,p10Timeline,p10AlongWay,p10Duration,p10DailyTime,p10BreakStops,p10Net,p10Suggestions,p10LegDescription,p10JevIsland,p10JevRouteName,P10_WISH_TIPS,P10_WISH_GUIDES,NODES,WISHES};
+if (typeof module !== 'undefined' && module.exports) module.exports={p10Plan,p10Timeline,p10Present,p10AlongWay,p10Duration,p10DailyTime,p10BreakStops,p10Net,p10Suggestions,p10LegDescription,p10JevIsland,p10JevRouteName,P10_WISH_TIPS,P10_WISH_GUIDES,NODES,WISHES};
+globalThis.P10_NODES = NODES;
 
-if (typeof window !== 'undefined') {
-  let p10Result=null, p10Recommendation=null;
+  if (typeof window !== 'undefined') {
+  let p10Result=null, p10Recommendation=null, p10View=null;
+  window.p10Plan = p10Plan;
+  window.p10Present = p10Present;
+  window.p10Timeline = p10Timeline;
   const p10$=selector=>document.querySelector(selector);
   const p10Text=()=>document.documentElement.lang.startsWith('zh') ? {
     start:'从哪里出发',end:'从哪里离开',days:'旅行天数',pace:'每天自驾节奏',pace35:'最多 3.5 小时',pace5:'最多 5 小时',pace65:'最多 6.5 小时',places:'想去哪些地方？',choose:'选择多个目的地',transport:'城市之间怎么走',car:'自驾',public:'公共交通',preference:'偏好的活动',method:'是否使用 Jev 推荐',local:'本地规划',jev:'Jev 辅助推荐',submit:'生成行程',
@@ -490,6 +519,7 @@ if (typeof window !== 'undefined') {
   function p10Status(text){const s=p10$('#plannerStatus');if(s)s.textContent=text||'';}
   // Coastline is the same Natural Earth base used by the homepage; road segments are schematic town-to-town connections.
   const P10_COAST = "M335.6,93.1L336.2,95.4L338.3,93.8L339.9,91.2L342.4,88.5L342.1,92.8L343.4,93.7L351.8,96.7L353.5,99.2L355.3,99.9L356.3,98.5L357.5,97.7L360.6,99.3L367.4,103.6L368.0,105.1L367.7,107.3L368.0,109.7L368.9,111.5L371.2,112.0L374.3,109.2L375.7,108.9L377.7,112.8L378.5,115.0L378.1,114.9L379.4,117.1L381.2,119.3L384.2,125.8L383.7,128.1L382.9,130.1L385.6,136.1L383.8,136.5L378.4,135.5L378.6,136.7L381.7,141.0L384.4,147.2L386.5,151.0L394.0,162.5L392.9,166.6L393.1,169.4L392.1,171.7L394.7,177.8L393.1,179.7L392.0,186.0L390.9,187.1L391.0,189.4L394.0,190.0L395.9,191.0L397.4,192.8L398.4,190.6L399.8,190.0L403.4,193.0L410.9,196.0L413.0,197.1L414.0,199.5L414.8,205.3L416.3,207.9L419.1,208.3L422.3,207.6L423.2,205.4L422.6,199.7L420.4,190.6L420.4,187.7L420.7,184.7L420.2,181.7L419.0,178.9L417.8,176.8L416.3,175.0L416.8,172.2L419.1,170.9L420.5,173.3L421.7,176.2L427.6,184.6L431.0,184.0L431.3,187.5L433.7,191.1L435.0,195.3L436.7,207.7L439.3,219.5L444.1,224.6L444.6,227.0L441.7,225.8L440.8,226.5L441.1,227.7L443.8,230.0L447.0,231.1L449.0,230.9L450.8,231.7L463.1,239.4L469.0,242.3L484.0,247.2L488.3,247.6L490.6,247.4L495.1,245.7L499.1,242.7L502.5,238.2L505.5,233.0L508.8,230.5L512.5,228.6L514.3,226.7L516.3,225.4L526.3,226.0L529.7,228.6L534.1,230.7L536.4,232.4L535.6,235.7L533.0,240.5L530.9,245.9L529.2,258.0L527.9,270.3L526.1,275.7L522.8,279.9L519.2,282.9L515.0,284.4L513.3,291.3L512.5,299.5L512.7,301.6L514.1,303.2L514.6,305.6L512.4,310.5L511.2,309.8L509.4,305.7L507.8,304.0L502.8,302.7L497.7,302.1L493.3,302.5L489.1,304.2L482.7,307.8L480.7,309.6L479.0,311.9L476.1,317.0L475.4,323.2L475.5,326.4L476.5,329.0L482.0,332.4L476.6,344.4L471.8,356.9L469.1,360.4L465.9,363.7L463.0,371.2L457.9,377.7L454.4,382.6L451.7,387.7L449.3,393.2L444.2,400.9L442.0,405.9L439.0,410.2L433.6,415.6L427.8,420.2L418.6,426.6L416.1,428.7L413.4,430.2L410.0,428.4L409.4,426.4L408.6,422.1L407.9,420.5L403.6,419.2L398.0,421.3L397.1,420.8L396.8,419.8L396.8,413.5L397.8,411.7L396.5,410.7L395.2,411.1L394.7,412.7L395.5,414.1L392.3,415.8L389.0,415.9L388.0,415.2L387.7,414.0L388.5,412.1L389.6,410.4L395.8,402.4L402.2,391.7L407.8,380.3L409.2,374.4L411.3,363.5L409.6,359.0L407.5,354.7L401.9,346.5L394.5,341.8L389.7,341.2L385.1,339.5L380.8,335.5L376.9,330.9L369.1,327.1L361.0,324.1L356.3,319.9L355.2,317.4L354.5,314.5L354.6,311.8L355.1,309.1L356.1,307.0L357.5,305.4L366.2,300.0L375.3,296.9L377.0,297.0L378.7,296.5L380.9,294.7L385.0,290.4L386.2,287.5L387.0,278.5L388.4,269.5L390.7,259.3L394.3,252.9L395.5,249.0L394.0,242.6L395.4,240.3L397.0,238.9L398.8,238.0L395.7,232.0L392.0,222.9L391.3,220.1L391.8,217.3L392.7,214.5L390.4,213.8L389.1,211.2L385.8,202.3L386.7,200.9L388.6,201.9L391.5,208.3L391.9,205.0L394.1,203.0L396.4,201.9L398.9,201.7L393.3,194.6L391.4,194.8L388.9,196.0L386.4,196.7L383.9,196.1L381.6,194.5L380.4,191.5L378.9,185.7L378.0,183.6L370.7,171.8L372.8,171.4L378.8,177.3L379.9,175.4L380.8,172.7L380.5,169.7L379.1,167.4L377.0,165.9L376.9,163.2L378.5,160.7L378.4,159.0L375.0,155.5L373.7,155.1L373.1,156.8L374.0,159.2L373.1,159.5L364.9,153.1L362.3,147.9L360.2,142.3L360.0,144.6L360.3,147.8L363.6,154.3L368.9,161.5L369.8,163.4L369.0,165.9L367.2,166.6L365.6,165.1L363.1,158.9L361.4,155.8L341.1,123.8L343.7,119.6L347.7,116.0L348.6,114.4L349.2,112.5L347.5,112.2L346.0,113.1L344.3,114.7L342.7,116.6L340.7,120.7L339.7,121.7L337.3,118.8L336.4,117.0L336.5,114.9L335.8,113.6L334.1,113.1L331.5,108.9L329.8,106.8L332.6,102.6L332.6,97.2L329.8,91.5L326.5,86.3L320.0,77.8L314.1,68.9L320.5,67.8L327.0,67.6L324.0,72.9L325.3,76.0L327.4,78.6L331.9,86.7L332.3,89.0L334.5,91.3L335.6,93.1ZM422.3,161.0L422.6,163.8L419.7,162.8L418.5,160.7L415.3,158.5L414.8,157.9L414.4,153.7L416.1,151.7L416.4,150.8L417.2,150.5L418.5,152.7L421.1,155.8L422.3,161.0ZM329.8,413.5L334.2,413.8L338.2,410.1L342.4,407.0L346.8,404.6L353.5,398.8L355.2,398.0L359.6,396.9L361.5,395.6L363.6,395.2L361.7,398.6L359.3,399.8L358.9,401.0L360.2,402.9L358.1,405.7L358.2,409.1L355.8,413.1L359.5,411.5L360.9,408.9L360.2,407.4L361.9,404.4L364.4,403.0L363.4,400.8L363.4,399.1L366.5,399.7L368.1,399.6L369.3,398.9L371.5,398.7L372.0,400.6L375.0,400.4L373.9,402.9L371.6,405.7L371.1,407.5L367.4,410.4L364.9,411.6L368.7,411.9L374.3,408.1L377.6,404.6L377.5,408.9L374.8,412.7L372.5,415.2L369.9,415.9L367.4,417.9L366.1,421.1L366.2,423.2L367.0,424.9L369.6,427.8L366.7,433.3L369.9,432.6L371.7,433.6L374.3,436.8L372.7,440.5L371.7,442.3L365.3,450.1L362.5,454.0L359.2,456.5L359.2,460.6L357.4,463.6L347.8,473.8L346.1,476.1L338.6,492.4L333.8,499.2L331.0,501.5L328.1,503.4L321.1,506.7L318.0,510.4L314.6,513.5L311.0,514.2L311.1,515.5L313.4,516.3L315.2,518.3L313.9,520.6L311.3,522.0L308.7,522.4L307.3,523.9L313.7,522.8L315.5,524.0L315.8,526.5L316.5,528.8L318.0,531.8L323.3,533.7L328.1,534.5L329.1,535.9L329.8,540.7L328.9,543.0L327.9,544.6L326.2,545.1L322.3,545.4L318.4,544.3L315.8,541.5L308.4,542.4L306.4,543.0L305.4,542.5L309.5,539.5L307.3,537.7L305.6,537.1L303.6,538.1L302.3,539.7L301.9,542.3L300.6,543.8L298.5,544.2L295.7,542.1L292.8,539.0L288.6,535.8L289.2,537.8L292.5,542.5L294.1,545.6L290.3,548.2L286.4,550.1L283.1,551.3L279.9,553.0L276.3,555.8L274.2,556.8L268.9,556.9L266.0,557.8L265.0,561.4L263.0,563.8L258.3,564.2L260.0,565.0L261.1,566.1L257.9,577.2L257.3,581.8L256.7,589.7L254.7,597.0L249.1,596.9L250.0,598.2L254.2,600.3L253.4,603.4L248.8,609.0L246.8,612.3L244.9,620.3L242.1,627.6L237.7,636.0L237.7,637.5L239.2,639.6L241.1,641.4L241.2,644.0L240.6,645.4L238.5,645.7L236.7,646.6L227.0,648.9L223.8,651.5L221.2,656.1L218.1,660.0L207.9,668.8L201.9,676.1L200.7,678.2L199.1,679.8L186.0,683.2L176.7,683.7L171.6,682.9L166.7,681.1L164.0,680.5L158.9,681.6L156.6,682.8L152.6,681.6L149.4,682.5L148.4,681.6L147.2,679.5L147.9,676.6L147.0,674.5L144.9,673.0L143.6,671.4L142.0,670.2L137.7,669.7L131.0,670.5L128.8,670.4L124.2,663.4L122.7,661.6L117.2,659.4L115.4,659.7L112.5,663.5L110.7,664.1L100.5,664.5L90.2,663.3L86.4,661.9L85.7,658.7L93.5,649.7L91.2,650.9L86.4,654.6L83.3,654.0L86.3,650.0L86.5,648.3L85.9,646.3L81.9,649.6L77.4,650.1L76.8,647.0L77.2,643.4L78.1,642.4L90.4,640.5L94.9,639.3L96.8,637.4L89.4,636.7L89.0,634.0L90.0,631.8L96.3,628.3L91.7,629.2L86.5,628.8L86.9,625.1L88.2,622.1L93.6,622.0L91.9,620.0L91.7,617.1L93.2,616.9L98.7,620.8L102.6,622.2L101.0,619.3L101.2,617.5L102.2,616.6L105.4,616.1L104.6,615.6L101.5,614.8L97.9,612.6L97.5,610.3L97.7,607.6L101.6,604.0L103.9,606.2L106.6,605.6L104.5,603.8L103.2,601.3L104.1,599.6L112.3,592.7L114.4,599.3L114.9,597.1L115.1,595.0L114.1,593.2L114.2,591.4L115.2,589.9L118.7,588.3L123.3,583.3L126.7,580.9L129.4,582.4L131.3,584.5L131.0,582.5L129.7,580.8L129.3,576.2L135.5,569.0L142.3,562.2L148.8,555.0L152.2,552.4L159.6,549.5L164.3,550.7L165.5,550.5L172.5,545.3L175.4,544.0L178.1,545.8L179.7,546.5L178.1,541.8L179.4,539.6L185.2,535.8L192.5,531.9L198.1,530.3L202.2,527.6L204.7,527.5L204.3,525.5L204.7,523.6L206.9,523.7L207.5,523.0L205.6,521.9L211.7,518.0L215.0,513.8L216.7,512.9L218.2,511.6L220.2,508.7L222.5,507.7L224.6,508.2L226.1,509.6L225.3,507.2L222.6,505.8L225.5,503.7L228.5,502.3L231.4,503.4L234.3,505.0L231.4,502.5L231.0,500.9L234.5,499.0L236.4,498.4L239.0,501.9L238.7,499.2L239.3,496.7L243.0,492.8L248.0,486.2L249.6,488.5L249.8,491.2L249.6,494.6L250.6,493.4L250.9,490.4L250.2,485.1L256.4,475.2L257.6,474.1L258.9,473.4L261.1,473.1L260.4,471.6L258.7,470.2L260.4,465.2L261.4,459.4L262.9,453.9L265.2,448.5L267.7,439.5L269.6,437.7L274.7,437.0L277.0,435.7L280.8,432.5L285.3,426.6L287.7,421.9L290.8,409.6L292.6,396.7L297.6,387.2L305.1,380.3L311.7,375.1L314.3,374.0L318.9,373.6L323.2,375.1L315.2,376.4L314.3,379.5L314.1,382.6L315.0,385.4L316.5,388.0L320.4,390.3L324.9,391.7L327.0,397.1L327.3,403.4L328.0,408.8L329.8,413.5ZM360.2,392.5L355.1,395.4L355.3,393.4L356.3,389.0L358.6,386.7L359.8,386.6L362.1,384.9L361.9,388.6L360.2,392.5ZM87.0,634.5L86.8,637.0L86.4,638.2L85.0,638.3L83.1,638.0L81.1,636.8L79.9,637.2L78.8,636.7L80.2,633.9L84.7,632.5L86.4,633.7L87.0,634.5ZM95.9,610.5L97.5,616.5L94.1,615.4L92.6,613.5L95.3,610.5L95.9,610.5ZM140.3,695.4L140.3,697.5L136.4,696.7L136.4,699.0L139.6,700.2L140.7,701.8L144.0,701.3L144.7,703.8L144.0,705.9L141.8,707.5L135.4,708.3L131.2,711.5L127.6,711.0L126.6,711.3L122.5,714.7L117.8,715.7L116.6,715.5L117.2,712.5L120.7,709.6L120.7,706.8L121.6,704.6L124.9,703.1L125.0,700.2L127.2,697.7L125.8,692.2L126.6,687.2L133.1,687.0L140.3,695.4Z";
+  window.P10_COAST_PATH = P10_COAST;
   const P10_DAY_COLORS=['#b44e2d','#225a4b','#9b5c1d','#4d5c8a','#8c3862','#446e28','#8b501b','#315d71','#944c40','#605292','#46695e','#a13e2e'];
   const p10MapPoint=id=>{const at=NODES[id]?.at;if(!at)return null;return [392.5+(at[1]-174.76)*38.05,189.7+(-at[0]-36.85)*50.5]};
   function p10TripMap(days){
@@ -523,21 +553,26 @@ if (typeof window !== 'undefined') {
     const notices=[];
     if(result.minimum>result.input.days){
       const f=result.fits,dropped=f?f.dropped.map(w=>p10Esc(w[p10Lang()])).join(zh?'、':', '):'';
-      const more=result.minimum<=21?`<button type="button" class="p10-add-stop" data-p10-days="${result.minimum}">${zh?`改成 ${result.minimum} 天`:`Change to ${result.minimum} days`}</button>`:'';
-      const trim=f&&f.dropped.length&&f.dropped.length<result.order.length?`<button type="button" class="p10-add-stop" data-p10-trim="1">${zh?`只保留排得下的地方（去掉${dropped}）`:`Keep what fits (drop ${dropped})`}</button>`:`<button type="button" class="p10-add-stop" data-p10-edit="1">${zh?'调整目的地':'Choose different places'}</button>`;
-      el.innerHTML=`<p class="p10-warning">${zh?`这些地方至少需要 ${result.minimum} 天，你选了 ${result.input.days} 天。`:`These places need at least ${result.minimum} days; you chose ${result.input.days}.`}</p><div class="p10-along">${more} ${trim}</div>`;
-      return;
+      const more=result.minimum<=21?`<button type="button" class="p10-add-stop" data-p10-days="${result.minimum}">${zh?`把天数改成 ${result.minimum}`:`Change to ${result.minimum} days`}</button>`:'';
+      const trim=f&&f.dropped.length&&f.dropped.length<result.order.length?`<button type="button" class="p10-add-stop" data-p10-trim="1">${zh?`减点或换点（去掉${dropped}）`:`Remove or swap a place (drop ${dropped})`}</button>`:`<button type="button" class="p10-add-stop" data-p10-edit="1">${zh?'减点或换点':'Remove or swap a place'}</button>`;
+      const tmpl=`<a class="p10-add-stop" href="guide.html?template=SI-09B&amp;lang=${p10Lang()}">${zh?'改选线路模板':'Switch route template'}</a>`;
+      notices.push(`<div class="p10-tight" role="alert"><p class="p10-warning">${zh?`这些地方至少需要约 ${result.minimum} 天，你选了 ${result.input.days} 天。行程和地图仍然留在下面，没有自动删点。`:`These places need about ${result.minimum} days; you chose ${result.input.days}. The days and the map stay below. Nothing was removed for you.`}</p><div class="p10-along">${trim} ${more} ${tmpl}</div></div>`);
     }
     if(result.inaccessible.length)notices.push(`<p class="p10-warning">${x.unreachable}：${result.inaccessible.map(w=>p10Esc(w[p10Lang()])).join('、')}。</p>`);
     const suggestions=p10AlongWay(result);
     if(suggestions.length)notices.push(`<div class="p10-along"><span>${zh?'还可以加入顺路地点：':'Add a stop along the way:'}</span> ${suggestions.map(w=>`<button type="button" class="p10-add-stop" data-p10-add="${p10Esc(w.id)}">＋ ${p10Esc(w[p10Lang()])}</button>`).join(' ')}</div>`);
-    const timeline=p10Timeline(result);
-    const rows=timeline.map(d=>{
+    if(!p10View || p10View.token!==result){
+      const fresh=result.disconnected?[]:p10Timeline(result).map(d=>({...d,legs:[...d.legs],activities:[...d.activities]}));
+      p10View={token:result,days:fresh};
+    }
+    const timeline=p10View.days;
+    const p10DayTools=(index,total)=>{const zh=p10Lang()==='zh';return `<div class="p10-day-tools"><button type="button" draggable="true" data-p10-drag="${index}" aria-label="${zh?'拖动排序':'Drag to reorder'}">⋮⋮</button><button type="button" data-p10-up="${index}" ${index===0?'disabled':''}>${zh?'上移':'Move up'}</button><button type="button" data-p10-down="${index}" ${index===total-1?'disabled':''}>${zh?'下移':'Move down'}</button><button type="button" data-p10-moveto="${index}">${zh?'移到…':'Move to…'}</button></div>`;};
+    const rows=timeline.map((d,i)=>{
       const number=d.n;
       if(d.kind==='weather'||d.kind==='free'){
         const title=d.kind==='weather'?(zh?`${p10Esc(p10Name(d.at))} · 天气机动日`:`${p10Esc(p10Name(d.at))} · weather buffer day`):(zh?`${p10Esc(p10Name(d.at))} · 自由活动日`:`${p10Esc(p10Name(d.at))} · free day`);
         const description=d.kind==='weather'?(zh?'天气不好时用来改期；天气适合时可自由活动。':'Use this day to reschedule if weather disrupts your plans; otherwise enjoy free time.'):(zh?'在离开城市自由活动。':'Enjoy free time in your departure city.');
-        return `<article class="plan-day"><button class="p10-day-focus" type="button" data-p10-focus="${number}">${x.day}${number}${x.dayEnd} <span aria-hidden="true">↗</span></button><span class="plan-day-title">${title}</span><p>${description}</p><p>${x.night}：${p10Esc(p10Name(d.at))}</p></article>`;
+        return `<article class="plan-day" tabindex="0" data-p10-index="${i}">${p10DayTools(i,timeline.length)}<button class="p10-day-focus" type="button" data-p10-focus="${number}">${x.day}${number}${x.dayEnd} <span aria-hidden="true">↗</span></button><span class="plan-day-title">${title}</span><p>${description}</p><p>${x.night}：${p10Esc(p10Name(d.at))}</p></article>`;
       }
       const heading=d.kind==='arrive'?`${x.arrive} ${p10Esc(p10Name(d.at))}`:d.kind==='depart'?`${x.depart} ${p10Esc(p10Name(d.at))}`:d.legs.length?`${p10Esc(p10Name(d.legs[0].a))} → ${p10Esc(p10Name(d.at))}`:`${x.activity} ${d.activities.map(a=>p10Esc(a.wish[p10Lang()])).join('、')}`;
       const legs=d.legs.map(l=>{const road=p10LegDescription(l,p10Lang());const mode=x[l.mode]||x.road;const duration=p10Duration(l.h,p10Lang());return `<li>${p10Esc(p10Name(l.a))} → ${p10Esc(p10Name(l.b))} · ${p10Esc(road)} · ${mode}${zh?'约':' about '}${duration}${l.km>0?` · ${l.km} km`:''} ${p10LegTag(l,zh)}</li>`;}).join('');
@@ -547,18 +582,37 @@ if (typeof window !== 'undefined') {
       const longDay=driving>pace?`<p class="p10-warning p10-long-day">${zh?'这天开车较长':'This is a long driving day'}${names?(zh?`，可以在${names}多住一晚并调整行程。`:`; consider an overnight stop in ${names} and adjust the itinerary.`):(zh?'，可以在途中多住一晚并调整行程。':'; consider an overnight stop and adjust the itinerary.')}</p>`:'';
       const activities=d.activities.map(a=>{const suggested=p10Suggestions(a.wish.id,result.input.preference);const guides=suggested.map(g=>`<a href="route.html?id=${encodeURIComponent(g.id)}&amp;lang=${p10Lang()}">${p10Esc(g[p10Lang()])}</a>`).join(' · ');const note=zh?'当天线路：':'Route for the day: ';const tipRec=P10_WISH_TIPS[a.wish.id],tip=tipRec?.[p10Lang()]||'',tipSrc=tipRec?(tipRec.src?` <span class="p10-tip-src">${zh?'来源：':'Source: '}${tipRec.src.map(s=>`<a href="${p10Esc(s.url)}" target="_blank" rel="noopener noreferrer">${p10Esc(new URL(s.url).hostname.replace(/^www\./,''))}</a>${s.checkedAt?(zh?`（${s.checkedAt} 核）`:` (checked ${s.checkedAt})`):''}`).join(zh?'；':'; ')}</span>`:` <abbr class="v3-tv" title="${zh?'这条提示尚未找到官方原文，出发前请自行核对。':'No official source found for this tip yet; check before you go.'}">${zh?'待核实':'To verify'}</abbr>`):'';return `<p>${x.activity}：${p10Esc(a.wish[p10Lang()])}${a.total>1?` (${a.part}/${a.total})`:''}。${tip?' '+p10Esc(tip)+tipSrc:''} ${x.localTransport}</p>${suggested.length?`<p class="p10-suggestions">${note}${guides}</p>`:''}`;}).join('');
       const arrivalTip=d.kind==='arrive'?(zh?'抵达后建议休息，避免落地当天长途驾驶。':'Rest after arrival and avoid a long drive on the first day.') : '';
-      return `<article class="plan-day"><button class="p10-day-focus" type="button" data-p10-focus="${number}">${x.day}${number}${x.dayEnd} <span aria-hidden="true">↗</span></button><span class="plan-day-title">${heading}</span>${arrivalTip?`<p>${arrivalTip}</p>`:''}${legs?`<ul class="p10-legs">${legs}</ul>`:''}${total}${longDay}${activities}${d.kind==='depart'?'':`<p>${x.night}：${p10Esc(p10Name(d.at))}</p>`}</article>`;
+      return `<article class="plan-day" tabindex="0" data-p10-index="${i}">${p10DayTools(i,timeline.length)}<button class="p10-day-focus" type="button" data-p10-focus="${number}">${x.day}${number}${x.dayEnd} <span aria-hidden="true">↗</span></button><span class="plan-day-title">${heading}</span>${arrivalTip?`<p>${arrivalTip}</p>`:''}${legs?`<ul class="p10-legs">${legs}</ul>`:''}${total}${longDay}${activities}${d.kind==='depart'?'':`<p>${x.night}：${p10Esc(p10Name(d.at))}</p>`}</article>`;
     }).join('');
     const recoName=p10JevRouteName(p10Recommendation,p10Lang(),typeof routes==='undefined'?[]:routes);
     const reco=recoName?`<p>${x.reco}：<a href="route.html?id=${encodeURIComponent(p10Recommendation)}&amp;lang=${p10Lang()}">${p10Esc(recoName)}</a></p>`:'';
     el.innerHTML=`${notices.join('')}${reco}${p10TripMap(timeline)}${rows}<p class="planner-small"><strong>${zh?'路段时间和里程都是估算值':'Segment times and distances are estimates'}</strong>${zh?`：自驾时间是 ${P10_NZTA_DATE} 在 NZTA Journey Planner 逐段查询的读数（含查询当时的路况），取整到 15 分钟，不含停留；NZTA 不显示里程，里程仍是规划估算。巴士、火车和渡轮时间是估算，以运营商时刻表为准。出发前请在下列官方来源核对。`:`: driving times are readings taken segment by segment in NZTA Journey Planner on ${P10_NZTA_DATE} (with the traffic at that moment), rounded to 15 minutes, without stops; NZTA shows no distances, so km are planning estimates. Coach, train and ferry times are estimates; check the operator's timetable. Check the official sources below before you go.`} ${x.sources}: ${(globalThis.P10_ROAD_SOURCES||[]).map(r=>`<a href="${r.url}" target="_blank" rel="noopener noreferrer">${p10Esc(r.label)}</a>`).join(' · ')}</p>`;
     p10FocusDay('all');
   }
+  const P10_WISH_REGION={christchurch:'christchurch-canterbury',nelson:'nelson-tasman',picton:'marlborough',tekapo:'christchurch-canterbury',aoraki:'christchurch-canterbury',wanaka:'wanaka',queenstown:'queenstown',milford:'fiordland','te-anau':'fiordland',glaciers:'west-coast',haast:'west-coast',hokitika:'west-coast',punakaiki:'west-coast','arthurs-pass':'christchurch-canterbury',kaikoura:'christchurch-canterbury','abel-tasman':'nelson-tasman',akaroa:'christchurch-canterbury',dunedin:'dunedin',oamaru:null,catlins:'clutha',stewart:'southland',auckland:'auckland','bay-of-islands':'northland-bay-of-islands',coromandel:'coromandel',hobbiton:'hamilton-waikato',waitomo:'hamilton-waikato',rotorua:'rotorua',taupo:'taupo',tongariro:'ruapehu',napier:'hawkes-bay',wellington:'wellington',taranaki:'taranaki'};
+  const P10_REGIONS=[{id:'northland-bay-of-islands',island:'north',zh:'北地与岛屿湾',en:'Northland & Bay of Islands'},{id:'auckland',island:'north',zh:'奥克兰',en:'Auckland'},{id:'coromandel',island:'north',zh:'科罗曼德',en:'The Coromandel'},{id:'hamilton-waikato',island:'north',zh:'汉密尔顿－怀卡托',en:'Hamilton - Waikato'},{id:'bay-of-plenty',island:'north',zh:'丰盛湾',en:'Bay of Plenty'},{id:'tairawhiti-gisborne',island:'north',zh:'泰拉维蒂／吉斯伯恩',en:'Tairāwhiti Gisborne'},{id:'rotorua',island:'north',zh:'罗托鲁瓦',en:'Rotorua'},{id:'taupo',island:'north',zh:'陶波',en:'Taupō'},{id:'ruapehu',island:'north',zh:'鲁阿佩胡',en:'Ruapehu'},{id:'hawkes-bay',island:'north',zh:'霍克斯湾',en:"Hawke's Bay"},{id:'taranaki',island:'north',zh:'塔拉纳基',en:'Taranaki'},{id:'whanganui',island:'north',zh:'旺格努伊',en:'Whanganui'},{id:'manawatu',island:'north',zh:'马纳瓦图',en:'Manawatū'},{id:'wairarapa',island:'north',zh:'怀拉拉帕',en:'Wairarapa'},{id:'wellington',island:'north',zh:'惠灵顿',en:'Wellington'},{id:'nelson-tasman',island:'south',zh:'纳尔逊－塔斯曼',en:'Nelson-Tasman'},{id:'marlborough',island:'south',zh:'马尔堡',en:'Marlborough'},{id:'christchurch-canterbury',island:'south',zh:'基督城－坎特伯雷',en:'Christchurch - Canterbury'},{id:'west-coast',island:'south',zh:'西海岸',en:'West Coast'},{id:'wanaka',island:'south',zh:'瓦纳卡',en:'Wānaka'},{id:'queenstown',island:'south',zh:'皇后镇',en:'Queenstown'},{id:'central-otago',island:'south',zh:'中奥塔哥',en:'Central Otago'},{id:'dunedin',island:'south',zh:'但尼丁',en:'Dunedin'},{id:'clutha',island:'south',zh:'克卢萨',en:'Clutha'},{id:'fiordland',island:'south',zh:'峡湾',en:'Fiordland'},{id:'southland',island:'south',zh:'南地',en:'Southland'}];
+  function p10WishLabel(w){const lang=p10Lang();if(w.id==='tekapo'&&lang==='zh')return '特卡波与暗夜星空';return w[lang];}
+  function p10RenderWishes(){
+    const box=p10$('#p10-wishes');if(!box)return;
+    const form=p10$('#plannerForm');if(!form)return;
+    const zh=p10Lang()==='zh';
+    const island=form.dataset.p10Island||'all';
+    const region=form.dataset.p10Region||'all';
+    const checked=new Set(Array.from(form.querySelectorAll('[name=p10-wish]:checked'),e=>e.value));
+    const islandHost=document.getElementById('p10-island');
+    if(islandHost){islandHost.innerHTML=[['all',zh?'全部':'All'],['north',zh?'北岛':'North Island'],['south',zh?'南岛':'South Island']].map(([id,label])=>`<button type="button" data-p10-island="${id}" aria-pressed="${island===id}">${label}</button>`).join('');}
+    const regionHost=document.getElementById('p10-region');
+    if(regionHost){const regs=P10_REGIONS.filter(r=>island==='all'||r.island===island);regionHost.innerHTML=`<button type="button" data-p10-region="all" aria-pressed="${region==='all'}">${zh?'全部地区':'All regions'}</button>`+regs.map(r=>{const n=WISHES.filter(w=>w.island===(island==='all'?w.island:island)&&P10_WISH_REGION[w.id]===r.id).length;return `<button type="button" data-p10-region="${r.id}" aria-pressed="${region===r.id}" ${n?'':'disabled'}>${zh?r.zh:r.en} (${n})${n?'':zh?' · 本目录暂无地点':' · No places in this directory yet'}</button>`;}).join('');}
+    const list=WISHES.filter(w=>(island==='all'||w.island===island)&&(region==='all'||P10_WISH_REGION[w.id]===region||(region==='unmapped'&&!P10_WISH_REGION[w.id])));
+    const groups=new Map();
+    for(const w of list){const key=P10_WISH_REGION[w.id]||'unmapped';if(!groups.has(key))groups.set(key,[]);groups.get(key).push(w);}
+    box.innerHTML=[...groups].map(([key,rows])=>{const meta=P10_REGIONS.find(r=>r.id===key);const heading=key==='unmapped'?(zh?'Waitaki（不在 TNZ 南岛 11 区）':'Waitaki (not a TNZ South Island region)'):(meta?(zh?meta.zh:meta.en):key);return `<section><h3>${p10Esc(heading)}</h3>${rows.map(w=>`<label data-p10-wish="${p10Esc(w.id)}"><input type="checkbox" name="p10-wish" value="${p10Esc(w.id)}" ${checked.has(w.id)?'checked':''}><span>${p10Esc(p10WishLabel(w))}</span></label>`).join('')}</section>`;}).join('');
+  }
   window.renderP10Planner=function(){
     if(!p10$('#plannerForm'))return;const x=p10Text(),lang=p10Lang();
     for(const [id,key] of [['p10-start-label','start'],['p10-end-label','end'],['p10-days-label','days'],['p10-pace-label','pace'],['p10-pace-35','pace35'],['p10-pace-5','pace5'],['p10-pace-65','pace65'],['p10-wishes-label','places'],['p10-choose','choose'],['p10-transport-label','transport'],['p10-car-label','car'],['p10-public-label','public'],['p10-preference-label','preference'],['p10-method-label','method'],['p10-local-label','local'],['p10-jev-label','jev'],['p10-submit','submit'],['p10-consent-text','consent']]){const el=document.getElementById(id);if(el)el.textContent=x[key];}
     for(const s of [p10$('#p10-start'),p10$('#p10-end')]) for(const o of s.options)o.textContent=NODES[o.value][lang];
-    for(const label of document.querySelectorAll('[data-p10-wish]')){const w=WISHES.find(item=>item.id===label.dataset.p10Wish);label.querySelector('span').textContent=w[lang];}
+    p10RenderWishes();
     p10Show(p10Result);
   };
   window.setupP10Planner=function(){
@@ -567,17 +621,42 @@ if (typeof window !== 'undefined') {
     for(const id of ['p10-start','p10-end'])p10$('#'+id).innerHTML=hubs.map(([key,n])=>`<option value="${key}">${p10Esc(n.zh)}</option>`).join('');
     p10$('#p10-start').value='christchurch';p10$('#p10-end').value='queenstown';
     p10$('#days').innerHTML=Array.from({length:19},(_,i)=>`<option value="${i+3}">${i+3}</option>`).join('');p10$('#days').value='7';
-    p10$('#p10-wishes').innerHTML=WISHES.map(w=>`<label data-p10-wish="${p10Esc(w.id)}"><input type="checkbox" name="p10-wish" value="${p10Esc(w.id)}"><span>${p10Esc(w.zh)}</span></label>`).join('');
-    const method=p10$('#plannerMethod'), jevAvailable=Boolean(window.TripPlanner?.jevEnabled);
+    p10RenderWishes();
+    const method=p10$('#plannerMethod'), jevAvailable=false;
     const methodLabel=p10$('#p10-method-label'), jevOption=p10$('#p10-jev-label');
     method.hidden=!jevAvailable;if(methodLabel)methodLabel.hidden=!jevAvailable;if(jevOption)jevOption.disabled=!jevAvailable;
     if(!jevAvailable){method.value='local';p10$('#jevConsent').hidden=true;}
     method.addEventListener('change',()=>{p10$('#jevConsent').hidden=method.value!=='jev';p10$('#jevConsentCheck').checked=false;p10Status('');});
     try{const saved=JSON.parse(localStorage.getItem('p10-road-plan'));if(saved){for(const [selector,value] of [['#p10-start',saved.start],['#p10-end',saved.end],['#days',saved.days],['#p10-pace',saved.pace],['#preference',saved.preference],['#p10-transport',saved.car?'car':'public']])if(value!=null&&p10$(selector).querySelector(`option[value="${String(value)}"]`))p10$(selector).value=String(value);for(const box of form.querySelectorAll('[name=p10-wish]'))box.checked=(saved.wishes||[]).includes(box.value);}}catch{}
+    form.addEventListener('click',event=>{
+      const island=event.target.closest('[data-p10-island]');
+      const region=event.target.closest('[data-p10-region]');
+      if(island){form.dataset.p10Island=island.dataset.p10Island;const meta=P10_REGIONS.find(r=>r.id===form.dataset.p10Region);if(meta&&form.dataset.p10Island!=='all'&&meta.island!==form.dataset.p10Island)form.dataset.p10Region='all';p10RenderWishes();}
+      if(region&&!region.disabled){form.dataset.p10Region=region.dataset.p10Region;p10RenderWishes();}
+    });
+    p10$('#planResult').addEventListener('keydown',event=>{
+      const card=event.target.closest('[data-p10-index]');
+      if(!card||!event.altKey||!p10View)return;
+      const i=Number(card.dataset.p10Index);
+      if(event.key==='ArrowUp'&&i>0){event.preventDefault();const days=p10View.days;const [item]=days.splice(i,1);days.splice(i-1,0,item);days.forEach((d,n)=>d.n=n+1);p10Show(p10Result);}
+      if(event.key==='ArrowDown'&&i<p10View.days.length-1){event.preventDefault();const days=p10View.days;const [item]=days.splice(i,1);days.splice(i+1,0,item);days.forEach((d,n)=>d.n=n+1);p10Show(p10Result);}
+    });
+    p10$('#planResult').addEventListener('dragstart',event=>{const b=event.target.closest('[data-p10-drag]');if(!b)return;event.dataTransfer.setData('text/plain',b.dataset.p10Drag);});
+    p10$('#planResult').addEventListener('dragover',event=>{if(event.target.closest('[data-p10-index]'))event.preventDefault();});
+    p10$('#planResult').addEventListener('drop',event=>{const card=event.target.closest('[data-p10-index]');if(!card||!p10View)return;event.preventDefault();const from=Number(event.dataTransfer.getData('text/plain'));const to=Number(card.dataset.p10Index);if(!Number.isInteger(from)||from===to)return;const days=p10View.days;const [item]=days.splice(from,1);days.splice(to,0,item);days.forEach((d,n)=>d.n=n+1);p10Show(p10Result);});
     p10$('#planResult').addEventListener('click',event=>{
       const focus=event.target.closest('[data-p10-focus],[data-p10-map-day]');if(focus){const day=focus.dataset.p10Focus||focus.dataset.p10MapDay;p10FocusDay(day);if(focus.dataset.p10Focus)p10$('#p10-trip-map')?.scrollIntoView({behavior:'auto',block:'start'});return;}
       const edit=event.target.closest('[data-p10-edit]');
-      if(edit){const choices=form.querySelector('.p10-choices');choices.open=true;choices.scrollIntoView({behavior:'auto',block:'start'});choices.querySelector('summary')?.focus({preventScroll:true});return;}
+      if(edit){const choices=form.querySelector('.p10-choices');if(choices){choices.open=true;choices.querySelector('summary')?.focus({preventScroll:true});}document.getElementById('p10-wishes')?.scrollIntoView({behavior:'auto',block:'start'});return;}
+      const up=event.target.closest('[data-p10-up]'),down=event.target.closest('[data-p10-down]'),moveto=event.target.closest('[data-p10-moveto]'),dest=event.target.closest('[data-p10-dest]');
+      if((up||down||moveto||dest)&&p10View){
+        const days=p10View.days;
+        const from=Number((up||down||moveto||{dataset:{}}).dataset.p10Up||(down&&down.dataset.p10Down)||(moveto&&moveto.dataset.p10Moveto)||0);
+        if(dest){const to=Number(dest.dataset.p10Dest);const item=days.splice(p10View.moveFrom,1)[0];days.splice(to,0,item);days.forEach((d,i)=>d.n=i+1);p10Show(p10Result);return;}
+        if(up){const i=Number(up.dataset.p10Up);if(i>0){const [item]=days.splice(i,1);days.splice(i-1,0,item);days.forEach((d,n)=>d.n=n+1);p10Show(p10Result);}return;}
+        if(down){const i=Number(down.dataset.p10Down);if(i<days.length-1){const [item]=days.splice(i,1);days.splice(i+1,0,item);days.forEach((d,n)=>d.n=n+1);p10Show(p10Result);}return;}
+        if(moveto){p10View.moveFrom=Number(moveto.dataset.p10Moveto);const zh=p10Lang()==='zh';const panel=document.createElement('div');panel.className='v4-drawer';panel.innerHTML=days.map((_,i)=>`<button type="button" data-p10-dest="${i}">${zh?`移到第 ${i+1} 天`:`Move to day ${i+1}`}</button>`).join(' ');moveto.closest('.plan-day')?.prepend(panel);return;}
+      }
       const more=event.target.closest('[data-p10-days]'),trim=event.target.closest('[data-p10-trim]');
       if((more||trim)&&p10Result){
         const input=more?{...p10Result.input,days:Number(more.dataset.p10Days)}:{...p10Result.input,wishes:p10Result.fits.keep};

@@ -10,3 +10,6 @@ node_modules/
 data/cache/
 .claude/
 screenshots/
+docs/local-config.js
+local-config.js
+

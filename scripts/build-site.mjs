@@ -1,10 +1,15 @@
 // Rebuild the published site data from the catalogue, then sync the second copy and asset versions.
 // Usage: node scripts/build-site.mjs
+import {createRequire} from 'node:module';
 import {readFile, writeFile, cp} from 'node:fs/promises';
 import {dirname, join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {execFileSync} from 'node:child_process';
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
+const require = createRequire(import.meta.url);
+const v4 = require('./lib/v4-import.cjs');
+const v4data = v4.writeSiteData(root);
+console.log(`Imported v4 places ${v4data.placeCount}, route rows ${v4data.routeRowCount}, missing place ids ${v4data.missingPlaceIds.length}.`);
 const routes = JSON.parse(await readFile(join(root, 'outputs/route-catalogue.json'), 'utf8'));
 const appPath = join(root, 'docs/app.js');
 const lines = (await readFile(appPath, 'utf8')).split('\n');

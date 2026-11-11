@@ -73,21 +73,23 @@ const NODES = {
   alexandra: { at: [-45.26, 169.39], en: 'Alexandra', zh: '亚历山德拉' },
 };
 
-const R = (en, zh) => ({ en, zh });
+// en/zh are the label when travelling from→to as stored. enRev/zhRev are the label in the other direction.
+// A segment with no reverse pair is the same text both ways (the road name does not point at one end).
+const R = (en, zh, enRev, zhRev) => ({ en, zh, enRev: enRev == null ? en : enRev, zhRev: zhRev == null ? zh : zhRev });
 // [from, to, hours, km, road, pt, ptH]
 const EDGES = [
   ['christchurch', 'akaroa', 1.5, 82, R('SH75 over Banks Peninsula', 'SH75 翻越班克斯半岛'), 'shuttle'],
-  ['christchurch', 'arthurs-pass', 2, 150, R('SH73 across the Canterbury Plains to Arthur’s Pass', 'SH73 穿过坎特伯雷平原上亚瑟通道'), 'train'],
-  ['arthurs-pass', 'greymouth', 1.25, 98, R('SH73 down the Ōtira Viaduct to the West Coast', 'SH73 经奥蒂拉高架桥下到西海岸'), 'train'],
+  ['christchurch', 'arthurs-pass', 2, 150, R('SH73 across the Canterbury Plains to Arthur’s Pass', 'SH73 穿过坎特伯雷平原上亚瑟通道', 'SH73 across the Canterbury Plains to Christchurch', 'SH73 穿过坎特伯雷平原到基督城'), 'train'],
+  ['arthurs-pass', 'greymouth', 1.25, 98, R('SH73 down the Ōtira Viaduct to the West Coast', 'SH73 经奥蒂拉高架桥下到西海岸', 'SH73 up the Ōtira Viaduct', 'SH73 经奥蒂拉高架桥而上'), 'train'],
   ['greymouth', 'hokitika', 0.5, 40, R('SH6 along the coast', 'SH6 沿海岸'), 'coach'],
   ['greymouth', 'punakaiki', 0.75, 45, R('SH6 Great Coast Road', 'SH6 大海岸公路'), 'coach'],
   ['punakaiki', 'westport', 0.75, 57, R('SH6 Great Coast Road', 'SH6 大海岸公路'), 'coach'],
   ['westport', 'nelson', 3, 225, R('SH6 through the Buller Gorge', 'SH6 穿过布勒峡谷'), 'coach'],
-  ['nelson', 'marahau', 1, 67, R('SH60 to the Abel Tasman', 'SH60 到亚伯塔斯曼'), 'shuttle'],
+  ['nelson', 'marahau', 1, 67, R('SH60 to the Abel Tasman', 'SH60 到亚伯塔斯曼', 'SH60 to Nelson', 'SH60 到纳尔逊'), 'shuttle'],
   ['nelson', 'picton', 2, 110, R('SH6 via Havelock (or Queen Charlotte Drive)', 'SH6 经哈夫洛克（或夏洛特皇后公路）'), 'coach'],
-  ['picton', 'kaikoura', 2, 155, R('SH1 down the Kaikōura coast', 'SH1 沿凯库拉海岸南下'), 'train'],
+  ['picton', 'kaikoura', 2, 155, R('SH1 down the Kaikōura coast', 'SH1 沿凯库拉海岸南下', 'SH1 up the Kaikōura coast', 'SH1 沿凯库拉海岸北上'), 'train'],
   ['kaikoura', 'christchurch', 2.5, 180, R('SH1', 'SH1'), 'train'],
-  ['hokitika', 'franz-josef', 2, 135, R('SH6 south through the rainforest', 'SH6 穿雨林南下'), 'coach'],
+  ['hokitika', 'franz-josef', 2, 135, R('SH6 south through the rainforest', 'SH6 穿雨林南下', 'SH6 north through the rainforest', 'SH6 穿雨林北上'), 'coach'],
   ['franz-josef', 'fox', 0.5, 25, R('SH6', 'SH6'), 'coach'],
   ['fox', 'haast', 1.5, 120, R('SH6 along the glacier coast', 'SH6 沿冰川海岸'), 'coach'],
   ['haast', 'wanaka', 2, 140, R('SH6 over the Haast Pass', 'SH6 翻越哈斯特隘口'), 'coach'],
@@ -95,7 +97,7 @@ const EDGES = [
   ['wanaka', 'twizel', 1.75, 143, R('SH8 over the Lindis Pass', 'SH8 翻越林迪斯隘口'), 'coach'],
   ['queenstown', 'twizel', 2.5, 185, R('SH6 and SH8 via Cromwell and the Lindis Pass', 'SH6、SH8 经克伦威尔和林迪斯隘口'), 'coach'],
   ['twizel', 'tekapo', 0.75, 58, R('SH8 past Lake Pukaki', 'SH8 经普卡基湖'), 'coach'],
-  ['twizel', 'aoraki', 0.75, 65, R('SH80 along Lake Pukaki to Aoraki/Mount Cook', 'SH80 沿普卡基湖到奥拉基／库克山'), 'shuttle'],
+  ['twizel', 'aoraki', 0.75, 65, R('SH80 along Lake Pukaki to Aoraki/Mount Cook', 'SH80 沿普卡基湖到奥拉基／库克山', 'SH80 along Lake Pukaki to Twizel', 'SH80 沿普卡基湖到特威泽尔'), 'shuttle'],
   ['christchurch', 'tekapo', 3, 226, R('SH1, SH79 and SH8 via Geraldine and Fairlie', 'SH1、SH79、SH8 经杰拉尔丁和费尔利'), 'coach'],
   ['queenstown', 'te-anau', 2.25, 170, R('SH6 and SH94', 'SH6、SH94'), 'coach'],
   ['te-anau', 'milford', 1.75, 120, R('SH94 Milford Road (check NZTA for avalanche closures)', 'SH94 米尔福德公路（冬季注意雪崩封路）'), 'coach'],
@@ -108,11 +110,11 @@ const EDGES = [
   ['dunedin', 'queenstown', 3.5, 280, R('SH8 through Central Otago', 'SH8 穿过中奥塔哥'), 'coach'],
   ['dunedin', 'oamaru', 1.5, 113, R('SH1 past Moeraki', 'SH1 经莫埃拉基'), 'coach'],
   ['oamaru', 'christchurch', 3, 245, R('SH1', 'SH1'), 'coach'],
-  ['oamaru', 'twizel', 1.75, 130, R('SH83 up the Waitaki Valley', 'SH83 沿怀塔基河谷'), null],
+  ['oamaru', 'twizel', 1.75, 130, R('SH83 up the Waitaki Valley', 'SH83 沿怀塔基河谷', 'SH83 down the Waitaki Valley', 'SH83 沿怀塔基河谷而下'), null],
   ['picton', 'wellington', 3.5, 0, R('Cook Strait ferry (Interislander or Bluebridge)', '库克海峡渡轮（Interislander 或 Bluebridge）'), 'ferry'],
   // North Island
-  ['auckland', 'paihia', 3, 230, R('SH1 north', 'SH1 北上'), 'coach'],
-  ['auckland', 'hahei', 2.25, 175, R('SH2 and SH25 to the Coromandel', 'SH2、SH25 到科罗曼德'), null],
+  ['auckland', 'paihia', 3, 230, R('SH1 north', 'SH1 北上', 'SH1 south', 'SH1 南下'), 'coach'],
+  ['auckland', 'hahei', 2.25, 175, R('SH2 and SH25 to the Coromandel', 'SH2、SH25 到科罗曼德', 'SH25 and SH2 to Auckland', 'SH25、SH2 到奥克兰'), null],
   ['auckland', 'hamilton', 1.25, 125, R('SH1 Waikato Expressway', 'SH1 怀卡托高速'), 'coach'],
   ['hamilton', 'matamata', 0.75, 60, R('SH26 and SH27', 'SH26、SH27'), 'coach'],
   ['hamilton', 'waitomo', 1, 75, R('SH39 and SH3', 'SH39、SH3'), 'coach'],
@@ -142,12 +144,12 @@ const EDGES = [
   ['rotorua', 'whakatane', 1.25, 105, R('SH30 past the Rotorua lakes', 'SH30 经罗托鲁瓦湖区'), null],
   ['whakatane', 'gisborne', 2.75, 185, R('SH2 via Ōpōtiki and the Waioeka Gorge', 'SH2 经奥波蒂基和怀奥伊卡峡谷'), null],
   ['napier', 'gisborne', 3.25, 217, R('SH2 via Wairoa', 'SH2 经怀罗阿'), null],
-  ['gisborne', 'tolaga-bay', 0.75, 55, R('SH35 up the East Coast', 'SH35 沿东海岸北上'), null],
+  ['gisborne', 'tolaga-bay', 0.75, 55, R('SH35 up the East Coast', 'SH35 沿东海岸北上', 'SH35 down the East Coast', 'SH35 沿东海岸南下'), null],
   ['whanganui', 'pipiriki', 1.5, 76, R('Whanganui River Road (narrow and winding)', '旺格努伊河路（路窄弯多）'), null],
   // 61 km is 35 km Raetihi–National Park plus 26 km Raetihi–Pipiriki on the Visit Ruapehu Raetihi map (read 2026-11-11).
   ['national-park', 'pipiriki', 1, 61, R('SH4 and the Pipiriki–Raetihi Road', 'SH4、皮皮里基—莱蒂希公路'), null],
   ['national-park', 'whanganui', 1.75, 121, R('SH4 through the Parapara', 'SH4 经帕拉帕拉'), null],
-  ['whanganui', 'wellington', 2.25, 193, R('SH3 and SH1 down the Kāpiti Coast', 'SH3、SH1 沿卡皮蒂海岸'), null],
+  ['whanganui', 'wellington', 2.25, 193, R('SH3 and SH1 down the Kāpiti Coast', 'SH3、SH1 沿卡皮蒂海岸', 'SH3 and SH1 up the Kāpiti Coast', 'SH3、SH1 沿卡皮蒂海岸北上'), null],
   ['new-plymouth', 'whanganui', 2, 158, R('SH3 round South Taranaki', 'SH3 绕南塔拉纳基'), null],
   ['whanganui', 'feilding', 0.75, 64, R('SH3 and SH54', 'SH3、SH54'), null],
   ['feilding', 'wellington', 2, 158, R('SH54 and SH1', 'SH54、SH1'), null],
@@ -454,9 +456,11 @@ function p10LegDescription(leg,lang){
     if(pair.has('kaikoura'))return lang==='zh'?'海岸太平洋列车':'Coastal Pacific train';
     return lang==='zh'?'火车':'Train';
   }
-  // The road name is the source string, including "up" and "down". A label that names only one end
-  // ("SH36 to Tauranga") is stored without that end so the reverse leg does not point the wrong way.
-  return (leg.road && leg.road[lang]) || '';
+  // Stored from→to text when this leg runs that way; the reverse pair when it runs the other way.
+  const road = leg.road || {};
+  const forward = leg.roadFrom == null || leg.a === leg.roadFrom;
+  if (lang === 'zh') return (forward ? road.zh : (road.zhRev || road.zh)) || '';
+  return (forward ? road.en : (road.enRev || road.en)) || '';
 }
 
 /* Pounamu Atlas local road planner. Travel weights are internal to route planning. */
@@ -473,7 +477,7 @@ function p10Net(car) {
     const mode = pt === 'ferry' ? 'ferry' : car ? 'car' : pt;
     const time = mode === 'ferry' && (a === 'picton' || b === 'picton') ? h + 1 : car ? h : ptH ?? Math.round(h * 1.3 * 4) / 4;
     const src = EDGE_SOURCES[a + '|' + b] || EDGE_SOURCE_DEFAULT;
-    graph[a].push({a,b,h:time,km,road,mode,src}); graph[b].push({a:b,b:a,h:time,km,road,mode,src});
+    graph[a].push({a,b,h:time,km,road,roadFrom:a,mode,src}); graph[b].push({a:b,b:a,h:time,km,road,roadFrom:a,mode,src});
   }
   const memo = {};
   function shortest(start) {

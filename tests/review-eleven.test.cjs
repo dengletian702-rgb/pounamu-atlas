@@ -15,14 +15,62 @@ async function withPage(t, fn) {
   try { await fn(page); } finally { await page.close(); }
 }
 
-test('English road names keep up and down exactly as stored', () => {
+test('English road names keep up and down when the leg runs in the stored direction', () => {
   const up = planner.p10Net(true).path('oamaru', 'twizel')[0];
   const down = planner.p10Net(true).path('arthurs-pass', 'greymouth')[0];
-  assert.match(up.road.en, /\bup\b/);
-  assert.match(down.road.en, /\bdown\b/);
+  assert.equal(up.a, 'oamaru');
+  assert.equal(down.a, 'arthurs-pass');
+  assert.match(planner.p10LegDescription(up, 'en'), /\bup\b/);
+  assert.match(planner.p10LegDescription(down, 'en'), /\bdown\b/);
   assert.equal(planner.p10LegDescription(up, 'en'), up.road.en);
   assert.equal(planner.p10LegDescription(down, 'en'), down.road.en);
   assert.equal(planner.p10LegDescription(up, 'zh'), up.road.zh);
+  assert.match(planner.p10LegDescription(down, 'zh'), /下到西海岸/);
+});
+
+test('a reversed direction-word label uses the reverse text in English and Chinese', () => {
+  const leg = (a, b) => planner.p10Net(true).path(a, b).find(item => item.a === a && item.b === b);
+  const cases = [
+    ['paihia', 'auckland', 'SH1 south', 'SH1 南下', /\bnorth\b|北上/],
+    ['kaikoura', 'picton', 'SH1 up the Kaikōura coast', 'SH1 沿凯库拉海岸北上', /\bdown\b|南下/],
+    ['franz-josef', 'hokitika', 'SH6 north through the rainforest', 'SH6 穿雨林北上', /\bsouth\b|南下/],
+    ['tolaga-bay', 'gisborne', 'SH35 down the East Coast', 'SH35 沿东海岸南下', /\bup\b|北上/],
+    ['twizel', 'oamaru', 'SH83 down the Waitaki Valley', 'SH83 沿怀塔基河谷而下', /\bup\b/],
+    ['wellington', 'whanganui', 'SH3 and SH1 up the Kāpiti Coast', 'SH3、SH1 沿卡皮蒂海岸北上', /\bdown\b/],
+    ['greymouth', 'arthurs-pass', 'SH73 up the Ōtira Viaduct', 'SH73 经奥蒂拉高架桥而上', /West Coast|西海岸/],
+  ];
+  for (const [a, b, en, zh, wrong] of cases) {
+    const item = leg(a, b);
+    assert.ok(item, a + '→' + b);
+    assert.equal(planner.p10LegDescription(item, 'en'), en, a);
+    assert.equal(planner.p10LegDescription(item, 'zh'), zh, a);
+    assert.doesNotMatch(planner.p10LegDescription(item, 'en') + planner.p10LegDescription(item, 'zh'), wrong, a);
+  }
+});
+
+test('a reversed destination label names the end you are actually driving toward', () => {
+  const leg = (a, b) => planner.p10Net(true).path(a, b).find(item => item.a === a && item.b === b);
+  const cases = [
+    ['marahau', 'nelson', 'SH60 to Nelson', 'SH60 到纳尔逊', /Abel Tasman|亚伯塔斯曼/],
+    ['hahei', 'auckland', 'SH25 and SH2 to Auckland', 'SH25、SH2 到奥克兰', /Coromandel|科罗曼德/],
+    ['aoraki', 'twizel', 'SH80 along Lake Pukaki to Twizel', 'SH80 沿普卡基湖到特威泽尔', /Aoraki|库克山/],
+    ['arthurs-pass', 'christchurch', 'SH73 across the Canterbury Plains to Christchurch', 'SH73 穿过坎特伯雷平原到基督城', /Arthur|亚瑟通道/],
+  ];
+  for (const [a, b, en, zh, wrong] of cases) {
+    const item = leg(a, b);
+    assert.ok(item, a + '→' + b);
+    assert.equal(planner.p10LegDescription(item, 'en'), en, a);
+    assert.equal(planner.p10LegDescription(item, 'zh'), zh, a);
+    assert.doesNotMatch(en + zh, wrong, a);
+  }
+});
+
+test('Palmerston North and Feilding are both kept, so the same town is visited twice', () => {
+  const plan = planner.p10Plan({ start: 'wellington', end: 'auckland', days: 8, pace: 5, preference: 'drive', car: true, wishes: ['ni-pmn', 'ni-fld'] });
+  assert.deepEqual(plan.order.map(w => w.id), ['ni-pmn', 'ni-fld']);
+  assert.deepEqual(plan.order.map(w => w.base), ['feilding', 'feilding']);
+  const visits = planner.p10Timeline(plan).flatMap(day => day.activities.map(a => a.wish.id));
+  assert.deepEqual(visits, ['ni-pmn', 'ni-fld']);
 });
 
 test('the Pipiriki day title does not say via Pipiriki twice', () => {

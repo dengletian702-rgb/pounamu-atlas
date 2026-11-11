@@ -88,3 +88,35 @@ body[data-page=plan] .type-char{opacity:1!important;transform:none!important;ani
   div#p10-region{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin;padding-bottom:6px}
   div#p10-region button{flex:none;white-space:nowrap}
 }
+/* Place picker map: every listed place is a dot; ticked places are filled. Beside the form on a wide screen (it
+   stays in view while the list scrolls), above the list on a narrow one. */
+.p10-pick-map{margin:10px 0 14px;background:#f7f6ef;border:1px solid #c3ccbd;padding:12px}
+.p10-pick-head{display:flex;flex-direction:column;gap:2px;margin:0 0 8px;font-size:15px;line-height:1.45;color:#203a2e}
+.p10-pick-head span{font-size:13px;color:#4e6157}
+.p10-pick-svg{display:block;width:100%;height:auto;max-height:min(62vh,560px);background:#dbe7ea}
+.p10-pick-sea{fill:#dbe7ea}
+.p10-pick-land{fill:#f1f1e6;stroke:#9fb1a6;stroke-width:calc(var(--k,1) * 1px)}
+.p10-pick-dot{cursor:pointer}
+.p10-pick-hit{fill:transparent}
+.p10-pick-mark{fill:#fff;stroke:#203a2e;stroke-width:calc(var(--k,1) * 1.8px)}
+.p10-pick-dot.is-town .p10-pick-mark{stroke:#6f8077;stroke-width:calc(var(--k,1) * 1.3px)}
+.p10-pick-dot.is-on .p10-pick-mark{fill:#203a2e;stroke:#fff}
+.p10-pick-dot.is-hot .p10-pick-mark,.p10-pick-dot:hover .p10-pick-mark{stroke:#b4512c;stroke-width:calc(var(--k,1) * 3px)}
+.p10-pick-labels{pointer-events:none}
+.p10-pick-label{font-size:calc(var(--k,1) * 12px);fill:#203a2e;stroke:#f6f6ee;stroke-width:calc(var(--k,1) * 3.5px);stroke-linejoin:round;paint-order:stroke;font-family:var(--bodyface,system-ui,sans-serif)}
+.p10-pick-label.is-town{font-size:calc(var(--k,1) * 11px);fill:#4e6157}
+.p10-pick-label.is-off{display:none}
+.p10-pick-label.is-hot{display:inline;font-weight:700;fill:#9e4a2e}
+.p10-pick-status{min-height:1.5em;margin:6px 0 0;font-size:13px;color:#203a2e}
+.p10-wishes .p10-group label.is-hot{border-color:#b4512c;background:#f6ece3}
+.p10-wish-stay{display:block;font-size:12px;color:#5b6b63}
+.p10-suggested{margin:0 0 12px;padding:14px 16px;background:#eef3e6;border-left:3px solid #446e28}
+.p10-suggested p{margin:0 0 6px}
+/* Wide screens: the side column runs the height of the form and only the map sticks inside it, so it never slides
+   over the itinerary below. */
+@media (min-width:1001px){
+  body[data-page=plan] .planner-explainer.p10-has-map{align-self:stretch;background:none;border-left:0;padding:0}
+  body[data-page=plan] .planner-explainer.p10-has-map > .planner-explainer-zh,body[data-page=plan] .planner-explainer.p10-has-map > .planner-explainer-en{background:#f5ede1;border-left:3px solid #c87d4b;padding:22px 26px}
+  body[data-page=plan] .planner-explainer.p10-has-map .p10-pick-map{position:sticky;top:12px;margin:18px 0 0;padding:14px 16px;background:#f5ede1;border:0;border-left:3px solid #c87d4b}
+  .planner-explainer.p10-has-map .p10-pick-svg{max-height:calc(100vh - 150px)}
+}

@@ -631,45 +631,65 @@
       return true;
     });
   }
+  // The same places the planner counts: sights in the region, plus towns that are not already one of those sights.
+  function regionEntries(regionId) {
+    if (typeof window.p10RegionEntries === 'function') return window.p10RegionEntries(regionId, state.draft.island);
+    const rows = towns().filter(p => p.region_id === regionId && (state.draft.island === 'all' || p.island === state.draft.island));
+    return { wishes: [], towns: rows };
+  }
+  function listedRegions() {
+    const island = state.draft.island;
+    const regions = (state.catalog.regions || []).filter(r => island === 'all' || r.island === island);
+    const picked = state.draft.regions || [];
+    return regions.filter(r => !picked.length || picked.includes(r.id)).map(r => ({ region: r, ...regionEntries(r.id) }));
+  }
+  function listedCount() {
+    return listedRegions().reduce((n, group) => n + group.wishes.length + group.towns.length, 0);
+  }
   function regionButtons() {
     const island = state.draft.island;
     const regions = (state.catalog.regions || []).filter(r => island === 'all' || r.island === island);
     return regions.map(r => {
-      const count = towns().filter(p => p.region_id === r.id && (island === 'all' || p.island === island)).length;
+      const entries = regionEntries(r.id);
+      const count = entries.wishes.length + entries.towns.length;
       const on = (state.draft.regions || []).includes(r.id);
       const label = t('regionTowns', { r: state.lang === 'en' ? r.en : r.zh, n: count });
       const empty = count === 0 ? ' · ' + t('noPlacesInRegion') : '';
       return `<button type="button" data-region="${esc(r.id)}" aria-pressed="${on ? 'true' : 'false'}" ${count === 0 ? 'data-empty="1"' : ''}>${esc(label + empty)}</button>`;
     }).join('');
   }
+  function placeBox(id, primary, secondary, extra) {
+    const on = state.draft.chosen.includes(id);
+    const other = state.lang === 'en' ? '' : (secondary && secondary !== primary ? ' ' + secondary : '');
+    return `<label class="v4-place"><input type="checkbox" data-place="${esc(id)}" data-label-en="${esc(state.lang === 'en' ? primary : (secondary || primary))}" data-label-zh="${esc(state.lang === 'zh' ? primary : (secondary || primary))}" ${on ? 'checked' : ''}><span><strong>${esc(primary)}</strong>${esc(other)}${extra || ''}</span></label>`;
+  }
   function placeList() {
-    const list = filteredTowns();
-    const groups = new Map();
-    for (const p of list) {
-      const key = p.region_id || 'unmapped';
-      if (!groups.has(key)) groups.set(key, []);
-      groups.get(key).push(p);
-    }
-    if ((state.draft.regions || []).includes('unmapped') === false && state.draft.regions && state.draft.regions.length && !state.draft.regions.some(id => groups.has(id) || id === 'unmapped')) {
-      /* filters already applied */
-    }
+    const groups = listedRegions();
     let html = '';
-    for (const [key, rows] of groups) {
-      const meta = regionMeta(key);
-      const heading = meta ? (state.lang === 'en' ? meta.en : meta.zh) : key;
-      html += `<section class="v4-group"><h3>${esc(heading)}</h3>`;
-      if (!rows.length) html += `<p>${esc(t('noPlacesInRegion'))}</p>`;
-      for (const p of rows) {
+    const ids = new Set();
+    for (const group of groups) {
+      const heading = state.lang === 'en' ? group.region.en : group.region.zh;
+      const rows = [];
+      for (const w of group.wishes) {
+        ids.add(w.id);
+        const primary = state.lang === 'en' ? w.en : w.zh;
+        const secondary = state.lang === 'en' ? w.zh : w.en;
+        rows.push(placeBox(w.id, primary, secondary, ''));
+      }
+      for (const p of group.towns) {
         if (state.draft.hideVerify && p.verify) continue;
-        const on = state.draft.chosen.includes(p.place_id);
+        ids.add(p.place_id);
+        const primary = nameOf(p);
+        const secondary = state.lang === 'en' ? p.name_zh : p.name_en;
         const verify = p.verify ? ` <span class="v4-badge">${esc(t('verifyBadge'))}</span>` : '';
         const coord = p.lat == null || p.lon == null ? ` <span class="v4-note">${esc(t('missingCoords'))}</span>` : '';
         const district = p.district_zh ? ` <span class="v4-note">${esc(state.lang === 'en' ? p.district_en : p.district_zh)}</span>` : '';
-        html += `<label class="v4-place"><input type="checkbox" data-place="${esc(p.place_id)}" ${on ? 'checked' : ''}><span><strong>${esc(nameOf(p))}</strong> ${esc(state.lang === 'en' ? p.name_zh : p.name_en)}${district}${verify}${coord}</span></label>`;
+        rows.push(placeBox(p.place_id, primary, secondary, district + verify + coord));
       }
-      html += '</section>';
+      if (!rows.length) continue;
+      html += `<section class="v4-group"><h3>${esc(heading)}</h3>${rows.join('')}</section>`;
     }
-    const hidden = state.draft.chosen.filter(id => !list.some(p => p.place_id === id));
+    const hidden = state.draft.chosen.filter(id => !ids.has(id));
     if (hidden.length) {
       html = `<p class="v4-note">${esc(t('hiddenChosen'))}: ${hidden.map(id => esc(nameOf(byId(id)) || id)).join(', ')}</p>` + html;
     }
@@ -783,7 +803,7 @@
     const view = d.view || 'edit';
     host.classList.remove('v4-show-days', 'v4-show-pick', 'v4-show-map', 'v4-show-chosen');
     host.classList.add('v4-show-' + (view === 'edit' ? 'days' : view));
-    const count = filteredTowns().length;
+    const count = listedCount();
     host.innerHTML = `<p class="v4-note">${esc(t('draftNote'))}</p>
       <div class="v4-guide-top"><h1>${esc(d.title || t('blankTrip'))}</h1>
         <div class="v4-actions"><button type="button" data-undo>${esc(t('undo'))}</button><button type="button" data-redo>${esc(t('redo'))}</button>
@@ -847,7 +867,8 @@
     else state.draft.chosen.push(id);
     if (i < 0 && !state.draft.days.some(d => d.placeId === id)) {
       const p = byId(id);
-      state.draft.days.push({ uid: uid(), placeId: id, from: '', to: p ? p.name_en : id, via: '', parts: [], notes: '', ferry: false, source_url: p ? p.source_url : '', est_date: '', nameVerify: Boolean(p && p.verify), km: '', rawTime: '' });
+      const box = document.querySelector(`[data-place="${CSS.escape(id)}"]`);
+      state.draft.days.push({ uid: uid(), placeId: id, from: '', to: p ? p.name_en : id, label_en: p ? p.name_en : (box && box.dataset.labelEn) || id, label_zh: p ? p.name_zh : (box && box.dataset.labelZh) || id, via: '', parts: [], notes: '', ferry: false, source_url: p ? p.source_url : '', est_date: '', nameVerify: Boolean(p && p.verify), km: '', rawTime: '' });
     }
     persist();
     renderGuide();

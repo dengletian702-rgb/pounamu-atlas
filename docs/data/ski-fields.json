@@ -23,13 +23,13 @@
       "town_zh": "梅斯文",
       "town_id": "",
       "url": "https://www.mthutt.co.nz/",
-      "season_en": "The official home page says it reopens on 11 June (2027 season); the closing date is not given (to be checked).",
-      "season_zh": "官网首页写 6 月 11 日重新开放（2027 雪季）；闭季日期未写，待核。",
-      "season_source": "https://www.mthutt.co.nz/",
+      "season_en": "The official mountain page lists the 2027 season as 11 June to 10 October.",
+      "season_zh": "官网山地信息页写 2027 雪季为 6 月 11 日至 10 月 10 日。",
+      "season_source": "https://www.mthutt.co.nz/mountain-info",
       "road_en": "The access road is unsealed; depending on the vehicle, chains may be needed, and rental cover may exclude alpine roads and chains. Check the Snow Report before going up.",
       "road_zh": "上山路是未铺装的砂石路；视车辆可能需要装防滑链，租车保险不一定覆盖高山路段和防滑链。上山前看滑雪场的每日雪况报告。",
       "road_source": "https://www.mthutt.co.nz/faqs",
-      "checkedAt": "2026-11-12"
+      "checkedAt": "2026-11-11"
     },
     {
       "id": "cardrona",

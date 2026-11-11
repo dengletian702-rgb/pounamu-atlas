@@ -68,6 +68,32 @@ test('every catalog town is a checkbox on plan.html and the new towns stay on th
       assert.ok(resultText.includes(town.name_zh), town.name_zh);
       assert.equal(await page.ev(`document.querySelector('#p10-wishes input[name="p10-wish"][value="${id}"]').checked`), true);
     }
+    const stops = await page.ev(`[...document.querySelectorAll('#planResult [data-p10-stop]')].map(n => n.getAttribute('data-p10-stop'))`);
+    for (const id of north) assert.ok(stops.includes(id), 'marker ' + id);
+    assert.deepEqual(page.errors, []);
+  } finally {
+    await page.close();
+  }
+});
+
+test('South Island towns si-alx and si-cly can be picked and both appear on the itinerary', async (t) => {
+  const page = await openBrowser();
+  if (!page) { t.skip('Chrome is not installed here'); return; }
+  try {
+    await page.go('plan.html?lang=zh');
+    await page.ev('localStorage.clear()');
+    await page.go('plan.html?lang=zh&from=queenstown&to=dunedin&days=5&car=1&pace=5&pref=drive&w=si-alx,si-cly');
+    await page.waitFor('document.querySelector("#planResult .plan-day")');
+    const resultText = await page.ev('document.querySelector("#planResult").innerText');
+    assert.match(resultText, /亚历山德拉/);
+    assert.match(resultText, /克莱德/);
+    const stops = await page.ev(`[...document.querySelectorAll('#planResult [data-p10-stop]')].map(n => n.getAttribute('data-p10-stop'))`);
+    assert.ok(stops.includes('si-alx'), 'marker si-alx');
+    assert.ok(stops.includes('si-cly'), 'marker si-cly');
+    await page.click('#p10-region [data-p10-region="central-otago"]');
+    for (const id of ['si-alx', 'si-cly']) {
+      assert.equal(await page.ev(`document.querySelector('#p10-wishes input[name="p10-wish"][value="${id}"]').checked`), true, id);
+    }
     assert.deepEqual(page.errors, []);
   } finally {
     await page.close();

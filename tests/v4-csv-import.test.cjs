@@ -13,8 +13,9 @@ test('imported v2 rows match the delivered CSV data rows', () => {
   assert.equal(routesText.charCodeAt(0), 0xfeff);
   const placeRows = parseCsv(placesText);
   const routeRows = parseCsv(routesText);
-  // 471 rows were delivered; ni-mau was merged into ni-tga (ticket C) and new towns gained rows (ticket D)
-  assert.ok(placeRows.length >= 470);
+  // 471 rows were delivered. Merging Mount Maunganui (ni-mau) into Tauranga removed 1 row,
+  // and the seven new towns each gained 4 sourced rows (2 sights and 2 activities): 471 - 1 + 28 = 498.
+  assert.equal(placeRows.length, 498);
   assert.equal(routeRows.length, 78);
   assert.equal(placeRows[0].place_id.startsWith('\ufeff'), false);
   assert.equal(routeRows[0].route_id.startsWith('\ufeff'), false);

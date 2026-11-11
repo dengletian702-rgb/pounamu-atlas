@@ -55,6 +55,7 @@ async function openBrowser() {
   await new Promise((resolve, reject) => { ws.onopen = resolve; ws.onerror = reject; });
   let id = 0;
   const pending = new Map();
+  const listeners = new Map();
   const errors = [];
   ws.onmessage = event => {
     const msg = JSON.parse(event.data);
@@ -62,6 +63,7 @@ async function openBrowser() {
     const p = msg.params || {};
     if (msg.method === 'Runtime.exceptionThrown') errors.push('exception ' + String((p.exceptionDetails.exception && p.exceptionDetails.exception.description) || p.exceptionDetails.text).split('\n')[0]);
     else if (msg.method === 'Runtime.consoleAPICalled' && p.type === 'error') errors.push('console.error ' + p.args.map(a => a.value ?? a.description).join(' '));
+    for (const fn of listeners.get(msg.method) || []) fn(p);
   };
   const send = (method, params = {}) => new Promise(resolve => { const n = ++id; pending.set(n, resolve); ws.send(JSON.stringify({ id: n, method, params })); });
   const ev = async expr => {
@@ -73,6 +75,15 @@ async function openBrowser() {
   await send('Page.enable');
   const page = {
     base, errors, ev,
+    cdp(method, params = {}) { return send(method, params); },
+    on(method, fn) {
+      if (!listeners.has(method)) listeners.set(method, []);
+      listeners.get(method).push(fn);
+    },
+    async shot(file) {
+      const shot = await send('Page.captureScreenshot', { format: 'png' });
+      fs.writeFileSync(file, Buffer.from(shot.result.data, 'base64'));
+    },
     async view(width, height, mobile = false) { await send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile }); },
     async go(rel) {
       errors.length = 0;

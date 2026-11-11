@@ -252,7 +252,7 @@ test('G P2-02/08/09: English guide legs, unknown template, region counts with un
   assert.match(await page.ev('document.querySelector("[data-template-missing]").innerText'), /XX-99/);
   await page.go('guide.html?view=pick&lang=zh');
   await page.waitFor('document.querySelector("[data-region]")');
-  assert.match(await page.ev('document.querySelector("[data-region]").textContent'), /个城镇/);
+  assert.match(await page.ev('document.querySelector("[data-region]").textContent'), /个地点/);
   await page.go('plan.html?lang=en');
   await page.waitFor('document.querySelector(\'#p10-region [data-p10-region="taranaki"]\')');
   assert.match(await page.ev('document.querySelector(\'#p10-region [data-p10-region="taranaki"]\').textContent'), /places?\)/);

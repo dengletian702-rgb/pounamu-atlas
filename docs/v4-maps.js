@@ -66,7 +66,14 @@
     });
   }
   let sessionSvg = false;
+  let mountSeq = 0;
   let errorHandler = null;
+  function alive(el, token) {
+    return Boolean(el && el.isConnected && el.dataset.mapToken === token);
+  }
+  function googleErrored(el) {
+    return Boolean(el.querySelector('.gm-err-container, .gm-err-message, .gm-err-title, .dismissButton'));
+  }
   let nativeObserver = null;
   let watchedObservers = [];
   function stopMapHooks() {
@@ -120,25 +127,35 @@
   async function mount(el, state) {
     if (!el) return { kind: 'none' };
     stopMapHooks();
+    const token = String(++mountSeq);
+    el.dataset.mapToken = token;
     const key = keyFromWindow();
     if (!key || sessionSvg) return showSvg(el, state);
     watchObservers();
     let failed = false;
+    const giveUp = () => {
+      failed = true;
+      sessionSvg = true;
+      if (alive(el, token)) showSvg(el, state);
+    };
     errorHandler = event => {
       const file = String(event.filename || '');
       const msg = String(event.message || '');
-      if (file.includes('maps.googleapis') || file.includes('maps.gstatic') || /google maps|invalidkey|gm_auth|getRootNode/i.test(msg)) {
+      if (file.includes('maps.googleapis') || file.includes('maps.gstatic') || /google maps|invalidkey|gm_auth|getRootNode|referernotallowed/i.test(msg)) {
         event.preventDefault();
-        failed = true;
-        sessionSvg = true;
-        showSvg(el, state);
+        giveUp();
       }
     };
     window.addEventListener('error', errorHandler, true);
-    window.gm_authFailure = () => { failed = true; sessionSvg = true; showSvg(el, state); };
+    window.gm_authFailure = () => giveUp();
+    const watch = new MutationObserver(() => { if (googleErrored(el)) giveUp(); });
+    watch.observe(el, { childList: true, subtree: true });
+    watchedObservers.push(watch);
     const ok = await loadGoogle(key);
+    if (!alive(el, token)) return { kind: 'stale' };
     if (ok && !failed) await new Promise(resolve => setTimeout(resolve, 800));
-    if (failed || sessionSvg) return { kind: 'svg' };
+    if (!alive(el, token)) return { kind: 'stale' };
+    if (failed || sessionSvg || googleErrored(el)) return showSvg(el, state);
     if (!ok || !window.google || !window.google.maps) { sessionSvg = true; return showSvg(el, state); }
     try {
       watchObservers();
@@ -186,7 +203,9 @@
         });
       }
       if (path.length || pool.length) map.fitBounds(bounds, 48);
-      if (failed || sessionSvg) { sessionSvg = true; return showSvg(el, state); }
+      await new Promise(resolve => setTimeout(resolve, 1200));
+      if (!alive(el, token)) return { kind: 'stale' };
+      if (failed || sessionSvg || googleErrored(el)) { sessionSvg = true; return showSvg(el, state); }
       return { kind: 'google', map };
     } catch {
       sessionSvg = true;

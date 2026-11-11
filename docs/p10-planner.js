@@ -135,7 +135,7 @@ const EDGES = [
   ['auckland', 'new-plymouth', 4.5, 350, R('SH1 and SH3 via Te Kūiti', 'SH1、SH3 经蒂库伊蒂'), 'coach'],
   // Ticket D (2026-11-12): hours from data/nzta/readings-2026-11-12.txt; km from an OSRM route on OpenStreetMap data
   // (data/nzta/osrm-km-2026-11-12.json; 0 = not checked). No public transport is listed on these legs (null) until a timetable is sourced.
-  ['rotorua', 'tauranga', 1, 64, R('SH36 to Tauranga', 'SH36 到陶朗加'), null],
+  ['rotorua', 'tauranga', 1, 64, R('SH36', 'SH36'), null],
   ['hamilton', 'tauranga', 1.5, 105, R('SH1 and SH29 over the Kaimai Range', 'SH1、SH29 翻越凯麦山脉'), null],
   ['auckland', 'tauranga', 2.75, 225, R('SH1 and SH2', 'SH1、SH2'), null],
   ['tauranga', 'whakatane', 1, 89, R('SH2 along the Bay of Plenty', 'SH2 沿丰盛湾'), null],
@@ -144,7 +144,8 @@ const EDGES = [
   ['napier', 'gisborne', 3.25, 217, R('SH2 via Wairoa', 'SH2 经怀罗阿'), null],
   ['gisborne', 'tolaga-bay', 0.75, 55, R('SH35 up the East Coast', 'SH35 沿东海岸北上'), null],
   ['whanganui', 'pipiriki', 1.5, 76, R('Whanganui River Road (narrow and winding)', '旺格努伊河路（路窄弯多）'), null],
-  ['national-park', 'pipiriki', 1, 0, R('SH4 and the Pipiriki–Raetihi Road', 'SH4、皮皮里基—莱蒂希公路'), null],
+  // 61 km is 35 km Raetihi–National Park plus 26 km Raetihi–Pipiriki on the Visit Ruapehu Raetihi map (read 2026-11-11).
+  ['national-park', 'pipiriki', 1, 61, R('SH4 and the Pipiriki–Raetihi Road', 'SH4、皮皮里基—莱蒂希公路'), null],
   ['national-park', 'whanganui', 1.75, 121, R('SH4 through the Parapara', 'SH4 经帕拉帕拉'), null],
   ['whanganui', 'wellington', 2.25, 193, R('SH3 and SH1 down the Kāpiti Coast', 'SH3、SH1 沿卡皮蒂海岸'), null],
   ['new-plymouth', 'whanganui', 2, 158, R('SH3 round South Taranaki', 'SH3 绕南塔拉纳基'), null],
@@ -228,7 +229,7 @@ const EDGE_SOURCES = {
   "napier|gisborne": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJmcqxT9bJaW0RUOiiQ2HvAAU&b=ChIJl6ywQZzAZW0RB5miQ2HvAAU", checkedAt: "2026-11-12", nzta: { from: "内皮尔, 新西兰", to: "吉斯伯恩, 新西兰", route: "State Hwy 2", time: "3h 16m", minutes: 196, traffic: "7 min slower than normal", readAt: "2026-11-11T15:02:48.574Z" }, hoursBefore: 3.25, estimate: true, km: { status: "osrm", source: "OSRM demo route (router.project-osrm.org) on OpenStreetMap data, town centre to town centre", checkedAt: "2026-11-12" } },
   "gisborne|tolaga-bay": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJl6ywQZzAZW0RB5miQ2HvAAU&b=ChIJl69hhXM3ZG0RkA-jQ2HvAAU", checkedAt: "2026-11-12", nzta: { from: "吉斯伯恩, 新西兰", to: "Tolaga Bay, 新西兰", route: "State Hwy 35", time: "45 mins", minutes: 45, traffic: "1 min faster than normal", readAt: "2026-11-11T15:02:52.124Z" }, hoursBefore: 0.75, estimate: true, km: { status: "osrm", source: "OSRM demo route (router.project-osrm.org) on OpenStreetMap data, town centre to town centre", checkedAt: "2026-11-12" } },
   "whanganui|pipiriki": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJS2N2fnS4am0RMpmjQ2HvAAU&b=ChIJf7mVjNjIam0RoPaiQ2HvAAU", checkedAt: "2026-11-12", nzta: { from: "Whanganui, 新西兰", to: "Pipiriki, 新西兰", route: "Whanganui River Rd", time: "1h 27m", minutes: 87, traffic: "1 min faster than normal", readAt: "2026-11-11T15:02:56.026Z" }, hoursBefore: 1.5, estimate: true, km: { status: "osrm", source: "OSRM demo route (router.project-osrm.org) on OpenStreetMap data, town centre to town centre", checkedAt: "2026-11-12" } },
-  "national-park|pipiriki": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJHVFNwkYca20RkOiiQ2HvAAU&b=ChIJf7mVjNjIam0RoPaiQ2HvAAU", checkedAt: "2026-11-12", nzta: { from: "國家公園村, 新西兰", to: "Pipiriki, 新西兰", route: "State Hwy 4和Pipiriki Raetihi Rd", time: "1h 0m", minutes: 60, traffic: null, readAt: "2026-11-11T15:03:01.859Z" }, hoursBefore: 1, estimate: true, km: { status: "待核", source: "OSRM routed a 169 km detour instead of NZTA's SH4 and Pipiriki–Raetihi Road route, so its distance is not used", checkedAt: "2026-11-12" } },
+  "national-park|pipiriki": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJHVFNwkYca20RkOiiQ2HvAAU&b=ChIJf7mVjNjIam0RoPaiQ2HvAAU", checkedAt: "2026-11-12", nzta: { from: "國家公園村, 新西兰", to: "Pipiriki, 新西兰", route: "State Hwy 4和Pipiriki Raetihi Rd", time: "1h 0m", minutes: 60, traffic: null, readAt: "2026-11-11T15:03:01.859Z" }, hoursBefore: 1, estimate: true, km: { status: "checked", km: 61, source: "Visit Ruapehu Raetihi town map: 35 km from Raetihi to National Park Village plus 26 km from Raetihi to Pipiriki, the SH4 and Pipiriki–Raetihi Road route", url: "https://www.visitruapehu.com/media/PDF/Raetihi%20map%2014%20BACK_compressed.pdf", checkedAt: "2026-11-11" } },
   "national-park|whanganui": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJHVFNwkYca20RkOiiQ2HvAAU&b=ChIJS2N2fnS4am0RMpmjQ2HvAAU", checkedAt: "2026-11-12", nzta: { from: "國家公園村, 新西兰", to: "Whanganui, 新西兰", route: "State Hwy 4", time: "1h 43m", minutes: 103, traffic: null, readAt: "2026-11-11T15:03:07.753Z" }, hoursBefore: 1.75, estimate: true, km: { status: "osrm", source: "OSRM demo route (router.project-osrm.org) on OpenStreetMap data, town centre to town centre", checkedAt: "2026-11-12" } },
   "whanganui|wellington": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJS2N2fnS4am0RMpmjQ2HvAAU&b=ChIJy3TpSfyxOG0RcLQTomPvAAo", checkedAt: "2026-11-12", nzta: { from: "Whanganui, 新西兰", to: "惠灵顿, 新西兰", route: "SH 1", time: "2h 19m", minutes: 139, traffic: "2 min faster than normal", readAt: "2026-11-11T15:03:11.944Z" }, hoursBefore: 2.25, estimate: true, km: { status: "osrm", source: "OSRM demo route (router.project-osrm.org) on OpenStreetMap data, town centre to town centre", checkedAt: "2026-11-12" } },
   "new-plymouth|whanganui": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJDc5kI-b5FG0RoOmiQ2HvAAU&b=ChIJS2N2fnS4am0RMpmjQ2HvAAU", checkedAt: "2026-11-12", nzta: { from: "新普利茅斯, 新西兰", to: "Whanganui, 新西兰", route: "SH 3", time: "2h 4m", minutes: 124, traffic: "1 min faster than normal", readAt: "2026-11-11T15:03:14.780Z" }, hoursBefore: 2, estimate: true, km: { status: "osrm", source: "OSRM demo route (router.project-osrm.org) on OpenStreetMap data, town centre to town centre", checkedAt: "2026-11-12" } },
@@ -268,14 +269,22 @@ function p10EdgeKey(a,b,table){return table[a+'|'+b]?a+'|'+b:table[b+'|'+a]?b+'|
 // The road and winter notes for one day's legs, as list items (empty when none apply).
 function p10RoadNotes(legs,month,zh){
   const out=[],seen=new Set();
+  // Coaches, trains and shuttles use the same alpine roads, so a winter closure applies to them too.
+  const onRoad=new Set(['car','coach','train','shuttle']);
   for(const l of legs||[]){
-    if(l.mode!=='car')continue;
-    const rk=p10EdgeKey(l.a,l.b,P10_ROAD_NOTES);
-    if(rk&&!seen.has(rk)){seen.add(rk);const n=P10_ROAD_NOTES[rk];out.push({kind:'road',text:zh?n.zh:n.en,sources:[{label:n.source,url:n.url,checkedAt:n.checkedAt}]});}
+    if(l.mode==='car'){
+      const rk=p10EdgeKey(l.a,l.b,P10_ROAD_NOTES);
+      if(rk&&!seen.has(rk)){seen.add(rk);const n=P10_ROAD_NOTES[rk];out.push({kind:'road',text:zh?n.zh:n.en,sources:[{label:n.source,url:n.url,checkedAt:n.checkedAt}]});}
+    }
+    if(!onRoad.has(l.mode))continue;
     const wk=P10_WINTER_MONTHS.includes(Number(month))?p10EdgeKey(l.a,l.b,P10_WINTER_EDGES):null;
     if(wk&&!seen.has('w'+wk)){seen.add('w'+wk);const pass=P10_WINTER_EDGES[wk][zh?'zh':'en'];
-      out.push({kind:'winter',text:zh?`冬季山路：${pass} 在 6–10 月可能结冰、下雪或临时封路。出发当天先查 NZTA 路况，封闭的道路不能走；冰雪路面放慢车速，车上备保暖衣物、水和食物，油箱至少留半箱。是否需要防滑链以当天路况为准，租车在高山路段和使用防滑链不一定在保险范围内，先问租车公司。`
-        :`Winter road: ${pass} can have ice, snow or temporary closures from June to October. Check NZTA road conditions on the day and never drive a closed road; slow down on ice and snow, carry warm clothes, water and food, and keep at least half a tank of fuel. Whether chains are needed depends on the day; rental cover may exclude alpine roads and chains, so ask your rental company first.`,sources:P10_WINTER_SOURCES});}
+      const text=l.mode==='car'
+        ?(zh?`冬季山路：${pass} 在 6–10 月可能结冰、下雪或临时封路。出发当天先查 NZTA 路况，封闭的道路不能走；冰雪路面放慢车速，车上备保暖衣物、水和食物，油箱至少留半箱。是否需要防滑链以当天路况为准，租车在高山路段和使用防滑链不一定在保险范围内，先问租车公司。`
+          :`Winter road: ${pass} can have ice, snow or temporary closures from June to October. Check NZTA road conditions on the day and never drive a closed road; slow down on ice and snow, carry warm clothes, water and food, and keep at least half a tank of fuel. Whether chains are needed depends on the day; rental cover may exclude alpine roads and chains, so ask your rental company first.`)
+        :(zh?`冬季山路：${pass} 在 6–10 月可能结冰、下雪或临时封路，大巴和火车也可能停开或改线。出发当天先查 NZTA 路况和运营商公告，封闭的道路不要走。`
+          :`Winter road: ${pass} can have ice, snow or temporary closures from June to October, and coaches and trains may be cancelled or rerouted. Check NZTA road conditions and the operator on the day, and do not travel a closed road.`);
+      out.push({kind:'winter',text,sources:P10_WINTER_SOURCES});}
   }
   return out;
 }
@@ -289,9 +298,14 @@ function p10LegTag(l, zh) {
   // A quiet note, not a warning badge: the full reading is in the tooltip and the method is explained once below the plan.
   // Segments added later (ticket D) are labelled as estimates: NZTA shows Google's suggested time, also on local roads.
   const label = nz ? (s.estimate ? (zh ? `NZTA ${s.checkedAt} 估算` : `NZTA estimate ${s.checkedAt}`) : (zh ? `NZTA ${s.checkedAt} 读数` : `NZTA reading ${s.checkedAt}`)) : (zh ? '时刻表为准' : 'check timetable');
+  const kmNote = s.km && s.km.status === 'checked'
+    ? (zh ? `里程 ${s.km.km} km：${s.km.source}（查阅 ${s.km.checkedAt}）。` : `Distance ${s.km.km} km: ${s.km.source} (read ${s.km.checkedAt}).`)
+    : s.km && s.km.status === '待核'
+      ? (zh ? '这一段里程待核，不计入合计。' : 'This segment’s distance is still to be verified and is not included in the total.')
+      : (zh ? 'NZTA 不显示里程，里程为规划估算。' : 'NZTA shows no distance; km is a planning estimate.');
   const title = nz
-    ? (zh ? `NZTA Journey Planner ${s.checkedAt} 读数：${road}，${s.nzta.time}${s.nzta.traffic ? '（' + s.nzta.traffic + '）' : ''}；取整到 15 分钟。NZTA 不显示里程，里程为规划估算。`
-          : `NZTA Journey Planner reading on ${s.checkedAt}: ${road}, ${s.nzta.time}${s.nzta.traffic ? ' (' + s.nzta.traffic + ')' : ''}; rounded to 15 minutes. NZTA shows no distance; km is a planning estimate.`)
+    ? (zh ? `NZTA Journey Planner ${s.checkedAt} 读数：${road}，${s.nzta.time}${s.nzta.traffic ? '（' + s.nzta.traffic + '）' : ''}；取整到 15 分钟。${kmNote}`
+          : `NZTA Journey Planner reading on ${s.checkedAt}: ${road}, ${s.nzta.time}${s.nzta.traffic ? ' (' + s.nzta.traffic + ')' : ''}; rounded to 15 minutes. ${kmNote}`)
     : (zh ? '规划用估算值；公共交通和渡轮以运营商时刻表为准。' : 'Planning estimate; for coaches, trains and ferries check the operator’s timetable.');
   const esc = v => String(v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   return `<abbr class="p10-src" title="${esc(title)}">${label}</abbr>`;
@@ -440,7 +454,9 @@ function p10LegDescription(leg,lang){
     if(pair.has('kaikoura'))return lang==='zh'?'海岸太平洋列车':'Coastal Pacific train';
     return lang==='zh'?'火车':'Train';
   }
-  return (leg.road[lang]||'').replace(/南下|北上/g,'').replace(/\b(north|south|down|up)\b/gi,'');
+  // The road name is the source string, including "up" and "down". A label that names only one end
+  // ("SH36 to Tauranga") is stored without that end so the reverse leg does not point the wrong way.
+  return (leg.road && leg.road[lang]) || '';
 }
 
 /* Pounamu Atlas local road planner. Travel weights are internal to route planning. */
@@ -719,7 +735,9 @@ function p10Plan(input) {
   // A ticked town that is the same place as a ticked sight (Queenstown the town, Queenstown the stay) counts once.
   const all=[...new Set(input.wishes)].map(p10WishById).filter(Boolean);
   const sightBases=new Set(all.filter(w=>!w.catalog).flatMap(w=>[w.base,w.id])), townBases=new Set();
-  const wanted=all.filter(w=>!w.catalog||(!sightBases.has(w.base)&&!townBases.has(w.base)&&townBases.add(w.base)));
+  // Two different towns can share a road node (Alexandra and Clyde). Keep both. A town that is the same
+  // place as a ticked sight is still listed once, as the sight.
+  const wanted=all.filter(w=>!w.catalog||(!sightBases.has(w.base)&&!(P10_SAME_PLACE[w.base]&&sightBases.has(P10_SAME_PLACE[w.base]))&&!townBases.has(w.id)&&townBases.add(w.id)));
   // Nothing picked: suggest a route that fills the days with the places most worth seeing.
   let suggested=null;
   if(!wanted.length){
@@ -788,8 +806,17 @@ function p10Fitted(plan){
   const built=p10Build(plan.input,keep);
   return {...built,input:plan.input,minimum:built.days.length};
 }
-// Travel-day titles: a stop on the way reads "· 途经霍比特村", a visit at the day's end "· 游览…" (walk-through H-07)
-function p10WayTitle(d,lang){const zh=lang==='zh',esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),names=list=>list.map(a=>esc(a.wish[lang])).join(zh?'、':', ');const way=d.activities.filter(a=>a.wish.base!==d.at),end=d.activities.filter(a=>a.wish.base===d.at);return (way.length?` · ${zh?'途经':'via '}${names(way)}`:'')+(end.length?` · ${zh?'游览':'explore '}${names(end)}`:'');}
+// Travel-day titles: a stop on the way reads "· 途经霍比特村", a visit at the day's end "· 游览…" (walk-through H-07).
+// A place already named as this day's start or overnight stop is not repeated as "via".
+function p10WayTitle(d,lang){
+  const zh=lang==='zh',esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const start=d.legs&&d.legs[0]?d.legs[0].a:'';
+  const unique=list=>{const seen=new Set();return list.filter(a=>{const id=a.wish&&(a.wish.id||a.wish[lang]);if(!id||seen.has(id))return false;seen.add(id);return true;});};
+  const names=list=>list.map(a=>esc(a.wish[lang])).join(zh?'、':', ');
+  const way=unique((d.activities||[]).filter(a=>a.wish&&a.wish.base!==d.at&&a.wish.base!==start));
+  const end=unique((d.activities||[]).filter(a=>a.wish&&a.wish.base===d.at));
+  return (way.length?` · ${zh?'途经':'via '}${names(way)}`:'')+(end.length?` · ${zh?'游览':'explore '}${names(end)}`:'');
+}
 function p10Present(plan){
   const selected = plan && plan.input ? plan.input.days : 0;
   const tight = Boolean(plan && plan.input && plan.minimum > selected);
@@ -861,10 +888,13 @@ function p10ShortfallNote(plan, present, lang) {
   let extra = '';
   if (legs && legs.length) {
     const hours = legs.reduce((sum, leg) => sum + leg.h, 0);
-    const km = legs.reduce((sum, leg) => sum + (Number(leg.km) || 0), 0);
+    const sum = p10KmSum(legs);
+    const unknown = sum.unknown
+      ? (zh ? `，另有 ${sum.unknown} 段里程待核，未计入` : `; ${sum.unknown} segment${sum.unknown > 1 ? 's' : ''} with no checked distance, not included in the total`)
+      : '';
     extra = zh
-      ? `（估算约 ${p10Duration(hours, 'zh')}${km ? '，' + km + ' km' : ''}）`
-      : ` (estimate, about ${p10Duration(hours, 'en')}${km ? ', ' + km + ' km' : ''})`;
+      ? `（估算约 ${p10Duration(hours, 'zh')}${sum.km ? '，' + sum.km + ' km' : ''}${unknown}）`
+      : ` (estimate, about ${p10Duration(hours, 'en')}${sum.km ? ', ' + sum.km + ' km' : ''}${unknown})`;
   }
   return zh
     ? `行程结束在${here.zh}，还没到${goal.zh}${extra}。`
@@ -896,7 +926,29 @@ function p10BreakStops(day){
   const priority=['haast','wanaka','arthurs-pass','hokitika'];
   return [...stops].sort((a,b)=>{const ai=priority.indexOf(a),bi=priority.indexOf(b);return (ai<0?100:ai)-(bi<0?100:bi);}).slice(0,2);
 }
-if (typeof module !== 'undefined' && module.exports) module.exports={p10RoadNotes,P10_ROAD_NOTES,P10_WINTER_EDGES,p10AliasId,P10_PLACE_ALIASES,p10Plan,p10Extras,p10CatalogBase,p10TownIsSight,p10Choose,p10Island,P10_WISH_WEIGHT,p10Timeline,p10Present,p10Fitted,p10DropChoices,p10Build,p10Removable,p10ShortfallNote,p10StillTight,p10AlongWay,p10Duration,p10DailyTime,p10BreakStops,p10Net,p10Suggestions,p10LegDescription,p10JevIsland,p10JevRouteName,P10_WISH_TIPS,P10_WISH_GUIDES,NODES,WISHES};
+const P10_WISH_REGION={christchurch:'christchurch-canterbury',nelson:'nelson-tasman',picton:'marlborough',tekapo:'christchurch-canterbury',aoraki:'christchurch-canterbury',wanaka:'wanaka',queenstown:'queenstown',milford:'fiordland','te-anau':'fiordland',glaciers:'west-coast',haast:'west-coast',hokitika:'west-coast',punakaiki:'west-coast','arthurs-pass':'christchurch-canterbury',kaikoura:'christchurch-canterbury','abel-tasman':'nelson-tasman',akaroa:'christchurch-canterbury',dunedin:'dunedin',oamaru:'dunedin',catlins:'clutha',stewart:'southland',auckland:'auckland','bay-of-islands':'northland-bay-of-islands',coromandel:'coromandel',hobbiton:'hamilton-waikato',waitomo:'hamilton-waikato',rotorua:'rotorua',taupo:'taupo',tongariro:'ruapehu',napier:'hawkes-bay',wellington:'wellington',taranaki:'taranaki'};
+
+function p10RegionEntries(regionId, island) {
+  const onIsland = value => !island || island === 'all' || value === island;
+  const wishes = WISHES.filter(w => onIsland(w.island) && P10_WISH_REGION[w.id] === regionId);
+  const towns = (Array.isArray(globalThis.P10_CATALOG_TOWNS) ? globalThis.P10_CATALOG_TOWNS : []).filter(t => t && t.type !== 'attraction' && t.region_id === regionId && onIsland(t.island) && !p10TownIsSight(t));
+  return { wishes, towns };
+}
+function p10LegKm(leg) {
+  const n = Number(leg && leg.km);
+  return Number.isFinite(n) && n > 0 ? n : null;
+}
+function p10KmSum(legs) {
+  let km = 0, unknown = 0;
+  for (const leg of legs || []) {
+    const n = p10LegKm(leg);
+    if (n == null) unknown += 1;
+    else km += n;
+  }
+  return { km, unknown };
+}
+
+if (typeof module !== 'undefined' && module.exports) module.exports={p10RoadNotes,P10_ROAD_NOTES,P10_WINTER_EDGES,p10AliasId,P10_PLACE_ALIASES,p10Plan,p10Extras,p10CatalogBase,p10TownIsSight,p10Choose,p10Island,P10_WISH_WEIGHT,p10Timeline,p10Present,p10Fitted,p10DropChoices,p10Build,p10Removable,p10ShortfallNote,p10StillTight,p10AlongWay,p10Duration,p10DailyTime,p10BreakStops,p10Net,p10Suggestions,p10LegDescription,p10JevIsland,p10JevRouteName,P10_WISH_TIPS,P10_WISH_GUIDES,NODES,WISHES,p10WayTitle,p10RegionEntries,p10LegKm,p10KmSum,P10_WISH_REGION};
 globalThis.P10_NODES = NODES;
 
   if (typeof window !== 'undefined') {
@@ -905,6 +957,8 @@ globalThis.P10_NODES = NODES;
   window.p10Plan = p10Plan;
   window.p10Present = p10Present;
   window.p10Timeline = p10Timeline;
+  window.p10RegionEntries = p10RegionEntries;
+  window.P10_WISHES = WISHES;
   const p10$=selector=>document.querySelector(selector);
   const p10Text=()=>document.documentElement.lang.startsWith('zh') ? {
     start:'从哪里出发',end:'从哪里离开',days:'旅行天数',month:'出行月份（选 6–10 月会提示冬季山路）',monthUnknown:'还没定',stay:'住宿档位（可选：每晚显示这一档的住宿入口）',stayNone:'不显示',stayBudget:'省钱',stayMid:'中档',stayHigh:'高端',pace:'每天自驾节奏',pace35:'最多 3.5 小时',pace5:'最多 5 小时',pace65:'最多 6.5 小时',places:'想去哪些地方？',island:'这次去哪一座岛？',region:'地区',choose:'选择多个目的地',transport:'城市之间怎么走',car:'自驾',public:'公共交通',preference:'想怎么玩',prefEasy:'轻松观光，不排长步道',prefWalk:'徒步',prefCycle:'骑行',prefDrive:'风景公路与火车',method:'是否使用 Jev 推荐',local:'本地规划',jev:'Jev 辅助推荐',submit:'生成行程',
@@ -941,7 +995,10 @@ globalThis.P10_NODES = NODES;
       const attrs=`data-p10-map-line="${d.n}" data-points="${points}" data-places="${p10Esc(ids.map(p10Name).join(' → '))}"`;
       return coords.length>1?`<polyline ${attrs} points="${points}" stroke="${color}"/>`:`<circle ${attrs} cx="${coords[0][0]}" cy="${coords[0][1]}" r="3" fill="${color}"/>`;
     }).join('');
-    const names=[...dots].map(([id,p])=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2.5"><title>${p10Esc(p10Name(id))}</title></circle>`).join('')+(p10View&&p10View.unscheduled||[]).map(w=>{const p=p10MapPoint(w.base);if(!p||dots.has(w.base))return '';return `<circle class="p10-unscheduled-dot" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="6"><title>${p10Esc((zh?w.zh:w.en)||p10Name(w.base))}</title></circle>`;}).join('')+(extraStops||[]).map(w=>{const id=w&&(w.base||w.id);const p=p10MapPoint(id);if(!p||dots.has(id))return '';return `<circle class="p10-catalog-stop" data-p10-stop="${p10Esc(w.id||id)}" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="4"><title>${p10Esc((zh?w.zh:w.en)||p10Name(id))}</title></circle>`;}).join('');
+    const placeAt=new Map();
+    for(const d of days)for(const a of d.activities||[])if(a.wish){const node=a.wish.base||d.at;if(!placeAt.has(node))placeAt.set(node,[]);if(!placeAt.get(node).some(w=>w.id===a.wish.id))placeAt.get(node).push(a.wish);}
+    const marker=(id,p,cls,r,label)=>`<circle class="${cls}" data-p10-stop="${p10Esc(id)}" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="${r}"><title>${p10Esc(label||p10Name(id))}</title></circle>`;
+    const names=[...dots].map(([id,p])=>marker(id,p,'',2.5)+(placeAt.get(id)||[]).filter(w=>w.id!==id).map(w=>marker(w.id,p,'p10-place-stop',2.5,zh?w.zh:w.en)).join('')).join('')+(p10View&&p10View.unscheduled||[]).map(w=>{const p=p10MapPoint(w.base);if(!p||dots.has(w.base))return '';return `<circle class="p10-unscheduled-dot" data-p10-stop="${p10Esc(w.id||w.base)}" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="6"><title>${p10Esc((zh?w.zh:w.en)||p10Name(w.base))}</title></circle>`;}).join('')+(extraStops||[]).map(w=>{const id=w&&(w.base||w.id);const p=p10MapPoint(id);if(!p||dots.has(id))return '';return `<circle class="p10-catalog-stop" data-p10-stop="${p10Esc(w.id||id)}" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="4"><title>${p10Esc((zh?w.zh:w.en)||p10Name(id))}</title></circle>`;}).join('');
     // Town names: every overnight stop, plus the places left out (in rust, marked as unscheduled).
     const stays=[];for(const d of days)if(d.at&&!stays.includes(d.at))stays.push(d.at);
     const label=(id,text,cls)=>{const p=p10MapPoint(id);return p?`<text class="p10-map-label${cls?' '+cls:''}" data-px="${p[0].toFixed(1)}" data-py="${p[1].toFixed(1)}" x="${(p[0]+7).toFixed(1)}" y="${(p[1]+4).toFixed(1)}">${p10Esc(text)}</text>`:'';};
@@ -1085,7 +1142,7 @@ globalThis.P10_NODES = NODES;
         :d.kind==='depart'?(d.legs.length?`${from} → ${p10Esc(p10Name(d.at))} · ${zh?'离开':'depart'}`:`${x.depart} ${p10Esc(p10Name(d.at))}`)
         :d.legs.length?`${from} → ${p10Esc(p10Name(d.at))}${d.kind==='activity'&&acts?` · ${zh?'游览':'explore '}${acts}${p10PartLabel(d.activities[0],zh)}`:d.activities.length?p10WayTitle(d,lang):''}`
         :`${acts}${zh?' · 游览':' · explore'}${d.activities[0]?p10PartLabel(d.activities[0],zh):''}`;
-      const legs=d.legs.map(l=>{const road=p10LegDescription(l,lang);const mode=x[l.mode]||x.road;const duration=p10Duration(l.h,lang);return `<li>${p10Esc(p10Name(l.a))} → ${p10Esc(p10Name(l.b))} · ${p10Esc(road)} · ${mode}${zh?'约':' about '}${duration}${l.km>0?` · ${l.km} km`:''} ${p10LegTag(l,zh)}</li>`;}).join('');
+      const legs=d.legs.map(l=>{const road=p10LegDescription(l,lang);const mode=x[l.mode]||x.road;const duration=p10Duration(l.h,lang);const km=p10LegKm(l);const kmText=km!=null?` · ${km} km`:(l.km===0||l.src&&l.src.km&&l.src.km.status==='待核'?` · ${zh?'里程待核':'distance to be verified'}`:'');return `<li>${p10Esc(p10Name(l.a))} → ${p10Esc(p10Name(l.b))} · ${p10Esc(road)} · ${mode}${zh?'约':' about '}${duration}${kmText} ${p10LegTag(l,zh)}</li>`;}).join('');
       const travel=d.legs.reduce((sum,l)=>sum+l.h,0),driving=d.legs.filter(l=>l.mode==='car').reduce((sum,l)=>sum+l.h,0),pace=Number(result.input.pace)||5;
       const total=travel>0?`<p class="p10-daily-total">${zh?'当天路上约':'Travel today: about '}${p10DailyTime(travel,lang)}</p>`:'';
       const stops=p10BreakStops(d),names=stops.map(id=>p10Esc(p10Name(id))).join(zh?'或':' or ');
@@ -1106,7 +1163,6 @@ globalThis.P10_NODES = NODES;
     el.innerHTML=`<h2 class="p10-result-title" tabindex="-1">${titleText}</h2>${tools}${notices.join('')}${unsHtml}${reco}${p10TripMap(timeline, result.input.start, result.input.end, result.inaccessible)}<div class="p10-days">${rows}</div>${shortfall?`<p class="p10-warning p10-shortfall">${p10Esc(shortfall)}</p>`:''}<p class="planner-small"><strong>${zh?'路段时间和里程都是估算值':'Segment times and distances are estimates'}</strong>${zh?`：自驾时间是 ${P10_NZTA_DATES.join('、')} 在 NZTA Journey Planner 逐段查询的读数（含查询当时的路况），取整到 15 分钟，不含停留；鼠标移到每段后面的小字上可看原始读数。NZTA 不显示里程，里程仍是规划估算。巴士、火车和渡轮时间是估算，以运营商时刻表为准。景点与步道起点的当地接驳不包含在行程中。出发前请在下列官方来源核对。`:`: driving times are readings taken segment by segment in NZTA Journey Planner on ${P10_NZTA_DATES.join(' and ')} (with the traffic at that moment), rounded to 15 minutes, without stops; hover the small note after each leg for the raw reading. NZTA shows no distances, so km are planning estimates. Coach, train and ferry times are estimates; check the operator's timetable. Local transport to sights and trailheads is not included. Check the official sources below before you go.`} ${x.sources}: ${(globalThis.P10_ROAD_SOURCES||[]).map(r=>`<a href="${r.url}" target="_blank" rel="noopener noreferrer">${p10Esc(r.label)}</a>`).join(' · ')}</p>`;
     p10FocusDay('all');
   }
-  const P10_WISH_REGION={christchurch:'christchurch-canterbury',nelson:'nelson-tasman',picton:'marlborough',tekapo:'christchurch-canterbury',aoraki:'christchurch-canterbury',wanaka:'wanaka',queenstown:'queenstown',milford:'fiordland','te-anau':'fiordland',glaciers:'west-coast',haast:'west-coast',hokitika:'west-coast',punakaiki:'west-coast','arthurs-pass':'christchurch-canterbury',kaikoura:'christchurch-canterbury','abel-tasman':'nelson-tasman',akaroa:'christchurch-canterbury',dunedin:'dunedin',oamaru:'dunedin',catlins:'clutha',stewart:'southland',auckland:'auckland','bay-of-islands':'northland-bay-of-islands',coromandel:'coromandel',hobbiton:'hamilton-waikato',waitomo:'hamilton-waikato',rotorua:'rotorua',taupo:'taupo',tongariro:'ruapehu',napier:'hawkes-bay',wellington:'wellington',taranaki:'taranaki'};
   const P10_REGIONS=[{id:'northland-bay-of-islands',island:'north',zh:'北地与岛屿湾',en:'Northland & Bay of Islands'},{id:'auckland',island:'north',zh:'奥克兰',en:'Auckland'},{id:'coromandel',island:'north',zh:'科罗曼德',en:'The Coromandel'},{id:'hamilton-waikato',island:'north',zh:'汉密尔顿－怀卡托',en:'Hamilton - Waikato'},{id:'bay-of-plenty',island:'north',zh:'丰盛湾',en:'Bay of Plenty'},{id:'tairawhiti-gisborne',island:'north',zh:'泰拉维蒂／吉斯伯恩',en:'Tairāwhiti Gisborne'},{id:'rotorua',island:'north',zh:'罗托鲁瓦',en:'Rotorua'},{id:'taupo',island:'north',zh:'陶波',en:'Taupō'},{id:'ruapehu',island:'north',zh:'鲁阿佩胡',en:'Ruapehu'},{id:'hawkes-bay',island:'north',zh:'霍克斯湾',en:"Hawke's Bay"},{id:'taranaki',island:'north',zh:'塔拉纳基',en:'Taranaki'},{id:'whanganui',island:'north',zh:'旺格努伊',en:'Whanganui'},{id:'manawatu',island:'north',zh:'马纳瓦图',en:'Manawatū'},{id:'wairarapa',island:'north',zh:'怀拉拉帕',en:'Wairarapa'},{id:'wellington',island:'north',zh:'惠灵顿',en:'Wellington'},{id:'nelson-tasman',island:'south',zh:'纳尔逊－塔斯曼',en:'Nelson-Tasman'},{id:'marlborough',island:'south',zh:'马尔堡',en:'Marlborough'},{id:'christchurch-canterbury',island:'south',zh:'基督城－坎特伯雷',en:'Christchurch - Canterbury'},{id:'west-coast',island:'south',zh:'西海岸',en:'West Coast'},{id:'wanaka',island:'south',zh:'瓦纳卡',en:'Wānaka'},{id:'queenstown',island:'south',zh:'皇后镇',en:'Queenstown'},{id:'central-otago',island:'south',zh:'中奥塔哥',en:'Central Otago'},{id:'dunedin',island:'south',zh:'但尼丁',en:'Dunedin'},{id:'clutha',island:'south',zh:'克卢萨',en:'Clutha'},{id:'fiordland',island:'south',zh:'峡湾',en:'Fiordland'},{id:'southland',island:'south',zh:'南地',en:'Southland'}];
   function p10WishLabel(w){const lang=p10Lang();if(w.id==='tekapo'&&lang==='zh')return '特卡波与暗夜星空';return w[lang];}
   function p10CatalogTowns(regionId, island){
@@ -1115,8 +1171,8 @@ globalThis.P10_NODES = NODES;
     return all.filter(t=>(!regionId || regionId==='all' || t.region_id===regionId) && (island==='all' || t.island===island) && t.type!=='attraction');
   }
   function p10RegionCount(regionId, island){
-    const towns=(p10CatalogTowns(regionId, island)||[]).filter(t=>!p10TownIsSight(t));
-    return WISHES.filter(w=>w.island===(island==='all'?w.island:island)&&P10_WISH_REGION[w.id]===regionId).length+towns.length;
+    const entries=p10RegionEntries(regionId, island);
+    return entries.wishes.length+entries.towns.length;
   }
   function p10WishDays(days,zh){return days<1?(zh?'半天':'half a day'):zh?`${days} 天`:days===1?'1 day':`${days} days`;}
   function p10PlaceLabel(id){
@@ -1158,15 +1214,17 @@ globalThis.P10_NODES = NODES;
     const stayAt=w=>{const n=NODES[w.base];if(!n)return '';const label=p10WishLabel(w);let town=(zh?n.zh:n.en).split(/[（(]/)[0].replace(/,.*$/,'').trim();if(zh&&town.startsWith(label))town=town.slice(label.length).trim();return !town||label.includes(town)?'':(zh?`住${town}`:`stay in ${town}`);};
     const mapItems=[];
     box.innerHTML=order.map(key=>{
-      const rows=groups.get(key)||[];
-      const townRows=townGroups.get(key)||[];
+      // The chip count and these rows both come from p10RegionEntries (unmapped stays on the leftover groups).
+      const entries=P10_REGIONS.some(r=>r.id===key)?p10RegionEntries(key, island):null;
+      const rows=entries?entries.wishes:(groups.get(key)||[]);
+      const townRows=entries?entries.towns:(townGroups.get(key)||[]);
       if(!rows.length&&!townRows.length) return '';
       const meta=P10_REGIONS.find(r=>r.id===key);
       const heading=meta?(zh?meta.zh:meta.en):key;
       for(const w of rows)mapItems.push({id:w.id,kind:'sight',name:p10WishLabel(w),short:p10PickShort(w),xy:p10MapPoint(NODES[w.id]?w.id:w.base),worth:P10_WISH_WEIGHT[w.id]||1});
       for(const t of townRows){const primary=zh?(t.name_zh||t.name_en):(t.name_en||t.name_zh);mapItems.push({id:t.place_id,kind:'town',name:primary,short:primary.split(/[（(]/)[0],xy:p10Project([Number(t.lat),Number(t.lon)]),worth:0});}
       const wishHtml=rows.map(w=>row(w.id,p10WishLabel(w)+(w.id==='oamaru'?(zh?' · 怀塔基区':' · Waitaki District'):''),w.days,stayAt(w))).join('');
-      const townHtml=townRows.map(t=>{const primary=zh?(t.name_zh||t.name_en):(t.name_en||t.name_zh);const other=zh?t.name_en:t.name_zh;return row(t.place_id,other&&other!==primary?`${primary} ${other}`:primary,0.5);}).join('');
+      const townHtml=townRows.map(t=>{const primary=zh?(t.name_zh||t.name_en):(t.name_en||t.name_zh);const other=zh?t.name_en:'';return row(t.place_id,other&&other!==primary?`${primary} ${other}`:primary,0.5);}).join('');
       return `<section><h3>${p10Esc(heading)}</h3>${wishHtml?`<p class="p10-group-label">${zh?'景点与体验':'Sights and experiences'}</p><div class="p10-group">${wishHtml}</div>`:''}${townHtml?`<p class="p10-group-label">${zh?'城镇（停留半天或住一晚）':'Towns (half a day or a night)'}</p><div class="p10-group">${townHtml}</div>`:''}</section>`;
     }).join('');
     p10RenderPickMap(mapItems.filter(i=>i.xy&&i.xy.every(Number.isFinite)));

@@ -73,6 +73,12 @@ const ZH_ALIASES = [
   ['达尼丁', '但尼丁'],
   ['罗托鲁阿', '罗托鲁瓦'],
   ['纳皮尔', '内皮尔'],
+  // 2026-11-11 walk-through: one spelling per place across the planner, catalogue and route pages
+  ['尼尔森（阿贝尔塔斯曼）', '纳尔逊（亚伯塔斯曼）'],
+  ['阿贝尔·塔斯曼', '亚伯塔斯曼'],
+  ['阿贝尔塔斯曼', '亚伯塔斯曼'],
+  ['玛拉豪', '马拉豪'],
+  ['马西森湖', '马瑟森湖'],
 ];
 
 function aliasZh(value) {

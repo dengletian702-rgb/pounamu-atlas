@@ -126,9 +126,9 @@ test('D: each new town has 2–5 sights and 2–5 activities, each with an offic
 const ski = require('../docs/data/ski-fields.json');
 const { searchTracks } = require('../docs/v4-match.js');
 const docTracks = require('../docs/data/doc-tracks.json').tracks;
-test('E: six ski areas, each with region, nearest town, official site and a sourced season line', () => {
+test('E: seven ski areas, each with region, nearest town, official site and a sourced season line', () => {
   const ids = ski.fields.map(f => f.id);
-  for (const id of ['mt-hutt', 'cardrona', 'coronet-peak', 'remarkables', 'ruapehu', 'round-hill']) assert.ok(ids.includes(id), id);
+  for (const id of ['mt-hutt', 'cardrona', 'treble-cone', 'coronet-peak', 'remarkables', 'ruapehu', 'round-hill']) assert.ok(ids.includes(id), id);
   for (const f of ski.fields) {
     assert.match(f.url, /^https:\/\//);
     assert.match(f.season_source, /^https:\/\//);
@@ -153,7 +153,7 @@ test('E: DOC track search finds tracks by region and place name (Ruapehu, 鲁阿
   assert.equal(great.length, searchTracks(docTracks, '大步道', towns).length);
 });
 test('E: home search finds ski areas; the prepare page lists them with winter driving', async t => withPage(t, async page => {
-  for (const [lang, q, re] of [['zh', '滑雪', /哈特山滑雪场/], ['en', 'Mt Hutt', /Methven/], ['zh', 'Cardrona', /卡德罗纳/]]) {
+  for (const [lang, q, re] of [['zh', '滑雪', /哈特山滑雪场/], ['en', 'Mt Hutt', /Methven/], ['zh', 'Cardrona', /卡德罗纳/], ['zh', '三锥山', /三锥山/], ['en', 'Treble Cone', /Treble Cone/]]) {
     await page.go('index.html?lang=' + lang);
     await page.waitFor('document.querySelector("#v4-search input[type=search]")');
     await page.ev(`(()=>{const i=document.querySelector('#v4-search input[type=search]');i.value=${JSON.stringify(q)};i.dispatchEvent(new Event('input',{bubbles:true}));const f=i.closest('form');if(f)f.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}));})()`);
@@ -162,7 +162,7 @@ test('E: home search finds ski areas; the prepare page lists them with winter dr
   }
   await page.go('prepare.html?lang=zh#ski');
   await page.waitFor('document.querySelector("#v4-prepare-extra #ski")');
-  assert.equal(await page.ev('document.querySelectorAll("#v4-prepare-extra #ski [id^=ski-]").length'), 6);
+  assert.equal(await page.ev('document.querySelectorAll("#v4-prepare-extra #ski [id^=ski-]").length'), 7);
   assert.match(await page.ev('document.querySelector("#v4-prepare-extra #winter").innerText'), /NZTA/);
   assert.deepEqual(page.errors, []);
 }));

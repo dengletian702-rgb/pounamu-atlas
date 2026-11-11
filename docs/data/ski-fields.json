@@ -8,7 +8,14 @@
       "id": "mt-hutt",
       "name_en": "Mt Hutt",
       "name_zh": "哈特山滑雪场",
-      "aliases": ["mt hutt", "mount hutt", "hutt", "哈特山", "methven", "梅斯文"],
+      "aliases": [
+        "mt hutt",
+        "mount hutt",
+        "hutt",
+        "哈特山",
+        "methven",
+        "梅斯文"
+      ],
       "island": "south",
       "region_en": "Christchurch - Canterbury",
       "region_zh": "基督城－坎特伯雷",
@@ -28,7 +35,11 @@
       "id": "cardrona",
       "name_en": "Cardrona Alpine Resort",
       "name_zh": "卡德罗纳滑雪场",
-      "aliases": ["cardrona", "卡德罗纳", "卡德罗纳高山度假村"],
+      "aliases": [
+        "cardrona",
+        "卡德罗纳",
+        "卡德罗纳高山度假村"
+      ],
       "island": "south",
       "region_en": "Wānaka",
       "region_zh": "瓦纳卡",
@@ -42,10 +53,36 @@
       "checkedAt": "2026-11-12"
     },
     {
+      "id": "treble-cone",
+      "name_en": "Treble Cone",
+      "name_zh": "三锥山滑雪场",
+      "aliases": [
+        "treble cone",
+        "treblecone",
+        "三锥山",
+        "三锥"
+      ],
+      "island": "south",
+      "region_en": "Wānaka",
+      "region_zh": "瓦纳卡",
+      "town_en": "Wānaka",
+      "town_zh": "瓦纳卡",
+      "town_id": "si-wan",
+      "url": "https://cardrona-treblecone.com/",
+      "season_en": "The official site gives no season months for Treble Cone itself (to be checked); the same operator's guide gives mid-June to early October for the ski fields around Queenstown and Wānaka.",
+      "season_zh": "官网没有单独写三锥山的雪季月份，待核；同一运营方的官网说明称皇后镇、瓦纳卡一带通常 6 月中到 10 月初。",
+      "season_source": "https://cardrona-treblecone.com/blog/queenstown-ski-season",
+      "checkedAt": "2026-11-12"
+    },
+    {
       "id": "coronet-peak",
       "name_en": "Coronet Peak",
       "name_zh": "皇冠峰滑雪场",
-      "aliases": ["coronet", "coronet peak", "皇冠峰"],
+      "aliases": [
+        "coronet",
+        "coronet peak",
+        "皇冠峰"
+      ],
       "island": "south",
       "region_en": "Queenstown",
       "region_zh": "皇后镇",
@@ -62,7 +99,11 @@
       "id": "remarkables",
       "name_en": "The Remarkables",
       "name_zh": "卓越山滑雪场",
-      "aliases": ["remarkables", "the remarkables", "卓越山"],
+      "aliases": [
+        "remarkables",
+        "the remarkables",
+        "卓越山"
+      ],
       "island": "south",
       "region_en": "Queenstown",
       "region_zh": "皇后镇",
@@ -79,7 +120,16 @@
       "id": "ruapehu",
       "name_en": "Mt Ruapehu: Whakapapa and Tūroa",
       "name_zh": "鲁阿佩胡山滑雪场（华卡帕帕、图罗阿）",
-      "aliases": ["ruapehu", "mt ruapehu", "whakapapa", "turoa", "tūroa", "鲁阿佩胡", "华卡帕帕", "图罗阿"],
+      "aliases": [
+        "ruapehu",
+        "mt ruapehu",
+        "whakapapa",
+        "turoa",
+        "tūroa",
+        "鲁阿佩胡",
+        "华卡帕帕",
+        "图罗阿"
+      ],
       "island": "north",
       "region_en": "Ruapehu",
       "region_zh": "鲁阿佩胡",
@@ -96,7 +146,12 @@
       "id": "round-hill",
       "name_en": "Roundhill Ski Area",
       "name_zh": "圆山滑雪场",
-      "aliases": ["round hill", "roundhill", "圆山", "tekapo ski"],
+      "aliases": [
+        "round hill",
+        "roundhill",
+        "圆山",
+        "tekapo ski"
+      ],
       "island": "south",
       "region_en": "Christchurch - Canterbury",
       "region_zh": "基督城－坎特伯雷",

@@ -83,7 +83,7 @@ test('South Island towns si-alx and si-cly can be picked and both appear on the 
     await page.go('plan.html?lang=zh');
     await page.ev('localStorage.clear()');
     await page.go('plan.html?lang=zh&from=queenstown&to=dunedin&days=5&car=1&pace=5&pref=drive&w=si-alx,si-cly');
-    await page.waitFor('document.querySelector("#planResult .plan-day")');
+    await page.waitFor('document.querySelector("#planResult") && document.querySelector("#planResult").innerText.includes("亚历山德拉")', 12000);
     const resultText = await page.ev('document.querySelector("#planResult").innerText');
     assert.match(resultText, /亚历山德拉/);
     assert.match(resultText, /克莱德/);

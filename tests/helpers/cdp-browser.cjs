@@ -87,9 +87,34 @@ async function openBrowser() {
     async view(width, height, mobile = false) { await send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile }); },
     async go(rel) {
       errors.length = 0;
-      await send('Page.navigate', { url: base + rel });
-      await page.waitFor('document.readyState === "complete"');
-      await sleep(300);
+      const target = new URL(rel, base);
+      // The document we are leaving is already "complete". Wait until this navigation commits
+      // and that new document fires its own load, so the next go() does not cancel it mid-fetch.
+      let committed = false;
+      let loaded = false;
+      const want = url => {
+        try {
+          const here = new URL(url);
+          return here.origin === target.origin && here.pathname === target.pathname;
+        } catch { return false; }
+      };
+      page.on('Page.frameNavigated', params => {
+        const frame = params.frame;
+        if (!frame || frame.parentId || !want(frame.url)) return;
+        committed = true;
+        loaded = false;
+      });
+      page.on('Page.loadEventFired', () => { if (committed) loaded = true; });
+      const nav = await send('Page.navigate', { url: target.href });
+      if (nav.result && nav.result.errorText) throw new Error(nav.result.errorText);
+      const until = Date.now() + 15000;
+      while (Date.now() < until) {
+        let ready = '';
+        try { ready = await ev('document.readyState'); } catch { ready = ''; }
+        if (committed && loaded && ready === 'complete') return;
+        await sleep(40);
+      }
+      throw new Error('navigation did not finish: ' + target.pathname);
     },
     async waitFor(expr, timeout = 8000) {
       const until = Date.now() + timeout;

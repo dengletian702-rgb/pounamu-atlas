@@ -280,7 +280,9 @@ function p10RoadNotes(legs,month,zh){
     }
     if(!onRoad.has(l.mode))continue;
     const wk=P10_WINTER_MONTHS.includes(Number(month))?p10EdgeKey(l.a,l.b,P10_WINTER_EDGES):null;
-    if(wk&&!seen.has('w'+wk)){seen.add('w'+wk);const pass=P10_WINTER_EDGES[wk][zh?'zh':'en'];
+    // One warning per pass per day: Christchurch–Arthur's Pass and Arthur's Pass–Greymouth are the same pass.
+    const passId=wk?P10_WINTER_EDGES[wk].en:'';
+    if(wk&&!seen.has('w:'+passId)){seen.add('w:'+passId);const pass=P10_WINTER_EDGES[wk][zh?'zh':'en'];
       const text=l.mode==='car'
         ?(zh?`冬季山路：${pass} 在 6–10 月可能结冰、下雪或临时封路。出发当天先查 NZTA 路况，封闭的道路不能走；冰雪路面放慢车速，车上备保暖衣物、水和食物，油箱至少留半箱。是否需要防滑链以当天路况为准，租车在高山路段和使用防滑链不一定在保险范围内，先问租车公司。`
           :`Winter road: ${pass} can have ice, snow or temporary closures from June to October. Check NZTA road conditions on the day and never drive a closed road; slow down on ice and snow, carry warm clothes, water and food, and keep at least half a tank of fuel. Whether chains are needed depends on the day; rental cover may exclude alpine roads and chains, so ask your rental company first.`)
@@ -1072,8 +1074,20 @@ globalThis.P10_NODES = NODES;
   }
   function p10PartLabel(a,zh){return a.total>1?(zh?`（第 ${a.part} 天，共 ${a.total} 天）`:` (day ${a.part} of ${a.total})`):'';}
   // Optional stay tier (ticket F): each night lists that tier's official links and a map search in the overnight town.
+  // A failed fetch is not cached: p10Stays stays null so the next night render tries again, and one retry runs on its own.
   let p10Stays=null,p10StaysLoading=false;
-  function p10LoadStays(){if(p10Stays||p10StaysLoading)return;p10StaysLoading=true;fetch('data/stays-budget.json').then(r=>r.ok?r.json():null).then(d=>{p10Stays=d&&Array.isArray(d.tiers)?d.tiers:[];if(p10Result&&p10Result.input.stay)p10Show(p10Result);}).catch(()=>{p10Stays=[];});}
+  function p10LoadStays(retry){
+    if(p10Stays||p10StaysLoading)return;
+    p10StaysLoading=true;
+    fetch('data/stays-budget.json').then(r=>{if(!r.ok)throw new Error('stays '+r.status);return r.json();}).then(d=>{
+      if(!d||!Array.isArray(d.tiers))throw new Error('stays');
+      p10Stays=d.tiers;p10StaysLoading=false;
+      if(p10Result&&p10Result.input.stay)p10Show(p10Result);
+    }).catch(()=>{
+      p10Stays=null;p10StaysLoading=false;
+      if(!retry&&p10Result&&p10Result.input.stay)setTimeout(()=>p10LoadStays(true),250);
+    });
+  }
   function p10StayLinks(tierId,at,zh){
     if(!tierId)return '';if(!p10Stays){p10LoadStays();return '';}
     const tier=p10Stays.find(t=>t.id===tierId);if(!tier)return '';const town=NODES[at]?.en||at;

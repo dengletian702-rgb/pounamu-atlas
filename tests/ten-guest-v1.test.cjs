@@ -212,6 +212,26 @@ test('F: the planner\'s optional stay tier adds that tier\'s links under every n
   }
   assert.deepEqual(page.errors, []);
 }));
+test('F: a failed stay fetch is not cached, so the links appear on the retry', async t => withPage(t, async page => {
+  let failed = 0;
+  await page.cdp('Fetch.enable', { patterns: [{ urlPattern: '*stays-budget.json*', requestStage: 'Request' }] });
+  page.on('Fetch.requestPaused', params => {
+    const next = failed < 1
+      ? page.cdp('Fetch.failRequest', { requestId: params.requestId, errorReason: 'Failed' })
+      : page.cdp('Fetch.continueRequest', { requestId: params.requestId });
+    if (failed < 1) failed += 1;
+    next.catch(() => {});
+  });
+  await page.go('plan.html?lang=en&from=christchurch&to=queenstown&days=7&car=1&pace=5&pref=easy&w=tekapo,wanaka&stay=budget');
+  await page.waitFor('document.querySelectorAll("#planResult .p10-stay-links").length > 0', 12000);
+  assert.ok(failed >= 1);
+  const first = await page.ev(`({text: document.querySelector('.p10-stay-links').innerText, hrefs: [...document.querySelectorAll('.p10-stay-links a')].map(a => a.href)})`);
+  assert.match(first.text, /^Budget stays: /);
+  assert.ok(first.hrefs.some(h => /doc\.govt\.nz/.test(h)));
+  await page.ev(`(()=>{const s=document.querySelector('#p10-stay');s.value='high';s.dispatchEvent(new Event('change',{bubbles:true}));})()`);
+  await page.waitFor('document.querySelector(\'.p10-stay-links[data-p10-stay="high"]\')');
+  assert.match(await page.ev('document.querySelector(".p10-stay-links").innerText'), /^High-end stays: /);
+}));
 test('F: the stay tier is part of the planner input and of the share link', () => {
   const r = planner.p10Plan({ start: 'christchurch', end: 'queenstown', days: 7, pace: 5, preference: 'easy', car: true, month: 0, stay: 'mid', wishes: ['tekapo'] });
   assert.equal(r.input.stay, 'mid');

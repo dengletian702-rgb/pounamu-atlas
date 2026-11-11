@@ -73,7 +73,9 @@
 
   // Optional data used by the search, destination and prepare pages (tickets E and F); a missing file leaves its block out.
   async function ensureExtra(key, url, empty) {
-    if (!state[key]) { try { state[key] = await loadJson(url); } catch { state[key] = empty; } }
+    if (state[key]) return state[key];
+    try { state[key] = await loadJson(url); }
+    catch { return empty; }
     return state[key];
   }
 
@@ -637,23 +639,25 @@
     const rows = towns().filter(p => p.region_id === regionId && (state.draft.island === 'all' || p.island === state.draft.island));
     return { wishes: [], towns: rows };
   }
-  function listedRegions() {
-    const island = state.draft.island;
-    const regions = (state.catalog.regions || []).filter(r => island === 'all' || r.island === island);
-    const picked = state.draft.regions || [];
-    return regions.filter(r => !picked.length || picked.includes(r.id)).map(r => ({ region: r, ...regionEntries(r.id) }));
-  }
   function listedCount() {
-    return listedRegions().reduce((n, group) => n + group.wishes.length + group.towns.length, 0);
+    return filteredTowns().filter(p => !(state.draft.hideVerify && p.verify)).length;
+  }
+  // Chip counts use the planner's shared tally (sights plus towns that are not already that sight).
+  // The checklist below stays on town ids, so a tick still matches the map and the destination pages.
+  function regionCount(regionId) {
+    const entries = regionEntries(regionId);
+    return entries.wishes.length + entries.towns.length;
   }
   function regionButtons() {
     const island = state.draft.island;
     const regions = (state.catalog.regions || []).filter(r => island === 'all' || r.island === island);
     return regions.map(r => {
-      const entries = regionEntries(r.id);
-      const count = entries.wishes.length + entries.towns.length;
+      const count = regionCount(r.id);
       const on = (state.draft.regions || []).includes(r.id);
-      const label = t('regionTowns', { r: state.lang === 'en' ? r.en : r.zh, n: count });
+      const name = state.lang === 'en' ? r.en : r.zh;
+      const label = state.lang === 'en'
+        ? `${name} (${count} ${count === 1 ? 'place' : 'places'})`
+        : t('regionTowns', { r: name, n: count });
       const empty = count === 0 ? ' · ' + t('noPlacesInRegion') : '';
       return `<button type="button" data-region="${esc(r.id)}" aria-pressed="${on ? 'true' : 'false'}" ${count === 0 ? 'data-empty="1"' : ''}>${esc(label + empty)}</button>`;
     }).join('');
@@ -664,19 +668,19 @@
     return `<label class="v4-place"><input type="checkbox" data-place="${esc(id)}" data-label-en="${esc(state.lang === 'en' ? primary : (secondary || primary))}" data-label-zh="${esc(state.lang === 'zh' ? primary : (secondary || primary))}" ${on ? 'checked' : ''}><span><strong>${esc(primary)}</strong>${esc(other)}${extra || ''}</span></label>`;
   }
   function placeList() {
-    const groups = listedRegions();
+    const groups = new Map();
+    for (const p of filteredTowns()) {
+      const key = p.region_id || 'unmapped';
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(p);
+    }
     let html = '';
     const ids = new Set();
-    for (const group of groups) {
-      const heading = state.lang === 'en' ? group.region.en : group.region.zh;
-      const rows = [];
-      for (const w of group.wishes) {
-        ids.add(w.id);
-        const primary = state.lang === 'en' ? w.en : w.zh;
-        const secondary = state.lang === 'en' ? w.zh : w.en;
-        rows.push(placeBox(w.id, primary, secondary, ''));
-      }
-      for (const p of group.towns) {
+    for (const [key, rows] of groups) {
+      const meta = regionMeta(key);
+      const heading = meta ? (state.lang === 'en' ? meta.en : meta.zh) : key;
+      const boxes = [];
+      for (const p of rows) {
         if (state.draft.hideVerify && p.verify) continue;
         ids.add(p.place_id);
         const primary = nameOf(p);
@@ -684,10 +688,10 @@
         const verify = p.verify ? ` <span class="v4-badge">${esc(t('verifyBadge'))}</span>` : '';
         const coord = p.lat == null || p.lon == null ? ` <span class="v4-note">${esc(t('missingCoords'))}</span>` : '';
         const district = p.district_zh ? ` <span class="v4-note">${esc(state.lang === 'en' ? p.district_en : p.district_zh)}</span>` : '';
-        rows.push(placeBox(p.place_id, primary, secondary, district + verify + coord));
+        boxes.push(placeBox(p.place_id, primary, secondary, district + verify + coord));
       }
-      if (!rows.length) continue;
-      html += `<section class="v4-group"><h3>${esc(heading)}</h3>${rows.join('')}</section>`;
+      if (!boxes.length) continue;
+      html += `<section class="v4-group"><h3>${esc(heading)}</h3>${boxes.join('')}</section>`;
     }
     const hidden = state.draft.chosen.filter(id => !ids.has(id));
     if (hidden.length) {
@@ -824,7 +828,7 @@
             <div class="v4-field"><span>${esc(t('islandLabel'))}</span><div class="v4-chips">${chip('gisland', 'all', t('islandAll'), d.island === 'all')}${chip('gisland', 'north', t('islandNorth'), d.island === 'north')}${chip('gisland', 'south', t('islandSouth'), d.island === 'south')}</div></div>
             <div class="v4-field"><span>${esc(t('regionLabel'))}</span><p class="v4-note">${esc(t('regionCountNote'))}</p><div class="v4-chips">${regionButtons()}</div>
               <button type="button" data-clear-regions>${esc(t('clearRegions'))}</button> <button type="button" data-clear-filters>${esc(t('clearAllFilters'))}</button></div>
-            <p>${esc(t('placeCount', { n: count }))} · ${esc(t('chosenCount', { n: d.chosen.length }))}</p>
+            <p>${esc(state.lang === 'en' ? `${count} ${count === 1 ? 'place' : 'places'}` : t('placeCount', { n: count }))} · ${esc(t('chosenCount', { n: d.chosen.length }))}</p>
             <button type="button" data-hide-verify>${esc(d.hideVerify ? t('showVerify') : t('hideVerify'))}</button>
             <div id="v4-places">${placeList()}</div>
             <p><button type="button" class="v4-primary" data-view="edit">${esc(t('donePicking'))}</button></p>

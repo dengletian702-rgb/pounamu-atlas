@@ -412,9 +412,32 @@ function p10Build(input, wanted) {
   days.push({kind:'depart',at:input.end,legs:[],activities:[],used:0});
   return {days,order,inaccessible,disconnected:false};
 }
+function p10WishById(id) {
+  const known = WISHES.find(w => w.id === id);
+  if (known) return known;
+  const towns = globalThis.P10_CATALOG_TOWNS;
+  if (!Array.isArray(towns)) return null;
+  const town = towns.find(t => t && t.place_id === id && t.type !== 'attraction');
+  if (!town) return null;
+  const lat = Number(town.lat), lon = Number(town.lon);
+  if (Number.isFinite(lat) && Number.isFinite(lon) && !NODES[id]) {
+    NODES[id] = { at: [lat, lon], en: town.name_en || id, zh: town.name_zh || town.name_en || id };
+  }
+  return {
+    id,
+    island: town.island === 'north' ? 'north' : 'south',
+    base: id,
+    days: 1,
+    en: town.name_en || id,
+    zh: town.name_zh || town.name_en || id,
+    routes: [],
+    places: [],
+    catalog: true
+  };
+}
 function p10Plan(input) {
   if (!NODES[input.start]?.hub || !NODES[input.end]?.hub || !Number.isInteger(input.days)||input.days<3||input.days>21 || !Array.isArray(input.wishes)) throw new Error('invalid_input');
-  const wanted=[...new Set(input.wishes)].map(id=>WISHES.find(w=>w.id===id)).filter(Boolean);
+  const wanted=[...new Set(input.wishes)].map(p10WishById).filter(Boolean);
   const plan=p10Build(input,wanted), minimum=plan.days.length;
   let suggestion=null;
   if(minimum>input.days){
@@ -575,7 +598,7 @@ globalThis.P10_NODES = NODES;
   window.P10_COAST_PATH = P10_COAST;
   const P10_DAY_COLORS=['#b44e2d','#225a4b','#9b5c1d','#4d5c8a','#8c3862','#446e28','#8b501b','#315d71','#944c40','#605292','#46695e','#a13e2e'];
   const p10MapPoint=id=>{const at=NODES[id]?.at;if(!at)return null;return [392.5+(at[1]-174.76)*38.05,189.7+(-at[0]-36.85)*50.5]};
-  function p10TripMap(days, startId){
+  function p10TripMap(days, startId, extraStops){
     const zh=p10Lang()==='zh', dots=new Map();
     const lines=days.map(d=>{const ids=d.legs.length?[d.legs[0].a,...d.legs.map(l=>l.b)]:[d.at],coords=ids.map(p10MapPoint).filter(Boolean),color=P10_DAY_COLORS[(d.n-1)%P10_DAY_COLORS.length];
       ids.forEach(id=>{if(!dots.has(id)&&p10MapPoint(id))dots.set(id,p10MapPoint(id))});
@@ -583,7 +606,7 @@ globalThis.P10_NODES = NODES;
       const attrs=`data-p10-map-line="${d.n}" data-points="${points}" data-places="${p10Esc(ids.map(p10Name).join(' → '))}"`;
       return coords.length>1?`<polyline ${attrs} points="${points}" stroke="${color}"/>`:`<circle ${attrs} cx="${coords[0][0]}" cy="${coords[0][1]}" r="3" fill="${color}"/>`;
     }).join('');
-    const names=[...dots].map(([id,p])=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2.5"><title>${p10Esc(p10Name(id))}</title></circle>`).join('')+(p10View&&p10View.unscheduled||[]).map(w=>{const p=p10MapPoint(w.base);if(!p||dots.has(w.base))return '';return `<circle class="p10-unscheduled-dot" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="6"><title>${p10Esc((zh?w.zh:w.en)||p10Name(w.base))}</title></circle>`;}).join('');
+    const names=[...dots].map(([id,p])=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2.5"><title>${p10Esc(p10Name(id))}</title></circle>`).join('')+(p10View&&p10View.unscheduled||[]).map(w=>{const p=p10MapPoint(w.base);if(!p||dots.has(w.base))return '';return `<circle class="p10-unscheduled-dot" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="6"><title>${p10Esc((zh?w.zh:w.en)||p10Name(w.base))}</title></circle>`;}).join('')+(extraStops||[]).map(w=>{const id=w&&(w.base||w.id);const p=p10MapPoint(id);if(!p||dots.has(id))return '';return `<circle class="p10-catalog-stop" data-p10-stop="${p10Esc(w.id||id)}" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="4"><title>${p10Esc((zh?w.zh:w.en)||p10Name(id))}</title></circle>`;}).join('');
     const selectors=days.map(d=>`<button type="button" data-p10-map-day="${d.n}" aria-pressed="false" style="--day-color:${P10_DAY_COLORS[(d.n-1)%P10_DAY_COLORS.length]}">${zh?'第 '+d.n+' 天':'Day '+d.n}</button>`).join('');
     const startAt=p10MapPoint(startId), startTag=startAt?`<text class="p10-map-tag" x="${startAt[0].toFixed(1)}" y="${(startAt[1]-10).toFixed(1)}" text-anchor="middle">${zh?'起':'S'}</text>`:'';
     return `<section class="p10-map-panel" id="p10-trip-map" aria-label="${zh?'行程地图':'Itinerary map'}"><div class="p10-map-heading"><div><p>${zh?'逐日路线':'DAY BY DAY'}</p><h2>${zh?'行程地图':'Your trip map'}</h2></div><p>${zh?'选择某一天，查看当天经过的地点。':'Choose a day to focus on its stops.'}</p></div><div class="p10-map-day-list" aria-label="${zh?'选择日期':'Choose a day'}"><button type="button" data-p10-map-day="all" aria-pressed="true">${zh?'全部':'All days'}</button>${selectors}</div><p class="p10-map-selection" role="status" aria-live="polite">${zh?'显示全部行程地点':'Showing all itinerary stops'}</p><svg class="p10-trip-svg" viewBox="0 0 680 820" role="img" aria-label="${zh?'行程地点与每日路段示意图':'Schematic map of itinerary stops and daily connections'}"><rect width="680" height="820" fill="#e2ece8"/><path class="p10-coast" d="${P10_COAST}"/><g class="p10-map-lines">${lines}</g><g class="p10-map-dots">${names}${startTag}</g></svg><p class="p10-map-note">${zh?'地点之间的连线为示意，不能用于导航。':'Connections between places are schematic, not for navigation.'} <a href="https://www.naturalearthdata.com/about/terms-of-use/" target="_blank" rel="noopener noreferrer">Natural Earth</a> · ${zh?'海岸线包含取自':'Coastline contains data sourced from the'} <a href="https://data.linz.govt.nz/layer/51153-nz-coastlines-and-islands-polygons-topo-150k/" target="_blank" rel="noopener noreferrer">LINZ Data Service</a> ${zh?'并按':'licensed for reuse under'} <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>${zh?' 许可再利用的数据':''}</p></section>`;
@@ -646,16 +669,16 @@ globalThis.P10_NODES = NODES;
     const uns=p10View.unscheduled||[];
     const unsHtml=uns.length?`<section class="p10-unscheduled"><h3>${zh?'未安排':'Unscheduled'}</h3><ul>${uns.map(w=>`<li>${p10Esc(zh?w.zh:w.en)}</li>`).join('')}</ul></section>`:'';
     const shortfall=p10ShortfallNote(result, {days: timeline}, p10Lang());
-    el.innerHTML=`${notices.join('')}${unsHtml}${reco}${p10TripMap(timeline, result.input && result.input.start)}${rows}${shortfall?`<p class="p10-warning p10-shortfall">${p10Esc(shortfall)}</p>`:''}<p class="planner-small"><strong>${zh?'路段时间和里程都是估算值':'Segment times and distances are estimates'}</strong>${zh?`：自驾时间是 ${P10_NZTA_DATE} 在 NZTA Journey Planner 逐段查询的读数（含查询当时的路况），取整到 15 分钟，不含停留；NZTA 不显示里程，里程仍是规划估算。巴士、火车和渡轮时间是估算，以运营商时刻表为准。出发前请在下列官方来源核对。`:`: driving times are readings taken segment by segment in NZTA Journey Planner on ${P10_NZTA_DATE} (with the traffic at that moment), rounded to 15 minutes, without stops; NZTA shows no distances, so km are planning estimates. Coach, train and ferry times are estimates; check the operator's timetable. Check the official sources below before you go.`} ${x.sources}: ${(globalThis.P10_ROAD_SOURCES||[]).map(r=>`<a href="${r.url}" target="_blank" rel="noopener noreferrer">${p10Esc(r.label)}</a>`).join(' · ')}</p>`;
+    el.innerHTML=`${notices.join('')}${unsHtml}${reco}${p10TripMap(timeline, result.input && result.input.start, result.inaccessible)}${rows}${shortfall?`<p class="p10-warning p10-shortfall">${p10Esc(shortfall)}</p>`:''}<p class="planner-small"><strong>${zh?'路段时间和里程都是估算值':'Segment times and distances are estimates'}</strong>${zh?`：自驾时间是 ${P10_NZTA_DATE} 在 NZTA Journey Planner 逐段查询的读数（含查询当时的路况），取整到 15 分钟，不含停留；NZTA 不显示里程，里程仍是规划估算。巴士、火车和渡轮时间是估算，以运营商时刻表为准。出发前请在下列官方来源核对。`:`: driving times are readings taken segment by segment in NZTA Journey Planner on ${P10_NZTA_DATE} (with the traffic at that moment), rounded to 15 minutes, without stops; NZTA shows no distances, so km are planning estimates. Coach, train and ferry times are estimates; check the operator's timetable. Check the official sources below before you go.`} ${x.sources}: ${(globalThis.P10_ROAD_SOURCES||[]).map(r=>`<a href="${r.url}" target="_blank" rel="noopener noreferrer">${p10Esc(r.label)}</a>`).join(' · ')}</p>`;
     p10FocusDay('all');
   }
   const P10_WISH_REGION={christchurch:'christchurch-canterbury',nelson:'nelson-tasman',picton:'marlborough',tekapo:'christchurch-canterbury',aoraki:'christchurch-canterbury',wanaka:'wanaka',queenstown:'queenstown',milford:'fiordland','te-anau':'fiordland',glaciers:'west-coast',haast:'west-coast',hokitika:'west-coast',punakaiki:'west-coast','arthurs-pass':'christchurch-canterbury',kaikoura:'christchurch-canterbury','abel-tasman':'nelson-tasman',akaroa:'christchurch-canterbury',dunedin:'dunedin',oamaru:'dunedin',catlins:'clutha',stewart:'southland',auckland:'auckland','bay-of-islands':'northland-bay-of-islands',coromandel:'coromandel',hobbiton:'hamilton-waikato',waitomo:'hamilton-waikato',rotorua:'rotorua',taupo:'taupo',tongariro:'ruapehu',napier:'hawkes-bay',wellington:'wellington',taranaki:'taranaki'};
   const P10_REGIONS=[{id:'northland-bay-of-islands',island:'north',zh:'北地与岛屿湾',en:'Northland & Bay of Islands'},{id:'auckland',island:'north',zh:'奥克兰',en:'Auckland'},{id:'coromandel',island:'north',zh:'科罗曼德',en:'The Coromandel'},{id:'hamilton-waikato',island:'north',zh:'汉密尔顿－怀卡托',en:'Hamilton - Waikato'},{id:'bay-of-plenty',island:'north',zh:'丰盛湾',en:'Bay of Plenty'},{id:'tairawhiti-gisborne',island:'north',zh:'泰拉维蒂／吉斯伯恩',en:'Tairāwhiti Gisborne'},{id:'rotorua',island:'north',zh:'罗托鲁瓦',en:'Rotorua'},{id:'taupo',island:'north',zh:'陶波',en:'Taupō'},{id:'ruapehu',island:'north',zh:'鲁阿佩胡',en:'Ruapehu'},{id:'hawkes-bay',island:'north',zh:'霍克斯湾',en:"Hawke's Bay"},{id:'taranaki',island:'north',zh:'塔拉纳基',en:'Taranaki'},{id:'whanganui',island:'north',zh:'旺格努伊',en:'Whanganui'},{id:'manawatu',island:'north',zh:'马纳瓦图',en:'Manawatū'},{id:'wairarapa',island:'north',zh:'怀拉拉帕',en:'Wairarapa'},{id:'wellington',island:'north',zh:'惠灵顿',en:'Wellington'},{id:'nelson-tasman',island:'south',zh:'纳尔逊－塔斯曼',en:'Nelson-Tasman'},{id:'marlborough',island:'south',zh:'马尔堡',en:'Marlborough'},{id:'christchurch-canterbury',island:'south',zh:'基督城－坎特伯雷',en:'Christchurch - Canterbury'},{id:'west-coast',island:'south',zh:'西海岸',en:'West Coast'},{id:'wanaka',island:'south',zh:'瓦纳卡',en:'Wānaka'},{id:'queenstown',island:'south',zh:'皇后镇',en:'Queenstown'},{id:'central-otago',island:'south',zh:'中奥塔哥',en:'Central Otago'},{id:'dunedin',island:'south',zh:'但尼丁',en:'Dunedin'},{id:'clutha',island:'south',zh:'克卢萨',en:'Clutha'},{id:'fiordland',island:'south',zh:'峡湾',en:'Fiordland'},{id:'southland',island:'south',zh:'南地',en:'Southland'}];
   function p10WishLabel(w){const lang=p10Lang();if(w.id==='tekapo'&&lang==='zh')return '特卡波与暗夜星空';return w[lang];}
   function p10CatalogTowns(regionId, island){
-    const all=window.P10_CATALOG_TOWNS;
+    const all=globalThis.P10_CATALOG_TOWNS;
     if(!Array.isArray(all)) return null;
-    return all.filter(t=>t.region_id===regionId && (island==='all' || t.island===island));
+    return all.filter(t=>(!regionId || regionId==='all' || t.region_id===regionId) && (island==='all' || t.island===island) && t.type!=='attraction');
   }
   function p10RegionCount(regionId, island){
     const towns=p10CatalogTowns(regionId, island);
@@ -676,14 +699,21 @@ globalThis.P10_NODES = NODES;
     const list=WISHES.filter(w=>(island==='all'||w.island===island)&&(region==='all'||P10_WISH_REGION[w.id]===region||(region==='unmapped'&&!P10_WISH_REGION[w.id])));
     const groups=new Map();
     for(const w of list){const key=P10_WISH_REGION[w.id]||'unmapped';if(!groups.has(key))groups.set(key,[]);groups.get(key).push(w);}
-    const townLinks=region!=='all' && !list.length ? (p10CatalogTowns(region, island)||[]) : [];
-    if(townLinks.length){
-      const meta=P10_REGIONS.find(r=>r.id===region);
-      const heading=meta?(zh?meta.zh:meta.en):region;
-      box.innerHTML=`<section><h3>${p10Esc(heading)}</h3>${townLinks.map(t=>`<p><a href="destination.html?id=${encodeURIComponent(t.place_id)}&amp;lang=${p10Lang()}">${p10Esc(zh?(t.name_zh||t.name_en):(t.name_en||t.name_zh))}</a></p>`).join('')}</section>`;
-      return;
-    }
-    box.innerHTML=[...groups].map(([key,rows])=>{const meta=P10_REGIONS.find(r=>r.id===key);const heading=meta?(zh?meta.zh:meta.en):key;return `<section><h3>${p10Esc(heading)}</h3>${rows.map(w=>{const note=w.id==='oamaru'?(zh?' · 怀塔基区':' · Waitaki District'):'';return `<label data-p10-wish="${p10Esc(w.id)}"><input type="checkbox" name="p10-wish" value="${p10Esc(w.id)}" ${checked.has(w.id)?'checked':''}><span>${p10Esc(p10WishLabel(w)+note)}</span></label>`;}).join('')}</section>`;}).join('');
+    const towns=p10CatalogTowns(region, island)||[];
+    const townGroups=new Map();
+    for(const t of towns){const key=t.region_id||'unmapped';if(!townGroups.has(key))townGroups.set(key,[]);townGroups.get(key).push(t);}
+    const order=P10_REGIONS.filter(r=>(island==='all'||r.island===island)&&(region==='all'||r.id===region)).map(r=>r.id);
+    if(region==='all'||region==='unmapped') order.push('unmapped');
+    box.innerHTML=order.map(key=>{
+      const rows=groups.get(key)||[];
+      const townRows=townGroups.get(key)||[];
+      if(!rows.length&&!townRows.length) return '';
+      const meta=P10_REGIONS.find(r=>r.id===key);
+      const heading=meta?(zh?meta.zh:meta.en):key;
+      const wishHtml=rows.map(w=>{const note=w.id==='oamaru'?(zh?' · 怀塔基区':' · Waitaki District'):'';return `<label data-p10-wish="${p10Esc(w.id)}"><input type="checkbox" name="p10-wish" value="${p10Esc(w.id)}" ${checked.has(w.id)?'checked':''}><span>${p10Esc(p10WishLabel(w)+note)}</span></label>`;}).join('');
+      const townHtml=townRows.map(t=>{const primary=zh?(t.name_zh||t.name_en):(t.name_en||t.name_zh);const other=zh?t.name_en:t.name_zh;const text=other&&other!==primary?`${primary} ${other}`:primary;return `<label data-p10-wish="${p10Esc(t.place_id)}"><input type="checkbox" name="p10-wish" value="${p10Esc(t.place_id)}" ${checked.has(t.place_id)?'checked':''}><span>${p10Esc(text)}</span></label>`;}).join('');
+      return `<section><h3>${p10Esc(heading)}</h3>${wishHtml}${townHtml}</section>`;
+    }).join('');
   }
   window.renderP10Planner=function(){
     if(!p10$('#plannerForm'))return;const x=p10Text(),lang=p10Lang();

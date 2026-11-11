@@ -224,18 +224,28 @@
       if (south) { writeSearch({ q: '', island: 'south', days: '7-10', activity: 'drive', scope: 'itineraries', exact: '' }, true); renderSearch(); }
     });
   }
+  // Empty-search suggestions are the same two primary templates for every island.
+  // Island, day and activity filters remove a card; they never add a different one.
+  // NI-01 is not a primary, so a North Island filter does not surface it.
+  function suggestionTemplates(filters) {
+    const pool = state.catalog.templates || [];
+    return ['SI-09B', 'SI-07A'].map(id => pool.find(item => item.id === id)).filter(item => {
+      if (!item) return false;
+      if (filters.island === 'north') return false;
+      if (filters.activity !== 'all' && item.activity !== filters.activity) return false;
+      return daysOk(item.stated_days || item.day_count, filters.days, filters.exact);
+    });
+  }
   function renderResultCards(templates, places, guides, nine, empty, filters) {
     if (empty) {
-      const pool = state.catalog.templates || [];
-      const unrelated = filters.island === 'north'
-        ? pool.filter(item => String(item.id).startsWith('NI')).slice(0, 2)
-        : ['SI-09B', 'SI-07A'].map(id => pool.find(item => item.id === id)).filter(Boolean);
+      const unrelated = suggestionTemplates(filters);
+      const suggested = unrelated.length ? `<p class="v4-note">${esc(t('unrelated'))}</p>${unrelated.map(cardTemplate).join('')}` : '';
       return `<div class="v4-alert"><h3>${esc(t('noResults', { q: filters.q }))}</h3><p>${esc(t('noResultsWhy'))}</p>
         <div class="v4-actions"><button type="button" data-v4-clear>${esc(t('clearFilters'))}</button>
         <button type="button" data-v4-south>${esc(t('seeSouth'))}</button>
         <a href="guide.html?blank=1&amp;lang=${state.lang}">${esc(t('blankTrip'))}</a>
         <a class="v4-alt" href="guide.html?view=pick&amp;lang=${state.lang}">${esc(t('browseDest'))}</a></div></div>
-        <p class="v4-note">${esc(t('unrelated'))}</p>${unrelated.map(cardTemplate).join('')}`;
+        ${suggested}`;
     }
     const cards = [];
     if (!filters.q && filters.scope !== 'destinations') {

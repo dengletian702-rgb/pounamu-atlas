@@ -15,3 +15,76 @@
 
 .p10-map-panel{margin:2rem 0 3rem;background:#f5f0e5;padding:clamp(18px,3vw,38px);color:#203a2e}.p10-map-heading{display:flex;justify-content:space-between;align-items:end;gap:20px}.p10-map-heading h2{font-family:var(--sans);font-size:clamp(27px,4vw,42px);margin:0}.p10-map-heading p{font-size:14px;line-height:1.6;margin:0}.p10-map-day-list{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0}.p10-map-day-list button,.p10-day-focus{font:inherit;background:transparent;color:#203a2e;border:1px solid #899487;cursor:pointer;padding:8px 12px;min-height:40px}.p10-map-day-list button:not(:first-child){border-left:5px solid var(--day-color)}.p10-map-day-list button[aria-pressed=true]{background:#203a2e;color:white}.p10-map-day-list button:focus-visible,.p10-day-focus:focus-visible{outline:3px solid #b65e32;outline-offset:2px}.p10-trip-svg{display:block;width:100%;height:auto;max-height:690px;background:#e2ece8}.p10-coast{fill:#d1ddc6;stroke:#54745b;stroke-width:1.25;stroke-linejoin:round}.p10-map-lines polyline{fill:none;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}.p10-map-lines circle{stroke:white;stroke-width:1}.p10-map-lines .p10-muted-line{opacity:.15}.p10-map-dots{fill:#243f30;stroke:#fff;stroke-width:1;pointer-events:none}.p10-map-note{font-size:14px;line-height:1.7;margin:14px 0 0}.p10-map-note a{text-decoration:underline}.p10-day-focus{display:inline-block;font-weight:700;margin-bottom:8px}.p10-day-focus:hover{background:#203a2e;color:#fff}@media(max-width:600px){.p10-map-heading{display:block}.p10-map-heading>p{margin-top:8px}.p10-map-panel{margin-inline:0}.p10-map-day-list{gap:6px}.p10-map-day-list button{font-size:14px;padding:7px 9px}.p10-trip-svg{max-height:560px}}
 .p10-map-selection{font-size:14px;line-height:1.6;margin:0 0 12px;color:#274639}
+
+/* 2026-11-11 planner walk-through fixes */
+/* Places: card-like rows with a real tap target instead of 13 px browser checkboxes */
+.p10-group-label{font-size:13px;letter-spacing:.04em;color:#4e6157;margin:10px 0 6px}
+.p10-group{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px}
+.p10-wishes .p10-group label{display:flex;align-items:center;gap:10px;min-height:46px;padding:8px 12px;border:1px solid #c3ccbd;background:#f7f6ef;cursor:pointer;font-size:15px;line-height:1.35;transition:background .15s,border-color .15s}
+.p10-wishes .p10-group label:hover{border-color:#203a2e}
+.p10-wishes .p10-group label:has(input:checked){background:#dfe8dd;border-color:#203a2e}
+.p10-wishes .p10-group input{width:20px;height:20px;margin:0;accent-color:#203a2e;flex:none}
+.p10-wishes .p10-group input:focus-visible{outline:3px solid #a57534;outline-offset:2px}
+.p10-wish-name{flex:1;min-width:0}
+.p10-wish-days{flex:none;font-size:12px;color:#5b6b63;white-space:nowrap}
+.p10-selected{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:4px 0 10px;min-height:32px}
+.p10-selected-label{font-size:14px;color:#4e6157;margin-right:4px}
+.p10-chip{font:inherit;font-size:14px;padding:4px 10px;min-height:34px;border:1px solid #203a2e;background:#203a2e;color:#f7f6ef;cursor:pointer;border-radius:999px}
+.p10-chip:hover{background:#355446}
+.p10-chip:focus-visible{outline:3px solid #a57534;outline-offset:2px}
+@media(max-width:700px){
+  /* Region filter: one swipeable row instead of a long block of buttons */
+  #p10-region{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin;padding-bottom:6px;margin-right:-4px}
+  #p10-region button{flex:none;white-space:nowrap}
+  .p10-group{grid-template-columns:1fr}
+}
+/* Result header and tools */
+.p10-result-title{font-family:var(--bodyface,inherit);font-size:clamp(22px,3vw,30px);line-height:1.3;margin:28px 0 10px;letter-spacing:0}
+.p10-result-title:focus{outline:none}
+.p10-result-tools{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 14px}
+.p10-share-status{font-size:14px;color:#355446}
+.p10-share-url{font:inherit;font-size:13px;width:min(100%,420px);padding:4px 6px}
+/* Day cards: the day and its title first, the reorder tools small and to the side */
+.p10-day-head{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-bottom:8px}
+.p10-day-head .p10-day-focus{margin:0;font-size:14px;padding:6px 10px;min-height:36px}
+.p10-day-head .plan-day-title{flex:1 1 260px;margin:0}
+.plan-day .p10-day-tools{display:flex;flex-wrap:nowrap;gap:4px;margin:0;opacity:.75}
+.plan-day:hover .p10-day-tools,.plan-day:focus-within .p10-day-tools{opacity:1}
+.plan-day .p10-day-tools button{font:inherit;font-size:13px;min-height:34px;min-width:34px;padding:4px 8px;background:transparent;color:#355446;border:1px solid #b5beb0;cursor:pointer}
+.plan-day .p10-day-tools button:disabled{opacity:.35;cursor:default}
+.p10-day-tools button:focus-visible{outline:3px solid #a57534;outline-offset:2px}
+.p10-drag{cursor:grab}
+.p10-night{font-size:14px!important;color:#4e6157;margin-top:10px}
+.p10-note{font-size:14px!important;color:#6b4a1e}
+.p10-legs li{font-size:15px}
+.p10-src{font-size:12px;color:#7a877f;text-decoration:none;border-bottom:1px dotted #9aa59e;cursor:help;white-space:nowrap;margin-left:2px}
+.p10-day-photo{margin:6px 0 12px}
+.p10-day-photo img{display:block;width:100%;max-height:240px;object-fit:cover;background:#dfe5dc}
+.p10-day-photo figcaption{font-size:12px;color:#5b6b63;margin-top:4px;line-height:1.5}
+.p10-day-photo figcaption a{color:inherit;text-decoration:underline}
+.p10-tight .p10-warning{margin:0}
+.p10-tight{margin:0 0 12px}
+@media(max-width:600px){.p10-day-tools{opacity:1}.p10-day-head .plan-day-title{flex-basis:100%;order:-1}}
+/* Map: town names that stay the same size when a day is zoomed in, and clear start/end tags */
+.p10-map-labels{pointer-events:none}
+.p10-map-label{font-size:calc(var(--k,1) * 12px);fill:#203a2e;stroke:#eef3ef;stroke-width:calc(var(--k,1) * 3.5px);stroke-linejoin:round;paint-order:stroke;font-family:var(--bodyface,system-ui,sans-serif)}
+.p10-map-label-off{fill:#9e4a2e;font-style:italic}
+.p10-map-tag{font-size:calc(var(--k,1) * 13px);font-weight:700;fill:#b4512c;stroke:#fff;stroke-width:calc(var(--k,1) * 3.5px);paint-order:stroke;stroke-linejoin:round;font-family:var(--bodyface,system-ui,sans-serif)}
+/* The planning page shows its headings at once; the letter-by-letter reveal left them blank for a moment */
+body[data-page=plan] .type-char{opacity:1!important;transform:none!important;animation:none!important}
+@media print{
+  .skip-link,.header,.planner-copy,#plannerForm,.planner-explainer,.planner-box-heading,.planner-small:not(.plan-result .planner-small),.travel-note,.footer,.p10-day-tools,.p10-result-tools,.p10-tight .p10-along,.p10-map-day-list,.p10-map-selection,.p10-along{display:none!important}
+  body,.planner,.planner-box{background:#fff!important;color:#000!important;padding:0!important}
+  .plan-result .plan-day{break-inside:avoid;background:#fff!important;border-top:1px solid #999}
+  .p10-map-panel{break-inside:avoid;background:#fff}
+  a{color:inherit}
+}
+/* Phone-width map: names sized by p10FocusDay; long "unscheduled" names stay in the list above the map. */
+.p10-map-narrow .p10-map-label-off{display:none}
+@media (max-width:520px){.p10-map-panel{padding:14px 10px}}
+/* Win over the older .planner h2 and #p10-region rules, which load later or are more specific. */
+.planner h2.p10-result-title{font-family:var(--bodyface,inherit);font-size:clamp(22px,3vw,30px);line-height:1.3;margin:28px 0 10px;letter-spacing:0}
+@media (max-width:700px){
+  div#p10-region{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin;padding-bottom:6px}
+  div#p10-region button{flex:none;white-space:nowrap}
+}

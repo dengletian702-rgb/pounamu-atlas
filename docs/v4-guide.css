@@ -99,3 +99,6 @@
 .v4-prepare-extra ul{padding-left:1.2em;line-height:1.7}
 .v4-prepare-extra a,.v4-topic a{overflow-wrap:anywhere}
 .v4-src{font-size:13px;line-height:1.5;color:#45574c}
+.v4-stay-tier,#ski article.v4-place,.v4-prepare-extra article.v4-place{display:block}
+.v4-stay-tier h3,#ski article.v4-place h3,.v4-prepare-extra article.v4-place h3{margin:0 0 6px;font-size:22px;line-height:1.35}
+.v4-stay-tier p,#ski article.v4-place p{margin:4px 0}

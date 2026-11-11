@@ -63,3 +63,61 @@ test('the South Island 7–10 day button clears the query and lists only those t
     await new Promise(resolve => server.close(resolve));
   }
 });
+
+async function suggestionIds(page) {
+  await page.waitForSelector('#v4-results .v4-alert');
+  return page.locator('#v4-results [data-template]').evaluateAll(nodes => nodes.map(node => node.getAttribute('data-template')));
+}
+
+test('empty-result suggestions follow the island and day filters in both languages', async (t) => {
+  const chromium = loadChromium();
+  if (!chromium || !fs.existsSync('/usr/bin/google-chrome')) {
+    t.skip('browser driver is not available in this environment');
+    return;
+  }
+  const server = await startDocsServer();
+  const browser = await chromium.launch({ executablePath: '/usr/bin/google-chrome', args: ['--no-sandbox', '--disable-dev-shm-usage'] });
+  try {
+    const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+    const base = 'http://127.0.0.1:' + server.address().port;
+    async function openSearch(lang, island, days) {
+      const params = new URLSearchParams({ lang, q: 'zzqx' });
+      if (island) params.set('island', island);
+      if (days) params.set('days', days);
+      await page.goto(base + '/index.html?' + params.toString(), { waitUntil: 'networkidle' });
+      return suggestionIds(page);
+    }
+    for (const lang of ['zh', 'en']) {
+      assert.deepEqual(await openSearch(lang), ['SI-09B', 'SI-07A']);
+      assert.deepEqual(await openSearch(lang, 'south'), ['SI-09B', 'SI-07A']);
+      const north = await openSearch(lang, 'north');
+      assert.deepEqual(north, []);
+      assert.equal((await page.locator('#v4-results').innerText()).includes('NI-01'), false);
+      assert.deepEqual(await openSearch(lang, 'south', '1-3'), []);
+      assert.deepEqual(await openSearch(lang, 'north', '4-6'), []);
+      assert.deepEqual(await openSearch(lang, 'north', '7-10'), []);
+      assert.deepEqual(await openSearch(lang, '', '7-10'), ['SI-09B', 'SI-07A']);
+    }
+    await page.goto(base + '/index.html?lang=zh', { waitUntil: 'networkidle' });
+    await page.fill('#v4-q', 'zzqx');
+    await page.click('#v4-search-form button[type=submit]');
+    await page.click('#v4-search-form button[data-island="north"]');
+    assert.deepEqual(await suggestionIds(page), []);
+    assert.equal(new URL(page.url()).searchParams.get('island'), 'north');
+    assert.equal((await page.locator('#v4-results').innerText()).includes('NI-01'), false);
+    await page.click('#v4-search-form button[data-island="south"]');
+    assert.deepEqual(await suggestionIds(page), ['SI-09B', 'SI-07A']);
+    await page.click('#v4-search-form button[data-island="all"]');
+    assert.deepEqual(await suggestionIds(page), ['SI-09B', 'SI-07A']);
+    await page.click('#v4-search-form button[data-days="1-3"]');
+    assert.deepEqual(await suggestionIds(page), []);
+    await page.locator('[data-v4-south]').click();
+    await page.waitForFunction(() => !new URL(location.href).searchParams.get('q'));
+    const ids = await page.locator('#v4-results [data-template]').evaluateAll(nodes => nodes.map(node => node.getAttribute('data-template')));
+    assert.deepEqual(ids, ['SI-09B', 'SI-09A', 'SI-07A', 'SI-07B']);
+    await page.close();
+  } finally {
+    await browser.close();
+    await new Promise(resolve => server.close(resolve));
+  }
+});

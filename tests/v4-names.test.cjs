@@ -5,7 +5,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { importPlaces, TNZ_REGIONS } = require('../scripts/lib/v4-import.cjs');
 
-const banned = ['达尼丁', '特卡波湖', '蒂卡普', '罗托鲁阿', '纳皮尔'];
+const banned = ['达尼丁', '特卡波湖', '蒂卡普', '罗托鲁阿', '纳皮尔', '阿贝尔塔斯曼', '玛拉豪', '马西森湖', '尼尔森（'];
 
 test('generated pages and data do not keep the old Chinese names', () => {
   const root = path.resolve(__dirname, '..');

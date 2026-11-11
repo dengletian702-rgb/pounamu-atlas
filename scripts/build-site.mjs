@@ -43,7 +43,30 @@ if (mi < 0) throw new Error('missing routeMapData line');
 const mapData = JSON.parse(mapLines[mi].slice('const routeMapData='.length).replace(/;\s*$/, ''));
 for (const [id, d] of Object.entries(mapData)) { const r = routes.find(x => x.id === id); if (!r) throw new Error('sketch without a catalogue route: ' + id); d.sources = r.sources.map(({label, url}) => ({label, url})); }
 mapLines[mi] = 'const routeMapData=' + JSON.stringify(mapData) + ';';
+// routes with no sketch: the national atlas draws them from their DOC track line (data/route-lines.json, DOC open
+// data, CC BY 4.0), its longest section thinned to at most 30 points; a route with neither is listed under the atlas as "no map data" (P1-01)
+const docLines = JSON.parse(await readFile(join(root, 'data/route-lines.json'), 'utf8'));
+const atlasStarts = {};
+for (const r of routes) {
+  if (mapData[r.id] || !Array.isArray(docLines[r.id]) || !docLines[r.id].length) continue;
+  const longest = docLines[r.id].filter(Array.isArray).sort((a, b) => b.length - a.length)[0] || [];
+  const pts = longest.filter(p => Array.isArray(p) && Number.isFinite(p[0]) && Number.isFinite(p[1]));
+  if (!pts.length) continue;
+  const step = Math.max(1, Math.ceil(pts.length / 30));
+  const line = pts.filter((_, i) => i % step === 0 || i === pts.length - 1).map(p => [+p[0].toFixed(4), +p[1].toFixed(4)]);
+  atlasStarts[r.id] = {start: line[0], line, source: 'DOC tracks open data (CC BY 4.0)'};
+}
+const ai = mapLines.findIndex(l => l.startsWith('const routeAtlasStarts='));
+const atlasLine = 'const routeAtlasStarts=' + JSON.stringify(atlasStarts) + ';';
+if (ai >= 0) mapLines[ai] = atlasLine; else mapLines.splice(mi + 1, 0, atlasLine);
 await writeFile(mapPath, v4.aliasZh(mapLines.join('\n')));
+// merged place ids (inputs/atlas/merged-place-ids.csv): the planner resolves old ids in shared links and saved trips (ticket C)
+const plannerPath = join(root, 'docs/p10-planner.js');
+const plannerLines = (await readFile(plannerPath, 'utf8')).split('\n');
+const pa = plannerLines.findIndex(l => l.startsWith('const P10_PLACE_ALIASES='));
+if (pa < 0) throw new Error('missing P10_PLACE_ALIASES line');
+plannerLines[pa] = 'const P10_PLACE_ALIASES=' + JSON.stringify(v4data.aliases || {}) + ';';
+await writeFile(plannerPath, plannerLines.join('\n'));
 // the footer links to the licence page inside the site; keep that copy identical to the root file
 await cp(join(root, 'CONTENT-LICENSE.md'), join(root, 'docs/CONTENT-LICENSE.md'));
 await cp(join(root, 'docs'), join(root, 'outputs/site'), {recursive: true, filter: src => !src.endsWith('.nojekyll') && !src.endsWith('SPORTS-SPEC.md')});

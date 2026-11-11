@@ -40,7 +40,12 @@
     return document.documentElement.lang && document.documentElement.lang.startsWith('en') ? 'en' : 'zh';
   }
   function uid() { return Math.random().toString(36).slice(2, 9); }
+  function aliasId(id) {
+    const aliases = (state.catalog && state.catalog.aliases) || {};
+    return Object.prototype.hasOwnProperty.call(aliases, id) ? aliases[id] : id;
+  }
   function byId(id) {
+    id = aliasId(id);
     return (state.catalog && state.catalog.places || []).find(p => p.place_id === id) || null;
   }
   function towns() {
@@ -911,6 +916,12 @@
     if (!host) return;
     const id = new URLSearchParams(location.search).get('id');
     const town = byId(id);
+    // destination.html?id=<merged id> moves to the place it was merged into (ni-mau -> ni-tga).
+    if (town && id && town.place_id !== id) {
+      const q = new URLSearchParams(location.search);
+      q.set('id', town.place_id);
+      history.replaceState(null, '', location.pathname + '?' + q.toString());
+    }
     if (!town || town.type !== 'town') {
       host.innerHTML = `<h1>${esc(t('noResults', { q: id || '' }))}</h1>`;
       return;

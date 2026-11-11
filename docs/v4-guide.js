@@ -40,7 +40,12 @@
     return document.documentElement.lang && document.documentElement.lang.startsWith('en') ? 'en' : 'zh';
   }
   function uid() { return Math.random().toString(36).slice(2, 9); }
+  function aliasId(id) {
+    const aliases = (state.catalog && state.catalog.aliases) || {};
+    return Object.prototype.hasOwnProperty.call(aliases, id) ? aliases[id] : id;
+  }
   function byId(id) {
+    id = aliasId(id);
     return (state.catalog && state.catalog.places || []).find(p => p.place_id === id) || null;
   }
   function towns() {
@@ -911,6 +916,12 @@
     if (!host) return;
     const id = new URLSearchParams(location.search).get('id');
     const town = byId(id);
+    // destination.html?id=<merged id> moves to the place it was merged into (ni-mau -> ni-tga).
+    if (town && id && town.place_id !== id) {
+      const q = new URLSearchParams(location.search);
+      q.set('id', town.place_id);
+      history.replaceState(null, '', location.pathname + '?' + q.toString());
+    }
     if (!town || town.type !== 'town') {
       host.innerHTML = `<h1>${esc(t('noResults', { q: id || '' }))}</h1>`;
       return;
@@ -931,7 +942,10 @@
     const townLabel = nameOf(town);
     const crumbRegion = regionLabel && regionLabel !== townLabel ? ` / ${esc(regionLabel)}` : '';
     const nearTracks = (state.tracks.tracks || []).filter(tr => window.v4TrackMatches(tr, state.lang === 'en' ? town.name_en : town.name_zh)).slice(0, 8);
-    const sport = (state.sports.cities || []).find(c => fold(c.name) === fold(town.name_en) || fold(c.zh) === fold(town.name_zh));
+    // a sports city is the same place when a name matches or its centre is within its own search radius of the town
+    // (a merged row such as "Tauranga & Mount Maunganui" no longer matches by name alone)
+    const sport = (state.sports.cities || []).find(c => [town.name_en, town.town].some(n => n && fold(c.name) === fold(n)) || fold(c.zh) === fold(town.name_zh)
+      || (Array.isArray(c.centre) && Number.isFinite(Number(town.lat)) && haversineKm(c.centre[0], c.centre[1], Number(town.lat), Number(town.lon)) <= (c.radiusKm || 10)));
     const fact = (label, value) => value ? `<p><strong>${esc(label)}</strong> ${value}</p>` : '';
     const row = k => {
       const sum = state.lang === 'en' ? k.summary_en : k.summary_zh;

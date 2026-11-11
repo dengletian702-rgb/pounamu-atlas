@@ -907,11 +907,11 @@ globalThis.P10_NODES = NODES;
   window.p10Timeline = p10Timeline;
   const p10$=selector=>document.querySelector(selector);
   const p10Text=()=>document.documentElement.lang.startsWith('zh') ? {
-    start:'从哪里出发',end:'从哪里离开',days:'旅行天数',month:'出行月份（选 6–10 月会提示冬季山路）',monthUnknown:'还没定',pace:'每天自驾节奏',pace35:'最多 3.5 小时',pace5:'最多 5 小时',pace65:'最多 6.5 小时',places:'想去哪些地方？',island:'这次去哪一座岛？',region:'地区',choose:'选择多个目的地',transport:'城市之间怎么走',car:'自驾',public:'公共交通',preference:'想怎么玩',prefEasy:'轻松观光，不排长步道',prefWalk:'徒步',prefCycle:'骑行',prefDrive:'风景公路与火车',method:'是否使用 Jev 推荐',local:'本地规划',jev:'Jev 辅助推荐',submit:'生成行程',
+    start:'从哪里出发',end:'从哪里离开',days:'旅行天数',month:'出行月份（选 6–10 月会提示冬季山路）',monthUnknown:'还没定',stay:'住宿档位（可选：每晚显示这一档的住宿入口）',stayNone:'不显示',stayBudget:'省钱',stayMid:'中档',stayHigh:'高端',pace:'每天自驾节奏',pace35:'最多 3.5 小时',pace5:'最多 5 小时',pace65:'最多 6.5 小时',places:'想去哪些地方？',island:'这次去哪一座岛？',region:'地区',choose:'选择多个目的地',transport:'城市之间怎么走',car:'自驾',public:'公共交通',preference:'想怎么玩',prefEasy:'轻松观光，不排长步道',prefWalk:'徒步',prefCycle:'骑行',prefDrive:'风景公路与火车',method:'是否使用 Jev 推荐',local:'本地规划',jev:'Jev 辅助推荐',submit:'生成行程',
     consent:'只有勾选同意，才会把所选岛屿、天数和活动方式发送给 TypeSafe，服务方也会收到请求 IP；地点和起终点不会发送。',statusConsent:'请先同意，再使用 Jev 推荐。',loading:'正在请求 Jev 推荐…',error:'Jev 推荐暂不可用，下面仍显示本地规划。',reco:'Jev 推荐',
     disclaimer:'出发前请查看 NZTA 路况和各线路链接的官方信息。',min:'至少需要',have:'你选择了',drop:'可增加天数或移除',unreachable:'以下地点目前无法按所选交通方式衔接，需另行安排',disconnected:'起点与终点之间缺少可用的交通连接，请改选交通方式或另行安排。',unknownNight:'',day:'第',dayEnd:'天',arrive:'抵达',depart:'离开',night:'住',check:'',activity:'安排时间游览',localTransport:'景点与步道起点的当地接驳不包含在行程中。',ferry:'渡轮',train:'火车',coach:'大巴',shuttle:'接驳车',road:'自驾',hour:'小时',dropNo:'请减少目的地或增加天数。',sources:'路况与交通来源'
   } : {
-    start:'Start city',end:'Departure city',days:'Days available',month:'Travel month (June–October adds winter road notes)',monthUnknown:'Not sure yet',pace:'Daily driving pace',pace35:'Up to 3.5 hours',pace5:'Up to 5 hours',pace65:'Up to 6.5 hours',places:'Where would you like to go?',island:'Which island this time?',region:'Region',choose:'Choose multiple destinations',transport:'Between towns',car:'Drive',public:'Public transport',preference:'How do you like to explore?',prefEasy:'Easy sightseeing, no long hikes',prefWalk:'Walking',prefCycle:'Cycling',prefDrive:'Scenic roads and trains',method:'Jev suggestions',local:'Local plan',jev:'Jev-assisted suggestion',submit:'Build itinerary',
+    start:'Start city',end:'Departure city',days:'Days available',month:'Travel month (June–October adds winter road notes)',monthUnknown:'Not sure yet',stay:'Stay budget (optional: shows stay links for each night)',stayNone:'Not shown',stayBudget:'Budget',stayMid:'Mid-range',stayHigh:'High-end',pace:'Daily driving pace',pace35:'Up to 3.5 hours',pace5:'Up to 5 hours',pace65:'Up to 6.5 hours',places:'Where would you like to go?',island:'Which island this time?',region:'Region',choose:'Choose multiple destinations',transport:'Between towns',car:'Drive',public:'Public transport',preference:'How do you like to explore?',prefEasy:'Easy sightseeing, no long hikes',prefWalk:'Walking',prefCycle:'Cycling',prefDrive:'Scenic roads and trains',method:'Jev suggestions',local:'Local plan',jev:'Jev-assisted suggestion',submit:'Build itinerary',
     consent:'Only with your consent, the selected island, days and activity type are sent to TypeSafe, which also receives the request IP. Your selected places and start/end are not sent.',statusConsent:'Please consent before using Jev.',loading:'Requesting a Jev suggestion…',error:'Jev is unavailable; the local plan is shown below.',reco:'Jev recommendation',
     disclaimer:'Check NZTA road conditions and the linked official information before you go.',min:'Minimum days',have:'Days selected',drop:'Removing this destination may reduce the trip to',unreachable:'These places need separate transport with the selected mode',disconnected:'No available connection is modelled between the start and end. Choose another mode or arrange this separately.',unknownNight:'',day:'Day ',dayEnd:'',arrive:'Arrive in',depart:'Depart from',night:'Overnight',check:'',activity:'Allow time to explore',localTransport:'Check local transport to sights and trailheads and return separately.',ferry:'Ferry',train:'Train',coach:'Coach',shuttle:'Shuttle',road:'Drive',hour:'h',dropNo:'Remove a destination or add more days.',sources:'Road and transport sources'
   };
@@ -1006,10 +1006,19 @@ globalThis.P10_NODES = NODES;
   function p10ShareUrl(input){
     const u=new URL(location.href);u.search='';u.hash='';const q=u.searchParams;
     q.set('lang',p10Lang());q.set('from',input.start);q.set('to',input.end);q.set('days',String(input.days));q.set('car',input.car?'1':'0');
-    if(input.car)q.set('pace',String(input.pace));q.set('pref',input.preference);if(input.wishes.length)q.set('w',input.wishes.join(','));if(input.month)q.set('m',String(input.month));
+    if(input.car)q.set('pace',String(input.pace));q.set('pref',input.preference);if(input.wishes.length)q.set('w',input.wishes.join(','));if(input.month)q.set('m',String(input.month));if(input.stay)q.set('stay',input.stay);
     return u.toString();
   }
   function p10PartLabel(a,zh){return a.total>1?(zh?`（第 ${a.part} 天，共 ${a.total} 天）`:` (day ${a.part} of ${a.total})`):'';}
+  // Optional stay tier (ticket F): each night lists that tier's official links and a map search in the overnight town.
+  let p10Stays=null,p10StaysLoading=false;
+  function p10LoadStays(){if(p10Stays||p10StaysLoading)return;p10StaysLoading=true;fetch('data/stays-budget.json').then(r=>r.ok?r.json():null).then(d=>{p10Stays=d&&Array.isArray(d.tiers)?d.tiers:[];if(p10Result&&p10Result.input.stay)p10Show(p10Result);}).catch(()=>{p10Stays=[];});}
+  function p10StayLinks(tierId,at,zh){
+    if(!tierId)return '';if(!p10Stays){p10LoadStays();return '';}
+    const tier=p10Stays.find(t=>t.id===tierId);if(!tier)return '';const town=NODES[at]?.en||at;
+    const links=tier.links.map(l=>{const href=l.kind==='maps'?`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(l.query+' '+town+' New Zealand')}`:l.url;return `<a href="${p10Esc(href)}" target="_blank" rel="noopener noreferrer">${p10Esc(zh?l.label_zh:l.label_en)}</a>`;}).join(' · ');
+    return `<p class="p10-stay-links" data-p10-stay="${p10Esc(tier.id)}">${p10Esc(zh?`${tier.zh}住宿：`:`${tier.en} stays: `)}${links}</p>`;
+  }
   function p10Show(result){
     const el=p10$('#planResult');if(!el)return;if(!result){el.innerHTML='';return;}const x=p10Text(),zh=p10Lang()==='zh',lang=p10Lang();
     if(result.disconnected){el.innerHTML=`<p class="p10-warning">${x.disconnected}</p>`;return;}
@@ -1068,7 +1077,7 @@ globalThis.P10_NODES = NODES;
       if(d.kind==='weather'||d.kind==='free'){
         const title=d.kind==='weather'?(zh?`${p10Esc(p10Name(d.at))} · 天气机动日`:`${p10Esc(p10Name(d.at))} · weather buffer day`):(zh?`${p10Esc(p10Name(d.at))} · 自由活动日`:`${p10Esc(p10Name(d.at))} · free day`);
         const description=d.kind==='weather'?(zh?'天气不好时用来改期；天气适合时可自由活动。':'Use this day to reschedule if weather disrupts your plans; otherwise enjoy free time.'):(zh?`多出来的一天：在${p10Esc(p10Name(d.at))}自由活动或休息。`:`A spare day: free time or rest in ${p10Esc(p10Name(d.at))}.`);
-        return `<article class="plan-day" tabindex="0" data-p10-index="${i}">${head(d,i,title)}<p>${description}</p><p class="p10-night">${x.night}${zh?'：':': '}${p10Esc(p10Name(d.at))}</p></article>`;
+        return `<article class="plan-day" tabindex="0" data-p10-index="${i}">${head(d,i,title)}<p>${description}</p><p class="p10-night">${x.night}${zh?'：':': '}${p10Esc(p10Name(d.at))}</p>${p10StayLinks(result.input.stay,d.at,zh)}</article>`;
       }
       const acts=d.activities.map(a=>p10Esc(a.wish[lang])).join(zh?'、':', ');
       const from=d.legs.length?p10Esc(p10Name(d.legs[0].a)):'';
@@ -1085,7 +1094,7 @@ globalThis.P10_NODES = NODES;
       const roadNotes=p10RoadNotes(d.legs,result.input.month,zh).map(n=>`<p class="p10-warning p10-road-note p10-${n.kind}-note">${p10Esc(n.text)} <span class="p10-note-src">${n.sources.map(src=>`<a href="${p10Esc(src.url)}" target="_blank" rel="noopener noreferrer">${p10Esc(src.label)}</a>`).join(' · ')}${zh?'（查阅 ':' (read '}${p10Esc(n.sources[0].checkedAt)}${zh?'）':')'}</span></p>`).join('');
       const arrivalTip=d.kind==='arrive'?`<p>${result.input.car?(zh?'落地后先休息，避免当天长途驾驶。':'Rest after landing and avoid a long drive on the first day.'):(zh?'落地后先休息，第一天别排长途大巴。':'Rest after landing and avoid a long bus ride on the first day.')}</p>`:'';
       const lateTip=d.kind==='depart'&&d.legs.length?`<p class="p10-note">${zh?'离开当天还要赶一段路，航班请订在下午或傍晚以后。':'You still travel on your departure day, so book an afternoon or evening flight.'}</p>`:'';
-      return `<article class="plan-day" tabindex="0" data-p10-index="${i}">${head(d,i,title)}${arrivalTip}${before}${legs?`<ul class="p10-legs">${legs}</ul>`:''}${roadNotes}${total}${longDay}${lateTip}${after}${d.kind==='depart'?'':`<p class="p10-night">${x.night}${zh?'：':': '}${p10Esc(p10Name(d.at))}</p>`}</article>`;
+      return `<article class="plan-day" tabindex="0" data-p10-index="${i}">${head(d,i,title)}${arrivalTip}${before}${legs?`<ul class="p10-legs">${legs}</ul>`:''}${roadNotes}${total}${longDay}${lateTip}${after}${d.kind==='depart'?'':`<p class="p10-night">${x.night}${zh?'：':': '}${p10Esc(p10Name(d.at))}</p>${p10StayLinks(result.input.stay,d.at,zh)}`}</article>`;
     }).join('');
     const recoName=p10JevRouteName(p10Recommendation,lang,typeof routes==='undefined'?[]:routes);
     const reco=recoName?`<p>${x.reco}${zh?'：':': '}<a href="route.html?id=${encodeURIComponent(p10Recommendation)}&amp;lang=${lang}">${p10Esc(recoName)}</a></p>`:'';
@@ -1241,6 +1250,7 @@ globalThis.P10_NODES = NODES;
     if(status&&item)status.textContent=`${item.name}${p10Selected.has(id)?(zh?' · 已选，点圆点可取消':' · picked; click the dot to remove'):(zh?' · 点圆点加入':' · click the dot to add')}`;
   }
   function p10Month(){return Number(p10$('#p10-month')?.value)||0;}
+  function p10Stay(){const v=p10$('#p10-stay')?.value||'';return ['budget','mid','high'].includes(v)?v:'';}
   function p10SyncTransport(){const car=p10$('#p10-transport')?.value!=='public';const field=p10$('#p10-pace-field');if(field)field.hidden=!car;}
   let p10LinkWishes=null;
   function p10LinkNote(lang){
@@ -1252,7 +1262,7 @@ globalThis.P10_NODES = NODES;
   }
   window.renderP10Planner=function(){
     if(!p10$('#plannerForm'))return;const x=p10Text(),lang=p10Lang(),zh=lang==='zh';
-    for(const [id,key] of [['p10-start-label','start'],['p10-end-label','end'],['p10-days-label','days'],['p10-month-label','month'],['p10-pace-label','pace'],['p10-pace-35','pace35'],['p10-pace-5','pace5'],['p10-pace-65','pace65'],['p10-wishes-label','places'],['p10-island-label','island'],['p10-region-label','region'],['p10-choose','choose'],['p10-transport-label','transport'],['p10-car-label','car'],['p10-public-label','public'],['p10-preference-label','preference'],['p10-pref-easy','prefEasy'],['p10-pref-walk','prefWalk'],['p10-pref-cycle','prefCycle'],['p10-pref-drive','prefDrive'],['p10-method-label','method'],['p10-local-label','local'],['p10-jev-label','jev'],['p10-submit','submit'],['p10-consent-text','consent']]){const el=document.getElementById(id);if(el)el.textContent=x[key];}
+    for(const [id,key] of [['p10-start-label','start'],['p10-end-label','end'],['p10-days-label','days'],['p10-month-label','month'],['p10-stay-label','stay'],['p10-stay-none','stayNone'],['p10-stay-budget','stayBudget'],['p10-stay-mid','stayMid'],['p10-stay-high','stayHigh'],['p10-pace-label','pace'],['p10-pace-35','pace35'],['p10-pace-5','pace5'],['p10-pace-65','pace65'],['p10-wishes-label','places'],['p10-island-label','island'],['p10-region-label','region'],['p10-choose','choose'],['p10-transport-label','transport'],['p10-car-label','car'],['p10-public-label','public'],['p10-preference-label','preference'],['p10-pref-easy','prefEasy'],['p10-pref-walk','prefWalk'],['p10-pref-cycle','prefCycle'],['p10-pref-drive','prefDrive'],['p10-method-label','method'],['p10-local-label','local'],['p10-jev-label','jev'],['p10-submit','submit'],['p10-consent-text','consent']]){const el=document.getElementById(id);if(el)el.textContent=x[key];}
     const monthSel=p10$('#p10-month');if(monthSel)for(const o of monthSel.options)o.textContent=o.value==='0'?x.monthUnknown:(zh?`${o.value} 月`:new Date(2026,Number(o.value)-1,1).toLocaleString('en-NZ',{month:'long'}));
     for(const s of [p10$('#p10-start'),p10$('#p10-end')]){for(const o of s.options)o.textContent=NODES[o.value][lang];for(const g of s.querySelectorAll('optgroup'))g.label=g.dataset.p10Group==='north'?(zh?'北岛':'North Island'):(zh?'南岛':'South Island');}
     // Catalogue towns load after the page: re-plan a restored or shared trip once they can be resolved.
@@ -1277,17 +1287,18 @@ globalThis.P10_NODES = NODES;
     // A shared link (?from=…&to=…) wins over the trip saved in this browser.
     let saved=null;const q=new URLSearchParams(location.search);
     if(q.get('from')&&q.get('to'))p10LinkWishes=(q.get('w')||'').split(',').filter(Boolean);
-    if(q.get('from')&&q.get('to'))saved={start:q.get('from'),end:q.get('to'),days:Number(q.get('days'))||7,pace:Number(q.get('pace'))||5,preference:q.get('pref')||'easy',car:q.get('car')!=='0',month:Number(q.get('m'))||0,wishes:(q.get('w')||'').split(',').filter(Boolean)};
+    if(q.get('from')&&q.get('to'))saved={start:q.get('from'),end:q.get('to'),days:Number(q.get('days'))||7,pace:Number(q.get('pace'))||5,preference:q.get('pref')||'easy',car:q.get('car')!=='0',month:Number(q.get('m'))||0,stay:q.get('stay')||'',wishes:(q.get('w')||'').split(',').filter(Boolean)};
     else try{saved=JSON.parse(localStorage.getItem('p10-road-plan'));}catch{}
     if(saved){
-      for(const [selector,value] of [['#p10-month',saved.month||0],['#p10-start',saved.start],['#p10-end',saved.end],['#days',saved.days],['#p10-pace',saved.pace],['#preference',saved.preference],['#p10-transport',saved.car?'car':'public']])if(value!=null&&p10$(selector).querySelector(`option[value="${String(value)}"]`))p10$(selector).value=String(value);
+      for(const [selector,value] of [['#p10-stay',saved.stay||''],['#p10-month',saved.month||0],['#p10-start',saved.start],['#p10-end',saved.end],['#days',saved.days],['#p10-pace',saved.pace],['#preference',saved.preference],['#p10-transport',saved.car?'car':'public']])if(value!=null&&p10$(selector).querySelector(`option[value="${String(value)}"]`))p10$(selector).value=String(value);
       for(const id of saved.wishes||[])p10Selected.add(p10AliasId(id));
-      try{p10Result=p10Plan({start:p10$('#p10-start').value,end:p10$('#p10-end').value,days:Number(p10$('#days').value),pace:Number(p10$('#p10-pace').value),preference:p10$('#preference').value,car:p10$('#p10-transport').value==='car',month:p10Month(),wishes:[...p10Selected]});}catch{p10Result=null;}
+      try{p10Result=p10Plan({start:p10$('#p10-start').value,end:p10$('#p10-end').value,days:Number(p10$('#days').value),pace:Number(p10$('#p10-pace').value),preference:p10$('#preference').value,car:p10$('#p10-transport').value==='car',month:p10Month(),stay:p10Stay(),wishes:[...p10Selected]});}catch{p10Result=null;}
     }
     form.addEventListener('change',event=>{
       const t=event.target;
       if(t.name==='p10-wish'){if(t.checked)p10Selected.add(t.value);else p10Selected.delete(t.value);p10RenderSelected();}
       if(t.id==='p10-transport')p10SyncTransport();
+      if(t.id==='p10-stay'&&p10Result){p10Result.input={...p10Result.input,stay:p10Stay()};try{localStorage.setItem('p10-road-plan',JSON.stringify(p10Result.input));}catch{}p10Show(p10Result);}
       if(t.id==='p10-start'||t.id==='p10-end')p10RenderPickMap(p10PickItems);
     });
     // The map lives outside the form on a wide screen, so its clicks and hovers are handled on the document.
@@ -1370,7 +1381,7 @@ globalThis.P10_NODES = NODES;
       event.preventDefault();const x=p10Text(),methodValue=method.value;
       if(methodValue==='jev'&&!p10$('#jevConsentCheck').checked){p10Status(x.statusConsent);return;}
       const start=p10$('#p10-start').value,end=p10$('#p10-end').value,days=Number(p10$('#days').value),pace=Number(p10$('#p10-pace').value),preference=p10$('#preference').value,car=p10$('#p10-transport').value==='car',wishes=[...p10Selected];
-      const input={start,end,days,pace,preference,car,month:p10Month(),wishes};p10Recommendation=null;p10Status('');
+      const input={start,end,days,pace,preference,car,month:p10Month(),stay:p10Stay(),wishes};p10Recommendation=null;p10Status('');
       if(methodValue==='jev'){
         const button=form.querySelector('button[type=submit]');button.disabled=true;p10Status(x.loading);
         try{p10Recommendation=await window.TripPlanner.chooseWithJev({days,preference:preference==='easy'?'walk':preference,island:p10JevIsland(start,wishes)});p10Status('');}catch{p10Status(x.error);}finally{button.disabled=false;}

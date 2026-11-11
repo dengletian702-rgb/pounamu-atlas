@@ -192,6 +192,31 @@ test('F: 青旅 / luxury / 露营 find the stays card; a town page has the three
   assert.deepEqual(page.errors, []);
 }));
 
+test('F: the planner\'s optional stay tier adds that tier\'s links under every night, and the share link keeps it', async t => withPage(t, async page => {
+  for (const lang of ['zh', 'en']) {
+    await page.go('plan.html?lang=' + lang);
+    await page.ev('localStorage.clear()');
+    await page.go(`plan.html?lang=${lang}&from=christchurch&to=queenstown&days=7&car=1&pace=5&pref=easy&w=tekapo,wanaka&stay=budget`);
+    await page.waitFor('document.querySelectorAll(".p10-stay-links").length > 0');
+    const r = await page.ev(`({nights: document.querySelectorAll('#planResult .p10-night').length, stays: [...document.querySelectorAll('#planResult .p10-stay-links')].map(p => ({tier: p.dataset.p10Stay, text: p.innerText, hrefs: [...p.querySelectorAll('a')].map(a => a.href)})), select: document.querySelector('#p10-stay').value, label: document.querySelector('#p10-stay-label').textContent})`);
+    assert.equal(r.select, 'budget');
+    assert.equal(r.stays.length, r.nights);
+    assert.ok(r.stays.every(s => s.tier === 'budget' && s.hrefs.some(h => /doc\.govt\.nz/.test(h)) && s.hrefs.some(h => /google\.com\/maps\/search/.test(h))));
+    assert.match(r.label, lang === 'zh' ? /住宿档位/ : /Stay budget/);
+    assert.match(r.stays[0].text, lang === 'zh' ? /^省钱住宿：/ : /^Budget stays: /);
+    // switching to high-end redraws the same days with the high-end links; switching off removes them
+    await page.ev(`(()=>{const s=document.querySelector('#p10-stay');s.value='high';s.dispatchEvent(new Event('change',{bubbles:true}));})()`);
+    assert.ok(await page.ev(`[...document.querySelectorAll('.p10-stay-links')].every(p => p.dataset.p10Stay === 'high' && /newzealand\.com/.test(p.innerHTML))`));
+    await page.ev(`(()=>{const s=document.querySelector('#p10-stay');s.value='';s.dispatchEvent(new Event('change',{bubbles:true}));})()`);
+    assert.equal(await page.ev('document.querySelectorAll(".p10-stay-links").length'), 0);
+  }
+  assert.deepEqual(page.errors, []);
+}));
+test('F: the stay tier is part of the planner input and of the share link', () => {
+  const r = planner.p10Plan({ start: 'christchurch', end: 'queenstown', days: 7, pace: 5, preference: 'easy', car: true, month: 0, stay: 'mid', wishes: ['tekapo'] });
+  assert.equal(r.input.stay, 'mid');
+});
+
 // ---------- G: the tester's P2 list ----------
 test('G P2-13: a bus trip Auckland → Wellington does not go back on itself within a day', () => {
   const plan = planner.p10Plan({ start: 'auckland', end: 'wellington', days: 8, pace: 5, preference: 'easy', car: false, wishes: ['hobbiton', 'waitomo', 'rotorua', 'taupo'] });

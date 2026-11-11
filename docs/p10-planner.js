@@ -345,7 +345,12 @@ function p10LegDescription(leg,lang){
 }
 
 /* Pounamu Atlas local road planner. Travel weights are internal to route planning. */
+// The network and its shortest paths are built once per travel mode: the trade-off search below builds many trial
+// plans, and each used to rebuild the graph and rerun Dijkstra.
+const P10_NETS = {};
 function p10Net(car) {
+  const mode0 = car ? 'car' : 'pt';
+  if (P10_NETS[mode0]) return P10_NETS[mode0];
   const graph = Object.fromEntries(Object.keys(NODES).map(id => [id, []]));
   for (const [a,b,h,km,road,pt,ptH] of EDGES) {
     // Drivers park in Bluff and take the Foveaux Express like everyone else, so Stewart Island stays reachable.
@@ -368,10 +373,11 @@ function p10Net(car) {
     }
     return memo[start] = {dist,prev};
   }
-  return {
+  const paths = {};
+  return P10_NETS[mode0] = {
     degree: id => (graph[id] || []).length,
     hours: (a,b) => a === b ? 0 : shortest(a).dist[b] ?? Infinity,
-    path(a,b) { if (a === b) return []; const {dist,prev}=shortest(a); if (dist[b] == null) return null; const legs=[]; for (let n=b;n!==a;n=prev[n].a) legs.unshift(prev[n]); return legs; }
+    path(a,b) { if (a === b) return []; const key=a+'>'+b; if (key in paths) return paths[key]; const {dist,prev}=shortest(a); if (dist[b] == null) return paths[key]=null; const legs=[]; for (let n=b;n!==a;n=prev[n].a) legs.unshift(prev[n]); return paths[key]=legs; }
   };
 }
 // Retracing the same road (out over the Haast Pass and back again, say) costs extra in the ordering, so a loop wins
@@ -388,17 +394,24 @@ function p10Order(net,start,end,stops) {
     return total;
   }
   if (stops.length <= 8) {
-    let best = [], bestCost = Infinity;
-    const used=new Map();
-    function step(at,base){let add=0;const legs=legsOf(at,base);for(const l of legs){const k=key(l),n=used.get(k)||0;add+=l.h+(n&&!spur(l)?l.h*P10_RETRACE_PENALTY:0);used.set(k,n+1);}return {add,legs};}
-    function undo(legs){for(const l of legs){const k=key(l),n=used.get(k);if(n<=1)used.delete(k);else used.set(k,n-1);}}
-    function perm(rest,order,soFar) {
+    // Every order is tried. Legs are numbered up front so a trial is plain array work (the fitting search builds
+    // many trial plans). Two stops in the same town are taken in list order, since swapping them changes nothing.
+    const n=stops.length, bases=[start,...stops.map(w=>w.base),end], ids=new Map(), legH=[], legSpur=[];
+    const hop=bases.map(a=>bases.map(b=>legsOf(a,b).map(l=>{const k=key(l);let id=ids.get(k);if(id===undefined){id=legH.length;ids.set(k,id);legH.push(l.h);legSpur.push(spur(l));}return id;})));
+    const used=new Int32Array(legH.length), taken=new Uint8Array(n), cur=[];
+    const twin=stops.map((w,i)=>stops.findIndex((x,j)=>j<i&&x.base===w.base));
+    let best=[], bestCost=Infinity;
+    const add=(a,b)=>{let s=0;for(const id of hop[a][b]){s+=legH[id]+(used[id]&&!legSpur[id]?legH[id]*P10_RETRACE_PENALTY:0);used[id]++;}return s;};
+    const drop=(a,b)=>{for(const id of hop[a][b])used[id]--;};
+    function dfs(at,depth,soFar){
       if (soFar >= bestCost) return;
-      const at=order.length?order[order.length-1].base:start;
-      if (!rest.length) { const {add,legs}=step(at,end); const total=soFar+add; undo(legs); if (total<bestCost) {bestCost=total;best=order;} return; }
-      rest.forEach((w,i)=>{const {add,legs}=step(at,w.base);perm([...rest.slice(0,i),...rest.slice(i+1)],[...order,w],soFar+add);undo(legs);});
+      if (depth===n) { const total=soFar+add(at,n+1); drop(at,n+1); if (total<bestCost) {bestCost=total;best=cur.map(i=>stops[i]);} return; }
+      for(let i=0;i<n;i++){
+        if(taken[i]||(twin[i]>=0&&!taken[twin[i]]))continue;
+        taken[i]=1;cur.push(i);const s=add(at,i+1);dfs(i+1,depth+1,soFar+s);drop(at,i+1);cur.pop();taken[i]=0;
+      }
     }
-    perm(stops,[],0); return best;
+    dfs(0,0,0); return best;
   }
   let at=start, left=[...stops], order=[];
   while(left.length){left.sort((a,b)=>net.hours(at,a.base)-net.hours(at,b.base)); const next=left.shift(); order.push(next); at=next.base;}
@@ -407,7 +420,7 @@ function p10Order(net,start,end,stops) {
 }
 // A day has about 9.5 usable hours. Driving is capped by the chosen pace (6.5 h of buses and trains without a car);
 // a half-day visit takes about 3.5 h on top of the road time, so a short drive and a visit share one day.
-const P10_DAY_HOURS = 9.5, P10_HALF_DAY = 3.5, P10_LAST_DAY_DRIVE = 2.5;
+const P10_DAY_HOURS = 9.5, P10_HALF_DAY = 3.5, P10_LAST_DAY_DRIVE = 2.5, P10_SHORT_DRIVE = 2;
 function p10Build(input, wanted) {
   const net=p10Net(input.car), reachable=wanted.filter(w=>net.hours(input.start,w.base)<Infinity && net.hours(w.base,input.end)<Infinity && (input.car || w.pt!==false));
   const inaccessible=wanted.filter(w=>!reachable.includes(w));
@@ -432,7 +445,12 @@ function p10Build(input, wanted) {
       if(day.kind==='arrive'||day.kind==='activity'||day.drive+day.act+P10_HALF_DAY>P10_DAY_HOURS)open();
       day.activities.push({wish:item.wish,part:1,total:1,before:!day.legs.length});day.act+=P10_HALF_DAY;
     }else{
-      for(let n=1;n<=Math.ceil(item.wish.days);n++){day={...fresh('activity',item.wish.base),activities:[{wish:item.wish,part:n,total:Math.ceil(item.wish.days)}]};days.push(day);}
+      const total=Math.ceil(item.wish.days);
+      for(let n=1;n<=total;n++){
+        // A short morning drive (Twizel to Aoraki/Mount Cook) shares the first day of a whole-day visit.
+        if(n===1&&day.kind==='travel'&&!day.activities.length&&day.drive<=P10_SHORT_DRIVE&&day.at===item.wish.base&&day.legs.every(l=>l.mode!=='ferry')){day.kind='activity';day.activities.push({wish:item.wish,part:1,total,before:false});day.act=P10_DAY_HOURS;continue;}
+        day={...fresh('activity',item.wish.base),activities:[{wish:item.wish,part:n,total}]};days.push(day);
+      }
     }
   }
   // A short last transfer into the departure city can share the departure day (fly out in the afternoon).
@@ -456,6 +474,10 @@ function p10CatalogBase(town){
   for(const [id,n] of Object.entries(NODES)){if(n.catalog)continue;const k=p10Km([lat,lon],n.at);if(!best||k<best.km)best={id,km:k};}
   return best&&best.km<=15?best.id:null;
 }
+// The picker shows a catalogue town that is the same place as a sight (Queenstown the town and Queenstown the stay,
+// Te Anau for Milford Sound, Fox Glacier for the glaciers) only once, as the sight.
+const P10_SAME_PLACE = { fox: 'franz-josef' };
+function p10TownIsSight(town){const b=p10CatalogBase(town),base=P10_SAME_PLACE[b]||b;return Boolean(base&&WISHES.some(w=>w.base===base||w.id===base));}
 function p10WishById(id) {
   const known = WISHES.find(w => w.id === id);
   if (known) return known;
@@ -483,9 +505,97 @@ function p10WishById(id) {
     catalog: true
   };
 }
-// How much a place is worth keeping when the days run short (1 = ordinary). Dropping prefers the place that saves the
-// most days per unit of weight, so a 10-day South Island trip keeps Milford Sound and skips the far West Coast.
-const P10_WISH_WEIGHT = { milford: 2, aoraki: 1.6, queenstown: 1.6, hobbiton: 1.6, rotorua: 1.6, tongariro: 1.4, tekapo: 1.4, glaciers: 1.2, waitomo: 1.4, coromandel: 1.2, 'abel-tasman': 1.2, wanaka: 1.2, kaikoura: 1.2, 'bay-of-islands': 1.2 };
+// How much a place is worth keeping when the days run short (1 = ordinary). The headline sights weigh most, so a
+// short loop keeps Milford Sound and Queenstown and leaves out a detour such as Kaikōura or Abel Tasman.
+const P10_WISH_WEIGHT = { milford: 4, queenstown: 4, aoraki: 3, tekapo: 2.5, glaciers: 2, wanaka: 2, kaikoura: 1.5, 'abel-tasman': 1.5, dunedin: 1.2, punakaiki: 0.8, 'arthurs-pass': 0.8, 'te-anau': 0.8, oamaru: 0.7, picton: 0.6, hokitika: 0.6, haast: 0.5, rotorua: 4, hobbiton: 3, waitomo: 2.5, tongariro: 2, 'bay-of-islands': 2, coromandel: 1.8, taupo: 1.5, auckland: 1.2, wellington: 1.2 };
+// A stay one day shorter than planned (Queenstown for one day instead of two) keeps most of its worth.
+const P10_SHORT_WORTH = 0.7, P10_ROAD_COST = 0.25;
+function p10Island(id){const a=NODES[id]&&NODES[id].at;if(!a)return null;return a[0]>-40.4||(a[0]>-41.7&&a[1]>174.4)?'north':'south';}
+function p10Worth(input,w,suggest){
+  const v=P10_WISH_WEIGHT[w.id]||(w.catalog?0.8:1);
+  return !suggest&&(w.base===input.start||w.base===input.end)?v*3:v;
+}
+// Choose how long to stay at each place so the trip fits the days and keeps the most worthwhile stays. Each place is
+// a full stay (level 2), one day shorter (1, for stays of two days or more) or left out (0). A greedy pass trims the
+// visitor's places (or, when suggesting, adds places); then swaps of up to two places in and two out are tried for as
+// long as they raise the total worth and the trip still fits. The first `fixed` places in the pool always stay full.
+function p10Choose(input,pool,{suggest=false,fixed=0}={}){
+  const shortOf=new Map();
+  const variant=(w,l)=>l===2?w:l===1?(shortOf.get(w.id)||shortOf.set(w.id,{...w,days:w.days-1,shortened:true,fullDays:w.days}).get(w.id)):null;
+  const list=lv=>pool.map((w,i)=>variant(w,lv[i])).filter(Boolean);
+  const memo=new Map();
+  const built=lv=>{const k=lv.join('');let r=memo.get(k);if(!r){const days=p10Build(input,list(lv)).days;r={days:days.length,hours:days.reduce((t,d)=>t+d.legs.reduce((u,l)=>u+l.h,0),0)};memo.set(k,r);}return r;};
+  const need=lv=>built(lv).days;
+  const worth=pool.map(w=>p10Worth(input,w,suggest));
+  const at=(i,l)=>l===2?worth[i]:l===1?worth[i]*P10_SHORT_WORTH:0;
+  const multi=i=>pool[i].days>=2;
+  const lower=(i,l)=>i<fixed?[]:l===2&&multi(i)?[1,0]:l>0?[0]:[];
+  const higher=(i,l)=>l===0&&multi(i)?[1,2]:l<2?[2]:[];
+  // Worth of the stays, less a little for every hour on the road, so a detour that costs no extra day (out to
+  // Arthur's Pass and back on the last morning) is not taken just because it fits.
+  const value=lv=>lv.reduce((t,l,i)=>t+at(i,l),0)-P10_ROAD_COST*built(lv).hours;
+  function improve(lv){
+    for(let round=0;round<12&&memo.size<600;round++){
+      const cur=need(lv),ups=[],downs=[];
+      for(let i=0;i<pool.length;i++){
+        for(const l of higher(i,lv[i])){const n=[...lv];n[i]=l;ups.push({i,l,g:at(i,l)-at(i,lv[i]),d:need(n)-cur});}
+        for(const l of lower(i,lv[i])){const n=[...lv];n[i]=l;downs.push({i,l,g:at(i,lv[i])-at(i,l),d:cur-need(n)});}
+      }
+      const upSets=[],downSets=[[]];
+      ups.forEach((u,a)=>{upSets.push([u]);for(let b=a+1;b<ups.length;b++)if(ups[b].i!==u.i)upSets.push([u,ups[b]]);});
+      downs.forEach((x,a)=>{downSets.push([x]);for(let b=a+1;b<downs.length;b++)if(downs[b].i!==x.i)downSets.push([x,downs[b]]);});
+      const tries=[];
+      for(const U of upSets)for(const D of downSets){
+        if(D.some(x=>U.some(u=>u.i===x.i)))continue;
+        const gain=U.reduce((t,u)=>t+u.g,0)-D.reduce((t,x)=>t+x.g,0);if(gain<=1e-9)continue;
+        // Days add up only roughly (two stops on one road share the drive), so near misses are tested too.
+        const est=cur+U.reduce((t,u)=>t+u.d,0)-D.reduce((t,x)=>t+x.d,0);if(est>input.days+2)continue;
+        tries.push({U,D,gain,est});
+      }
+      tries.sort((x,y)=>y.gain-x.gain||x.est-y.est);
+      let moved=false;
+      const now=value(lv);
+      for(const t of tries.slice(0,60)){const n=[...lv];for(const u of t.U)n[u.i]=u.l;for(const x of t.D)n[x.i]=x.l;if(need(n)<=input.days&&value(n)>now+1e-9){lv=n;moved=true;break;}}
+      if(!moved)break;
+    }
+    return lv;
+  }
+  const result=lv=>({lv,list:list(lv),days:need(lv),ok:need(lv)<=input.days});
+  if(suggest){
+    // Two starts, each then improved: add the place worth most per extra day, or simply the place worth most,
+    // until nothing more fits. A loop needs the second (Milford Sound is a long way, but worth it).
+    const empty=pool.map((w,i)=>i<fixed?2:0);
+    let byRate=[...empty];
+    for(;;){
+      const cur=need(byRate),hours=built(byRate).hours;let best=null;
+      for(let i=fixed;i<pool.length;i++){if(byRate[i])continue;for(const l of higher(i,0)){const n=[...byRate];n[i]=l;const d=need(n);if(d>input.days)continue;const g=at(i,l)-P10_ROAD_COST*(built(n).hours-hours);if(g<=0)continue;const r=g/(Math.max(0,d-cur)+0.5);if(!best||r>best.r)best={n,r};}}
+      if(!best)break;byRate=best.n;
+    }
+    let byWorth=[...empty];
+    if(need(byWorth)<=input.days)for(const i of pool.map((w,i)=>i).filter(i=>i>=fixed).sort((x,y)=>worth[y]-worth[x]))for(const l of higher(i,0).reverse()){const n=[...byWorth];n[i]=l;if(need(n)<=input.days&&value(n)>value(byWorth)){byWorth=n;break;}}
+    const x=improve(byRate),y=improve(byWorth);
+    return result(value(y)>value(x)+1e-9?y:x);
+  }
+  let lv=pool.map(()=>2);
+  // Trim: a change that alone closes the gap and costs least, else the one that saves most days per worth lost.
+  while(need(lv)>input.days){
+    const cur=need(lv),gap=cur-input.days,moves=[];
+    for(let i=0;i<pool.length;i++){const l=lower(i,lv[i])[0];if(l===undefined)continue;const n=[...lv];n[i]=l;const saves=cur-need(n);if(saves>0)moves.push({n,saves,loss:at(i,lv[i])-at(i,l)});}
+    let pick=null;
+    if(moves.length){const enough=moves.filter(m=>m.saves>=gap);pick=enough.length?enough.sort((x,y)=>x.loss-y.loss||y.saves-x.saves)[0]:moves.sort((x,y)=>y.saves/y.loss-x.saves/x.loss||x.loss-y.loss)[0];}
+    else{let j=-1;for(let i=fixed;i<pool.length;i++)if(lv[i]&&(j<0||at(i,lv[i])<at(j,lv[j])))j=i;if(j<0)break;pick={n:lv.map((l,i)=>i===j?0:l)};}
+    lv=pick.n;
+  }
+  if(need(lv)>input.days)return result(lv);
+  return result(improve(lv));
+}
+// Places offered when the visitor has picked none (or has days to spare): the sights on the islands the trip
+// touches, both when it crosses Cook Strait. A plain city stay at the start or end is left out, since the trip spends
+// a night there anyway.
+function p10SuggestPool(input,taken){
+  const islands=new Set([p10Island(input.start),p10Island(input.end)]),net=p10Net(input.car);
+  return WISHES.filter(w=>islands.has(w.island)&&!taken.has(w.id)&&!taken.has(w.base)&&(input.car||w.pt!==false)&&net.hours(input.start,w.base)<Infinity&&net.hours(w.base,input.end)<Infinity&&!((w.base===input.start||w.base===input.end)&&(P10_WISH_WEIGHT[w.id]||1)<2));
+}
 function p10DropOptions(input, keep) {
   const pinned = new Set([input.start, input.end]);
   const base = p10Build(input, keep).days.length, need = base - input.days;
@@ -502,8 +612,14 @@ function p10Plan(input) {
   if (!NODES[input.start]?.hub || !NODES[input.end]?.hub || !Number.isInteger(input.days)||input.days<3||input.days>21 || !Array.isArray(input.wishes)) throw new Error('invalid_input');
   // A ticked town that is the same place as a ticked sight (Queenstown the town, Queenstown the stay) counts once.
   const all=[...new Set(input.wishes)].map(p10WishById).filter(Boolean);
-  const sightBases=new Set(all.filter(w=>!w.catalog).map(w=>w.base)), townBases=new Set();
+  const sightBases=new Set(all.filter(w=>!w.catalog).flatMap(w=>[w.base,w.id])), townBases=new Set();
   const wanted=all.filter(w=>!w.catalog||(!sightBases.has(w.base)&&!townBases.has(w.base)&&townBases.add(w.base)));
+  // Nothing picked: suggest a route that fills the days with the places most worth seeing.
+  let suggested=null;
+  if(!wanted.length){
+    const pick=p10Choose(input,p10SuggestPool(input,new Set()),{suggest:true});
+    if(pick.ok&&pick.list.length){wanted.push(...pick.list);suggested=pick.list.map(w=>w.id);}
+  }
   const plan=p10Build(input,wanted), minimum=plan.days.length;
   let suggestion=null, options=[];
   if(minimum>input.days){
@@ -512,22 +628,18 @@ function p10Plan(input) {
   }
   let fits=null;
   if(minimum>input.days){
-    let keep=[...plan.order];
-    while(keep.length&&p10Build(input,keep).days.length>input.days){
-      const next=p10DropOptions(input,keep)[0];
-      if(!next)break;
-      keep=keep.filter(x=>x!==next.wish);
-    }
-    // Put back anything that fits in the days left over, most important first.
-    const pinned=w=>w.base===input.start||w.base===input.end;
-    for(const w of plan.order.filter(w=>!keep.includes(w)).sort((a,b)=>(pinned(b)-pinned(a))||(P10_WISH_WEIGHT[b.id]||1)-(P10_WISH_WEIGHT[a.id]||1))){
-      const trial=plan.order.filter(x=>keep.includes(x)||x===w);
-      if(p10Build(input,trial).days.length<=input.days)keep=trial;
-    }
-    const days=p10Build(input,keep).days.length;
-    fits={keep:keep.map(w=>w.id),dropped:plan.order.filter(w=>!keep.includes(w)),days,ok:days<=input.days};
+    const pick=p10Choose(input,plan.order), keep=pick.list, kept=new Set(keep.map(w=>w.id));
+    fits={keep:keep.map(w=>w.id),list:keep,dropped:plan.order.filter(w=>!kept.has(w.id)),shortened:keep.filter(w=>w.shortened),days:pick.days,ok:pick.ok};
   }
-  return {...plan,minimum,spare:Math.max(0,input.days-minimum),suggestion,options,fits,input};
+  return {...plan,minimum,spare:Math.max(0,input.days-minimum),suggestion,options,fits,suggested,input};
+}
+// With days to spare, the places that would fill them best; the visitor's own places stay as they are.
+function p10Extras(plan){
+  if(!plan||plan.disconnected||plan.suggested||!plan.input||!plan.input.wishes.length||plan.minimum>=plan.input.days)return [];
+  const taken=new Set([...plan.order,...plan.inaccessible].flatMap(w=>[w.id,w.base]));
+  const pool=[...plan.order,...p10SuggestPool(plan.input,taken)];
+  const pick=p10Choose(plan.input,pool,{suggest:true,fixed:plan.order.length});
+  return pick.ok?pick.list.filter(w=>!taken.has(w.id)).map(w=>WISHES.find(x=>x.id===w.id)).filter(Boolean):[];
 }
 function p10Timeline(plan) {
   if (plan.disconnected || !plan.days.length) return [];
@@ -536,15 +648,23 @@ function p10Timeline(plan) {
   // With a day to spare, the last drive gets its own day again and the departure day stays free.
   const tail=days[days.length-1];
   if(spare&&tail.kind==='depart'&&tail.legs.length){days[days.length-1]={...tail,kind:'travel',lateDeparture:false};days.push({kind:'depart',at:plan.input.end,legs:[],activities:[],used:0,drive:0,act:0});spare--;}
-  const staged=[], seen=new Set();
-  for(const day of days.slice(0,-1)){
-    staged.push(day);
+  const weather=new Map(), free=new Map(), seen=new Set(), stays=[];
+  days.slice(0,-1).forEach((day,i)=>{
     for(const a of day.activities){
-      if(spare && a.wish.weather && day.at===a.wish.base && a.part===a.total && !seen.has(a.wish.id)){
-        staged.push({kind:'weather',at:day.at,weatherWish:a.wish,legs:[],activities:[],used:0});seen.add(a.wish.id);spare--;
-      }
+      if(day.at!==a.wish.base||a.part!==a.total)continue;
+      if(spare && a.wish.weather && !seen.has(a.wish.id)){(weather.get(i)||weather.set(i,[]).get(i)).push(a.wish);seen.add(a.wish.id);spare--;}
+      if(a.wish.base!==plan.input.end&&!stays.some(s=>s.at===day.at))stays.push({i,at:day.at,worth:P10_WISH_WEIGHT[a.wish.id]||1});
     }
-  }
+  });
+  // Days left over go to the best places on the way, one extra day each, then to the departure city.
+  stays.sort((x,y)=>y.worth-x.worth);
+  for(const s of stays)if(spare>0){free.set(s.i,1);spare--;}
+  const staged=[];
+  days.slice(0,-1).forEach((day,i)=>{
+    staged.push(day);
+    for(const w of weather.get(i)||[])staged.push({kind:'weather',at:day.at,weatherWish:w,legs:[],activities:[],used:0});
+    for(let k=0;k<(free.get(i)||0);k++)staged.push({kind:'free',at:day.at,legs:[],activities:[],used:0});
+  });
   for(let i=0;i<spare;i++) staged.push({kind:'free',at:plan.input.end,legs:[],activities:[],used:0});
   staged.push(days[days.length-1]);
   return staged.map((d,i)=>({...d,n:i+1}));
@@ -558,7 +678,7 @@ function p10Project(at){
 // needs more days is the trip cut off, with a note on how far the departure city still is.
 function p10Fitted(plan){
   if(!plan||!plan.fits||!plan.fits.ok||!plan.input)return null;
-  const keep=plan.order.filter(w=>plan.fits.keep.includes(w.id));
+  const keep=plan.fits.list||plan.order.filter(w=>plan.fits.keep.includes(w.id));
   const built=p10Build(plan.input,keep);
   return {...built,input:plan.input,minimum:built.days.length};
 }
@@ -606,6 +726,7 @@ function p10Present(plan){
     days,
     unscheduled,
     fitted: Boolean(fitted),
+    shortened: fitted ? plan.fits.shortened.map(w => ({ id: w.id, en: w.en, zh: w.zh, days: w.days, fullDays: w.fullDays })) : [],
     map: { points, schematic: true },
     warning: tight ? { minimum: plan.minimum, selected, suggestions: ['drop-or-swap', 'add-days', 'switch-template'] } : null,
   };
@@ -667,7 +788,7 @@ function p10BreakStops(day){
   const priority=['haast','wanaka','arthurs-pass','hokitika'];
   return [...stops].sort((a,b)=>{const ai=priority.indexOf(a),bi=priority.indexOf(b);return (ai<0?100:ai)-(bi<0?100:bi);}).slice(0,2);
 }
-if (typeof module !== 'undefined' && module.exports) module.exports={p10Plan,p10Timeline,p10Present,p10Fitted,p10DropChoices,p10Build,p10Removable,p10ShortfallNote,p10StillTight,p10AlongWay,p10Duration,p10DailyTime,p10BreakStops,p10Net,p10Suggestions,p10LegDescription,p10JevIsland,p10JevRouteName,P10_WISH_TIPS,P10_WISH_GUIDES,NODES,WISHES};
+if (typeof module !== 'undefined' && module.exports) module.exports={p10Plan,p10Extras,p10CatalogBase,p10TownIsSight,p10Choose,p10Island,P10_WISH_WEIGHT,p10Timeline,p10Present,p10Fitted,p10DropChoices,p10Build,p10Removable,p10ShortfallNote,p10StillTight,p10AlongWay,p10Duration,p10DailyTime,p10BreakStops,p10Net,p10Suggestions,p10LegDescription,p10JevIsland,p10JevRouteName,P10_WISH_TIPS,P10_WISH_GUIDES,NODES,WISHES};
 globalThis.P10_NODES = NODES;
 
   if (typeof window !== 'undefined') {
@@ -788,7 +909,8 @@ globalThis.P10_NODES = NODES;
     const early=p10Present(result);
     const startName=p10Esc(p10Name(result.input.start)),endName=p10Esc(p10Name(result.input.end));
     if(p10StillTight(result, early)){
-      const choices=p10DropChoices(result);
+      // When the trip was fitted, offer to drop only places that were left out; the kept ones are the trip shown.
+      const choices=p10DropChoices(result).filter(c=>!(early.fitted&&result.fits&&result.fits.keep.includes(c.id)));
       const drops=choices.map(c=>`<button type="button" class="p10-add-stop" data-p10-trim="1" data-p10-drop="${p10Esc(c.id)}">${zh?`去掉${p10Esc(c.zh)}（省 ${c.saves} 天）`:`Drop ${p10Esc(c.en)} (saves ${c.saves} day${c.saves>1?'s':''})`}</button>`).join(' ');
       const more=result.minimum<=21?`<button type="button" class="p10-add-stop" data-p10-days="${result.minimum}">${zh?`把天数改成 ${result.minimum}`:`Change to ${result.minimum} days`}</button>`:'';
       const southTrip=!P10_NORTH_HUBS.has(result.input.start)&&!P10_NORTH_HUBS.has(result.input.end)&&result.order.every(w=>w.island!=='north');
@@ -797,12 +919,20 @@ globalThis.P10_NODES = NODES;
       const msg=early.fitted
         ?(zh?`你选的地方全部排进去约需 ${result.minimum} 天，你选了 ${result.input.days} 天。下面这 ${result.input.days} 天会按时把你带到${endName}；排不下的地点在「未安排」里，你的勾选没有删除。`:`All your places need about ${result.minimum} days; you chose ${result.input.days}. The ${result.input.days} days below still get you to ${endName}. Places that do not fit are under Unscheduled; your ticks are kept.`)
         :(zh?`光是从${startName}到${endName}的路程就要约 ${direct} 天，你选了 ${result.input.days} 天。下面先列出前 ${result.input.days} 天，请增加天数或换一个离开城市。`:`The journey from ${startName} to ${endName} alone takes about ${direct} days; you chose ${result.input.days}. The first ${result.input.days} days are shown; add days or choose another departure city.`);
-      notices.push(`<div class="p10-tight" role="status"><p class="p10-warning">${msg}</p><div class="p10-along">${drops?`<span>${zh?'减点或换点：':'Remove or swap a place: '}</span>${drops}`:''} ${more} ${tmpl}</div></div>`);
+      const short=(early.shortened||[]).map(w=>zh?`${p10Esc(w.zh)}从 ${w.fullDays} 天缩短为 ${w.days} 天`:`${p10Esc(w.en)} is shortened from ${w.fullDays} to ${w.days} day${w.days>1?'s':''}`).join(zh?'；':'; ');
+      const shortMsg=short?`<p class="p10-note">${zh?`为了排下更多地点，${short}。`:`To fit more places in, ${short}.`}</p>`:'';
+      notices.push(`<div class="p10-tight" role="status"><p class="p10-warning">${msg}</p>${shortMsg}<div class="p10-along">${drops?`<span>${zh?'减点或换点：':'Remove or swap a place: '}</span>${drops}`:''} ${more} ${tmpl}</div></div>`);
+    }
+    if(result.suggested&&result.suggested.length){
+      const names=result.order.map(w=>`${p10Esc(p10WishLabel(WISHES.find(x=>x.id===w.id)||w))}${w.shortened?(zh?`（${w.days} 天）`:` (${w.days} day${w.days>1?'s':''})`):''}`).join(zh?'、':', ');
+      notices.push(`<div class="p10-suggested" role="status"><p><strong>${zh?`你还没选地点，这是按 ${result.input.days} 天推荐的路线，可以增删。`:`You have not picked any places yet, so this is a suggested ${result.input.days}-day route. Add or remove places as you like.`}</strong></p><p>${zh?'推荐地点：':'Suggested places: '}${names}</p><div class="p10-along"><button type="button" class="p10-add-stop" data-p10-adopt="1">${zh?'把这些地点加入我的勾选':'Make these my picks'}</button><button type="button" class="p10-add-stop" data-p10-edit="1">${zh?'去地图和列表里增删':'Change places on the map or list'}</button></div></div>`);
     }
     const offNetwork=result.inaccessible.filter(w=>w.catalog&&w.base===w.id),noService=result.inaccessible.filter(w=>!offNetwork.includes(w));
     if(noService.length)notices.push(`<p class="p10-warning">${x.unreachable}：${noService.map(w=>p10Esc(w[lang])).join(zh?'、':', ')}。</p>`);
     if(offNetwork.length)notices.push(`<p class="p10-warning">${zh?'这些城镇还没有核实过的道路时间，没有排进每日行程，请自行安排：':'These towns have no checked road times yet, so they are not in the daily plan; arrange them separately: '}${offNetwork.map(w=>p10Esc(w[lang])).join(zh?'、':', ')}${zh?'。':'.'}</p>`);
-    const suggestions=p10AlongWay(result);
+    const extras=p10Extras(result),spareDays=result.input.days-result.minimum;
+    if(extras.length)notices.push(`<div class="p10-along"><span>${zh?`还有 ${spareDays} 天空闲，按天数还能加上：`:`You have ${spareDays} spare day${spareDays>1?'s':''}. These places still fit:`}</span> ${extras.map(w=>`<button type="button" class="p10-add-stop" data-p10-add="${p10Esc(w.id)}">＋ ${p10Esc(p10WishLabel(w))}</button>`).join(' ')}${extras.length>1?` <button type="button" class="p10-add-stop" data-p10-add="${p10Esc(extras.map(w=>w.id).join(','))}">${zh?'全部加入':'Add them all'}</button>`:''}</div>`);
+    const suggestions=extras.length?[]:p10AlongWay(result);
     if(suggestions.length)notices.push(`<div class="p10-along"><span>${zh?'还可以加入顺路地点：':'Add a stop along the way:'}</span> ${suggestions.map(w=>`<button type="button" class="p10-add-stop" data-p10-add="${p10Esc(w.id)}">＋ ${p10Esc(w[lang])}</button>`).join(' ')}</div>`);
     if(!p10View || p10View.token!==result){
       const present=p10Present(result);
@@ -829,14 +959,14 @@ globalThis.P10_NODES = NODES;
       const number=d.n;
       if(d.kind==='weather'||d.kind==='free'){
         const title=d.kind==='weather'?(zh?`${p10Esc(p10Name(d.at))} · 天气机动日`:`${p10Esc(p10Name(d.at))} · weather buffer day`):(zh?`${p10Esc(p10Name(d.at))} · 自由活动日`:`${p10Esc(p10Name(d.at))} · free day`);
-        const description=d.kind==='weather'?(zh?'天气不好时用来改期；天气适合时可自由活动。':'Use this day to reschedule if weather disrupts your plans; otherwise enjoy free time.'):(zh?'在离开城市自由活动。':'Enjoy free time in your departure city.');
+        const description=d.kind==='weather'?(zh?'天气不好时用来改期；天气适合时可自由活动。':'Use this day to reschedule if weather disrupts your plans; otherwise enjoy free time.'):(zh?`多出来的一天：在${p10Esc(p10Name(d.at))}自由活动或休息。`:`A spare day: free time or rest in ${p10Esc(p10Name(d.at))}.`);
         return `<article class="plan-day" tabindex="0" data-p10-index="${i}">${head(d,i,title)}<p>${description}</p><p class="p10-night">${x.night}：${p10Esc(p10Name(d.at))}</p></article>`;
       }
       const acts=d.activities.map(a=>p10Esc(a.wish[lang])).join(zh?'、':', ');
       const from=d.legs.length?p10Esc(p10Name(d.legs[0].a)):'';
       const title=d.kind==='arrive'?`${x.arrive} ${p10Esc(p10Name(d.at))}`
         :d.kind==='depart'?(d.legs.length?`${from} → ${p10Esc(p10Name(d.at))} · ${zh?'离开':'depart'}`:`${x.depart} ${p10Esc(p10Name(d.at))}`)
-        :d.legs.length?`${from} → ${p10Esc(p10Name(d.at))}`
+        :d.legs.length?`${from} → ${p10Esc(p10Name(d.at))}${d.kind==='activity'&&acts?` · ${zh?'游览':'explore '}${acts}${p10PartLabel(d.activities[0],zh)}`:''}`
         :`${acts}${zh?' · 游览':' · explore'}${d.activities[0]?p10PartLabel(d.activities[0],zh):''}`;
       const legs=d.legs.map(l=>{const road=p10LegDescription(l,lang);const mode=x[l.mode]||x.road;const duration=p10Duration(l.h,lang);return `<li>${p10Esc(p10Name(l.a))} → ${p10Esc(p10Name(l.b))} · ${p10Esc(road)} · ${mode}${zh?'约':' about '}${duration}${l.km>0?` · ${l.km} km`:''} ${p10LegTag(l,zh)}</li>`;}).join('');
       const travel=d.legs.reduce((sum,l)=>sum+l.h,0),driving=d.legs.filter(l=>l.mode==='car').reduce((sum,l)=>sum+l.h,0),pace=Number(result.input.pace)||5;
@@ -867,9 +997,8 @@ globalThis.P10_NODES = NODES;
     return all.filter(t=>(!regionId || regionId==='all' || t.region_id===regionId) && (island==='all' || t.island===island) && t.type!=='attraction');
   }
   function p10RegionCount(regionId, island){
-    const towns=p10CatalogTowns(regionId, island);
-    if(towns) return towns.length;
-    return WISHES.filter(w=>w.island===(island==='all'?w.island:island)&&P10_WISH_REGION[w.id]===regionId).length;
+    const towns=(p10CatalogTowns(regionId, island)||[]).filter(t=>!p10TownIsSight(t));
+    return WISHES.filter(w=>w.island===(island==='all'?w.island:island)&&P10_WISH_REGION[w.id]===regionId).length+towns.length;
   }
   function p10WishDays(days,zh){return days<1?(zh?'半天':'half a day'):zh?`${days} 天`:days===1?'1 day':`${days} days`;}
   function p10PlaceLabel(id){
@@ -883,7 +1012,8 @@ globalThis.P10_NODES = NODES;
     const items=[...p10Selected].map(id=>({id,label:p10PlaceLabel(id)})).filter(i=>i.label);
     host.innerHTML=items.length
       ?`<span class="p10-selected-label">${zh?`已选 ${items.length} 处：`:`Selected (${items.length}):`}</span>${items.map(i=>`<button type="button" class="p10-chip" data-p10-unselect="${p10Esc(i.id)}" aria-label="${zh?'取消 ':'Remove '}${p10Esc(i.label)}">${p10Esc(i.label)} <span aria-hidden="true">×</span></button>`).join('')}`
-      :`<span class="p10-selected-label">${zh?'还没选地点。不选也可以，会直接排从出发到离开的路线。':'No places yet. Leave it empty to get the direct route.'}</span>`;
+      :`<span class="p10-selected-label">${zh?'还没选地点。不选也可以：会按你的天数推荐一条路线，排好后还能增删。':'No places yet. You can leave it empty: you get a suggested route for your days, and can change it afterwards.'}</span>`;
+    p10PickRefresh();
   }
   function p10RenderWishes(){
     const box=p10$('#p10-wishes');if(!box)return;
@@ -898,23 +1028,106 @@ globalThis.P10_NODES = NODES;
     const list=WISHES.filter(w=>(island==='all'||w.island===island)&&(region==='all'||P10_WISH_REGION[w.id]===region||(region==='unmapped'&&!P10_WISH_REGION[w.id])));
     const groups=new Map();
     for(const w of list){const key=P10_WISH_REGION[w.id]||'unmapped';if(!groups.has(key))groups.set(key,[]);groups.get(key).push(w);}
-    const towns=p10CatalogTowns(region, island)||[];
+    const towns=(p10CatalogTowns(region, island)||[]).filter(t=>!p10TownIsSight(t));
     const townGroups=new Map();
     for(const t of towns){const key=t.region_id||'unmapped';if(!townGroups.has(key))townGroups.set(key,[]);townGroups.get(key).push(t);}
     const order=P10_REGIONS.filter(r=>(island==='all'||r.island===island)&&(region==='all'||r.id===region)).map(r=>r.id);
     if(region==='all'||region==='unmapped') order.push('unmapped');
-    const row=(id,name,days)=>`<label data-p10-wish="${p10Esc(id)}"><input type="checkbox" name="p10-wish" value="${p10Esc(id)}" ${p10Selected.has(id)?'checked':''}><span class="p10-wish-name">${p10Esc(name)}</span><span class="p10-wish-days">${p10WishDays(days,zh)}</span></label>`;
+    const row=(id,name,days,stay)=>`<label data-p10-wish="${p10Esc(id)}"><input type="checkbox" name="p10-wish" value="${p10Esc(id)}" ${p10Selected.has(id)?'checked':''}><span class="p10-wish-name">${p10Esc(name)}${stay?`<span class="p10-wish-stay">${p10Esc(stay)}</span>`:''}</span><span class="p10-wish-days">${p10WishDays(days,zh)}</span></label>`;
+    // Where the night is spent, when the name does not say it (Milford Sound: stay in Te Anau).
+    const stayAt=w=>{const n=NODES[w.base];if(!n)return '';const label=p10WishLabel(w);let town=(zh?n.zh:n.en).split(/[（(]/)[0].replace(/,.*$/,'').trim();if(zh&&town.startsWith(label))town=town.slice(label.length).trim();return !town||label.includes(town)?'':(zh?`住${town}`:`stay in ${town}`);};
+    const mapItems=[];
     box.innerHTML=order.map(key=>{
       const rows=groups.get(key)||[];
       const townRows=townGroups.get(key)||[];
       if(!rows.length&&!townRows.length) return '';
       const meta=P10_REGIONS.find(r=>r.id===key);
       const heading=meta?(zh?meta.zh:meta.en):key;
-      const wishHtml=rows.map(w=>row(w.id,p10WishLabel(w)+(w.id==='oamaru'?(zh?' · 怀塔基区':' · Waitaki District'):''),w.days)).join('');
+      for(const w of rows)mapItems.push({id:w.id,kind:'sight',name:p10WishLabel(w),short:p10PickShort(w),xy:p10MapPoint(NODES[w.id]?w.id:w.base),worth:P10_WISH_WEIGHT[w.id]||1});
+      for(const t of townRows){const primary=zh?(t.name_zh||t.name_en):(t.name_en||t.name_zh);mapItems.push({id:t.place_id,kind:'town',name:primary,short:primary.split(/[（(]/)[0],xy:p10Project([Number(t.lat),Number(t.lon)]),worth:0});}
+      const wishHtml=rows.map(w=>row(w.id,p10WishLabel(w)+(w.id==='oamaru'?(zh?' · 怀塔基区':' · Waitaki District'):''),w.days,stayAt(w))).join('');
       const townHtml=townRows.map(t=>{const primary=zh?(t.name_zh||t.name_en):(t.name_en||t.name_zh);const other=zh?t.name_en:t.name_zh;return row(t.place_id,other&&other!==primary?`${primary} ${other}`:primary,0.5);}).join('');
       return `<section><h3>${p10Esc(heading)}</h3>${wishHtml?`<p class="p10-group-label">${zh?'景点与体验':'Sights and experiences'}</p><div class="p10-group">${wishHtml}</div>`:''}${townHtml?`<p class="p10-group-label">${zh?'城镇（停留半天或住一晚）':'Towns (half a day or a night)'}</p><div class="p10-group">${townHtml}</div>`:''}</section>`;
     }).join('');
+    p10RenderPickMap(mapItems.filter(i=>i.xy&&i.xy.every(Number.isFinite)));
     p10RenderSelected();
+  }
+  // The listed places on a map: every place in the list is a dot, filled once ticked, and clicking a dot ticks or
+  // unticks it, so a visitor who does not know the names can pick by where they are. On a wide screen the map sits
+  // beside the form and stays in view while the list scrolls; on a narrow one it sits above the list.
+  let p10PickItems=[];
+  const p10Wide=()=>Boolean(window.matchMedia&&window.matchMedia('(min-width:1001px)').matches);
+  function p10PickShort(w){const name=p10WishLabel(w);if(p10Lang()==='zh'){const s=name.split(/[与（(]/)[0];return s.includes('／')?s.split('／').pop():s;}return name.split(/ and | \(|\//)[0];}
+  function p10PickHost(){
+    let host=document.getElementById('p10-pick-map');
+    if(!host){host=document.createElement('div');host.id='p10-pick-map';host.className='p10-pick-map';}
+    const aside=document.querySelector('.planner-explainer'),anchor=document.getElementById('p10-selected');
+    if(p10Wide()&&aside){if(host.parentElement!==aside)aside.append(host);aside.classList.add('p10-has-map');}
+    else if(anchor){if(host.nextElementSibling!==anchor)anchor.before(host);aside?.classList.remove('p10-has-map');}
+    return host;
+  }
+  function p10RenderPickMap(items){
+    p10PickItems=items||[];
+    const host=p10PickHost(),zh=p10Lang()==='zh';
+    if(!p10PickItems.length){host.hidden=true;host.innerHTML='';return;}
+    host.hidden=false;
+    const xs=p10PickItems.map(i=>i.xy[0]),ys=p10PickItems.map(i=>i.xy[1]);
+    const x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);
+    const w=Math.max(x1-x0+130,220),h=Math.max(y1-y0+70,220),vb=[(x0+x1)/2+15-w/2,(y0+y1)/2-h/2,w,h];
+    const start=p10$('#p10-start')?.value,end=p10$('#p10-end')?.value;
+    // Labels are placed in this order, so ticked places and the best-known sights keep theirs when space runs out.
+    const order=[...p10PickItems].sort((a,b)=>(p10Selected.has(b.id)-p10Selected.has(a.id))||((b.kind==='sight')-(a.kind==='sight'))||(b.worth-a.worth));
+    const f=n=>n.toFixed(1);
+    const dot=i=>`<g class="p10-pick-dot ${i.kind==='town'?'is-town':'is-sight'}${p10Selected.has(i.id)?' is-on':''}" data-p10-pick="${p10Esc(i.id)}"><circle class="p10-pick-hit" cx="${f(i.xy[0])}" cy="${f(i.xy[1])}" r="8"/><circle class="p10-pick-mark" cx="${f(i.xy[0])}" cy="${f(i.xy[1])}" r="4"/><title>${p10Esc(i.name)}</title></g>`;
+    const label=i=>`<text class="p10-pick-label${i.kind==='town'?' is-town':''}" data-p10-pick-label="${p10Esc(i.id)}" data-px="${f(i.xy[0])}" data-py="${f(i.xy[1])}" x="${f(i.xy[0]+7)}" y="${f(i.xy[1]+4)}">${p10Esc(i.short)}</text>`;
+    const tag=(id,text)=>{const p=p10MapPoint(id);return p?`<text class="p10-map-tag p10-pick-tag" data-px="${f(p[0])}" data-py="${f(p[1])}" x="${f(p[0])}" y="${f(p[1]-9)}" text-anchor="middle">${text}</text>`:'';};
+    const tags=start===end?tag(start,zh?'起 / 终':'Start / end'):tag(start,zh?'起':'Start')+tag(end,zh?'终':'End');
+    host.innerHTML=`<div class="p10-pick-head"><strong>${zh?'在地图上选地点':'Pick places on the map'}</strong><span>${zh?'点圆点加入或取消，和列表同步。大圆点是景点，小圆点是城镇，深色是已选。':'Click a dot to add or remove a place; the list stays in step. Large dots are sights, small dots towns, dark ones are picked.'}</span></div><svg class="p10-pick-svg" viewBox="${vb.map(f).join(' ')}" aria-hidden="true"><rect class="p10-pick-sea" x="-2000" y="-2000" width="5000" height="5000"/><path class="p10-pick-land" d="${P10_COAST}"/><g class="p10-pick-dots">${[...order].reverse().map(dot).join('')}</g><g class="p10-pick-labels">${tags}${order.map(label).join('')}</g></svg><p class="p10-pick-status" aria-live="polite"></p>`;
+    p10PickLayout();
+  }
+  // Dots, names and start/end tags are sized for the map as drawn on screen; a name that would sit on another one is
+  // left off (it still shows when the place is pointed at or ticked).
+  function p10PickLayout(){
+    const svg=document.querySelector('#p10-pick-map .p10-pick-svg');if(!svg)return;
+    const vb=svg.viewBox.baseVal,box=svg.getBoundingClientRect();
+    const k=box.width&&box.height?Math.max(vb.width/box.width,vb.height/box.height):vb.width/360;
+    svg.style.setProperty('--k',k.toFixed(3));
+    for(const g of svg.querySelectorAll('.p10-pick-dot')){const town=g.classList.contains('is-town');g.querySelector('.p10-pick-mark').setAttribute('r',((town?3.5:5.5)*k).toFixed(2));g.querySelector('.p10-pick-hit').setAttribute('r',(11*k).toFixed(2));}
+    const tags=[...svg.querySelectorAll('.p10-pick-tag')];
+    for(const t of tags)t.setAttribute('y',(Number(t.dataset.py)-10*k).toFixed(1));
+    const boxes=tags.map(t=>{try{return t.getBBox();}catch{return null;}}).filter(b=>b&&b.width);
+    const hit=(a,b)=>a.x<b.x+b.width&&b.x<a.x+a.width&&a.y<b.y+b.height&&b.y<a.y+a.height;
+    for(const t of svg.querySelectorAll('.p10-pick-label')){
+      const id=t.dataset.p10PickLabel,on=p10Selected.has(id),px=Number(t.dataset.px),py=Number(t.dataset.py);
+      t.classList.remove('is-off');
+      if(t.classList.contains('is-town')&&!on){t.classList.add('is-off');continue;}
+      const gap=8*k,line=13*k;
+      const tries=[[px+gap,py+4*k,'start'],[px-gap,py+4*k,'end'],[px,py+4*k+line,'middle'],[px,py-gap,'middle']];
+      const put=([x,y,anchor])=>{t.setAttribute('x',x.toFixed(1));t.setAttribute('y',y.toFixed(1));t.setAttribute('text-anchor',anchor);try{return t.getBBox();}catch{return null;}};
+      let spot=null;
+      const inside=b=>b.x>=vb.x&&b.y>=vb.y&&b.x+b.width<=vb.x+vb.width&&b.y+b.height<=vb.y+vb.height;
+      for(const s of tries){const b=put(s);if(!b||!b.width){spot=b;break;}if(inside(b)&&!boxes.some(o=>hit(b,o))){spot=b;break;}}
+      if(!spot){if(on)spot=put(tries[0]);else{put(tries[0]);t.classList.add('is-off');continue;}}
+      if(spot&&spot.width)boxes.push(spot);
+    }
+  }
+  // After a tick or untick: fill or empty the dots and redo the names (a ticked place always gets its name).
+  function p10PickRefresh(){
+    const svg=document.querySelector('#p10-pick-map .p10-pick-svg');if(!svg)return;
+    for(const g of svg.querySelectorAll('.p10-pick-dot'))g.classList.toggle('is-on',p10Selected.has(g.dataset.p10Pick));
+    p10PickLayout();
+  }
+  function p10PickHot(id,on){
+    const host=p10$('#p10-pick-map');if(!host)return;
+    for(const el of host.querySelectorAll('.is-hot'))el.classList.remove('is-hot');
+    for(const el of document.querySelectorAll('#p10-wishes label.is-hot'))el.classList.remove('is-hot');
+    const status=host.querySelector('.p10-pick-status');
+    if(!on||!id){if(status)status.textContent='';return;}
+    const sel=`[data-p10-pick="${CSS.escape(id)}"]`,lab=`[data-p10-pick-label="${CSS.escape(id)}"]`;
+    host.querySelector(sel)?.classList.add('is-hot');host.querySelector(lab)?.classList.add('is-hot');
+    document.querySelector(`#p10-wishes label[data-p10-wish="${CSS.escape(id)}"]`)?.classList.add('is-hot');
+    const item=p10PickItems.find(i=>i.id===id),zh=p10Lang()==='zh';
+    if(status&&item)status.textContent=`${item.name}${p10Selected.has(id)?(zh?' · 已选，点圆点可取消':' · picked; click the dot to remove'):(zh?' · 点圆点加入':' · click the dot to add')}`;
   }
   function p10SyncTransport(){const car=p10$('#p10-transport')?.value!=='public';const field=p10$('#p10-pace-field');if(field)field.hidden=!car;}
   window.renderP10Planner=function(){
@@ -952,7 +1165,21 @@ globalThis.P10_NODES = NODES;
       const t=event.target;
       if(t.name==='p10-wish'){if(t.checked)p10Selected.add(t.value);else p10Selected.delete(t.value);p10RenderSelected();}
       if(t.id==='p10-transport')p10SyncTransport();
+      if(t.id==='p10-start'||t.id==='p10-end')p10RenderPickMap(p10PickItems);
     });
+    // The map lives outside the form on a wide screen, so its clicks and hovers are handled on the document.
+    document.addEventListener('click',event=>{
+      const dot=event.target.closest&&event.target.closest('#p10-pick-map [data-p10-pick]');if(!dot)return;
+      const id=dot.dataset.p10Pick;if(p10Selected.has(id))p10Selected.delete(id);else p10Selected.add(id);
+      for(const box of form.querySelectorAll('[name=p10-wish]'))box.checked=p10Selected.has(box.value);
+      p10RenderSelected();p10PickHot(id,true);
+    });
+    document.addEventListener('mouseover',event=>{
+      const el=event.target.closest&&event.target.closest('#p10-pick-map [data-p10-pick],#p10-wishes label[data-p10-wish]');
+      if(el)p10PickHot(el.dataset.p10Pick||el.dataset.p10Wish,true);
+      else if(event.target.closest&&!event.target.closest('#p10-pick-map,#p10-wishes'))p10PickHot(null,false);
+    });
+    form.addEventListener('focusin',event=>{const el=event.target.closest('#p10-wishes label[data-p10-wish]');if(el)p10PickHot(el.dataset.p10Wish,true);});
     form.addEventListener('click',event=>{
       const island=event.target.closest('[data-p10-island]');
       const region=event.target.closest('[data-p10-region]');
@@ -970,7 +1197,7 @@ globalThis.P10_NODES = NODES;
       if(event.key==='ArrowDown'&&i<p10View.days.length-1){event.preventDefault();move(i,i+1);}
     });
     let p10ResizeTimer=0;
-    window.addEventListener('resize',()=>{clearTimeout(p10ResizeTimer);p10ResizeTimer=setTimeout(()=>{const on=p10$('#p10-trip-map [data-p10-map-day][aria-pressed="true"]');if(on)p10FocusDay(on.dataset.p10MapDay);},150);});
+    window.addEventListener('resize',()=>{clearTimeout(p10ResizeTimer);p10ResizeTimer=setTimeout(()=>{const on=p10$('#p10-trip-map [data-p10-map-day][aria-pressed="true"]');if(on)p10FocusDay(on.dataset.p10MapDay);const host=p10$('#p10-pick-map');if(host&&p10PickItems.length){if(Boolean(host.closest('.planner-explainer'))!==p10Wide())p10RenderPickMap(p10PickItems);else p10PickLayout();}},150);});
     p10$('#planResult').addEventListener('dragstart',event=>{const b=event.target.closest('[data-p10-drag]');if(!b)return;event.dataTransfer.setData('text/plain',b.dataset.p10Drag);});
     p10$('#planResult').addEventListener('dragover',event=>{if(event.target.closest('[data-p10-index]'))event.preventDefault();});
     p10$('#planResult').addEventListener('drop',event=>{const card=event.target.closest('[data-p10-index]');if(!card||!p10View)return;event.preventDefault();const from=Number(event.dataTransfer.getData('text/plain'));const to=Number(card.dataset.p10Index);if(!Number.isInteger(from)||from===to)return;move(from,to);});
@@ -986,7 +1213,13 @@ globalThis.P10_NODES = NODES;
         return;
       }
       const edit=event.target.closest('[data-p10-edit]');
-      if(edit){document.getElementById('p10-wishes')?.scrollIntoView({behavior:'auto',block:'start'});return;}
+      if(edit){document.getElementById('p10-wishes-label')?.scrollIntoView({behavior:'auto',block:'start'});return;}
+      if(event.target.closest('[data-p10-adopt]')&&p10Result&&p10Result.suggested){
+        for(const id of p10Result.suggested)p10Selected.add(id);
+        for(const box of form.querySelectorAll('[name=p10-wish]'))box.checked=p10Selected.has(box.value);p10RenderSelected();
+        replan({...p10Result.input,wishes:[...p10Selected]},zh?'已把推荐地点加入你的勾选，可以在地点列表或地图上增删。':'The suggested places are now your picks; change them in the list or on the map.');
+        return;
+      }
       const up=event.target.closest('[data-p10-up]'),down=event.target.closest('[data-p10-down]'),moveto=event.target.closest('[data-p10-moveto]'),dest=event.target.closest('[data-p10-dest]');
       if((up||down||moveto||dest)&&p10View){
         const days=p10View.days;
@@ -1005,8 +1238,9 @@ globalThis.P10_NODES = NODES;
         return;
       }
       const add=event.target.closest('[data-p10-add]');if(!add||!p10Result)return;
-      const id=add.dataset.p10Add;p10Selected.add(id);const checkbox=[...form.querySelectorAll('[name=p10-wish]')].find(box=>box.value===id);if(checkbox)checkbox.checked=true;p10RenderSelected();
-      replan({...p10Result.input,wishes:[...new Set([...p10Result.input.wishes,id])]},zh?'已加入目的地并重新排行程。':'Stop added; the itinerary has been updated.');
+      const ids=add.dataset.p10Add.split(',').filter(Boolean);for(const id of ids)p10Selected.add(id);
+      for(const box of form.querySelectorAll('[name=p10-wish]'))box.checked=p10Selected.has(box.value);p10RenderSelected();
+      replan({...p10Result.input,wishes:[...new Set([...p10Result.input.wishes,...ids])]},zh?'已加入目的地并重新排行程。':'Stop added; the itinerary has been updated.');
     });
     form.addEventListener('submit',async event=>{
       event.preventDefault();const x=p10Text(),methodValue=method.value;

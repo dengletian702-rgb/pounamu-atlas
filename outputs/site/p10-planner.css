@@ -125,3 +125,7 @@ body[data-page=plan] .type-char{opacity:1!important;transform:none!important;ani
 .p10-winter-note{background:#e3edf5;color:#1f3242}
 .p10-note-src{display:block;margin-top:.3rem;font-size:.8rem}
 .p10-note-src a{color:inherit}
+
+/* ten-guest-v1: long suggestion buttons wrap inside the screen on phones (H-12); unknown ids in a shared link (H-14) */
+.p10-add-stop{max-width:100%;white-space:normal;text-align:left;overflow-wrap:anywhere}
+.p10-link-note{border-left:4px solid #b4572e;padding:.5rem .75rem;background:#f7f0e8;margin:.75rem 0}

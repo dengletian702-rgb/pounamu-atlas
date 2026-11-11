@@ -82,3 +82,20 @@
   .v4-layout{display:block}
   .v4-pane-days,.v4-pane-map{display:block!important}
 }
+/* ten-guest-v1: topic cards, empty help, destination photo, stays tiers, prepare extras */
+.v4-topic{border-left:4px solid #203a2e}
+.v4-topic ul{margin:6px 0 8px;padding-left:1.2em;line-height:1.6}
+.v4-empty-help,.v4-mode-note{grid-column:1/-1}
+.v4-empty-help .v4-actions,.v4-mode-note .v4-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.v4-dest-photo{margin:12px 0;max-width:960px}
+.v4-dest-photo img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;background:#e2ece8}
+.v4-dest-photo figcaption{font-size:13px;line-height:1.5;margin-top:6px;overflow-wrap:anywhere}
+.v4-stay-tier ul{margin:6px 0;padding-left:1.2em;line-height:1.6}
+.v4-unscheduled{margin:16px 0;padding:12px 16px;border:1px dashed #98a496}
+.v4-prepare-extra{display:grid;gap:16px}
+.v4-prepare-extra:empty{display:none}
+.v4-prepare-extra section{border-top:1px solid #c5d0bc;padding-top:12px}
+.v4-prepare-extra h2{font-family:var(--serif);font-weight:400;font-size:clamp(24px,3vw,34px);margin:0 0 8px}
+.v4-prepare-extra ul{padding-left:1.2em;line-height:1.7}
+.v4-prepare-extra a,.v4-topic a{overflow-wrap:anywhere}
+.v4-src{font-size:13px;line-height:1.5;color:#45574c}

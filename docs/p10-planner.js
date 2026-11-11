@@ -35,8 +35,8 @@ const NODES = {
   'franz-josef': { at: [-43.39, 170.18], en: 'Franz Josef', zh: '弗朗茨约瑟夫' },
   fox: { at: [-43.46, 170.02], en: 'Fox Glacier', zh: '福克斯冰川镇' },
   haast: { at: [-43.88, 169.04], en: 'Haast', zh: '哈斯特' },
-  wanaka: { at: [-44.7, 169.13], en: 'Wānaka', zh: '瓦纳卡' },
-  'te-anau': { at: [-45.41, 167.72], en: 'Te Anau', zh: '蒂阿瑙' },
+  wanaka: { at: [-44.7, 169.13], en: 'Wānaka', zh: '瓦纳卡', hub: true },
+  'te-anau': { at: [-45.41, 167.72], en: 'Te Anau', zh: '蒂阿瑙', hub: true },
   milford: { at: [-44.67, 167.93], en: 'Milford Sound', zh: '米尔福德峡湾' },
   tekapo: { at: [-44.0, 170.48], en: 'Lake Tekapo', zh: '特卡波' },
   twizel: { at: [-44.26, 170.1], en: 'Twizel', zh: '特威泽尔' },
@@ -55,7 +55,7 @@ const NODES = {
   matamata: { at: [-37.81, 175.77], en: 'Matamata', zh: '玛塔玛塔' },
   waitomo: { at: [-38.26, 175.1], en: 'Waitomo', zh: '怀托摩' },
   rotorua: { at: [-38.14, 176.25], en: 'Rotorua', zh: '罗托鲁瓦', hub: true },
-  taupo: { at: [-38.69, 176.07], en: 'Taupō', zh: '陶波' },
+  taupo: { at: [-38.69, 176.07], en: 'Taupō', zh: '陶波', hub: true },
   'national-park': { at: [-39.18, 175.4], en: 'National Park Village (Tongariro)', zh: '国家公园村（汤加里罗）' },
   napier: { at: [-39.49, 176.91], en: 'Napier', zh: '内皮尔', hub: true },
   'new-plymouth': { at: [-39.06, 174.08], en: 'New Plymouth', zh: '新普利茅斯', hub: true },
@@ -530,13 +530,17 @@ function p10Build(input, wanted) {
   const cap=input.car?(Number(input.pace)||5):6.5;
   // Two packings: one that may stop for the night in a transit town halfway to the next place, one that stays where
   // the visit was and leaves next morning. The second wins unless it needs more days.
-  const pack=stayPut=>{
-  const fresh=(kind,at)=>({kind,at,legs:[],activities:[],used:0,drive:0,act:0});
+  // A third packing (noBack) also ends the day at a visit when the next leg would head back toward where the day
+  // began on the way somewhere else (Auckland → Waitomo → back up to Hamilton → Matamata, ticket P2-13); a plain
+  // return trip (Te Anau → Milford Sound → Te Anau) is not a detour. It is used only when it fits the days asked for.
+  const pack=(stayPut,noBack)=>{
+  const fresh=(kind,at)=>({kind,at,from:at,legs:[],activities:[],used:0,drive:0,act:0});
   const days=[fresh('arrive',input.start)]; let day=days[0];
   function open(){day=fresh('travel',days[days.length-1].at); days.push(day);return day;}
   for(const item of stream){
     if(item.type==='leg'){
       const h=item.leg.h;
+      if(noBack&&item.hop&&day.act&&day.legs.length&&item.leg.b!==day.from&&net.hours(day.from,item.leg.b)+1e-9<net.hours(day.from,day.at))open();
       if(stayPut&&item.hop&&day.act&&(day.drive+item.hop>cap||day.drive+day.act+item.hop>P10_DAY_HOURS))open();
       if(day.kind==='arrive'||day.kind==='activity'||(day.drive&&day.drive+h>cap)||(day.drive+day.act&&day.drive+day.act+h>P10_DAY_HOURS))open();
       day.legs.push(item.leg);day.drive+=h;day.used=day.drive;day.at=item.leg.b;
@@ -558,8 +562,9 @@ function p10Build(input, wanted) {
   else days.push(fresh('depart',input.end));
   return days;
   };
-  const loose=pack(false), settled=pack(true);
-  return {days:settled.length<=loose.length?settled:loose,order,inaccessible,disconnected:false};
+  const loose=pack(false), settled=pack(true), clean=pack(true,true);
+  const chosen=settled.length<=loose.length?settled:loose;
+  return {days:clean.length<=Math.max(chosen.length,Number(input.days)||0)?clean:chosen,order,inaccessible,disconnected:false};
 }
 // Catalogue towns: one that is the same place as a road-network town (within 15 km, or Stewart Island's Oban) plans
 // as that town. A town off the network gets no invented drive time; it stays under "arrange separately".
@@ -783,6 +788,8 @@ function p10Fitted(plan){
   const built=p10Build(plan.input,keep);
   return {...built,input:plan.input,minimum:built.days.length};
 }
+// Travel-day titles: a stop on the way reads "· 途经霍比特村", a visit at the day's end "· 游览…" (walk-through H-07)
+function p10WayTitle(d,lang){const zh=lang==='zh',esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),names=list=>list.map(a=>esc(a.wish[lang])).join(zh?'、':', ');const way=d.activities.filter(a=>a.wish.base!==d.at),end=d.activities.filter(a=>a.wish.base===d.at);return (way.length?` · ${zh?'途经':'via '}${names(way)}`:'')+(end.length?` · ${zh?'游览':'explore '}${names(end)}`:'');}
 function p10Present(plan){
   const selected = plan && plan.input ? plan.input.days : 0;
   const tight = Boolean(plan && plan.input && plan.minimum > selected);
@@ -917,7 +924,7 @@ globalThis.P10_NODES = NODES;
   window.P10_COAST_PATH = P10_COAST;
   const P10_DAY_COLORS=['#b44e2d','#225a4b','#9b5c1d','#4d5c8a','#8c3862','#446e28','#8b501b','#315d71','#944c40','#605292','#46695e','#a13e2e'];
   const p10MapPoint=id=>{const at=NODES[id]?.at;if(!at)return null;return [392.5+(at[1]-174.76)*38.05,189.7+(-at[0]-36.85)*50.5]};
-  const P10_NORTH_HUBS=new Set(['auckland','hamilton','rotorua','napier','new-plymouth','wellington']);
+  const P10_NORTH_HUBS=new Set(['auckland','hamilton','rotorua','taupo','napier','new-plymouth','wellington']);
   // Pictures for a visit day come from the licensed route photos already on the site (credit shown under each one).
   const P10_WISH_PHOTO={christchurch:'bridle',nelson:'greattaste',picton:'pictonnelson',aoraki:'hooker',queenstown:'queenstowncycle',milford:'milford','te-anau':'teanaubus',glaciers:'matheson',haast:'haast','arthurs-pass':'arthurs',kaikoura:'coastroad','abel-tasman':'abel-tasman',catlins:'catlins',auckland:'ni-rangitoto','bay-of-islands':'ni-aucklandpaihia',coromandel:'ni-coromandel',rotorua:'ni-thermalexplorer',taupo:'ni-huka',tongariro:'tongariro-crossing',napier:'ni-wellingtonnapier'};
   function p10WishPhoto(id){
@@ -1015,7 +1022,7 @@ globalThis.P10_NODES = NODES;
       const drops=choices.map(c=>`<button type="button" class="p10-add-stop" data-p10-trim="1" data-p10-drop="${p10Esc(c.id)}">${zh?`去掉${p10Esc(c.zh)}（省 ${c.saves} 天）`:`Drop ${p10Esc(c.en)} (saves ${c.saves} day${c.saves>1?'s':''})`}</button>`).join(' ');
       const more=result.minimum<=21?`<button type="button" class="p10-add-stop" data-p10-days="${result.minimum}">${zh?`把天数改成 ${result.minimum}`:`Change to ${result.minimum} days`}</button>`:'';
       const southTrip=!P10_NORTH_HUBS.has(result.input.start)&&!P10_NORTH_HUBS.has(result.input.end)&&result.order.every(w=>w.island!=='north');
-      const tmpl=southTrip?`<a class="p10-add-stop" href="guide.html?template=SI-09B&amp;lang=${lang}">${zh?'看 9 天南岛线路模板':'See the 9-day South Island template'}</a>`:'';
+      const tmpl=southTrip&&result.input.days>=7?`<a class="p10-add-stop" href="guide.html?template=SI-09B&amp;lang=${lang}">${zh?'看 9 天南岛线路模板':'See the 9-day South Island template'}</a>`:'';
       const direct=p10Build(result.input,[]).days.length;
       const msg=early.fitted
         ?(zh?`你选的地方全部排进去约需 ${result.minimum} 天，你选了 ${result.input.days} 天。下面这 ${result.input.days} 天会按时把你带到${endName}；排不下的地点在「未安排」里，你的勾选没有删除。`:`All your places need about ${result.minimum} days; you chose ${result.input.days}. The ${result.input.days} days below still get you to ${endName}. Places that do not fit are under Unscheduled; your ticks are kept.`)
@@ -1054,20 +1061,20 @@ globalThis.P10_NODES = NODES;
       const guides=p10Suggestions(w.id,pref).map(g=>`<a href="route.html?id=${encodeURIComponent(g.id)}&amp;lang=${lang}">${p10Esc(g[lang])}</a>`).join(' · ');
       const photo=a.part===1&&!shownPhotos.has(w.id)?p10WishPhoto(w.id):null;if(photo)shownPhotos.add(w.id);
       const figure=photo?`<figure class="p10-day-photo"><img src="${p10Esc(photo.src)}" alt="${p10Esc(Array.isArray(photo.place)?photo.place[zh?1:0]:name)}" loading="lazy" decoding="async" width="640" height="360"><figcaption>${p10Esc(Array.isArray(photo.place)?photo.place[zh?1:0]:'')} · <a href="${p10Esc(photo.source)}" target="_blank" rel="noopener noreferrer">${p10Esc(photo.author)}</a> · <a href="${p10Esc(photo.licenseUrl)}" target="_blank" rel="noopener noreferrer">${p10Esc(photo.license)}</a></figcaption></figure>`:'';
-      return `${figure}<p><strong>${zh?'游览':'Visit'}：${name}${p10PartLabel(a,zh)}</strong>${tip?(zh?'。':'. ')+p10Esc(tip)+src:''}${official}</p>${guides?`<p class="p10-suggestions">${zh?'当天可走的线路：':'Route for the day: '}${guides}</p>`:''}`;
+      return `${figure}<p><strong>${zh?'游览：':'Visit: '}${name}${p10PartLabel(a,zh)}</strong>${tip?(zh?'。':'. ')+p10Esc(tip)+src:''}${official}</p>${guides?`<p class="p10-suggestions">${zh?'当天可走的线路：':'Route for the day: '}${guides}</p>`:''}`;
     };
     const rows=timeline.map((d,i)=>{
       const number=d.n;
       if(d.kind==='weather'||d.kind==='free'){
         const title=d.kind==='weather'?(zh?`${p10Esc(p10Name(d.at))} · 天气机动日`:`${p10Esc(p10Name(d.at))} · weather buffer day`):(zh?`${p10Esc(p10Name(d.at))} · 自由活动日`:`${p10Esc(p10Name(d.at))} · free day`);
         const description=d.kind==='weather'?(zh?'天气不好时用来改期；天气适合时可自由活动。':'Use this day to reschedule if weather disrupts your plans; otherwise enjoy free time.'):(zh?`多出来的一天：在${p10Esc(p10Name(d.at))}自由活动或休息。`:`A spare day: free time or rest in ${p10Esc(p10Name(d.at))}.`);
-        return `<article class="plan-day" tabindex="0" data-p10-index="${i}">${head(d,i,title)}<p>${description}</p><p class="p10-night">${x.night}：${p10Esc(p10Name(d.at))}</p></article>`;
+        return `<article class="plan-day" tabindex="0" data-p10-index="${i}">${head(d,i,title)}<p>${description}</p><p class="p10-night">${x.night}${zh?'：':': '}${p10Esc(p10Name(d.at))}</p></article>`;
       }
       const acts=d.activities.map(a=>p10Esc(a.wish[lang])).join(zh?'、':', ');
       const from=d.legs.length?p10Esc(p10Name(d.legs[0].a)):'';
       const title=d.kind==='arrive'?`${x.arrive} ${p10Esc(p10Name(d.at))}`
         :d.kind==='depart'?(d.legs.length?`${from} → ${p10Esc(p10Name(d.at))} · ${zh?'离开':'depart'}`:`${x.depart} ${p10Esc(p10Name(d.at))}`)
-        :d.legs.length?`${from} → ${p10Esc(p10Name(d.at))}${d.kind==='activity'&&acts?` · ${zh?'游览':'explore '}${acts}${p10PartLabel(d.activities[0],zh)}`:''}`
+        :d.legs.length?`${from} → ${p10Esc(p10Name(d.at))}${d.kind==='activity'&&acts?` · ${zh?'游览':'explore '}${acts}${p10PartLabel(d.activities[0],zh)}`:d.activities.length?p10WayTitle(d,lang):''}`
         :`${acts}${zh?' · 游览':' · explore'}${d.activities[0]?p10PartLabel(d.activities[0],zh):''}`;
       const legs=d.legs.map(l=>{const road=p10LegDescription(l,lang);const mode=x[l.mode]||x.road;const duration=p10Duration(l.h,lang);return `<li>${p10Esc(p10Name(l.a))} → ${p10Esc(p10Name(l.b))} · ${p10Esc(road)} · ${mode}${zh?'约':' about '}${duration}${l.km>0?` · ${l.km} km`:''} ${p10LegTag(l,zh)}</li>`;}).join('');
       const travel=d.legs.reduce((sum,l)=>sum+l.h,0),driving=d.legs.filter(l=>l.mode==='car').reduce((sum,l)=>sum+l.h,0),pace=Number(result.input.pace)||5;
@@ -1076,12 +1083,12 @@ globalThis.P10_NODES = NODES;
       const longDay=result.input.car&&driving>pace?`<p class="p10-warning p10-long-day">${zh?'这天开车较长':'This is a long driving day'}${names?(zh?`，可以在${names}多住一晚并调整行程。`:`; consider an overnight stop in ${names} and adjust the itinerary.`):(zh?'，可以在途中多住一晚并调整行程。':'; consider an overnight stop and adjust the itinerary.')}</p>`:'';
       const before=d.activities.filter(a=>a.before).map(activityHtml).join(''),after=d.activities.filter(a=>!a.before).map(activityHtml).join('');
       const roadNotes=p10RoadNotes(d.legs,result.input.month,zh).map(n=>`<p class="p10-warning p10-road-note p10-${n.kind}-note">${p10Esc(n.text)} <span class="p10-note-src">${n.sources.map(src=>`<a href="${p10Esc(src.url)}" target="_blank" rel="noopener noreferrer">${p10Esc(src.label)}</a>`).join(' · ')}${zh?'（查阅 ':' (read '}${p10Esc(n.sources[0].checkedAt)}${zh?'）':')'}</span></p>`).join('');
-      const arrivalTip=d.kind==='arrive'?`<p>${zh?'落地后先休息，避免当天长途驾驶。':'Rest after landing and avoid a long drive on the first day.'}</p>`:'';
+      const arrivalTip=d.kind==='arrive'?`<p>${result.input.car?(zh?'落地后先休息，避免当天长途驾驶。':'Rest after landing and avoid a long drive on the first day.'):(zh?'落地后先休息，第一天别排长途大巴。':'Rest after landing and avoid a long bus ride on the first day.')}</p>`:'';
       const lateTip=d.kind==='depart'&&d.legs.length?`<p class="p10-note">${zh?'离开当天还要赶一段路，航班请订在下午或傍晚以后。':'You still travel on your departure day, so book an afternoon or evening flight.'}</p>`:'';
-      return `<article class="plan-day" tabindex="0" data-p10-index="${i}">${head(d,i,title)}${arrivalTip}${before}${legs?`<ul class="p10-legs">${legs}</ul>`:''}${roadNotes}${total}${longDay}${lateTip}${after}${d.kind==='depart'?'':`<p class="p10-night">${x.night}：${p10Esc(p10Name(d.at))}</p>`}</article>`;
+      return `<article class="plan-day" tabindex="0" data-p10-index="${i}">${head(d,i,title)}${arrivalTip}${before}${legs?`<ul class="p10-legs">${legs}</ul>`:''}${roadNotes}${total}${longDay}${lateTip}${after}${d.kind==='depart'?'':`<p class="p10-night">${x.night}${zh?'：':': '}${p10Esc(p10Name(d.at))}</p>`}</article>`;
     }).join('');
     const recoName=p10JevRouteName(p10Recommendation,lang,typeof routes==='undefined'?[]:routes);
-    const reco=recoName?`<p>${x.reco}：<a href="route.html?id=${encodeURIComponent(p10Recommendation)}&amp;lang=${lang}">${p10Esc(recoName)}</a></p>`:'';
+    const reco=recoName?`<p>${x.reco}${zh?'：':': '}<a href="route.html?id=${encodeURIComponent(p10Recommendation)}&amp;lang=${lang}">${p10Esc(recoName)}</a></p>`:'';
     const uns=p10View.unscheduled||[];
     const unsHtml=uns.length?`<section class="p10-unscheduled"><h3>${zh?'未安排':'Unscheduled'}</h3><ul>${uns.map(w=>`<li>${p10Esc(zh?w.zh:w.en)}${w.passThrough?(zh?'（会路过，但没留游览时间）':' (you pass through, without time to stop)'):''}</li>`).join('')}</ul></section>`:'';
     const shortfall=p10ShortfallNote(result, {days: timeline}, lang);
@@ -1128,7 +1135,7 @@ globalThis.P10_NODES = NODES;
     const islandHost=document.getElementById('p10-island');
     if(islandHost){islandHost.innerHTML=[['all',zh?'全部':'All'],['north',zh?'北岛':'North Island'],['south',zh?'南岛':'South Island']].map(([id,label])=>`<button type="button" data-p10-island="${id}" aria-pressed="${island===id}">${label}</button>`).join('');}
     const regionHost=document.getElementById('p10-region');
-    if(regionHost){const regs=P10_REGIONS.filter(r=>island==='all'||r.island===island);regionHost.innerHTML=`<button type="button" data-p10-region="all" aria-pressed="${region==='all'}">${zh?'全部地区':'All regions'}</button>`+regs.map(r=>{const n=p10RegionCount(r.id, island);return `<button type="button" data-p10-region="${r.id}" aria-pressed="${region===r.id}" ${n?'':'disabled'}>${zh?r.zh:r.en} (${n})${n?'':zh?' · 本目录暂无地点':' · No places in this directory yet'}</button>`;}).join('');}
+    if(regionHost){const regs=P10_REGIONS.filter(r=>island==='all'||r.island===island);regionHost.innerHTML=`<button type="button" data-p10-region="all" aria-pressed="${region==='all'}">${zh?'全部地区':'All regions'}</button>`+regs.map(r=>{const n=p10RegionCount(r.id, island);return `<button type="button" data-p10-region="${r.id}" aria-pressed="${region===r.id}" ${n?'':'disabled'}>${zh?`${r.zh}（${n} 个地点）`:`${r.en} (${n} ${n===1?'place':'places'})`}${n?'':zh?' · 本目录暂无地点':' · No places in this directory yet'}</button>`;}).join('');}
     const list=WISHES.filter(w=>(island==='all'||w.island===island)&&(region==='all'||P10_WISH_REGION[w.id]===region||(region==='unmapped'&&!P10_WISH_REGION[w.id])));
     const groups=new Map();
     for(const w of list){const key=P10_WISH_REGION[w.id]||'unmapped';if(!groups.has(key))groups.set(key,[]);groups.get(key).push(w);}
@@ -1235,6 +1242,14 @@ globalThis.P10_NODES = NODES;
   }
   function p10Month(){return Number(p10$('#p10-month')?.value)||0;}
   function p10SyncTransport(){const car=p10$('#p10-transport')?.value!=='public';const field=p10$('#p10-pace-field');if(field)field.hidden=!car;}
+  let p10LinkWishes=null;
+  function p10LinkNote(lang){
+    if(!p10LinkWishes||!Array.isArray(globalThis.P10_CATALOG_TOWNS))return;
+    const unknown=p10LinkWishes.map(p10AliasId).filter(id=>!p10WishById(id));const host=p10$('#planResult');if(!host)return;
+    let note=p10$('#p10-link-note');if(!unknown.length){if(note)note.remove();return;}
+    if(!note){note=document.createElement('p');note.id='p10-link-note';note.className='p10-link-note';note.setAttribute('role','status');host.before(note);}
+    note.textContent=lang==='zh'?`链接里有 ${unknown.length} 个地点编号没有找到：${unknown.join('、')}。可能是旧链接或打错了，下面的行程没有包含它们。`:`${unknown.length} place id${unknown.length>1?'s':''} in this link ${unknown.length>1?'were':'was'} not found: ${unknown.join(', ')}. The link may be old or mistyped; the trip below leaves ${unknown.length>1?'them':'it'} out.`;
+  }
   window.renderP10Planner=function(){
     if(!p10$('#plannerForm'))return;const x=p10Text(),lang=p10Lang(),zh=lang==='zh';
     for(const [id,key] of [['p10-start-label','start'],['p10-end-label','end'],['p10-days-label','days'],['p10-month-label','month'],['p10-pace-label','pace'],['p10-pace-35','pace35'],['p10-pace-5','pace5'],['p10-pace-65','pace65'],['p10-wishes-label','places'],['p10-island-label','island'],['p10-region-label','region'],['p10-choose','choose'],['p10-transport-label','transport'],['p10-car-label','car'],['p10-public-label','public'],['p10-preference-label','preference'],['p10-pref-easy','prefEasy'],['p10-pref-walk','prefWalk'],['p10-pref-cycle','prefCycle'],['p10-pref-drive','prefDrive'],['p10-method-label','method'],['p10-local-label','local'],['p10-jev-label','jev'],['p10-submit','submit'],['p10-consent-text','consent']]){const el=document.getElementById(id);if(el)el.textContent=x[key];}
@@ -1245,6 +1260,7 @@ globalThis.P10_NODES = NODES;
     p10RenderWishes();
     p10SyncTransport();
     p10Show(p10Result);
+    p10LinkNote(lang);
   };
   window.setupP10Planner=function(){
     const form=p10$('#plannerForm');if(!form||form.dataset.p10Ready)return;form.dataset.p10Ready='1';
@@ -1260,6 +1276,7 @@ globalThis.P10_NODES = NODES;
     method.addEventListener('change',()=>{p10$('#jevConsent').hidden=method.value!=='jev';p10$('#jevConsentCheck').checked=false;p10Status('');});
     // A shared link (?from=…&to=…) wins over the trip saved in this browser.
     let saved=null;const q=new URLSearchParams(location.search);
+    if(q.get('from')&&q.get('to'))p10LinkWishes=(q.get('w')||'').split(',').filter(Boolean);
     if(q.get('from')&&q.get('to'))saved={start:q.get('from'),end:q.get('to'),days:Number(q.get('days'))||7,pace:Number(q.get('pace'))||5,preference:q.get('pref')||'easy',car:q.get('car')!=='0',month:Number(q.get('m'))||0,wishes:(q.get('w')||'').split(',').filter(Boolean)};
     else try{saved=JSON.parse(localStorage.getItem('p10-road-plan'));}catch{}
     if(saved){

@@ -1,0 +1,107 @@
+{
+  "meta": {
+    "about": "Stay and budget guidance for ticket F (2026-11-12). Prices appear only where an official page states them, with the page and the date it was read. Town-level prices are not given: use the search links.",
+    "checkedAt": "2026-11-12"
+  },
+  "tiers": [
+    {
+      "id": "budget",
+      "zh": "省钱",
+      "en": "Budget",
+      "types_zh": "DOC 营地、假日公园（营位或简易小屋）、青年旅舍",
+      "types_en": "DOC campsites, holiday parks (sites or basic cabins), hostels",
+      "area_zh": "镇外的 DOC 营地或镇边的假日公园；青旅多在镇中心",
+      "area_en": "DOC campsites outside town or holiday parks on its edge; hostels are usually central",
+      "facts": [
+        {
+          "zh": "DOC 标准营地成人每晚 $10–20，服务型营地（不通电营位）成人每晚 $25；个别营地价格不同。",
+          "en": "DOC Standard campsites: adults $10–20 a night; Serviced campsites (unpowered sites): adults $25 a night; some campsites differ.",
+          "label": "DOC: Campsite categories, facilities and fees",
+          "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-stay/stay-at-a-campsite/facilities-and-fees/",
+          "checkedAt": "2026-11-12"
+        }
+      ],
+      "links": [
+        { "kind": "doc-campsites", "label_zh": "DOC 营地（官方）", "label_en": "DOC campsites (official)", "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-stay/stay-at-a-campsite/" },
+        { "kind": "official", "label_zh": "假日公园（新西兰旅游局）", "label_en": "Holiday parks (Tourism New Zealand)", "url": "https://www.newzealand.com/int/holiday-parks/" },
+        { "kind": "maps", "label_zh": "地图上搜青旅", "label_en": "Search hostels on the map", "query": "hostel" }
+      ]
+    },
+    {
+      "id": "mid",
+      "zh": "中档",
+      "en": "Mid-range",
+      "types_zh": "汽车旅馆（motel）、民宿（B&B）、假日公园的带卫浴小屋",
+      "types_en": "Motels, B&Bs, holiday-park cabins with their own bathroom",
+      "area_zh": "镇中心或主路边，开车方便停车",
+      "area_en": "The town centre or the main road, with easy parking",
+      "facts": [],
+      "links": [
+        { "kind": "official", "label_zh": "汽车旅馆（新西兰旅游局）", "label_en": "Motels (Tourism New Zealand)", "url": "https://www.newzealand.com/int/motels/" },
+        { "kind": "maps", "label_zh": "地图上搜汽车旅馆", "label_en": "Search motels on the map", "query": "motel" }
+      ]
+    },
+    {
+      "id": "high",
+      "zh": "高端",
+      "en": "High-end",
+      "types_zh": "酒店、精品酒店、山林或湖畔度假小屋（lodge）",
+      "types_en": "Hotels, boutique hotels, lodges",
+      "area_zh": "湖边、海边或景观好的镇外位置",
+      "area_en": "Lake or sea fronts, or out-of-town spots with views",
+      "facts": [],
+      "links": [
+        { "kind": "official", "label_zh": "精品酒店与小屋（新西兰旅游局）", "label_en": "Boutique and lodge stays (Tourism New Zealand)", "url": "https://www.newzealand.com/int/boutique-and-lodge/" },
+        { "kind": "official", "label_zh": "豪华度假小屋（新西兰旅游局）", "label_en": "Luxury lodges (Tourism New Zealand)", "url": "https://www.newzealand.com/int/feature/luxury-lodges/" },
+        { "kind": "maps", "label_zh": "地图上搜酒店", "label_en": "Search hotels on the map", "query": "hotel" }
+      ]
+    }
+  ],
+  "tips": [
+    {
+      "id": "campsite-pass",
+      "zh": "DOC 营地通票：成人 $295、5–17 岁 $147.50，从选定的开始日起一年内有效，可用于 DOC 的营地；同一营地 30 天内最多用 7 晚，带电营位每人每晚另加 $3。",
+      "en": "DOC Campsite Pass: adults $295, ages 5–17 $147.50, valid for a year from the start date you choose at DOC campsites; at most 7 nights in 30 days at one campsite, plus $3 a person a night on powered sites.",
+      "label": "DOC: Campsite Pass",
+      "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-stay/stay-at-a-campsite/booking-and-paying/campsite-pass/",
+      "checkedAt": "2026-11-12"
+    },
+    {
+      "id": "huts",
+      "zh": "DOC 小屋按晚付费：标准小屋成人每晚 $15，服务型小屋成人每晚 $25（Great Walk 小屋另有价格）。DOC 小屋收费页没有写年度小屋通票，是否还有请向 DOC 确认（待核）。",
+      "en": "DOC huts are paid by the night: Standard huts $15 an adult, Serviced huts $25 an adult (Great Walk huts are priced separately). DOC's hut fee page does not mention an annual hut pass; check with DOC whether one is still sold (to be checked).",
+      "label": "DOC: Hut categories, facilities and fees",
+      "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-stay/stay-in-a-hut/hut-categories/",
+      "checkedAt": "2026-11-12"
+    },
+    {
+      "id": "flexipass",
+      "zh": "InterCity FlexiPass 巴士通票按小时计，12 个月内有效，可以随时加时，也可用于 Interislander 渡轮和部分一日游。",
+      "en": "The InterCity FlexiPass bus pass is sold in hours, is valid for 12 months, can be topped up, and also covers the Interislander ferry and selected day tours.",
+      "label": "InterCity: FlexiPass",
+      "url": "https://www.intercity.co.nz/bus-pass/flexipass-overview",
+      "checkedAt": "2026-11-12"
+    }
+  ],
+  "winter": {
+    "zh": [
+      "出发前查天气和路况，冬季傍晚天黑得早。NZTA Journey Planner 有实时路况。",
+      "封闭的道路不能开，开上去是违法的。",
+      "冰雪路面放慢车速；能选的话在白天中段通过山路。",
+      "车上备保暖衣物、水和食物，油箱至少留半箱（电车留足电量），以防绕路或等候。",
+      "滑雪场上山路可能要求装防滑链；租车保险不一定覆盖高山路段和防滑链，先问租车公司。"
+    ],
+    "en": [
+      "Check the weather and road conditions before you leave; it gets dark early in winter. NZTA Journey Planner has live updates.",
+      "Never drive on a closed road: it is illegal.",
+      "Slow down on ice and snow, and cross passes in the middle of the day when you can.",
+      "Carry warm clothes, water and food, and keep at least half a tank of fuel (or enough charge) for detours and waits.",
+      "Ski-field roads may require chains; rental cover may exclude alpine roads and chains, so ask your rental company first."
+    ],
+    "sources": [
+      { "label": "NZTA: Winter driving", "url": "https://www.nzta.govt.nz/driving-skills/safe-driving-habits/driving-to-the-conditions/winter-driving", "checkedAt": "2026-11-12" },
+      { "label": "NZTA Journey Planner", "url": "https://www.journeys.nzta.govt.nz/journey-planner", "checkedAt": "2026-11-12" },
+      { "label": "Mt Hutt FAQs (access road, chains, rental cars)", "url": "https://www.mthutt.co.nz/faqs", "checkedAt": "2026-11-12" }
+    ]
+  }
+}

@@ -8,8 +8,8 @@ const catalog = require('../docs/data/v4-catalog.json');
 const towns = catalog.places.filter(place => place.type === 'town');
 // The eight towns added in v4 (Mount Maunganui is now part of Tauranga, ticket C). Ticket D gave them road segments.
 const eight = ['ni-tga', 'ni-wka', 'ni-tol', 'ni-pip', 'ni-fld', 'ni-mst', 'si-alx', 'si-cly'];
-// Catalogue towns that still have no road segment of their own.
-const offNetwork = ['ni-whk', 'ni-mtb', 'ni-str'];
+// The twelve catalogue towns that were off the network now have a sourced spur (OSRM or the Fullers360 ferry).
+const linked = ['si-gle', 'si-bhe', 'ni-whk', 'si-crm', 'ni-cor', 'ni-ktt', 'ni-opo', 'ni-whg', 'ni-wmt', 'ni-str', 'ni-wmo', 'ni-mtb'];
 globalThis.P10_CATALOG_TOWNS = towns;
 const planner = require('../docs/p10-planner.js');
 
@@ -24,13 +24,18 @@ test('the v4 towns are on the road network and other catalogue towns still stay 
   const plan = planner.p10Plan({ start: 'auckland', end: 'wellington', days: 14, pace: 5, preference: 'drive', car: true, wishes: north });
   for (const id of north) assert.equal(plan.inaccessible.some(w => w.id === id), false, id);
   const before = net.hours('auckland', 'wellington');
-  const separate = planner.p10Plan({ start: 'auckland', end: 'wellington', days: 7, pace: 5, preference: 'drive', car: true, wishes: ['auckland', ...offNetwork] });
+  const separate = planner.p10Plan({ start: 'auckland', end: 'wellington', days: 14, pace: 5, preference: 'drive', car: true, wishes: ['auckland', ...linked.filter(id => id.startsWith('ni-'))] });
   assert.equal(planner.p10Net(true).hours('auckland', 'wellington'), before);
   assert.ok(separate.order.some(wish => wish.id === 'auckland'));
-  for (const id of offNetwork) {
-    assert.ok(separate.input.wishes.includes(id));
-    assert.ok(separate.inaccessible.some(wish => wish.id === id), id);
-    assert.equal(planner.p10Net(true).hours('auckland', id), Infinity);
+  for (const id of linked) {
+    const town = towns.find(t => t.place_id === id);
+    const base = planner.p10CatalogBase(town);
+    assert.ok(base, id);
+    const hub = id.startsWith('si-') ? 'queenstown' : 'auckland';
+    assert.ok(Number.isFinite(planner.p10Net(true).hours(hub, base)), id + ' ' + base);
+  }
+  for (const id of linked.filter(item => item.startsWith('ni-'))) {
+    assert.equal(separate.inaccessible.some(wish => wish.id === id), false, id);
   }
 });
 

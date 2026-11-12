@@ -19,7 +19,7 @@
 /* 2026-11-11 planner walk-through fixes */
 /* Places: card-like rows with a real tap target instead of 13 px browser checkboxes */
 .p10-group-label{font-size:13px;letter-spacing:.04em;color:#4e6157;margin:10px 0 6px}
-.p10-group{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px}
+.p10-group{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(230px,100%),1fr));gap:8px}
 .p10-wishes .p10-group label{display:flex;align-items:center;gap:10px;min-height:46px;padding:8px 12px;border:1px solid #c3ccbd;background:#f7f6ef;cursor:pointer;font-size:15px;line-height:1.35;transition:background .15s,border-color .15s}
 .p10-wishes .p10-group label:hover{border-color:#203a2e}
 .p10-wishes .p10-group label:has(input:checked){background:#dfe8dd;border-color:#203a2e}
@@ -131,3 +131,24 @@ body[data-page=plan] .type-char{opacity:1!important;transform:none!important;ani
 .p10-link-note{border-left:4px solid #b4572e;padding:.5rem .75rem;background:#f7f0e8;margin:.75rem 0}
 .p10-stay-links{margin:4px 0 0;font-size:14px;line-height:1.6;overflow-wrap:anywhere}
 .p10-stay-links a{text-decoration:underline;text-underline-offset:2px}
+.p10-steps{display:flex;gap:8px;list-style:none;margin:0 0 18px;padding:0}
+.p10-steps button{border:1px solid #1a3d32;background:transparent;color:#1a3d32;border-radius:999px;padding:8px 12px;cursor:pointer}
+.p10-steps button[aria-current="step"]{background:#1a3d32;color:#f4f6ef}
+.p10-step{display:grid;gap:10px;min-width:0;max-width:100%}
+.p10-step > *{min-width:0;max-width:100%}
+#plannerForm,.planner-box,.page-planner{min-width:0;max-width:100%}
+.p10-step[hidden]{display:none!important}
+.p10-step .planner-button{justify-self:start;margin-top:8px}
+.p10-area{display:flex;flex-wrap:wrap;gap:8px}
+.p10-area button{border:1px solid #c5d0c4;background:#f7f8f3;color:#1a3d32;border-radius:8px;padding:10px 12px;text-align:left;cursor:pointer}
+.p10-area button[aria-pressed="true"]{border-color:#1a3d32;background:#e7efe6}
+.p10-step-nav{display:flex;gap:10px;flex-wrap:wrap}
+.p10-more{margin-top:8px}
+.p10-more summary{cursor:pointer;font-weight:600}
+.p10-rank{margin:6px 0 0;padding-left:1.2em}
+.p10-rank-box{border:1px solid #c5d0c4;background:#f7f8f3;padding:12px 14px;margin:12px 0}
+.page-planner,.planner-box,#plannerForm,#planResult{max-width:100%}
+@media(max-width:750px){
+  .p10-steps{flex-direction:column}
+  .p10-steps button,.p10-area button,.planner-button{max-width:100%}
+}

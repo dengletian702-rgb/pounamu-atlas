@@ -5,6 +5,13 @@ const V3_SURFACE_ZH = {paved: '硬化路面', asphalt: '沥青', concrete: '水�
 const V3_FIELDS = ['time', 'distance', 'level', 'season', 'booking', 'access', 'safety'];
 const V3_LABEL = {time: ['Time', '用时'], distance: ['Distance', '距离'], level: ['Grade', '难度'], season: ['Season and closures', '季节与封闭'], booking: ['Booking', '预订'], access: ['Getting there', '交通'], safety: ['Safety notes', '安全提示']};
 const v3L = (en, zh) => lang === 'zh' ? zh : en;
+function v3Flag(name) { const flags = window.POUNAMU_FLAGS; return !flags || flags[name] !== false; }
+function v3IsWalk(r) { return Boolean(r && r.mode === 'walk'); }
+function v3FieldShown(r, key) {
+  if (!key || !v3IsWalk(r)) return true;
+  const src = r.fieldSources?.[key];
+  return Boolean(src) && !(r.verify || []).includes(key);
+}
 const v3Host = url => { try { return new URL(url).hostname.replace(/^www\./, ''); } catch { return ''; } };
 const v3Link = (url, text, cls = '') => `<a ${cls ? `class="${cls}" ` : ''}href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${text}</a>`;
 window.V3_MESSAGES = {en: {paddle: 'Paddling', paddleDesc: 'River journeys by canoe or kayak.', navTracks: 'DOC tracks', navCities: 'Sports nearby', tracksLabel: 'DOC TRACK DIRECTORY', tracksTitle: 'Every DOC walk<br><em>we can list.</em>', tracksDescription: 'A plain directory beside the featured guides: name, region, time, grade and the DOC page for each walk. Filter by island, region and length.', citiesLabel: 'SPORTS NEARBY', citiesTitle: 'A court or a course<br><em>near where you stay.</em>', citiesDescription: 'Tennis courts, golf courses and basketball courts around the main cities, from OpenStreetMap. No account, no tracking, no adverts.'}, zh: {paddle: '划船', paddleDesc: '乘独木舟或皮划艇的河上线路。', navTracks: 'DOC 步道', navCities: '城市运动', tracksLabel: 'DOC 步道目录', tracksTitle: 'DOC 步道<br><em>全量目录</em>', tracksDescription: '精选攻略之外的一份目录：每条步道的名称、地区、用时、难度和 DOC 页面。可按岛屿、地区和用时筛选。', citiesLabel: '城市运动', citiesTitle: '住处附近的<br><em>球场与球道</em>', citiesDescription: '主要城市周边的网球场、高尔夫球场和篮球场，数据来自 OpenStreetMap。不需要账号，不追踪，没有广告。'}};
@@ -17,25 +24,31 @@ function v3Badge(r, key) {
   return v3Link(src.url, `${v3L('Checked', '已核')} ${src.checkedAt} · ${escapeHtml(v3Host(src.url))} ↗`, 'v3-ok');
 }
 function v3FactCell(r, label, value, key) {
+  if (key && !v3FieldShown(r, key)) return '';
   const shown = value ? escapeHtml(value) : `<span class="v3-missing">${v3L('No checked value yet', '暂无已核实的数值')}</span>`;
   return `<div><span>${label}</span><strong>${shown}</strong>${key ? v3Badge(r, key) : ''}</div>`;
 }
 function v3SideFact(r, key) {
+  if (!v3FieldShown(r, key)) return '';
   const value = pick(r[key]);
   return `<dt>${v3L(...V3_LABEL[key])}</dt><dd>${value ? escapeHtml(value) : `<span class="v3-missing">${v3L('No checked information yet', '暂无已核实的信息')}</span>`} ${v3Badge(r, key)}</dd>`;
 }
 function v3CardBadge(r) {
-  const open = (r.verify || []).length, shut = v3ActiveClosure(r);
+  const shut = v3ActiveClosure(r);
+  if (v3IsWalk(r)) return shut ? `<p class="v3-card-closure">${shut.scope === 'section' ? v3L('Section closed now', '部分路段当前封闭中') : v3L('Closed now', '当前封闭中')} · ${escapeHtml(v3ClosureWhen(shut))}</p>` : '';
+  const open = (r.verify || []).length;
   return (shut ? `<p class="v3-card-closure">${shut.scope === 'section' ? v3L('Section closed now', '部分路段当前封闭中') : v3L('Closed now', '当前封闭中')} · ${escapeHtml(v3ClosureWhen(shut))}</p>` : '') + (open ? `<p class="v3-card-note"><span class="v3-tv">${v3L('To verify', '待核实')}</span> ${v3L(`${open} of 7 facts not yet checked`, `7 项事实中有 ${open} 项尚未核实`)}</p>` : `<p class="v3-card-note"><span class="v3-ok">${v3L('All 7 facts checked', '7 项事实已全部核实')}</span></p>`);
 }
 function v3VerifyPanel(r) {
-  const rows = V3_FIELDS.map(key => {
+  const fields = V3_FIELDS.filter(key => v3FieldShown(r, key));
+  if (v3IsWalk(r) && !fields.length) return '';
+  const rows = fields.map(key => {
     const src = r.fieldSources?.[key], value = pick(r[key]);
     const quote = src ? `<details><summary>${v3L('Official wording', '官方原文')}</summary>${src.quote.map(q => `<q>${escapeHtml(q)}</q>`).join('')}${src.note ? `<p>${escapeHtml(src.note)}</p>` : ''}</details>` : '';
     return `<tr><th scope="row">${v3L(...V3_LABEL[key])}</th><td>${value ? escapeHtml(value) : `<span class="v3-missing">—</span>`}${quote}</td><td>${v3Badge(r, key)}</td></tr>`;
   }).join('');
-  const done = V3_FIELDS.length - (r.verify || []).length;
-  return `<section class="journey-section v3-verify" id="journey-verify"><p class="section-label">${v3L('FIELD CHECKS', '字段核查')}</p><h2>${v3L(`${done} of 7 facts checked against an official source`, `7 项事实中 ${done} 项已对照官方来源`)}</h2><p class="v3-lead">${v3L('Each checked fact links to the page it came from and shows the date we read it. Facts marked “To verify” are editorial notes or still empty: do not rely on them.', '已核实的事实都链接到出处，并注明读取日期。标「待核实」的是编辑文字或尚无数值，请不要据此出行。')}</p><div class="v3-table-wrap"><table class="v3-table"><thead><tr><th>${v3L('Fact', '事实')}</th><th>${v3L('What we show', '本站内容')}</th><th>${v3L('Status and source', '状态与来源')}</th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
+  const done = fields.length;
+  return `<section class="journey-section v3-verify" id="journey-verify"><p class="section-label">${v3L('FIELD CHECKS', '字段核查')}</p><h2>${v3L(`${done} checked fact${done === 1 ? '' : 's'} from an official source`, `已对照官方来源的事实：${done} 项`)}</h2><p class="v3-lead">${v3L('Each checked fact names the page it came from and the date we read it. Unchecked notes are kept off this page.', '已核实的事实写明出处和读取日期。尚未核实的内容不放在这一页上。')}</p><div class="v3-table-wrap"><table class="v3-table"><thead><tr><th>${v3L('Fact', '事实')}</th><th>${v3L('What we show', '本站内容')}</th><th>${v3L('Status and source', '状态与来源')}</th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
 }
 
 /* ---------- official closures (data/closures.json, quotes checked at build time) ---------- */
@@ -96,7 +109,7 @@ function v3RouteMapFallback(r) {
   const d = line.map(part => part.map((p, i) => `${i ? 'L' : 'M'}${(ox + (p[0] * k - x0) * scale).toFixed(1)} ${(H - oy - (p[1] - y0) * scale).toFixed(1)}`).join('')).join('');
   box.innerHTML = `<figure class="v3-line-map"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${escapeHtml(routeTitle(r))}"><path d="${d}" fill="none" stroke="#9b4e2d" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/></svg><figcaption>${v3L('Track line: DOC Walking and Tramping Experiences (routes), Department of Conservation, CC BY 4.0. Simplified and redrawn; not for navigation.', '步道线：DOC Walking and Tramping Experiences（routes），新西兰保护部，CC BY 4.0。经简化重绘，不可用于导航。')}</figcaption></figure>`;
 }
-function v3AfterJourney(r) { v3LoadSports().then(() => { const el = document.querySelector('#journey-sports'); if (el) el.outerHTML = v3SportsPanel(r); }); }
+function v3AfterJourney(r) { if (!v3Flag('sports')) { document.querySelector('#journey-sports')?.remove(); return; } v3LoadSports().then(() => { const el = document.querySelector('#journey-sports'); if (el) el.outerHTML = v3SportsPanel(r); }); }
 
 /* ---------- sports (OpenStreetMap, pre-fetched) ---------- */
 const V3_SPORT = {tennis: ['Tennis', '网球'], golf: ['Golf', '高尔夫'], basketball: ['Basketball', '篮球']};
@@ -122,6 +135,7 @@ function v3SportFilters(counts) {
 }
 const v3OsmCredit = () => `<p class="v3-attribution">${v3L('Venue data', '场地数据')} ${v3Link('https://www.openstreetmap.org/copyright', '© OpenStreetMap contributors')}, ${v3Link('https://opendatacommons.org/licenses/odbl/', 'ODbL 1.0')}. ${v3L(`Fetched ${v3Sports?.index?.fetchedAt?.slice(0, 10) || ''} and stored with the site; nothing is requested from OpenStreetMap while you browse. Details may be out of date: check with the venue.`, `于 ${v3Sports?.index?.fetchedAt?.slice(0, 10) || ''} 抓取后随站点保存，浏览时不会向 OpenStreetMap 发请求。信息可能过期，请向场地确认。`)}</p>`;
 function v3SportsPanel(r) {
+  if (!v3Flag('sports')) return '';
   const head = `<section class="journey-section v3-sports" id="journey-sports"><p class="section-label">${v3L('SPORTS NEARBY', '沿线运动场地')}</p><h2>${v3L('Tennis, golf and basketball near this route', '这条线路附近的网球、高尔夫和篮球场地')}</h2>`;
   if (!v3Sports) return head + `<p class="v3-lead">${v3L('Loading…', '加载中……')}</p></section>`;
   const near = v3Sports.routesNear[r.id];
@@ -149,6 +163,10 @@ let v3Tracks = null, v3TrackState = {island: 'all', region: 'all', time: 'all', 
 const V3_BUCKET = {short: ['Under 1 hour', '1 小时以内'], half: ['1–4 hours', '1–4 小时'], day: ['Over 4 hours, same day', '4 小时以上（当天）'], multi: ['Overnight or longer', '过夜或多日'], unknown: ['Time not stated', '未注明用时']};
 function v3RenderTracks() {
   const host = document.querySelector('#trackDirectory'); if (!host) return;
+  if (!v3Flag('docDirectory')) {
+    host.innerHTML = `<section class="page-intro section"><h1>${v3L('The DOC track directory is switched off.', 'DOC 步道目录已暂时收起。')}</h1><p>${v3L('Turn docDirectory back to true in site-flags.js to show it again. Route guides stay available.', '把 site-flags.js 里的 docDirectory 改回 true 即可恢复。精选线路攻略仍可阅读。')}</p></section>`;
+    return;
+  }
   if (!v3Tracks) { host.innerHTML = `<p class="v3-lead">${v3L('Loading the DOC track directory…', '正在加载 DOC 步道目录……')}</p>`; fetch('data/doc-tracks.json').then(x => x.json()).then(d => { v3Tracks = d; v3RenderTracks(); }).catch(() => { host.innerHTML = `<p class="v3-lead">${v3L('The directory file could not be loaded.', '目录文件加载失败。')}</p>`; }); return; }
   const m = v3Tracks.meta, S = v3TrackState;
   const regions = [...new Set(v3Tracks.tracks.filter(x => S.island === 'all' || x.island === S.island).map(x => x.region))].sort();
@@ -166,9 +184,9 @@ function v3RenderTracks() {
       : official.length ? `<span class="v3-status-pill">${v3L('Seasonal closure: ', '季节性封闭：')}${escapeHtml(official.map(v3ClosureWhen).join('; '))}</span>`
       : st ? `<span class="v3-status-pill v3-status-${st.state}">${st.state !== 'closed' ? v3L('Open', '开放') : part ? v3L(`Some segments closed (${st.closed} of ${st.segments})`, `有关闭路段（${st.closed}/${st.segments} 段）`) : v3L(`Closed (all ${st.segments} segments)`, `关闭（全部 ${st.segments} 段）`)}</span>`
       : `<span class="v3-status-pill">${v3L('No status data', '无状态数据')}</span>`;
-    const titleBits = x.zh ? `${escapeHtml(x.zh)} <span>${escapeHtml(x.name)}</span>` : `${escapeHtml(x.name)} <abbr class="v3-tv" title="${v3L('No Chinese name is published here.','这里不编造中文名。')}">${v3L('To verify','待核')}</abbr>`;
+    const titleBits = x.zh ? `${escapeHtml(x.zh)} <span>${escapeHtml(x.name)}</span>` : escapeHtml(x.name);
     const heading = x.featured ? `<a href="${routeUrl(x.featured)}">${titleBits}</a> <a href="${routeUrl(x.featured)}"><em class="v3-role">${v3L('Featured guide', '有精选攻略')}</em></a>` : titleBits;
-    return `<article class="v3-track"><div><h3>${heading}</h3><p class="v3-track-region">${v3L(x.island === 'north' ? 'North Island' : x.island === 'south' ? 'South Island' : 'Other islands', x.island === 'north' ? '北岛' : x.island === 'south' ? '南岛' : '其他岛屿')} · ${escapeHtml(v3Region(x.region))}</p></div><dl><div><dt>${v3L('Time (DOC dataset)', '用时（DOC 数据集）')}</dt><dd>${x.time ? escapeHtml(x.time) : `<span class="v3-missing">—</span>`} <abbr class="v3-tv" title="${v3L('Copied from the DOC dataset, which is no longer maintained and has known errors. Check the DOC page.', '取自 DOC 数据集，该数据集已停更且有已知错值，请以 DOC 页面为准。')}">${v3L('To verify', '待核实')}</abbr></dd></div><div><dt>${v3L('Distance', '距离')}</dt><dd>${x.km ? escapeHtml(x.km) : `<span class="v3-missing">${v3L('Not in the dataset', '数据集未提供')}</span> <abbr class="v3-tv">${v3L('To verify', '待核实')}</abbr>`}</dd></div><div><dt>${v3L('Grade (DOC dataset)', '难度（DOC 数据集）')}</dt><dd>${x.difficulty ? escapeHtml(x.difficulty) : '—'}</dd></div><div><dt>${v3L('Status', '状态')}</dt><dd>${status}</dd></div></dl>${(x.urlGone ? `<span class="v3-missing">${v3L(`DOC page removed (checked ${x.urlGone})`, `DOC 页面已下线（${x.urlGone} 核对）`)}</span>` : v3Link(x.url, v3L('DOC page ↗', 'DOC 页面 ↗'), 'text-link'))}</article>`;
+    return `<article class="v3-track"><div><h3>${heading}</h3><p class="v3-track-region">${v3L(x.island === 'north' ? 'North Island' : x.island === 'south' ? 'South Island' : 'Other islands', x.island === 'north' ? '北岛' : x.island === 'south' ? '南岛' : '其他岛屿')} · ${escapeHtml(v3Region(x.region))}</p></div><dl><div><dt>${v3L('Grade (DOC dataset)', '难度（DOC 数据集）')}</dt><dd>${x.difficulty ? escapeHtml(x.difficulty) : '—'}</dd></div><div><dt>${v3L('Status', '状态')}</dt><dd>${status}</dd></div></dl>${(x.urlGone ? `<span class="v3-missing">${v3L(`DOC page removed (checked ${x.urlGone})`, `DOC 页面已下线（${x.urlGone} 核对）`)}</span>` : '')}</article>`;
   };
   host.innerHTML = `<div class="v3-notice"><p><strong>${v3L('Open or closed: the live DOC notice always takes precedence.', '开放或关闭：以 DOC 实时公告为准。')}</strong> ${v3L(`Status comes from DOC Tracks open data read on ${m.tracksReadAt} and matched to each walk by location, so it can be wrong or out of date.`, `状态取自 ${m.tracksReadAt} 读取的 DOC Tracks 开放数据，按位置匹配到各步道，可能有误或已过期。`)} ${v3Link('https://www.doc.govt.nz/parks-and-recreation/know-before-you-go/alerts/', v3L('DOC alerts ↗', 'DOC 公告页 ↗'))}</p><p>${v3L(`${m.count} walks from the DOC dataset “${m.dataset}” (read ${m.readAt}). DOC has stopped maintaining it and it omits some tracks, including the Milford and Heaphy tracks; those are in our featured routes. Times are the dataset's own values and have not been checked page by page. The dataset gives no distance.`, `共 ${m.count} 条，取自 DOC 数据集「${m.dataset}」（读取于 ${m.readAt}）。DOC 已停止维护该数据集，其中缺少米尔福德步道、希菲步道等，这些已收在本站精选线路里。用时为数据集原值，未逐条回 DOC 页面核对；数据集不提供距离。`)}</p></div>
   <div class="catalogue-filters v3-track-filters"><div class="island-filter" role="group" aria-label="${v3L('Island', '岛屿')}">${btn('island', 'all', v3L('All New Zealand', '全国'))}${btn('island', 'north', v3L('North Island', '北岛'))}${btn('island', 'south', v3L('South Island', '南岛'))}</div><div class="filters" role="group" aria-label="${v3L('Time', '用时')}">${btn('time', 'all', v3L('Any length', '不限用时'))}${Object.entries(V3_BUCKET).map(([k, l]) => btn('time', k, v3L(...l))).join('')}</div><div class="v3-track-controls"><label>${v3L('Region', '地区')} <select id="trackRegion"><option value="all">${v3L('All regions', '全部地区')}</option>${regions.map(k => `<option value="${k}"${S.region === k ? ' selected' : ''}>${escapeHtml(v3Region(k))}</option>`).join('')}</select></label><label>${v3L('Name', '名称')} <input id="trackSearch" type="search" value="${escapeHtml(S.q)}" placeholder="${v3L('Search by name', '按名称搜索')}"></label><span class="route-count" role="status" aria-live="polite">${list.length} ${v3L('walks', '条步道')}</span></div></div>
@@ -181,6 +199,7 @@ function v3RenderTracks() {
 }
 function v3RenderCities() {
   const host = document.querySelector('#cityList'); if (!host) return;
+  if (!v3Flag('sports')) { host.innerHTML = `<section class="page-intro section"><h1>${v3L('Sports venues are switched off.', '运动场地已暂时收起。')}</h1><p>${v3L('Turn sports back to true in site-flags.js to show them again.', '把 site-flags.js 里的 sports 改回 true 即可恢复。')}</p></section>`; return; }
   if (!v3Sports) { host.innerHTML = `<p class="v3-lead">${v3L('Loading…', '加载中……')}</p>`; v3LoadSports().then(v3RenderCities); return; }
   if (!v3Sports.index) { host.innerHTML = `<p class="v3-lead">${v3L('The sports data file could not be loaded.', '运动场地数据加载失败。')}</p>`; return; }
   host.innerHTML = `<div class="v3-city-grid">${v3Sports.index.cities.map(c => `<a class="v3-city" href="${pageUrl('city', {id: c.id})}"><p class="route-place">${v3L(c.island === 'north' ? 'North Island' : 'South Island', c.island === 'north' ? '北岛' : '南岛')}</p><h3>${escapeHtml(v3L(c.name, c.zh))}</h3><p class="v3-city-counts">${Object.keys(V3_SPORT).map(k => `<span>${v3L(...V3_SPORT[k])} ${c.counts[k] || 0}</span>`).join('')}</p><p class="v3-venue-dist">${v3L(`within ${c.radiusKm} km of the centre`, `市中心 ${c.radiusKm} 公里内`)} ↗</p></a>`).join('')}</div>${v3OsmCredit()}`;
@@ -188,6 +207,7 @@ function v3RenderCities() {
 let v3City = null;
 function v3RenderCity() {
   const host = document.querySelector('#cityDetail'); if (!host) return;
+  if (!v3Flag('sports')) { host.innerHTML = `<section class="page-intro section"><h1>${v3L('Sports venues are switched off.', '运动场地已暂时收起。')}</h1><p>${v3L('Turn sports back to true in site-flags.js to show them again.', '把 site-flags.js 里的 sports 改回 true 即可恢复。')}</p></section>`; return; }
   const id = new URLSearchParams(location.search).get('id');
   if (!v3Sports) { v3LoadSports().then(v3RenderCity); return; }
   const meta = v3Sports.index?.cities.find(c => c.id === id);
@@ -205,14 +225,10 @@ function v3Footer() {
     p.innerHTML = v3L(`Code: MIT. Unless marked otherwise, our own text and route notes © Pounamu Atlas, CC BY 4.0. Not covered by that licence: coordinates and OSRM drive times from OpenStreetMap (${v3Link('https://www.openstreetmap.org/copyright', '© OpenStreetMap contributors')}, ODbL); track information sourced from the Department of Conservation (NZ), CC BY 4.0; data sourced from the LINZ Data Service licensed for reuse under CC BY 4.0; itinerary ideas referenced from newzealand.com (© Tourism New Zealand, linked only). Photos carry their own licences. `, `代码：MIT。除另有标注外，本站自写的文字与线路说明 © 绿石之地，CC BY 4.0。以下内容不在此许可内：取自 OpenStreetMap 的坐标与 OSRM 车程（${v3Link('https://www.openstreetmap.org/copyright', '© OpenStreetMap 贡献者')}，ODbL）；来源于新西兰保护部 Department of Conservation (NZ) 的步道信息（CC BY 4.0）；取自 LINZ Data Service 并按 CC BY 4.0 许可再利用的数据；参考 newzealand.com 的行程思路（© Tourism New Zealand，只链接）。照片各按原许可。`) + v3Link('CONTENT-LICENSE.md', v3L('Licences and attribution ↗', '许可与署名 ↗'));
   });
 }
-function v3PrepareExtras() {
-  const grid = document.querySelector('#prepareGrid'); if (!grid || document.querySelector('.v3-prepare')) return;
-  grid.insertAdjacentHTML('afterend', `<div class="v3-prepare v3-notice"></div>`);
-}
+function v3PrepareExtras() { return; }
 function v3Render() {
-  v3Footer(); v3PrepareExtras();
-  const prep = document.querySelector('.v3-prepare');
-  if (prep) prep.innerHTML = `<p><strong>${v3L('In an emergency call 111.', '紧急情况拨 111。')}</strong> ${v3L('Official safety information:', '官方安全信息：')} ${v3Link('https://www.mountainsafety.org.nz/', 'NZ Mountain Safety Council ↗')} · ${v3Link('https://www.doc.govt.nz/parks-and-recreation/know-before-you-go/alerts/', v3L('DOC alerts ↗', 'DOC 公告 ↗'))} · ${v3Link('https://www.metservice.com/warnings/home', v3L('MetService warnings ↗', 'MetService 天气预警 ↗'))} · ${v3Link('https://www.journeys.nzta.govt.nz/highway-conditions/traffic-and-travel-list-view', v3L('NZTA road conditions ↗', 'NZTA 路况 ↗'))}</p>`;
+  v3Footer();
+  window.pounamuHideFlaggedLinks?.();
   v3RenderTracks(); v3RenderCities(); v3RenderCity();
 }
 document.addEventListener('click', e => {

@@ -35,7 +35,15 @@
       "types_en": "Motels, B&Bs, holiday-park cabins with their own bathroom",
       "area_zh": "镇中心或主路边，开车方便停车",
       "area_en": "The town centre or the main road, with easy parking",
-      "facts": [],
+      "facts": [
+        {
+          "zh": "新西兰统计局的住宿调查统计入住和出租率，但不采集金额，所以没有官方公布的全国中档每晚房价。中档价格待核。",
+          "en": "Stats NZ’s Accommodation Survey counts guest nights and occupancy and does not collect prices, so there is no official nationwide nightly rate for a mid-range stay. The price is to be confirmed.",
+          "label": "Stats NZ DataInfo+: Accommodation Survey",
+          "url": "https://datainfoplus.stats.govt.nz/Item/nz.govt.stats/38574cd6-b696-41a5-b311-41bfa5611a99/121",
+          "checkedAt": "2026-11-12"
+        }
+      ],
       "links": [
         { "kind": "official", "label_zh": "汽车旅馆（新西兰旅游局）", "label_en": "Motels (Tourism New Zealand)", "url": "https://www.newzealand.com/int/motels/" },
         { "kind": "maps", "label_zh": "地图上搜汽车旅馆", "label_en": "Search motels on the map", "query": "motel" }
@@ -49,7 +57,15 @@
       "types_en": "Hotels, boutique hotels, lodges",
       "area_zh": "湖边、海边或景观好的镇外位置",
       "area_en": "Lake or sea fronts, or out-of-town spots with views",
-      "facts": [],
+      "facts": [
+        {
+          "zh": "同一份统计局住宿调查也不采集高端住宿的房价。没有找到可引用的官方每晚价格，高端价格待核。",
+          "en": "The same Stats NZ survey does not collect rates for high-end stays either. No official nightly price was found. The price is to be confirmed.",
+          "label": "Stats NZ DataInfo+: Accommodation Survey",
+          "url": "https://datainfoplus.stats.govt.nz/Item/nz.govt.stats/38574cd6-b696-41a5-b311-41bfa5611a99/121",
+          "checkedAt": "2026-11-12"
+        }
+      ],
       "links": [
         { "kind": "official", "label_zh": "精品酒店与小屋（新西兰旅游局）", "label_en": "Boutique and lodge stays (Tourism New Zealand)", "url": "https://www.newzealand.com/int/boutique-and-lodge/" },
         { "kind": "official", "label_zh": "豪华度假小屋（新西兰旅游局）", "label_en": "Luxury lodges (Tourism New Zealand)", "url": "https://www.newzealand.com/int/feature/luxury-lodges/" },

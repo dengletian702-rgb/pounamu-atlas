@@ -228,7 +228,10 @@
     const out = [];
     const ski = skiMatches(q);
     if (ski.length) out.push({ id: 'ski', fields: ski });
-    for (const id of ['stay', 'sport', 'boat']) if (TOPICS[id].test(q)) out.push({ id });
+    for (const id of ['stay', 'sport', 'boat']) {
+      if (id === 'sport' && window.pounamuFlag && !window.pounamuFlag('sports')) continue;
+      if (TOPICS[id].test(q)) out.push({ id });
+    }
     return out;
   }
   function cardTopic(topic) {
@@ -399,7 +402,7 @@
     if (its.length) parts.push(`<section><h3>${esc(t('suggestRoutes'))}</h3>${its.map(item => `<button type="button" data-go="guide.html?template=${esc(item.id)}&lang=${state.lang}">${esc(state.lang === 'en' ? item.title_en : item.title_zh)}</button>`).join('')}</section>`);
     if (guideRows.length) parts.push(`<section><h3>${esc(t('readGuide'))}</h3>${guideRows.map(r => `<button type="button" data-go="route.html?id=${esc(r.id)}&lang=${state.lang}">${esc(state.lang === 'en' ? r.name : (r.zh || r.name))}</button>`).join('')}</section>`);
     if (sightRows.length) parts.push(`<section><h3>${esc(t('seeOnPage'))}</h3>${sightRows.map(p => { const town = townOf(p); return `<button type="button" data-go="destination.html?id=${esc(town ? town.place_id : '')}&lang=${state.lang}#p-${esc(p.place_id)}">${esc(nameOf(p))}</button>`; }).join('')}</section>`);
-    if (tracks.length) parts.push(`<section><h3>${esc(t('suggestTracks'))}</h3>${tracks.map(tr => `<button type="button" data-go="tracks.html?q=${encodeURIComponent(raw)}&lang=${state.lang}">${esc(tr.zh || tr.name)}</button>`).join('')}</section>`);
+    if (tracks.length && (!window.pounamuFlag || window.pounamuFlag('docDirectory'))) parts.push(`<section><h3>${esc(t('suggestTracks'))}</h3>${tracks.map(tr => `<button type="button" data-go="tracks.html?q=${encodeURIComponent(raw)}&lang=${state.lang}">${esc(tr.zh || tr.name)}</button>`).join('')}</section>`);
     if (draft && draft.templateId) parts.push(`<section><h3>${esc(t('suggestDrafts'))}</h3><button type="button" data-go="guide.html?draft=1&lang=${state.lang}">${esc(draft.templateId)}</button></section>`);
     box.hidden = !parts.length;
     box.innerHTML = parts.join('');
@@ -452,9 +455,8 @@
       nz_sources: Array.isArray(item.nz_sources) ? item.nz_sources : [],
     };
   }
-  function draftFromTight() {
+  function draftFromPlan(input, templateId) {
     if (typeof window.p10Plan !== 'function' || typeof window.p10Present !== 'function') return draftFromTemplate('SI-09B');
-    const input = { start: 'christchurch', end: 'queenstown', days: 9, pace: 5, preference: 'drive', car: true, wishes: ['tekapo', 'aoraki', 'wanaka', 'queenstown', 'milford'] };
     const plan = window.p10Plan(input);
     const present = window.p10Present(plan);
     const nodes = window.P10_NODES || {};
@@ -464,7 +466,10 @@
       const place = towns().find(p => fold(p.name_zh) === fold(w.zh) || fold(p.name_en) === fold(w.en));
       return { placeId: place ? place.place_id : w.base, label_zh: w.zh, label_en: w.en, lat: node.at && node.at[0], lon: node.at && node.at[1] };
     });
-    return { templateId: 'p10-tight', title: '', requestedDays: 9, days, unscheduled, chosen: days.map(d => d.placeId).filter(Boolean), island: 'south', regions: [], hideVerify: false, view: 'edit', minimum: plan.minimum, oneWay: false, p10Input: input };
+    return { templateId: templateId || 'p10-plan', title: state.lang === 'en' ? 'From the planner' : '来自规划器', requestedDays: input.days, days, unscheduled, chosen: days.map(d => d.placeId).filter(Boolean), island: 'all', regions: [], hideVerify: false, view: 'edit', minimum: plan.minimum, oneWay: input.start !== input.end, p10Input: input };
+  }
+  function draftFromTight() {
+    return draftFromPlan({ start: 'christchurch', end: 'queenstown', days: 9, pace: 5, preference: 'drive', car: true, wishes: ['tekapo', 'aoraki', 'wanaka', 'queenstown', 'milford'] }, 'p10-tight');
   }
   function placeForNode(node) {
     if (!node) return null;
@@ -499,7 +504,7 @@
   function stripEntryParams() {
     const q = new URLSearchParams(location.search);
     let changed = false;
-    for (const key of ['template', 'add', 'blank', 'demo']) {
+    for (const key of ['template', 'add', 'blank', 'demo', 'fromPlan']) {
       if (q.has(key)) { q.delete(key); changed = true; }
     }
     if (!changed) return;
@@ -523,6 +528,17 @@
   }
   function applyEntry() {
     const q = new URLSearchParams(location.search);
+    if (q.get('fromPlan') === '1') {
+      let raw = null;
+      try { raw = JSON.parse(sessionStorage.getItem('pounamu-plan-handoff') || 'null'); } catch { raw = null; }
+      if (raw && raw.input) {
+        state.draft = draftFromPlan(raw.input);
+        state.draft.edited = true;
+        persist();
+        stripEntryParams();
+        return;
+      }
+    }
     const template = q.get('template');
     const add = q.get('add');
     const saved = savedDraft();
@@ -817,7 +833,7 @@
     host.innerHTML = `<p class="v4-note">${esc(t('draftNote'))}</p>
       <div class="v4-guide-top"><h1>${esc(d.title || t('blankTrip'))}</h1>
         <div class="v4-actions"><button type="button" data-undo>${esc(t('undo'))}</button><button type="button" data-redo>${esc(t('redo'))}</button>
-        <button type="button" data-add-end>${esc(t('addDayEnd'))}</button><button type="button" data-export>${esc(t('exportJson'))}</button>
+        <button type="button" data-add-end>${esc(t('addDayEnd'))}</button><button type="button" data-export>${esc(t('exportJson'))}</button>${d.p10Input ? `<a href="plan.html?lang=${encodeURIComponent(state.lang)}&amp;from=${encodeURIComponent(d.p10Input.start)}&amp;to=${encodeURIComponent(d.p10Input.end)}&amp;days=${encodeURIComponent(d.p10Input.days)}&amp;car=${d.p10Input.car ? '1' : '0'}&amp;pref=${encodeURIComponent(d.p10Input.preference || 'easy')}${d.p10Input.wishes && d.p10Input.wishes.length ? '&amp;w=' + encodeURIComponent(d.p10Input.wishes.join(',')) : ''}">${esc(state.lang === 'en' ? 'Back to the planner' : '回到规划器')}</a>` : ''}
         <label class="v4-text-btn">${esc(t('importJson'))}<input id="v4-import" type="file" accept="application/json" hidden></label>
         <button type="button" data-print>${esc(t('printPdf'))}</button><button type="button" data-clear>${esc(t('clearTrip'))}</button></div></div>
       <p class="v4-note">${esc(t('keysHint'))} ${esc(t('saveState'))}</p>
@@ -859,6 +875,7 @@
       onToggle: (id, how) => { if (how === 'key') state.focusPlace = id; togglePlace(id); },
     });
     bindGuide(host);
+    window.pounamuSealContent?.();
     if (state.focusDay != null) {
       const card = host.querySelector(`.v4-day[data-index="${state.focusDay}"]`);
       if (card) card.focus();
@@ -1151,7 +1168,7 @@
       ${(tier.facts || []).map(f => `<p>${esc(L === 'en' ? f.en : f.zh)} <span class="v4-note"><a href="${esc(f.url)}" target="_blank" rel="noopener noreferrer">${esc(f.label)}</a> · ${esc(t('readOn', { d: f.checkedAt }))}</span></p>`).join('')}
       <p><strong>${esc(t('staysLinks'))}</strong> ${(tier.links || []).map(l => `<a href="${esc(l.url || mapsSearch(l.query))}" target="_blank" rel="noopener noreferrer">${esc(L === 'en' ? l.label_en : l.label_zh)}</a>`).join(' · ')}</p></article>`).join('');
     const skiHtml = skiNear.map(f => `<article class="v4-place"><h3>${esc(L === 'en' ? f.name_en : f.name_zh)}</h3><p>${esc(t('skiSeason'))}: ${esc(L === 'en' ? f.season_en : f.season_zh)} <span class="v4-note"><a href="${esc(f.season_source)}" target="_blank" rel="noopener noreferrer">${esc(t('sourceWord'))}</a> · ${esc(t('readOn', { d: f.checkedAt }))}</span></p><p><a href="${esc(f.url)}" target="_blank" rel="noopener noreferrer">${esc(t('skiOfficial'))}</a> · <a href="prepare.html?lang=${L}#winter">${esc(t('prepWinterTitle'))}</a></p></article>`).join('');
-    const photoHtml = photo ? `<figure class="v4-dest-photo"><img src="${esc(photo.src)}" alt="${esc(Array.isArray(photo.place) ? photo.place[L === 'en' ? 0 : 1] || photo.place[0] : '')}" loading="lazy" decoding="async" width="960" height="540"><figcaption>${esc(Array.isArray(photo.place) ? photo.place[L === 'en' ? 0 : 1] || photo.place[0] : '')} · ${esc(t('photoNear', { route: L === 'en' ? photo.route_en : photo.route_zh }))} · <a href="${esc(photo.source)}" target="_blank" rel="noopener noreferrer">${esc(photo.author)}</a> · <a href="${esc(photo.licenseUrl)}" target="_blank" rel="noopener noreferrer">${esc(photo.license)}</a></figcaption></figure>` : `<div class="v4-photo-ph">${esc(t('photoPlaceholder'))}</div>`;
+    const photoHtml = photo ? `<figure class="v4-dest-photo"><img src="${esc(photo.src)}" alt="${esc(Array.isArray(photo.place) ? photo.place[L === 'en' ? 0 : 1] || photo.place[0] : '')}" loading="lazy" decoding="async" width="960" height="540"><figcaption>${esc(Array.isArray(photo.place) ? photo.place[L === 'en' ? 0 : 1] || photo.place[0] : '')} · ${esc(t('photoNear', { route: L === 'en' ? photo.route_en : photo.route_zh }))} · <a href="${esc(photo.source)}" target="_blank" rel="noopener noreferrer">${esc(photo.author)}</a> · <a href="${esc(photo.licenseUrl)}" target="_blank" rel="noopener noreferrer">${esc(photo.license)}</a></figcaption></figure>` : '';
     host.innerHTML = `<p class="v4-note"><a href="index.html?lang=${state.lang}">${esc(t('homeCrumb'))}</a> / ${esc(town.island === 'north' ? t('islandNorth') : t('islandSouth'))}${crumbRegion} / ${esc(townLabel)}</p>
       <div class="v4-guide-top"><h1>${esc(townLabel)} <span class="v4-en-name">${esc(state.lang === 'en' ? town.name_zh : town.name_en)}</span></h1></div>
       ${photoHtml}
@@ -1163,12 +1180,12 @@
       <section class="v4-block" id="overview"><h2>${esc(t('overview'))}</h2>${summary ? `<p>${esc(summary)}</p>` : `<p>${esc(t('summaryEmpty'))}</p>`}${summaryUrl ? `<p><a href="${esc(summaryUrl)}" target="_blank" rel="noopener noreferrer">${esc(t('sourceLink'))}</a>${summaryDate ? ' · ' + esc(t('accessed')) + ' ' + esc(summaryDate) : ''}</p>` : ''}</section>
       <section class="v4-block" id="sights"><h2>${esc(t('sights'))}</h2>${sights.length ? sights.map(row).join('') : `<p>${esc(kids.length ? t('emptySights') : t('noListings'))}</p>`}</section>
       <section class="v4-block" id="activities"><h2>${esc(t('activities'))}</h2>${acts.length ? acts.map(row).join('') : `<p>${esc(t('noActivities'))}</p>`}</section>
-      <section class="v4-block" id="doc"><h2>${esc(t('docTracks'))}</h2><p>${esc(t('docNear'))}</p><p class="v4-note">${esc(t('docLive'))}</p>${nearTracks.map(({ tr, km }) => `<article class="v4-place"><h3>${esc(tr.zh && L !== 'en' ? tr.zh : tr.name)}</h3><p>${km != null ? esc(t('kmAway', { n: Math.round(km) })) + ' · ' : ''}${tr.time ? esc(docTime(tr.time)) + ' · ' : ''}${tr.urlGone ? esc(t('docGone', { d: tr.urlGone })) : `<a href="${esc(tr.url)}" target="_blank" rel="noopener noreferrer">DOC</a>`}</p></article>`).join('') || `<p><a href="tracks.html?q=${encodeURIComponent(town.name_en)}&amp;lang=${state.lang}">${esc(t('openTracks'))}</a></p>`}</section>
+      <section class="v4-block" id="doc"><h2>${esc(t('docTracks'))}</h2><p>${esc(t('docNear'))}</p>${nearTracks.map(({ tr, km }) => `<article class="v4-place"><h3>${esc(tr.zh && L !== 'en' ? tr.zh : tr.name)}</h3><p>${km != null ? esc(t('kmAway', { n: Math.round(km) })) : ''}</p></article>`).join('') || `<p>${esc(t('paddleNone'))}</p>`}</section>
       <section class="v4-block" id="stays"><h2>${esc(t('staysTitle'))}</h2><p class="v4-note">${esc(t('staysLead'))}</p>${staysHtml}</section>
       ${skiNear.length ? `<section class="v4-block" id="ski"><h2>${esc(t('skiNear'))}</h2>${skiHtml}</section>` : ''}
       <section class="v4-block" id="sports"><h2>${esc(t('paddleSports'))}</h2>
         <h3>${esc(t('paddleBlock'))}</h3>${boats.map(row).join('')}${paddleRoutes.length ? `<p>${esc(t('paddleNearby'))}: ${paddleRoutes.map(r => `<a href="route.html?id=${esc(r.id)}&amp;lang=${state.lang}">${esc(L === 'en' ? r.name : (r.zh || r.name))}</a>`).join(' · ')}</p>` : ''}${!boats.length && !paddleRoutes.length ? `<p>${esc(t('paddleNone'))}</p>` : ''}
-        <h3>${esc(t('sportsBlock'))}</h3>${sport ? `<p><a href="city.html?id=${esc(sport.id)}&amp;lang=${state.lang}">${esc(t('openSports'))}</a></p>` : `<p><a href="cities.html?lang=${state.lang}">${esc(t('openSports'))}</a></p>`}
+        <h3>${esc(t('sportsBlock'))}</h3>${(window.pounamuFlag && !window.pounamuFlag('sports')) ? `<p>${esc(state.lang === 'en' ? 'Sports venues are switched off.' : '运动场地已暂时收起。')}</p>` : (sport ? `<p><a href="city.html?id=${esc(sport.id)}&amp;lang=${state.lang}">${esc(t('openSports'))}</a></p>` : `<p><a href="cities.html?lang=${state.lang}">${esc(t('openSports'))}</a></p>`)}
         <h3>${esc(t('routeBlock'))}</h3><p><a href="routes.html?island=${town.island}&amp;lang=${state.lang}">${esc(t('readGuide'))}</a></p>
       </section>
       <section class="v4-block" id="links"><h2>${esc(t('officialLinks'))}</h2>${[town, ...visible].filter(k => k.source_url).slice(0, 12).map(k => safeHttp(k.source_url) ? `<p><a href="${esc(k.source_url)}" target="_blank" rel="noopener noreferrer">${esc(nameOf(k))}</a>${k.summary_accessed ? ' · ' + esc(k.summary_accessed) : ''}</p>` : `<p>${esc(nameOf(k))} · ${esc(t('sourceToVerify'))}</p>`).join('')}</section>
@@ -1237,6 +1254,7 @@
     const tips = (stays.tips || []).map(x => `<li>${esc(L === 'en' ? x.en : x.zh)} <span class="v4-note"><a href="${esc(x.url)}" target="_blank" rel="noopener noreferrer">${esc(x.label)}</a> · ${esc(t('readOn', { d: x.checkedAt }))}</span></li>`).join('');
     const money = tips ? `<section class="v4-block" id="money"><h2>${esc(t('prepMoneyTitle'))}</h2><ul>${tips}</ul><p>${esc(t('topicStayLead'))}</p></section>` : '';
     host.innerHTML = winter + skiHtml + money;
+    window.pounamuSealContent?.();
     if (location.hash) { const target = document.getElementById(location.hash.slice(1)); if (target) target.scrollIntoView(); }
   }
 
@@ -1302,6 +1320,8 @@
     }
     const toastUndo = document.querySelector('#v4-toast');
     if (toastUndo) toastUndo.onclick = event => { if (event.target.closest('[data-v4-undo]')) undo(); };
+    window.pounamuHideFlaggedLinks?.();
+    window.pounamuSealContent?.();
   }
   window.v4AfterRender = function () {
     state.lang = pageLang();
@@ -1309,6 +1329,9 @@
     if (state.catalog && document.querySelector('#v4-search')) renderSearch();
     if (state.catalog && document.querySelector('#v4-app') && state.draft) renderGuide();
     if (state.catalog && document.querySelector('#v4-destination')) renderDestination();
+    if (document.querySelector('#v4-prepare-extra')) renderPrepareExtras();
+    window.pounamuHideFlaggedLinks?.();
+    window.pounamuSealContent?.();
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();

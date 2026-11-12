@@ -216,14 +216,16 @@ test('a cancelled strings file is fetched again and the search box still appears
   let failed = 0;
   await page.cdp('Fetch.enable', { patterns: [{ urlPattern: '*v4-strings.json*', requestStage: 'Request' }] });
   page.on('Fetch.requestPaused', params => {
-    const next = failed < 1
+    const fail = failed < 1;
+    if (fail) failed += 1;
+    const next = fail
       ? page.cdp('Fetch.failRequest', { requestId: params.requestId, errorReason: 'Failed' })
       : page.cdp('Fetch.continueRequest', { requestId: params.requestId });
-    if (failed < 1) failed += 1;
     next.catch(() => {});
   });
-  await page.go('index.html?lang=en');
-  await page.waitFor('document.querySelector("#v4-search-form")', 12000);
+  // The search box is the signal that the retry finished. Document load can lag behind that fetch.
+  await page.cdp('Page.navigate', { url: page.base + 'index.html?lang=en' });
+  await page.waitFor('document.querySelector("#v4-search-form")', 20000);
   assert.ok(failed >= 1);
   assert.match(await page.ev('document.querySelector("#v4-search-form").innerText'), /Search/);
 }));
@@ -302,9 +304,8 @@ test('G P2-02: English planner days use half-width colons', async t => withPage(
 // ---------- H: walk-through findings ----------
 test('H-07/H-14/H-17: on-the-way stops in titles, unknown ids in links named, more start cities', async t => withPage(t, async page => {
   await page.go('plan.html?lang=zh&from=auckland&to=wellington&days=14&w=ni-tga,ni-wka,xx-typo');
-  await page.waitFor('document.querySelector("#planResult .plan-day")');
+  await page.waitFor('document.querySelector("#p10-link-note")', 12000);
   assert.match(await page.ev('document.querySelector("#planResult").innerText'), /途经陶朗加/);
-  await page.waitFor('document.querySelector("#p10-link-note")');
   assert.match(await page.ev('document.querySelector("#p10-link-note").textContent'), /xx-typo/);
   const starts = await page.ev('[...document.querySelectorAll("#p10-start option")].map(o => o.value)');
   for (const id of ['wanaka', 'te-anau', 'taupo']) assert.ok(starts.includes(id), id);

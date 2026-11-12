@@ -233,6 +233,41 @@ test('an invalid map key on a destination page falls back to the SVG sketch', as
   }
 }));
 
+test('after the SVG fallback, a Google script error is swallowed and a page error is not', async t => withPage(t, async page => {
+  let mode = 'fail';
+  await page.cdp('Fetch.enable', { patterns: [
+    { urlPattern: '*maps.googleapis.com*', requestStage: 'Request' },
+    { urlPattern: '*maps.gstatic.com*', requestStage: 'Request' },
+  ] });
+  page.on('Fetch.requestPaused', params => {
+    if (mode === 'fail') {
+      page.cdp('Fetch.failRequest', { requestId: params.requestId, errorReason: 'Failed' }).catch(() => {});
+      return;
+    }
+    const body = Buffer.from('throw new Error("Cannot read properties of undefined (reading \'setAttribute\')");').toString('base64');
+    page.cdp('Fetch.fulfillRequest', {
+      requestId: params.requestId,
+      responseCode: 200,
+      responseHeaders: [{ name: 'Content-Type', value: 'application/javascript' }],
+      body,
+    }).catch(() => {});
+  });
+  await page.cdp('Page.addScriptToEvaluateOnNewDocument', { source: 'window.POUNAMU_GOOGLE_MAPS_KEY="not-a-real-maps-key";' });
+  await page.go('destination.html?id=si-zqn&lang=en');
+  await page.waitFor('document.querySelector("#v4-dest-map") && document.querySelector("#v4-dest-map").dataset.mapKind === "svg"', 12000);
+  page.errors.length = 0;
+  mode = 'throw';
+  await page.ev(`(() => { const s = document.createElement('script'); s.src = 'https://maps.googleapis.com/maps/api/js?key=not-a-real-maps-key&v=weekly&libraries=marker&probe=1'; document.head.appendChild(s); })()`);
+  await page.ev('new Promise(resolve => setTimeout(resolve, 400))');
+  assert.deepEqual(page.errors.filter(line => /setAttribute/.test(line)), []);
+  await page.ev('setTimeout(() => { throw new Error("page code reading setAttribute"); }, 0)');
+  const until = Date.now() + 3000;
+  while (Date.now() < until && !page.errors.some(line => /page code reading setAttribute/.test(line))) {
+    await page.ev('new Promise(resolve => setTimeout(resolve, 50))');
+  }
+  assert.ok(page.errors.some(line => /page code reading setAttribute/.test(line)));
+}));
+
 test('SI-09B ticks each of its towns, and a day card links to the destination', async t => withPage(t, async page => {
   const ids = [...new Set(catalog.templates.find(item => item.id === 'SI-09B').days.map(day => day.place_id))].sort();
   await page.go('guide.html?template=SI-09B&lang=en');

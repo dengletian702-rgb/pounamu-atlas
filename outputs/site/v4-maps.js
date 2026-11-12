@@ -76,16 +76,30 @@
   }
   let nativeObserver = null;
   let watchedObservers = [];
-  function googleScriptError(event) {
+  function mapsScriptUrl(value) {
+    return /maps\.(?:googleapis|gstatic|google)\.com/i.test(String(value || ''));
+  }
+  function eventFromMaps(event) {
     const file = String(event.filename || '');
+    const stack = event.error && event.error.stack ? String(event.error.stack) : '';
+    return mapsScriptUrl(file) || mapsScriptUrl(stack);
+  }
+  // While the Google script is still loading, a few messages mean it failed even if the URL is hidden.
+  // After the SVG fallback, only a Maps script URL in the source or the stack is swallowed.
+  function googleScriptError(event) {
+    if (eventFromMaps(event)) return true;
     const msg = String(event.message || '');
-    return file.includes('maps.googleapis') || file.includes('maps.gstatic') || /google maps|invalidkey|gm_auth|getRootNode|referernotallowed/i.test(msg);
+    return /google maps|invalidkey|gm_auth|getRootNode|referernotallowed/i.test(msg);
   }
   let googleQuiet = null;
   function keepGoogleQuiet() {
     if (googleQuiet) return;
     googleQuiet = event => {
-      if (googleScriptError(event)) event.preventDefault();
+      // A cross-origin Maps script reports only "Script error." to the page. The detailed
+      // message (setAttribute, getRootNode, …) is visible to the console unless this event is cancelled.
+      const opaque = event.message === 'Script error.' && !event.filename
+        && [...document.scripts].some(script => mapsScriptUrl(script.src));
+      if (eventFromMaps(event) || opaque) event.preventDefault();
     };
     window.addEventListener('error', googleQuiet, true);
   }

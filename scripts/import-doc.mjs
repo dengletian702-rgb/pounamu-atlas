@@ -130,6 +130,9 @@ const meta = {dataset: SRC.experiences.name, datasetUrl: SRC.experiences.catalog
   count: out.length, byIsland: {north: count('north'), south: count('south'), other: count('other')}, withTime: out.filter(x => x.time).length, withStatus: out.filter(x => x.status).length, closedWalks: out.filter(x => x.status?.state === 'closed').length, featuredLinked: out.filter(x => x.featured).length,
   notes: ['time is the DOC dataset value (completionTime), not checked against the DOC page', 'km is null: the dataset has no distance and line length is not a walking distance', 'status is a location match against DOC Tracks segments (>=60% of a segment within about 200 m of the walk line); the live DOC notice takes precedence', 'island uses a coordinate rule: north if lat > -40.4, or lon >= 174.4 and lat > -41.7']};
 const regions = Object.fromEntries([...new Set(out.map(x => x.region))].sort().map(k => [k, REGION_NAME[k] || k]));
+// DOC pages found gone (data/doc-link-checks.json, ticket P2-07): keep the mark so the site never links a dead page
+const linkChecks = JSON.parse(await readFile(join(root, 'data/doc-link-checks.json'), 'utf8'));
+for (const g of linkChecks.gone) { const row = out.find(x => x.id === g.id); if (row && row.url === g.url) row.urlGone = g.checkedAt; }
 const payload = JSON.stringify({meta, regions, tracks: out});
 await writeFile(join(root, 'data/doc-tracks.json'), payload);
 await writeFile(join(root, 'docs/data/doc-tracks.json'), payload);

@@ -43,7 +43,55 @@ if (mi < 0) throw new Error('missing routeMapData line');
 const mapData = JSON.parse(mapLines[mi].slice('const routeMapData='.length).replace(/;\s*$/, ''));
 for (const [id, d] of Object.entries(mapData)) { const r = routes.find(x => x.id === id); if (!r) throw new Error('sketch without a catalogue route: ' + id); d.sources = r.sources.map(({label, url}) => ({label, url})); }
 mapLines[mi] = 'const routeMapData=' + JSON.stringify(mapData) + ';';
+// routes with no sketch: the national atlas draws them from their DOC track line (data/route-lines.json, DOC open
+// data, CC BY 4.0), its longest section thinned to at most 30 points; a route with neither is listed under the atlas as "no map data" (P1-01)
+const docLines = JSON.parse(await readFile(join(root, 'data/route-lines.json'), 'utf8'));
+const atlasStarts = {};
+for (const r of routes) {
+  if (mapData[r.id] || !Array.isArray(docLines[r.id]) || !docLines[r.id].length) continue;
+  const longest = docLines[r.id].filter(Array.isArray).sort((a, b) => b.length - a.length)[0] || [];
+  const pts = longest.filter(p => Array.isArray(p) && Number.isFinite(p[0]) && Number.isFinite(p[1]));
+  if (!pts.length) continue;
+  const step = Math.max(1, Math.ceil(pts.length / 30));
+  const line = pts.filter((_, i) => i % step === 0 || i === pts.length - 1).map(p => [+p[0].toFixed(4), +p[1].toFixed(4)]);
+  atlasStarts[r.id] = {start: line[0], line, source: 'DOC tracks open data (CC BY 4.0)'};
+}
+const ai = mapLines.findIndex(l => l.startsWith('const routeAtlasStarts='));
+const atlasLine = 'const routeAtlasStarts=' + JSON.stringify(atlasStarts) + ';';
+if (ai >= 0) mapLines[ai] = atlasLine; else mapLines.splice(mi + 1, 0, atlasLine);
 await writeFile(mapPath, v4.aliasZh(mapLines.join('\n')));
+// destination pages (walk-through H-03, ticket P2-05): each town reuses the licensed photo of the nearest route that
+// passes within 15 km of it, and lists paddling routes that pass within 60 km. Distances use the sketch points.
+{
+  const km = (a, b, c, d) => { const r = 6371, x = (c - a) * Math.PI / 180, y = (d - b) * Math.PI / 180; const h = Math.sin(x / 2) ** 2 + Math.cos(a * Math.PI / 180) * Math.cos(c * Math.PI / 180) * Math.sin(y / 2) ** 2; return 2 * r * Math.asin(Math.min(1, Math.sqrt(h))); };
+  const near = (town, r) => {
+    const pts = (mapData[r.id] && mapData[r.id].points) || [];
+    const extra = atlasStarts[r.id] ? atlasStarts[r.id].line.map(([lon, lat]) => ({lat, lon})) : [];
+    return Math.min(Infinity, ...[...pts, ...extra].filter(p => Number.isFinite(p.lat) && Number.isFinite(p.lon)).map(p => km(+town.lat, +town.lon, p.lat, p.lon)));
+  };
+  const out = {};
+  for (const town of v4data.places.filter(p => p.type === 'town' && Number.isFinite(+p.lat) && Number.isFinite(+p.lon))) {
+    const ranked = routes.filter(r => r.island === town.island).map(r => ({r, d: near(town, r)})).filter(x => Number.isFinite(x.d)).sort((a, b) => a.d - b.d);
+    // the photo must show this place: its caption names the town (so Wellington never gets a Martinborough vineyard)
+    const names = [town.name_en, town.town, town.name_zh, ...String(town.name_en).split(/[\/(),&]+/)].map(n => String(n || '').trim().toLowerCase().normalize('NFD').replace(/\p{M}/gu, '')).filter(n => n.length > 3);
+    const shows = p => (p.place || []).some(c => { const f = String(c).toLowerCase().normalize('NFD').replace(/\p{M}/gu, ''); return names.some(n => f.includes(n)); });
+    const withPhoto = ranked.find(x => x.d <= 15 && x.r.photoId && library[x.r.photoId] && !library[x.r.photoId].placeholder && shows(library[x.r.photoId]));
+    const paddle = ranked.filter(x => x.r.mode === 'paddle' && x.d <= 60).map(x => ({id: x.r.id, km: Math.round(x.d)}));
+    if (!withPhoto && !paddle.length) continue;
+    out[town.place_id] = {};
+    if (withPhoto) { const p = library[withPhoto.r.photoId]; out[town.place_id].photo = {route: withPhoto.r.id, route_en: withPhoto.r.name, route_zh: withPhoto.r.zh || withPhoto.r.name, km: Math.round(withPhoto.d), src: p.src, place: p.place, author: p.author, source: p.source, license: p.license, licenseUrl: p.licenseUrl}; }
+    if (paddle.length) out[town.place_id].paddle = paddle;
+  }
+  await writeFile(join(root, 'docs/data/destination-extras.json'), JSON.stringify({about: 'Built by scripts/build-site.mjs: a licensed route photo within 15 km of each town, and paddling routes within 60 km.', towns: out}));
+  console.log(`Destination extras: ${Object.values(out).filter(x => x.photo).length} towns with a nearby route photo, ${Object.values(out).filter(x => x.paddle).length} with a paddling route nearby.`);
+}
+// merged place ids (inputs/atlas/merged-place-ids.csv): the planner resolves old ids in shared links and saved trips (ticket C)
+const plannerPath = join(root, 'docs/p10-planner.js');
+const plannerLines = (await readFile(plannerPath, 'utf8')).split('\n');
+const pa = plannerLines.findIndex(l => l.startsWith('const P10_PLACE_ALIASES='));
+if (pa < 0) throw new Error('missing P10_PLACE_ALIASES line');
+plannerLines[pa] = 'const P10_PLACE_ALIASES=' + JSON.stringify(v4data.aliases || {}) + ';';
+await writeFile(plannerPath, plannerLines.join('\n'));
 // the footer links to the licence page inside the site; keep that copy identical to the root file
 await cp(join(root, 'CONTENT-LICENSE.md'), join(root, 'docs/CONTENT-LICENSE.md'));
 await cp(join(root, 'docs'), join(root, 'outputs/site'), {recursive: true, filter: src => !src.endsWith('.nojekyll') && !src.endsWith('SPORTS-SPEC.md')});

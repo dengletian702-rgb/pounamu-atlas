@@ -1,0 +1,168 @@
+{
+  "meta": {
+    "about": "Ski areas listed for ticket E (2026-11-12). Season text comes only from each area's official site, read on the date given; where the site gives no months it says 待核 / to be checked.",
+    "checkedAt": "2026-11-12"
+  },
+  "fields": [
+    {
+      "id": "mt-hutt",
+      "name_en": "Mt Hutt",
+      "name_zh": "哈特山滑雪场",
+      "aliases": [
+        "mt hutt",
+        "mount hutt",
+        "hutt",
+        "哈特山",
+        "methven",
+        "梅斯文"
+      ],
+      "island": "south",
+      "region_en": "Christchurch - Canterbury",
+      "region_zh": "基督城－坎特伯雷",
+      "town_en": "Methven",
+      "town_zh": "梅斯文",
+      "town_id": "",
+      "url": "https://www.mthutt.co.nz/",
+      "season_en": "The official mountain page lists the 2027 season as 11 June to 10 October.",
+      "season_zh": "官网山地信息页写 2027 雪季为 6 月 11 日至 10 月 10 日。",
+      "season_source": "https://www.mthutt.co.nz/mountain-info",
+      "road_en": "The access road is unsealed; depending on the vehicle, chains may be needed, and rental cover may exclude alpine roads and chains. Check the Snow Report before going up.",
+      "road_zh": "上山路是未铺装的砂石路；视车辆可能需要装防滑链，租车保险不一定覆盖高山路段和防滑链。上山前看滑雪场的每日雪况报告。",
+      "road_source": "https://www.mthutt.co.nz/faqs",
+      "checkedAt": "2026-11-11"
+    },
+    {
+      "id": "cardrona",
+      "name_en": "Cardrona Alpine Resort",
+      "name_zh": "卡德罗纳滑雪场",
+      "aliases": [
+        "cardrona",
+        "卡德罗纳",
+        "卡德罗纳高山度假村"
+      ],
+      "island": "south",
+      "region_en": "Wānaka",
+      "region_zh": "瓦纳卡",
+      "town_en": "Wānaka",
+      "town_zh": "瓦纳卡",
+      "town_id": "si-wan",
+      "url": "https://cardrona-treblecone.com/",
+      "season_en": "The resort's own guide says the Queenstown-area ski season typically runs from mid-June to early October, depending on snow.",
+      "season_zh": "滑雪场官网的雪季说明：皇后镇一带雪季通常从 6 月中到 10 月初，视降雪而定。",
+      "season_source": "https://cardrona-treblecone.com/blog/queenstown-ski-season",
+      "checkedAt": "2026-11-12"
+    },
+    {
+      "id": "treble-cone",
+      "name_en": "Treble Cone",
+      "name_zh": "三锥山滑雪场",
+      "aliases": [
+        "treble cone",
+        "treblecone",
+        "三锥山",
+        "三锥"
+      ],
+      "island": "south",
+      "region_en": "Wānaka",
+      "region_zh": "瓦纳卡",
+      "town_en": "Wānaka",
+      "town_zh": "瓦纳卡",
+      "town_id": "si-wan",
+      "url": "https://cardrona-treblecone.com/",
+      "season_en": "The official site gives no season months for Treble Cone itself (to be checked); the same operator's guide gives mid-June to early October for the ski fields around Queenstown and Wānaka.",
+      "season_zh": "官网没有单独写三锥山的雪季月份，待核；同一运营方的官网说明称皇后镇、瓦纳卡一带通常 6 月中到 10 月初。",
+      "season_source": "https://cardrona-treblecone.com/blog/queenstown-ski-season",
+      "checkedAt": "2026-11-12"
+    },
+    {
+      "id": "coronet-peak",
+      "name_en": "Coronet Peak",
+      "name_zh": "皇冠峰滑雪场",
+      "aliases": [
+        "coronet",
+        "coronet peak",
+        "皇冠峰"
+      ],
+      "island": "south",
+      "region_en": "Queenstown",
+      "region_zh": "皇后镇",
+      "town_en": "Queenstown",
+      "town_zh": "皇后镇",
+      "town_id": "si-zqn",
+      "url": "https://www.coronetpeak.co.nz/",
+      "season_en": "The official site gives no season months (to be checked); the Cardrona guide above gives mid-June to early October for the Queenstown area.",
+      "season_zh": "官网没有写雪季月份，待核；上面 Cardrona 官网的说明称皇后镇一带通常 6 月中到 10 月初。",
+      "season_source": "https://cardrona-treblecone.com/blog/queenstown-ski-season",
+      "checkedAt": "2026-11-12"
+    },
+    {
+      "id": "remarkables",
+      "name_en": "The Remarkables",
+      "name_zh": "卓越山滑雪场",
+      "aliases": [
+        "remarkables",
+        "the remarkables",
+        "卓越山"
+      ],
+      "island": "south",
+      "region_en": "Queenstown",
+      "region_zh": "皇后镇",
+      "town_en": "Queenstown",
+      "town_zh": "皇后镇",
+      "town_id": "si-zqn",
+      "url": "https://www.theremarkables.co.nz/",
+      "season_en": "The official site gives no season months (to be checked); the Cardrona guide above gives mid-June to early October for the Queenstown area.",
+      "season_zh": "官网没有写雪季月份，待核；Cardrona 官网的说明称皇后镇一带通常 6 月中到 10 月初。",
+      "season_source": "https://cardrona-treblecone.com/blog/queenstown-ski-season",
+      "checkedAt": "2026-11-12"
+    },
+    {
+      "id": "ruapehu",
+      "name_en": "Mt Ruapehu: Whakapapa and Tūroa",
+      "name_zh": "鲁阿佩胡山滑雪场（华卡帕帕、图罗阿）",
+      "aliases": [
+        "ruapehu",
+        "mt ruapehu",
+        "whakapapa",
+        "turoa",
+        "tūroa",
+        "鲁阿佩胡",
+        "华卡帕帕",
+        "图罗阿"
+      ],
+      "island": "north",
+      "region_en": "Ruapehu",
+      "region_zh": "鲁阿佩胡",
+      "town_en": "Whakapapa Village / National Park Village",
+      "town_zh": "华卡帕帕村／国家公园村",
+      "town_id": "ni-ton",
+      "url": "https://www.mtruapehu.com/",
+      "season_en": "Whakapapa's official site lists its winter season as May to October, with skiing terrain opening progressively.",
+      "season_zh": "华卡帕帕官网：冬季为 5 月到 10 月，雪道随雪况逐步开放。",
+      "season_source": "https://www.whakapapa.com/",
+      "checkedAt": "2026-11-12"
+    },
+    {
+      "id": "round-hill",
+      "name_en": "Roundhill Ski Area",
+      "name_zh": "圆山滑雪场",
+      "aliases": [
+        "round hill",
+        "roundhill",
+        "圆山",
+        "tekapo ski"
+      ],
+      "island": "south",
+      "region_en": "Christchurch - Canterbury",
+      "region_zh": "基督城－坎特伯雷",
+      "town_en": "Lake Tekapo",
+      "town_zh": "特卡波",
+      "town_id": "si-tek",
+      "url": "https://www.roundhill.co.nz/",
+      "season_en": "The official site gives the 2026 season as 27 June to 20 September.",
+      "season_zh": "官网：2026 雪季为 6 月 27 日到 9 月 20 日。",
+      "season_source": "https://www.roundhill.co.nz/",
+      "checkedAt": "2026-11-12"
+    }
+  ]
+}

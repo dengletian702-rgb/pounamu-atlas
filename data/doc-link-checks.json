@@ -1,0 +1,7 @@
+{
+  "about": "DOC pages that no longer load (HTTP 404 for both the page and the DOC permalink). scripts/import-doc.mjs copies urlGone onto the matching rows, and the site shows 'DOC page removed' instead of a dead link (ticket P2-07).",
+  "gone": [
+    { "id": "8a19e795f5a64dbd95469b6da6e795b4", "name": "Jack's Point Track", "url": "https://www.doc.govt.nz/recycle-bin/jacks-point-track/", "checkedAt": "2026-11-12" },
+    { "id": "be37becb313c4bd4af6ee6b4591f90f8", "name": "West Egmont tramping tracks", "url": "https://www.doc.govt.nz/parks-and-recreation/places-to-go/taranaki/places/te-papa-kura-o-taranaki/things-to-do/tracks/west-egmont-tramping-tracks/", "checkedAt": "2026-11-12" }
+  ]
+}

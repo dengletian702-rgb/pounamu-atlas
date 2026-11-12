@@ -120,3 +120,14 @@ body[data-page=plan] .type-char{opacity:1!important;transform:none!important;ani
   body[data-page=plan] .planner-explainer.p10-has-map .p10-pick-map{position:sticky;top:12px;margin:18px 0 0;padding:14px 16px;background:#f5ede1;border:0;border-left:3px solid #c87d4b}
   .planner-explainer.p10-has-map .p10-pick-svg{max-height:calc(100vh - 150px)}
 }
+/* ticket D/E: road and winter notes on a day card */
+.p10-road-note{margin:.6rem 0;font-size:.92rem}
+.p10-winter-note{background:#e3edf5;color:#1f3242}
+.p10-note-src{display:block;margin-top:.3rem;font-size:.8rem}
+.p10-note-src a{color:inherit}
+
+/* ten-guest-v1: long suggestion buttons wrap inside the screen on phones (H-12); unknown ids in a shared link (H-14) */
+.p10-add-stop{max-width:100%;white-space:normal;text-align:left;overflow-wrap:anywhere}
+.p10-link-note{border-left:4px solid #b4572e;padding:.5rem .75rem;background:#f7f0e8;margin:.75rem 0}
+.p10-stay-links{margin:4px 0 0;font-size:14px;line-height:1.6;overflow-wrap:anywhere}
+.p10-stay-links a{text-decoration:underline;text-underline-offset:2px}

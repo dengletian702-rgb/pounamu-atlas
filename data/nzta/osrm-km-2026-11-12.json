@@ -1,0 +1,6 @@
+{
+ "source": "OSRM demo route (router.project-osrm.org) on OpenStreetMap data, town centre to town centre",
+ "accessed": "2026-11-12",
+ "km": {"rotorua|tauranga": 64, "hamilton|tauranga": 105, "auckland|tauranga": 225, "tauranga|whakatane": 89, "rotorua|whakatane": 105, "whakatane|gisborne": 185, "napier|gisborne": 217, "gisborne|tolaga-bay": 55, "whanganui|pipiriki": 76, "national-park|pipiriki": null, "national-park|whanganui": 121, "whanganui|wellington": 193, "new-plymouth|whanganui": 158, "whanganui|feilding": 64, "feilding|wellington": 158, "napier|feilding": 186, "wellington|masterton": 99, "napier|masterton": 231, "queenstown|alexandra": 94, "dunedin|alexandra": 180, "national-park|taumarunui": 43},
+ "unchecked": {"national-park|pipiriki": "OSRM routed a 169 km detour instead of NZTA's SH4 and Pipiriki–Raetihi Road route, so its distance is not used"}
+}

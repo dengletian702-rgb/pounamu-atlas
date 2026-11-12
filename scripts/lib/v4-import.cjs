@@ -397,12 +397,29 @@ function searchTemplates(templates, query, filters) {
   });
 }
 
+// Places merged into another row (inputs/atlas/merged-place-ids.csv): old shared links, saved trips and
+// destination.html?id=<old> keep working by resolving the old id to the new one (ticket C).
+function readPlaceAliases(root, byId) {
+  const file = path.join(root, 'inputs/atlas/merged-place-ids.csv');
+  if (!fs.existsSync(file)) return {};
+  const aliases = {};
+  for (const row of parseCsv(fs.readFileSync(file, 'utf8'))) {
+    const from = (row.old_id || '').trim(), to = (row.new_id || '').trim();
+    if (!from || !to) continue;
+    if (byId.has(from)) throw new Error('merged place id still has its own row: ' + from);
+    if (!byId.has(to)) throw new Error('merged place id points to an unknown place: ' + to);
+    aliases[from] = to;
+  }
+  return aliases;
+}
+
 function writeSiteData(root) {
   const placesText = fs.readFileSync(path.join(root, 'inputs/atlas/places-v2.csv'), 'utf8');
   const routesText = fs.readFileSync(path.join(root, 'inputs/meridian/routes-v2.csv'), 'utf8');
   const places = importPlaces(placesText);
   const byId = new Map(places.rows.map(p => [p.place_id, p]));
   const routes = importRoutes(routesText, byId);
+  const aliases = readPlaceAliases(root, byId);
   const outDir = path.join(root, 'docs/data');
   fs.mkdirSync(outDir, { recursive: true });
   const payload = {
@@ -414,6 +431,7 @@ function writeSiteData(root) {
     regions: TNZ_REGIONS,
     places: places.rows,
     templates: routes.templates,
+    aliases,
   };
   fs.writeFileSync(path.join(outDir, 'v4-catalog.json'), JSON.stringify(payload));
   return payload;
@@ -421,7 +439,7 @@ function writeSiteData(root) {
 
 module.exports = {
   TNZ_REGIONS, REGION_MAP, TEMPLATE_META,
-  stripBom, parseCsv, importPlaces, importRoutes, labelDrive,
+  stripBom, parseCsv, importPlaces, readPlaceAliases, importRoutes, labelDrive,
   searchTracks, searchTemplates, daysBucket, fold, haversineKm,
   writeSiteData, mapRegion, aliasZh, ZH_ALIASES,
 };

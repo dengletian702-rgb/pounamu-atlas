@@ -208,6 +208,10 @@ test('plan.html and guide.html show the same region counts', async t => withPage
   const guide = await read('guide.html?blank=1&view=pick&lang=en', 'data-region');
   assert.deepEqual(plan, { taranaki: 3, 'christchurch-canterbury': 7, 'west-coast': 5 });
   assert.deepEqual(guide, plan);
+  const note = await page.ev('document.querySelector(\'[data-region="taranaki"]\').closest(".v4-field").querySelector(".v4-note").textContent');
+  assert.match(note, /including attractions/);
+  assert.match(note, /list below shows towns/);
+  assert.doesNotMatch(note, /same list/);
 }));
 
 test('an invalid map key on a destination page falls back to the SVG sketch', async t => withPage(t, async page => {

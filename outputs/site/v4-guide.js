@@ -59,10 +59,16 @@
     return (state.catalog && state.catalog.regions || []).find(r => r.id === id) || null;
   }
 
-  async function loadJson(url) {
-    const res = await fetch(url, { cache: 'no-store' });
-    if (!res.ok) throw new Error(url);
-    return res.json();
+  async function loadJson(url, retry) {
+    try {
+      const res = await fetch(url, { cache: 'no-store' });
+      if (!res.ok) throw new Error(url);
+      return await res.json();
+    } catch (err) {
+      if (retry) throw err;
+      await new Promise(resolve => setTimeout(resolve, 400));
+      return loadJson(url, true);
+    }
   }
   async function ensureData() {
     if (!state.strings) state.strings = await loadJson('data/v4-strings.json');

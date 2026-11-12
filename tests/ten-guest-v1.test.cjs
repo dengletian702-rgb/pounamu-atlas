@@ -82,7 +82,7 @@ test('C: destination.html?id=ni-mau shows Tauranga and rewrites the address; one
   assert.match(await page.ev('document.querySelector("#v4-destination h1").textContent'), /陶朗加/);
   assert.match(await page.ev('location.search'), /id=ni-tga/);
   await page.go('plan.html?lang=zh&from=auckland&to=wellington&days=7&w=ni-mau');
-  await page.waitFor('document.querySelector("#p10-pick-map [data-p10-pick]")');
+  await page.waitFor('document.querySelector(\'#p10-pick-map [data-p10-pick="ni-tga"]\')');
   assert.equal(await page.ev('document.querySelectorAll(\'#p10-pick-map [data-p10-pick="ni-mau"]\').length'), 0);
   assert.equal(await page.ev('document.querySelectorAll(\'#p10-pick-map [data-p10-pick="ni-tga"]\').length'), 1);
   assert.equal(await page.ev('document.querySelector(\'#p10-wishes input[value="ni-tga"]\') ? document.querySelector(\'#p10-wishes input[value="ni-tga"]\').checked : "absent"'), true);
@@ -211,6 +211,21 @@ test('F: the planner\'s optional stay tier adds that tier\'s links under every n
     assert.equal(await page.ev('document.querySelectorAll(".p10-stay-links").length'), 0);
   }
   assert.deepEqual(page.errors, []);
+}));
+test('a cancelled strings file is fetched again and the search box still appears', async t => withPage(t, async page => {
+  let failed = 0;
+  await page.cdp('Fetch.enable', { patterns: [{ urlPattern: '*v4-strings.json*', requestStage: 'Request' }] });
+  page.on('Fetch.requestPaused', params => {
+    const next = failed < 1
+      ? page.cdp('Fetch.failRequest', { requestId: params.requestId, errorReason: 'Failed' })
+      : page.cdp('Fetch.continueRequest', { requestId: params.requestId });
+    if (failed < 1) failed += 1;
+    next.catch(() => {});
+  });
+  await page.go('index.html?lang=en');
+  await page.waitFor('document.querySelector("#v4-search-form")', 12000);
+  assert.ok(failed >= 1);
+  assert.match(await page.ev('document.querySelector("#v4-search-form").innerText'), /Search/);
 }));
 test('F: a failed stay fetch is not cached, so the links appear on the retry', async t => withPage(t, async page => {
   let failed = 0;

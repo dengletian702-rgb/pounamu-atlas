@@ -76,6 +76,19 @@
   }
   let nativeObserver = null;
   let watchedObservers = [];
+  function googleScriptError(event) {
+    const file = String(event.filename || '');
+    const msg = String(event.message || '');
+    return file.includes('maps.googleapis') || file.includes('maps.gstatic') || /google maps|invalidkey|gm_auth|getRootNode|referernotallowed/i.test(msg);
+  }
+  let googleQuiet = null;
+  function keepGoogleQuiet() {
+    if (googleQuiet) return;
+    googleQuiet = event => {
+      if (googleScriptError(event)) event.preventDefault();
+    };
+    window.addEventListener('error', googleQuiet, true);
+  }
   function stopMapHooks() {
     if (errorHandler) {
       window.removeEventListener('error', errorHandler, true);
@@ -107,6 +120,7 @@
   }
   function showSvg(el, state) {
     stopMapHooks();
+    keepGoogleQuiet();
     el.dataset.mapKind = 'svg';
     el.innerHTML = schematicSvg(state);
     bindSvg(el, state);
@@ -139,9 +153,7 @@
       if (alive(el, token)) showSvg(el, state);
     };
     errorHandler = event => {
-      const file = String(event.filename || '');
-      const msg = String(event.message || '');
-      if (file.includes('maps.googleapis') || file.includes('maps.gstatic') || /google maps|invalidkey|gm_auth|getRootNode|referernotallowed/i.test(msg)) {
+      if (googleScriptError(event)) {
         event.preventDefault();
         giveUp();
       }

@@ -202,7 +202,7 @@
   "viaLabel": { "zh": "途经", "en": "Via" },
   "roadLabel": { "zh": "道路", "en": "Road" },
   "regionTowns": { "zh": "{r}（{n} 个地点）", "en": "{r} ({n} places)" },
-  "regionCountNote": { "zh": "括号里的数字和下面的列表、以及规划页用的是同一套：这个地区的景点，加上还不是这些景点的城镇。", "en": "The number is the same list as below and on the planner: sights in this region, plus towns that are not already one of those sights." },
+  "regionCountNote": { "zh": "括号里的数字和规划页一致，算的是这个地区的全部地点，包括景点。下面的列表只列出城镇。", "en": "The number on each chip matches the planner. It counts every place in the region, including attractions. The list below shows towns." },
   "prepWinterTitle": { "zh": "冬季自驾（6–10 月）", "en": "Winter driving (June–October)" },
   "prepSkiTitle": { "zh": "滑雪场", "en": "Ski areas" },
   "prepMoneyTitle": { "zh": "省钱小贴士", "en": "Money-saving tips" },

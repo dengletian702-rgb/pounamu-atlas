@@ -539,7 +539,7 @@
   }
   function labelDot(svg, text) {
     const g = text.parentNode;
-    if (text.classList.contains('v4-map-name') || text.classList.contains('v4-map-tag')) {
+    if (text.classList.contains('v4-map-name') || text.classList.contains('v4-map-tag') || text.classList.contains('v4-map-num')) {
       const circle = g && g.querySelector && g.querySelector('circle');
       if (circle) return circle;
     }
@@ -561,48 +561,87 @@
     });
     return bestD < 3 ? best : null;
   }
+  function coversPoint(box, x, y) {
+    return x >= box.left && x <= box.right && y >= box.top && y <= box.bottom;
+  }
+  function pointBoxDist(x, y, box) {
+    return Math.hypot(Math.max(box.left - x, x - box.right, 0), Math.max(box.top - y, y - box.bottom, 0));
+  }
+  function clipLength(x1, y1, x2, y2, rect) {
+    let t0 = 0, t1 = 1;
+    const dx = x2 - x1, dy = y2 - y1;
+    const p = [-dx, dx, -dy, dy];
+    const q = [x1 - rect.left, rect.right - x1, y1 - rect.top, rect.bottom - y1];
+    for (let i = 0; i < 4; i++) {
+      if (Math.abs(p[i]) < 1e-6) { if (q[i] < 0) return 0; continue; }
+      const t = q[i] / p[i];
+      if (p[i] < 0) { if (t > t1) return 0; if (t > t0) t0 = t; }
+      else { if (t < t0) return 0; if (t < t1) t1 = t; }
+    }
+    if (t1 - t0 <= 0) return 0;
+    return Math.hypot(dx, dy) * (t1 - t0);
+  }
   function settleMapLabels(svg, scale) {
     if (!svg || (!svg.classList.contains('v4-schematic') && !svg.classList.contains('p10-pick-svg'))) return;
     const frame = svg.getBoundingClientRect();
     if (!(frame.width > 2) || !(scale > 0)) return;
     const schematic = svg.classList.contains('v4-schematic');
-    const texts = [...svg.querySelectorAll(schematic ? '.v4-map-name, .v4-map-tag' : '.p10-pick-label, .p10-pick-tag')].filter(textShown);
-    if (!texts.length) return;
+    svg.querySelectorAll('.is-unplaced').forEach(node => {
+      node.classList.remove('is-unplaced', 'is-off');
+      node.style.removeProperty('display');
+    });
+    const texts = [...svg.querySelectorAll(schematic ? '.v4-map-num, .v4-map-name, .v4-map-tag' : '.p10-pick-label, .p10-pick-tag')].filter(textShown);
     svg.querySelectorAll('.v4-map-leader, .p10-pick-leader').forEach(line => line.remove());
+    if (!texts.length) { syncPickList(svg); return; }
     const ns = 'http://www.w3.org/2000/svg';
     const inside = r => r.left >= frame.left - 0.5 && r.right <= frame.right + 0.5 && r.top >= frame.top - 0.5 && r.bottom <= frame.bottom + 0.5;
     const dirs = [[0, -1, 'middle'], [0, 1, 'middle'], [-1, 0, 'end'], [1, 0, 'start'], [-0.75, -0.75, 'end'], [0.75, -0.75, 'start'], [-0.75, 0.75, 'end'], [0.75, 0.75, 'start']];
     const placed = [];
-    const ordered = [
-      ...texts.filter(t => t.classList.contains('v4-map-name') || t.classList.contains('p10-pick-label')),
-      ...texts.filter(t => t.classList.contains('v4-map-tag') || t.classList.contains('p10-pick-tag'))
-    ];
-    const paintLeader = (text, circle) => {
+    const dotCenters = () => [...svg.querySelectorAll('circle')].filter(c => !c.classList.contains('p10-pick-hit')).map(c => {
+      const r = c.getBoundingClientRect();
+      return { x: (r.left + r.right) / 2, y: (r.top + r.bottom) / 2, r };
+    }).filter(d => d.r.width > 0.5);
+    const ordered = texts.slice().sort((a, b) => (a.textContent || '').length - (b.textContent || '').length);
+    const leaderEnds = (circle, rect) => {
       const c = circle.getBoundingClientRect();
-      const r = text.getBoundingClientRect();
-      const ccx = (c.left + c.right) / 2, ccy = (c.top + c.bottom) / 2;
-      const tx = Math.max(r.left, Math.min(ccx, r.right));
-      const ty = Math.max(r.top, Math.min(ccy, r.bottom));
+      const cx = (c.left + c.right) / 2, cy = (c.top + c.bottom) / 2;
+      const x = Math.max(rect.left, Math.min(cx, rect.right));
+      const y = Math.max(rect.top, Math.min(cy, rect.bottom));
+      const dx = x - cx, dy = y - cy;
+      const len = Math.hypot(dx, dy) || 1;
+      return { x1: cx, y1: cy, x2: x - dx / len * 1.5, y2: y - dy / len * 1.5, len: len - 1.5 };
+    };
+    const clearOf = (rect, ends) => {
+      if (dotCenters().some(d => Math.hypot(d.x - ends.ownX, d.y - ends.ownY) > 2 && coversPoint(rect, d.x, d.y))) return false;
+      if (!ends.draw) return true;
+      if (ends.len > 48) return false;
+      return !placed.some(p => clipLength(ends.x1, ends.y1, ends.x2, ends.y2, p.rect) > 0.2);
+    };
+    const paint = (text, circle, ends) => {
+      if (!ends.draw) return;
       const line = doc.createElementNS(ns, 'line');
       line.setAttribute('class', schematic ? 'v4-map-leader' : 'p10-pick-leader');
       line.setAttribute('stroke', '#163528');
       line.setAttribute('stroke-width', '1.5');
       line.setAttribute('vector-effect', 'non-scaling-stroke');
+      const c = circle.getBoundingClientRect();
+      const ccx = (c.left + c.right) / 2, ccy = (c.top + c.bottom) / 2;
       if (schematic) {
         line.setAttribute('x1', circle.getAttribute('cx') || '0');
         line.setAttribute('y1', circle.getAttribute('cy') || '0');
-        line.setAttribute('x2', ((tx - ccx) / scale).toFixed(1));
-        line.setAttribute('y2', ((ty - ccy) / scale).toFixed(1));
+        line.setAttribute('x2', ((ends.x2 - ccx) / scale).toFixed(1));
+        line.setAttribute('y2', ((ends.y2 - ccy) / scale).toFixed(1));
         text.parentNode.insertBefore(line, text);
       } else {
         const box = svg.getBoundingClientRect();
         const vb = svg.viewBox.baseVal;
+        const sy = box.height / vb.height || scale;
         const xOf = sx => vb.x + (sx - box.left) / scale;
-        const yOf = sy => vb.y + (sy - box.top) / (box.height / vb.height || scale);
-        line.setAttribute('x1', xOf(ccx).toFixed(1));
-        line.setAttribute('y1', yOf(ccy).toFixed(1));
-        line.setAttribute('x2', xOf(tx).toFixed(1));
-        line.setAttribute('y2', yOf(ty).toFixed(1));
+        const yOf = syv => vb.y + (syv - box.top) / sy;
+        line.setAttribute('x1', xOf(ends.x1).toFixed(1));
+        line.setAttribute('y1', yOf(ends.y1).toFixed(1));
+        line.setAttribute('x2', xOf(ends.x2).toFixed(1));
+        line.setAttribute('y2', yOf(ends.y2).toFixed(1));
         const host = svg.querySelector('.p10-pick-labels') || text.parentNode;
         host.insertBefore(line, host.firstChild);
       }
@@ -621,14 +660,13 @@
         if (!(r0.width > 1)) continue;
         const half = Math.abs(ux) * r0.width / 2 + Math.abs(uy) * r0.height / 2;
         const dist = rad + gapScreen + half;
-        const tcx = (r0.left + r0.right) / 2, tcy = (r0.top + r0.bottom) / 2;
-        shiftText(text, (ccx + ux * dist - tcx) / scale, (ccy + uy * dist - tcy) / scale);
+        shiftText(text, (ccx + ux * dist - (r0.left + r0.right) / 2) / scale, (ccy + uy * dist - (r0.top + r0.bottom) / 2) / scale);
         let r = text.getBoundingClientRect();
         let gap = boxGap(r, c);
         if (gap > gapScreen + 1) {
-          const cx = (r.left + r.right) / 2, cy = (r.top + r.bottom) / 2;
-          const d = Math.hypot(cx - ccx, cy - ccy) || 1;
-          shiftText(text, (ccx - cx) / d * (gap - gapScreen) / scale, (ccy - cy) / d * (gap - gapScreen) / scale);
+          const mx = (r.left + r.right) / 2, my = (r.top + r.bottom) / 2;
+          const d = Math.hypot(mx - ccx, my - ccy) || 1;
+          shiftText(text, (ccx - mx) / d * (gap - gapScreen) / scale, (ccy - my) / d * (gap - gapScreen) / scale);
           r = text.getBoundingClientRect();
           gap = boxGap(r, c);
         }
@@ -637,52 +675,69 @@
           r = text.getBoundingClientRect();
           gap = boxGap(r, c);
         }
-        if (inside(r) && gap >= 2 && gap <= gapScreen + 1.5 && !placed.some(o => overlaps(r, o))) return { r, gap };
+        const ends = leaderEnds(circle, r);
+        ends.ownX = ccx;
+        ends.ownY = ccy;
+        ends.draw = gap > 14;
+        if (inside(r) && gap >= 2 && gap <= gapScreen + 1.5 && !placed.some(o => overlaps(r, o.rect)) && clearOf(r, ends)) return { r, ends };
       }
       return null;
     };
     for (const text of ordered) {
+      text.classList.remove('is-unplaced');
       const circle = labelDot(svg, text);
       if (!circle) continue;
       let fit = null;
-      for (const gap of [4, 8, 12]) {
+      for (const gap of [4, 8, 12, 14]) {
         fit = sit(text, circle, gap);
         if (fit) break;
       }
-      let led = false;
       if (!fit) {
-        for (const gap of [18, 28, 40, 56, 76, 100, 130, 170]) {
+        for (const gap of [18, 26, 34, 42]) {
           fit = sit(text, circle, gap);
-          if (fit) { led = fit.gap > 12; break; }
+          if (fit) break;
         }
       }
       if (!fit) {
-        text.setAttribute('text-anchor', 'start');
-        text.setAttribute('x', '0');
-        text.setAttribute('y', '0');
-        const seed = text.getBoundingClientRect();
-        const c = circle.getBoundingClientRect();
-        const tops = [];
-        const prefer = (c.top + c.bottom) / 2 - seed.height / 2;
-        for (let y = prefer; y >= frame.top + 2; y -= 10) tops.push(y);
-        for (let y = prefer + 10; y <= frame.bottom - seed.height - 2; y += 10) tops.push(y);
-        const edges = seed.width < frame.width - 6 ? [['start', frame.left + 2], ['end', frame.right - 2]] : [['start', frame.left + 2]];
-        for (const [anchor, edge] of edges) {
-          if (fit) break;
-          for (const top of tops) {
-            text.setAttribute('text-anchor', anchor);
-            text.setAttribute('x', '0');
-            text.setAttribute('y', '0');
-            const cur = text.getBoundingClientRect();
-            shiftText(text, ((anchor === 'start' ? edge - cur.left : edge - cur.right)) / scale, (top - cur.top) / scale);
-            const r = text.getBoundingClientRect();
-            const gap = boxGap(r, c);
-            if (inside(r) && gap >= 2 && !placed.some(o => overlaps(r, o))) { fit = { r, gap }; led = gap > 12; break; }
-          }
-        }
+        text.classList.add('is-off', 'is-unplaced');
+        text.style.setProperty('display', 'none', 'important');
+        continue;
       }
-      if (fit) placed.push(fit.r);
-      if (led) paintLeader(text, circle);
+      text.classList.remove('is-off');
+      text.style.removeProperty('display');
+      placed.push({ rect: fit.r });
+      paint(text, circle, fit.ends);
+    }
+    for (const line of [...svg.querySelectorAll('.v4-map-leader, .p10-pick-leader')]) {
+      const ctm = line.getScreenCTM();
+      if (!ctm) { line.remove(); continue; }
+      const pt = (x, y) => { const p = new DOMPoint(+x, +y).matrixTransform(ctm); return { x: p.x, y: p.y }; };
+      const a = pt(line.getAttribute('x1'), line.getAttribute('y1'));
+      const b = pt(line.getAttribute('x2'), line.getAttribute('y2'));
+      const len = Math.hypot(b.x - a.x, b.y - a.y);
+      const live = [...svg.querySelectorAll('text')].filter(textShown);
+      const own = live.find(t => pointBoxDist(b.x, b.y, t.getBoundingClientRect()) <= 3);
+      const crosses = live.some(t => t !== own && clipLength(a.x, a.y, b.x, b.y, t.getBoundingClientRect()) > 0.2);
+      if (len > 48 || crosses) {
+        line.remove();
+        if (own) { own.classList.add('is-off', 'is-unplaced'); own.style.setProperty('display', 'none', 'important'); }
+      }
+    }
+    syncPickList(svg);
+  }
+  function syncPickList(svg) {
+    if (!svg || !svg.classList.contains('p10-pick-svg')) return;
+    const ul = svg.parentElement && svg.parentElement.querySelector('.p10-pick-name-list');
+    if (!ul) return;
+    if (!ul.dataset.full) ul.dataset.full = ul.innerHTML;
+    const narrow = window.matchMedia('(max-width:420px)').matches;
+    const missed = [...svg.querySelectorAll('.is-unplaced')].map(t => (t.textContent || '').trim()).filter(Boolean);
+    if (!narrow && missed.length) {
+      ul.replaceChildren(...missed.map(name => { const li = doc.createElement('li'); li.textContent = name; return li; }));
+      ul.classList.add('is-open');
+    } else {
+      ul.innerHTML = ul.dataset.full;
+      ul.classList.remove('is-open');
     }
   }
   window.pounamuSettleLabels = settleMapLabels;

@@ -1471,30 +1471,15 @@ globalThis.P10_NODES = NODES;
     const svg=document.querySelector('#p10-pick-map .p10-pick-svg');if(!svg)return;
     const vb=svg.viewBox.baseVal,box=svg.getBoundingClientRect();
     const k=box.width&&box.height?Math.max(vb.width/box.width,vb.height/box.height):vb.width/360;
-    const fitPick=()=>{const b=svg.getBoundingClientRect();if(!b.width||!vb.width)return;const sc=b.width/vb.width;svg.querySelectorAll('text').forEach(t=>t.style.setProperty('font-size',(13/sc).toFixed(2)+'px','important'));if(window.pounamuSettleLabels)window.pounamuSettleLabels(svg,sc);};
-    fitPick();requestAnimationFrame(fitPick);setTimeout(fitPick,120);
     svg.style.setProperty('--k',k.toFixed(3));
     for(const g of svg.querySelectorAll('.p10-pick-dot')){const town=g.classList.contains('is-town');g.querySelector('.p10-pick-mark').setAttribute('r',((town?3.5:5.5)*k).toFixed(2));g.querySelector('.p10-pick-hit').setAttribute('r',(11*k).toFixed(2));}
-    const tags=[...svg.querySelectorAll('.p10-pick-tag')];
-    for(const t of tags)t.setAttribute('y',(Number(t.dataset.py)-10*k).toFixed(1));
-    const boxes=tags.map(t=>{try{return t.getBBox();}catch{return null;}}).filter(b=>b&&b.width);
-    const hit=(a,b)=>a.x<b.x+b.width&&b.x<a.x+a.width&&a.y<b.y+b.height&&b.y<a.y+a.height;
-    for(const t of svg.querySelectorAll('.p10-pick-label')){
-      const id=t.dataset.p10PickLabel,on=p10Selected.has(id),px=Number(t.dataset.px),py=Number(t.dataset.py);
-      t.classList.remove('is-off');
-      if(t.classList.contains('is-town')&&!on){t.classList.add('is-off');continue;}
-      const gap=8*k,line=13*k;
-      const tries=[];
-      for(const dy of [4*k,-gap,-line,line*2,-line*2,line*3,-line*3,line*4,-line*4,line*5,-line*5]){
-        tries.push([px+gap,py+dy,'start'],[px-gap,py+dy,'end'],[px,py+dy,'middle']);
-      }
-      const put=([x,y,anchor])=>{t.setAttribute('x',x.toFixed(1));t.setAttribute('y',y.toFixed(1));t.setAttribute('text-anchor',anchor);try{return t.getBBox();}catch{return null;}};
-      let spot=null;
-      const inside=b=>b.x>=vb.x&&b.y>=vb.y&&b.x+b.width<=vb.x+vb.width&&b.y+b.height<=vb.y+vb.height;
-      for(const s of tries){const b=put(s);if(!b||!b.width){spot=b;break;}if(inside(b)&&!boxes.some(o=>hit(b,o))){spot=b;break;}}
-      if(!spot){if(on||!t.classList.contains('is-town'))spot=put(tries[0]);else{put(tries[0]);t.classList.add('is-off');continue;}}
-      if(spot&&spot.width)boxes.push(spot);
+    for(const t of svg.querySelectorAll('.p10-pick-label,.p10-pick-tag')){
+      t.classList.remove('is-off','is-unplaced');
+      t.style.removeProperty('display');
+      if(t.classList.contains('is-town')&&!p10Selected.has(t.dataset.p10PickLabel))t.classList.add('is-off');
     }
+    const fitPick=()=>{const b=svg.getBoundingClientRect();if(!b.width||!vb.width)return;const sc=b.width/vb.width;svg.querySelectorAll('text').forEach(t=>t.style.setProperty('font-size',(13/sc).toFixed(2)+'px','important'));if(window.pounamuSettleLabels)window.pounamuSettleLabels(svg,sc);};
+    fitPick();requestAnimationFrame(fitPick);setTimeout(fitPick,120);
   }
   // After a tick or untick: fill or empty the dots and redo the names (a ticked place always gets its name).
   function p10PickRefresh(){

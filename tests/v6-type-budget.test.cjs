@@ -493,38 +493,86 @@ test('map labels do not overlap and stay inside the svg', async (t) => {
       return { rendered: Math.round(rendered * 100) / 100, ratio: Math.round(ratio * 100) / 100 };
     });
     const gap = (a, b) => Math.hypot(Math.max(b.left - a.right, a.left - b.right, 0), Math.max(b.top - a.bottom, a.top - b.bottom, 0));
-    const touch = (a, b, pad) => a.right >= b.left - pad && a.left <= b.right + pad && a.bottom >= b.top - pad && a.top <= b.bottom + pad;
-    const detached = [];
-    for (const el of texts) {
-      if (!el.classList.contains('v4-map-name') && !el.classList.contains('p10-pick-label') && !el.classList.contains('p10-pick-tag')) continue;
-      let circle = el.parentNode && el.parentNode.querySelector && el.classList.contains('v4-map-name') ? el.parentNode.querySelector('circle') : null;
-      const id = el.getAttribute('data-p10-pick-label');
-      if (!circle && id) circle = svg.querySelector('[data-p10-pick="' + CSS.escape(id) + '"] .p10-pick-mark');
-      if (!circle && el.hasAttribute('data-px')) {
-        const px = parseFloat(el.getAttribute('data-px')), py = parseFloat(el.getAttribute('data-py'));
-        let best = null, bestD = 1e9;
-        svg.querySelectorAll('.p10-pick-mark').forEach(mark => {
-          const d = Math.hypot(parseFloat(mark.getAttribute('cx')) - px, parseFloat(mark.getAttribute('cy')) - py);
-          if (d < bestD) { bestD = d; best = mark; }
-        });
-        if (bestD < 3) circle = best;
+    const pointDist = (x, y, box) => Math.hypot(Math.max(box.left - x, x - box.right, 0), Math.max(box.top - y, y - box.bottom, 0));
+    const clipLen = (x1, y1, x2, y2, rect) => {
+      let t0 = 0, t1 = 1;
+      const dx = x2 - x1, dy = y2 - y1;
+      const p = [-dx, dx, -dy, dy];
+      const q = [x1 - rect.left, rect.right - x1, y1 - rect.top, rect.bottom - y1];
+      for (let i = 0; i < 4; i++) {
+        if (Math.abs(p[i]) < 1e-6) { if (q[i] < 0) return 0; continue; }
+        const t = q[i] / p[i];
+        if (p[i] < 0) { if (t > t1) return 0; if (t > t0) t0 = t; }
+        else { if (t < t0) return 0; if (t < t1) t1 = t; }
       }
-      if (!circle) continue;
-      const box = el.getBoundingClientRect();
-      const dot = circle.getBoundingClientRect();
-      const dist = gap(box, dot);
-      if (dist <= 14) continue;
-      const lines = [...(el.parentNode.querySelectorAll ? el.parentNode.querySelectorAll('.v4-map-leader') : []), ...svg.querySelectorAll('.p10-pick-leader')];
-      const linked = lines.some(line => {
-        const cs = getComputedStyle(line);
-        if (cs.display === 'none' || cs.visibility === 'hidden') return false;
-        const width = parseFloat(cs.strokeWidth) || 0;
-        const lb = line.getBoundingClientRect();
-        return width >= 1.4 && /22,\\s*53,\\s*40/.test(cs.stroke) && touch(lb, dot, 6) && touch(lb, box, 6) && (lb.width > 2 || lb.height > 2);
-      });
-      if (!linked) detached.push((el.textContent || '').trim().slice(0, 22) + ' ' + dist.toFixed(1));
+      if (t1 - t0 <= 0) return 0;
+      return Math.hypot(dx, dy) * (t1 - t0);
+    };
+    const endsOf = line => {
+      const ctm = line.getScreenCTM();
+      if (!ctm) return null;
+      const pt = (x, y) => { const p = new DOMPoint(+x, +y).matrixTransform(ctm); return { x: p.x, y: p.y }; };
+      return [pt(line.getAttribute('x1'), line.getAttribute('y1')), pt(line.getAttribute('x2'), line.getAttribute('y2'))];
+    };
+    const watch = svg.classList.contains('v4-schematic') || svg.classList.contains('p10-pick-svg');
+    const covers = [];
+    const leaderThrough = [];
+    const leaderLong = [];
+    const detached = [];
+    if (watch) {
+      const dots = [...svg.querySelectorAll('circle')].filter(c => !c.classList.contains('p10-pick-hit')).map(c => {
+        const r = c.getBoundingClientRect();
+        return { x: (r.left + r.right) / 2, y: (r.top + r.bottom) / 2, el: c };
+      }).filter(d => d.x || d.y);
+      for (const el of texts) {
+        const box = el.getBoundingClientRect();
+        let circle = (el.classList.contains('v4-map-num') || el.classList.contains('v4-map-name') || el.classList.contains('v4-map-tag')) && el.parentNode ? el.parentNode.querySelector('circle') : null;
+        const id = el.getAttribute('data-p10-pick-label');
+        if (!circle && id) circle = svg.querySelector('[data-p10-pick="' + CSS.escape(id) + '"] .p10-pick-mark');
+        if (!circle && el.hasAttribute('data-px')) {
+          const px = parseFloat(el.getAttribute('data-px')), py = parseFloat(el.getAttribute('data-py'));
+          let best = null, bestD = 1e9;
+          svg.querySelectorAll('.p10-pick-mark').forEach(mark => {
+            const d = Math.hypot(parseFloat(mark.getAttribute('cx')) - px, parseFloat(mark.getAttribute('cy')) - py);
+            if (d < bestD) { bestD = d; best = mark; }
+          });
+          if (bestD < 3) circle = best;
+        }
+        if (!circle) continue;
+        const dot = circle.getBoundingClientRect();
+        const cx = (dot.left + dot.right) / 2, cy = (dot.top + dot.bottom) / 2;
+        const name = (el.textContent || '').trim().slice(0, 22);
+        for (const other of dots) {
+          if (Math.hypot(other.x - cx, other.y - cy) <= 2) continue;
+          if (other.x >= box.left && other.x <= box.right && other.y >= box.top && other.y <= box.bottom) covers.push(name);
+        }
+        const dist = gap(box, dot);
+        if (dist <= 14) continue;
+        const rad = Math.min(dot.width, dot.height) / 2;
+        const linked = [...svg.querySelectorAll('.v4-map-leader, .p10-pick-leader')].some(line => {
+          const ends = endsOf(line);
+          if (!ends) return false;
+          const [a, b] = ends;
+          const nearDot = Math.hypot(a.x - cx, a.y - cy) <= rad + 3 || Math.hypot(b.x - cx, b.y - cy) <= rad + 3;
+          const nearText = pointDist(a.x, a.y, box) <= 3 || pointDist(b.x, b.y, box) <= 3;
+          return nearDot && nearText;
+        });
+        if (!linked) detached.push(name + ' ' + dist.toFixed(1));
+      }
+      for (const line of svg.querySelectorAll('.v4-map-leader, .p10-pick-leader')) {
+        const ends = endsOf(line);
+        if (!ends) continue;
+        const [a, b] = ends;
+        const len = Math.hypot(b.x - a.x, b.y - a.y);
+        if (len > 48) leaderLong.push(len.toFixed(1));
+        const own = texts.find(t => pointDist(b.x, b.y, t.getBoundingClientRect()) <= 3 || pointDist(a.x, a.y, t.getBoundingClientRect()) <= 3);
+        for (const el of texts) {
+          if (el === own) continue;
+          if (clipLen(a.x, a.y, b.x, b.y, el.getBoundingClientRect()) > 0.2) leaderThrough.push((own && own.textContent || '').trim().slice(0, 12) + ' > ' + (el.textContent || '').trim().slice(0, 12));
+        }
+      }
     }
-    return { hits, outside, small, detached, marker: texts.some(t => /起终|Start\\/end/.test(t.textContent || '')), leaders, wide: frame.width > 20 };
+    return { hits, outside, small, detached, covers, leaderThrough, leaderLong, marker: texts.some(t => /起终|Start\\/end/.test(t.textContent || '')), leaders, wide: frame.width > 20 };
   })()`;
   try {
     const found = [];
@@ -557,7 +605,14 @@ test('map labels do not overlap and stay inside the svg', async (t) => {
         await page.ev('document.querySelector("#v4-map").scrollIntoView()');
         await page.ev('new Promise(r => setTimeout(r, 600))');
         const schematic = await page.ev(report('#v4-map svg.v4-schematic'));
-        if (!schematic.wide || !schematic.marker || schematic.hits.length || schematic.outside.length || schematic.small.length || (schematic.detached || []).length) found.push('schematic ' + lang + ' ' + w + ' ' + JSON.stringify(schematic));
+        const legend = await page.ev(`(() => {
+          const ul = document.querySelector('#v4-map .v4-map-name-list');
+          if (!ul) return { missing: true };
+          const item = ul.querySelector('li');
+          return { display: getComputedStyle(ul).display, n: ul.querySelectorAll('li').length, fs: item ? parseFloat(getComputedStyle(item).fontSize) : 0, text: ul.innerText };
+        })()`);
+        const badMap = !schematic.wide || !schematic.marker || schematic.hits.length || schematic.outside.length || schematic.small.length || (schematic.detached || []).length || (schematic.covers || []).length || (schematic.leaderThrough || []).length || (schematic.leaderLong || []).length;
+        if (badMap || legend.missing || legend.display === 'none' || legend.n < 2 || !(legend.fs >= 11.95) || !/\d/.test(legend.text)) found.push('schematic ' + lang + ' ' + w + ' ' + JSON.stringify({ schematic, legend }));
         await page.go('plan.html?lang=' + lang);
         await page.waitFor('document.querySelector("#p10-next-1")', 20000);
         await page.click('#p10-next-1');
@@ -567,7 +622,15 @@ test('map labels do not overlap and stay inside the svg', async (t) => {
         await page.ev('document.querySelector("#p10-pick-map").scrollIntoView()');
         await page.ev('new Promise(r => setTimeout(r, 600))');
         const pick = await page.ev(report('#p10-pick-map svg.p10-pick-svg'));
-        if (!pick.wide || pick.hits.length || pick.outside.length || pick.small.length || (w === 1440 && (pick.detached || []).length)) found.push('planner ' + lang + ' ' + w + ' ' + JSON.stringify(pick));
+        const spill = await page.ev(`(() => {
+          const hidden = [...document.querySelectorAll('#p10-pick-map .is-unplaced')].map(t => (t.textContent || '').trim()).filter(Boolean);
+          const ul = document.querySelector('#p10-pick-map .p10-pick-name-list');
+          const items = ul ? [...ul.querySelectorAll('li')].map(li => li.textContent.trim()) : [];
+          const item = ul && ul.querySelector('li');
+          return { hidden, shown: Boolean(ul && getComputedStyle(ul).display !== 'none'), absent: hidden.filter(name => !items.includes(name)), fs: item ? parseFloat(getComputedStyle(item).fontSize) : 0 };
+        })()`);
+        const badPick = !pick.wide || pick.hits.length || pick.outside.length || pick.small.length || (pick.detached || []).length || (pick.covers || []).length || (pick.leaderThrough || []).length || (pick.leaderLong || []).length || (spill.hidden.length && (!spill.shown || spill.absent.length || !(spill.fs >= 11.95)));
+        if (badPick) found.push('planner ' + lang + ' ' + w + ' ' + JSON.stringify({ pick, spill }));
         if (w <= 420) {
           const list = await page.ev(`(() => {
             const ul = document.querySelector('#p10-pick-map .p10-pick-name-list');

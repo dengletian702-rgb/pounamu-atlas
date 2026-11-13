@@ -68,8 +68,10 @@
 /* Map: town names that stay the same size when a day is zoomed in, and clear start/end tags */
 .p10-map-name-list,.p10-pick-name-list{display:none;list-style:none;margin:8px 0 0;padding:0;gap:6px 14px}
 .p10-map-name-list li,.p10-pick-name-list li{font-size:var(--type-sm);line-height:1.4}
+.p10-pick-name-list.is-open{display:flex;flex-wrap:wrap}
+.p10-pick-tag.is-off,.v4-map-num.is-off{display:none}
 @media(max-width:420px){
-  .p10-map-label,.p10-map-tag,.p10-pick-label{display:none!important}
+  .p10-map-label,.p10-map-tag,.p10-pick-label,.p10-pick-tag{display:none!important}
   .p10-map-name-list,.p10-pick-name-list{display:flex;flex-wrap:wrap}
 }
 .p10-map-label{fill:#203a2e;stroke:#eef3ef;stroke-width:calc(var(--k,1) * 3.5px);stroke-linejoin:round;paint-order:stroke}

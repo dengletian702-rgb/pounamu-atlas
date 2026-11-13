@@ -22,6 +22,19 @@ test('sports and the DOC directory are switched off in the site flag', () => {
   }
 });
 
+test('prepare copy names 111, the Mountain Safety Council and NZTA', () => {
+  const app = fs.readFileSync(path.join(root, 'docs/app.js'), 'utf8');
+  const start = app.indexOf('function renderPrepare()');
+  const end = app.indexOf('function render()', start);
+  const body = app.slice(start, end);
+  assert.match(body, /111/);
+  assert.match(body, /Mountain Safety Council/);
+  assert.match(body, /NZTA/);
+  assert.match(body, /https:\/\/www\.mountainsafety\.org\.nz\//);
+  assert.match(body, /https:\/\/www\.journeys\.nzta\.govt\.nz\/highway-conditions/);
+  assert.equal(body.includes('href="http'), false);
+});
+
 test('preparation copy has no outbound anchors in the renderer', () => {
   const app = fs.readFileSync(path.join(root, 'docs/app.js'), 'utf8');
   const start = app.indexOf('function renderPrepare()');
@@ -95,7 +108,31 @@ test('navigation hides sports and the DOC directory, and preparation has no outb
       assert.equal(prep.refs, true);
       assert.match(prep.text, lang === 'zh' ? /参考来源/ : /References/);
       assert.match(prep.text, /NZeTA|电子旅行/);
+      assert.match(prep.text, /111/);
+      assert.match(prep.text, /Mountain Safety Council/);
+      assert.match(prep.text, /NZTA/);
+      assert.match(prep.text, lang === 'zh' ? /mountainsafety\.org\.nz/ : /mountainsafety\.org\.nz/);
       assert.equal(prep.overflow, false);
+    }
+    for (const [file, gone] of [['cities.html', /网球场|Tennis courts/], ['tracks.html', /全量目录|Every DOC walk|待核实/]]) {
+      await page.go(file + '?lang=zh');
+      const hidden = await page.ev(`(() => {
+        const main = document.querySelector('main');
+        const intro = document.querySelector('main .page-intro:not(.pounamu-paused)');
+        return {
+          text: main.innerText,
+          introHidden: !intro || intro.hidden || intro.textContent.trim() === '',
+          flags: /site-flags/.test(main.innerText),
+          doc: !!main.querySelector('a[href*="doc.govt.nz"]'),
+          cities: !!main.querySelector('a[href*="guide.html"]')
+        };
+      })()`);
+      assert.equal(hidden.introHidden, true, file);
+      assert.equal(hidden.flags, false, file);
+      assert.match(hidden.text, /本栏目更新中/);
+      assert.equal(hidden.doc, true, file);
+      assert.equal(hidden.cities, true, file);
+      assert.doesNotMatch(hidden.text, gone);
     }
     assert.deepEqual(page.errors, []);
   } finally {

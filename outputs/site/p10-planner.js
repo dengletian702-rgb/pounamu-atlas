@@ -1410,6 +1410,13 @@ globalThis.P10_NODES = NODES;
     let ranked=[]; try{ranked=p10Rank(input).slice(0,5);}catch{ranked=[];}
     host.innerHTML=ranked.map(w=>`<li>${p10Esc(zh?w.zh:w.en)}</li>`).join('');
   }
+  function p10SyncAreaPressed(){
+    const start=p10$('#p10-start')?.value, end=p10$('#p10-end')?.value;
+    document.querySelectorAll('[data-p10-area]').forEach(b=>{
+      const pair=P10_AREAS[b.dataset.p10Area];
+      b.setAttribute('aria-pressed', pair && pair[0]===start && pair[1]===end ? 'true' : 'false');
+    });
+  }
   const P10_AREAS={south:['christchurch','queenstown'],'south-loop':['christchurch','christchurch'],north:['auckland','wellington'],'north-loop':['auckland','auckland'],both:['auckland','queenstown']};
   let p10LinkWishes=null;
   function p10LinkNote(lang){
@@ -1432,6 +1439,7 @@ globalThis.P10_NODES = NODES;
     p10LinkNote(lang);
     for(const [id,key] of [['p10-step1-label','step1'],['p10-step2-label','step2'],['p10-step3-label','step3'],['p10-next-1','next'],['p10-next-2','next'],['p10-back-2','back'],['p10-back-3','back'],['p10-more-label','more'],['p10-area-label','area'],['p10-area-south','areaSouth'],['p10-area-loop','areaLoop'],['p10-area-north','areaNorth'],['p10-area-north-loop','areaNorthLoop'],['p10-area-both','areaBoth'],['p10-rank-label','rankLive']]){const el=document.getElementById(id);if(el)el.textContent=x[key];}
     p10FillRank();
+    p10SyncAreaPressed();
     const lead=document.getElementById('p10-step-lead');
     if(lead)lead.textContent=zh?'下面直接生成逐日行程。地点、住宿和玩法都有默认值，想改再打开更多选项。':'This builds the day-by-day plan. Cities, stays and style already have defaults. Open more options only if you want to change them.';
   };

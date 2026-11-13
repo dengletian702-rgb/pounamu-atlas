@@ -161,10 +161,25 @@ const v3MissingWalks = query => {
 const v3Region = k => lang === 'zh' ? (V3_REGION_ZH[k] || k) : (v3Tracks?.regions[k] || k);
 let v3Tracks = null, v3TrackState = {island: 'all', region: 'all', time: 'all', q: '', shown: 60};
 const V3_BUCKET = {short: ['Under 1 hour', '1 小时以内'], half: ['1–4 hours', '1–4 小时'], day: ['Over 4 hours, same day', '4 小时以上（当天）'], multi: ['Overnight or longer', '过夜或多日'], unknown: ['Time not stated', '未注明用时']};
+function v3PausedNotice() {
+  const cities = `guide.html?view=pick&lang=${lang === 'zh' ? 'zh' : 'en'}`;
+  return `<section class="page-intro section pounamu-paused"><h1>${v3L('This section is being updated.', '本栏目更新中。')}</h1><p>${v3L(
+    `Meanwhile see the <a href="${cities}">Cities page</a> or the <a href="https://www.doc.govt.nz/">DOC website</a>.`,
+    `可先看<a href="${cities}">城市页</a>或 <a href="https://www.doc.govt.nz/">DOC 官网</a>。`
+  )}</p></section>`;
+}
+function v3ConcealIntro() {
+  document.querySelectorAll('main .page-intro').forEach(el => {
+    if (el.classList.contains('pounamu-paused')) return;
+    el.hidden = true;
+    el.replaceChildren();
+  });
+}
 function v3RenderTracks() {
   const host = document.querySelector('#trackDirectory'); if (!host) return;
   if (!v3Flag('docDirectory')) {
-    host.innerHTML = `<section class="page-intro section"><h1>${v3L('The DOC track directory is switched off.', 'DOC 步道目录已暂时收起。')}</h1><p>${v3L('Turn docDirectory back to true in site-flags.js to show it again. Route guides stay available.', '把 site-flags.js 里的 docDirectory 改回 true 即可恢复。精选线路攻略仍可阅读。')}</p></section>`;
+    v3ConcealIntro();
+    host.innerHTML = v3PausedNotice();
     return;
   }
   if (!v3Tracks) { host.innerHTML = `<p class="v3-lead">${v3L('Loading the DOC track directory…', '正在加载 DOC 步道目录……')}</p>`; fetch('data/doc-tracks.json').then(x => x.json()).then(d => { v3Tracks = d; v3RenderTracks(); }).catch(() => { host.innerHTML = `<p class="v3-lead">${v3L('The directory file could not be loaded.', '目录文件加载失败。')}</p>`; }); return; }
@@ -199,7 +214,7 @@ function v3RenderTracks() {
 }
 function v3RenderCities() {
   const host = document.querySelector('#cityList'); if (!host) return;
-  if (!v3Flag('sports')) { host.innerHTML = `<section class="page-intro section"><h1>${v3L('Sports venues are switched off.', '运动场地已暂时收起。')}</h1><p>${v3L('Turn sports back to true in site-flags.js to show them again.', '把 site-flags.js 里的 sports 改回 true 即可恢复。')}</p></section>`; return; }
+  if (!v3Flag('sports')) { v3ConcealIntro(); host.innerHTML = v3PausedNotice(); return; }
   if (!v3Sports) { host.innerHTML = `<p class="v3-lead">${v3L('Loading…', '加载中……')}</p>`; v3LoadSports().then(v3RenderCities); return; }
   if (!v3Sports.index) { host.innerHTML = `<p class="v3-lead">${v3L('The sports data file could not be loaded.', '运动场地数据加载失败。')}</p>`; return; }
   host.innerHTML = `<div class="v3-city-grid">${v3Sports.index.cities.map(c => `<a class="v3-city" href="${pageUrl('city', {id: c.id})}"><p class="route-place">${v3L(c.island === 'north' ? 'North Island' : 'South Island', c.island === 'north' ? '北岛' : '南岛')}</p><h3>${escapeHtml(v3L(c.name, c.zh))}</h3><p class="v3-city-counts">${Object.keys(V3_SPORT).map(k => `<span>${v3L(...V3_SPORT[k])} ${c.counts[k] || 0}</span>`).join('')}</p><p class="v3-venue-dist">${v3L(`within ${c.radiusKm} km of the centre`, `市中心 ${c.radiusKm} 公里内`)} ↗</p></a>`).join('')}</div>${v3OsmCredit()}`;
@@ -207,7 +222,7 @@ function v3RenderCities() {
 let v3City = null;
 function v3RenderCity() {
   const host = document.querySelector('#cityDetail'); if (!host) return;
-  if (!v3Flag('sports')) { host.innerHTML = `<section class="page-intro section"><h1>${v3L('Sports venues are switched off.', '运动场地已暂时收起。')}</h1><p>${v3L('Turn sports back to true in site-flags.js to show them again.', '把 site-flags.js 里的 sports 改回 true 即可恢复。')}</p></section>`; return; }
+  if (!v3Flag('sports')) { host.innerHTML = v3PausedNotice(); return; }
   const id = new URLSearchParams(location.search).get('id');
   if (!v3Sports) { v3LoadSports().then(v3RenderCity); return; }
   const meta = v3Sports.index?.cities.find(c => c.id === id);

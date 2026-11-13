@@ -213,14 +213,16 @@ const cards=zh?[
 ['03','巴士','InterCity 经营连接各城的长途巴士，也出售 FlexiPass、TravelPass，以及含 Interislander 渡轮的联程。班次会变，出发当天以运营商的时刻为准，本站不转载时刻表。'],
 ['04','渡轮','Interislander 往返惠灵顿和皮克顿，运营商写明航行时间 3.5 小时。Bluebridge 也走这条海峡，本页没有读到它的航行时长，不写数字。怀希基岛由 Fullers360 从奥克兰市区码头（Quay 街 99 号 11、12 号码头）开往马蒂亚蒂亚，运营商写大约 40 到 45 分钟；经德文港的班次大约再多 10 分钟。我们读到的时刻表页面写往返票价自 48.50 新西兰元起，票价以当天页面为准。'],
 ['05','NZeTA','多数免签国家的旅客，行前要在移民局办新西兰电子旅行授权（NZeTA），而不是另办访客签证。移民局页面写：每次可停留最多 3 个月，英国护照最多 6 个月；多数旅客的授权有效 2 年。费用自 17 新西兰元起，请预留 72 小时。持澳大利亚护照的人，行前不需要签证，也不需要 NZeTA。其他护照是否豁免，以移民局页面上的名单为准。'],
-['06','住宿花费','保护部营地有官方价格，写在各城镇页的省钱一档里。中档和高端住宿，统计局的住宿调查不采集房价，所以这里不写每晚多少钱，标为待核。']
+['06','住宿花费','保护部营地有官方价格，写在各城镇页的省钱一档里。中档和高端住宿，统计局的住宿调查不采集房价，所以这里不写每晚多少钱，标为待核。'],
+['07','安全','紧急情况请拨 111。山岳安全委员会（Mountain Safety Council）的网站用来作出门准备：可以自己排一条步道计划，也有技能说明，并提醒出发前先看天气，免得到了户外才发现没准备好。开车前看 NZTA 路况页上的延误、施工、封路和路况摄像头；这一页不是当天的实时路况。']
 ]:[
 ['01','Weather','Before a mountain day, read the MetService mountain forecast and severe-weather warnings. If the weather turns, change the day. This page is not a forecast.'],
 ['02','Gear','DOC asks you to check alerts, the weather and your map before a trip on conservation land, and to carry a registered distress beacon that can call for help in a life-threatening situation. Start with clean, dry gear and carry your rubbish out.'],
 ['03','Buses','InterCity runs the national coach network between cities and sells a FlexiPass, a TravelPass, and trips that include the Interislander ferry. Timetables change. Use the operator’s times for the day you travel. This site does not copy them.'],
 ['04','Ferries','The Interislander sails between Wellington and Picton. The operator says the crossing takes 3.5 hours. Bluebridge also sails that strait; this page did not read a crossing time there, so none is given. Fullers360 ferries run from Downtown Auckland (Piers 11 and 12, 99 Quay Street) to Matiatia on Waiheke and the operator says the trip is about 40 to 45 minutes. Sailings via Devonport take about 10 minutes longer. The timetable page we read listed return fares from NZD $48.50; check the fare on the day you go.'],
 ['05','NZeTA','Many visitors from visa-waiver countries request a New Zealand Electronic Travel Authority (NZeTA) before they travel, instead of a visitor visa. Immigration New Zealand says a visit can last up to 3 months at a time, or up to 6 months on a United Kingdom passport, and that an NZeTA is valid for 2 years for most travellers. The cost starts at NZD $17. Allow 72 hours. If you travel on an Australian passport you do not need a visa or an NZeTA before you travel. Other passports are listed on the Immigration New Zealand page.'],
-['06','Stay prices','DOC publishes campsite fees; those figures sit in the budget tier on town pages. Stats NZ’s Accommodation Survey does not collect prices, so this guide gives no nightly rate for a mid-range or high-end stay. Those prices are to be confirmed.']
+['06','Stay prices','DOC publishes campsite fees; those figures sit in the budget tier on town pages. Stats NZ’s Accommodation Survey does not collect prices, so this guide gives no nightly rate for a mid-range or high-end stay. Those prices are to be confirmed.'],
+['07','Safety','In an emergency call 111. The Mountain Safety Council site is for getting ready before you head outdoors: you can plan a walk, read skills notes, and check you are not caught out by the weather. Before you drive, use NZTA’s road-conditions page for delays, roadworks, closures and traffic cameras. This page is not that live list.']
 ];
 $('#prepareGrid').innerHTML=cards.map(([num,title,body])=>`<article class="prepare-card"><span>${num}</span><h2>${title}</h2><p>${body}</p></article>`).join('');
 const sources=zh?[
@@ -231,7 +233,9 @@ const sources=zh?[
 ['Bluebridge','https://www.bluebridge.co.nz/','2026-11-12'],
 ['Fullers360 怀希基岛','https://www.fullers.co.nz/destinations-and-experiences/destinations/waiheke-island','2026-11-12'],
 ['移民局 NZeTA','https://www.immigration.govt.nz/new-zealand-visas/visas/visa/nzeta','2026-11-12'],
-['统计局住宿调查说明','https://datainfoplus.stats.govt.nz/Item/nz.govt.stats/38574cd6-b696-41a5-b311-41bfa5611a99/121','2026-11-12']
+['统计局住宿调查说明','https://datainfoplus.stats.govt.nz/Item/nz.govt.stats/38574cd6-b696-41a5-b311-41bfa5611a99/121','2026-11-12'],
+['新西兰山岳安全委员会 Mountain Safety Council','https://www.mountainsafety.org.nz/','2026-11-13'],
+['NZTA 路况','https://www.journeys.nzta.govt.nz/highway-conditions/traffic-and-travel-list-view','2026-11-13']
 ]:[
 ['MetService warnings','https://www.metservice.com/warnings/home','access date to be confirmed (sentence kept from this site; the page was not reopened this round)'],
 ['DOC: prepare for your trip','https://www.doc.govt.nz/parks-and-recreation/know-before-you-go/gear/','2026-11-12'],
@@ -240,7 +244,9 @@ const sources=zh?[
 ['Bluebridge','https://www.bluebridge.co.nz/','2026-11-12'],
 ['Fullers360 Waiheke','https://www.fullers.co.nz/destinations-and-experiences/destinations/waiheke-island','2026-11-12'],
 ['Immigration New Zealand NZeTA','https://www.immigration.govt.nz/new-zealand-visas/visas/visa/nzeta','2026-11-12'],
-['Stats NZ DataInfo+: Accommodation Survey','https://datainfoplus.stats.govt.nz/Item/nz.govt.stats/38574cd6-b696-41a5-b311-41bfa5611a99/121','2026-11-12']
+['Stats NZ DataInfo+: Accommodation Survey','https://datainfoplus.stats.govt.nz/Item/nz.govt.stats/38574cd6-b696-41a5-b311-41bfa5611a99/121','2026-11-12'],
+['New Zealand Mountain Safety Council','https://www.mountainsafety.org.nz/','2026-11-13'],
+['NZTA road conditions','https://www.journeys.nzta.govt.nz/highway-conditions/traffic-and-travel-list-view','2026-11-13']
 ];
 let refs=document.getElementById('page-references');
 if(!refs){refs=document.createElement('section');refs.id='page-references';refs.className='page-references';$('#prepareGrid').parentElement.append(refs);} 

@@ -12,11 +12,20 @@ function pounamuFlag(name) {
 }
 
 function pounamuHideFlaggedLinks() {
-  const drop = [];
-  if (!pounamuFlag('sports')) drop.push('cities', 'city');
-  if (!pounamuFlag('docDirectory')) drop.push('tracks');
-  document.querySelectorAll('a[data-page]').forEach(a => {
-    if (drop.includes(a.dataset.page)) a.remove();
+  const dropPages = [];
+  const dropHref = [];
+  if (!pounamuFlag('sports')) {
+    dropPages.push('cities', 'city');
+    dropHref.push(/(?:^|\/)city\.html/i, /(?:^|\/)cities\.html/i);
+  }
+  if (!pounamuFlag('docDirectory')) {
+    dropPages.push('tracks');
+    dropHref.push(/(?:^|\/)tracks\.html/i);
+  }
+  document.querySelectorAll('a[href]').forEach(a => {
+    if (a.closest('.pounamu-paused')) return;
+    const href = a.getAttribute('href') || '';
+    if (dropPages.includes(a.dataset.page || '') || dropHref.some(re => re.test(href))) a.remove();
   });
 }
 
@@ -28,7 +37,7 @@ function pounamuSealContent() {
   const keep = a => {
     const href = a.getAttribute('href') || '';
     if (!/^https?:/i.test(href)) return true;
-    if (a.closest('.page-references, .v3-licence, .map-attribution, .photo-band-credit, .image-credits, figcaption, .v4-dest-photo')) return true;
+    if (a.closest('.page-references, .pounamu-paused, .v3-licence, .map-attribution, .photo-band-credit, .image-credits, figcaption, .v4-dest-photo')) return true;
     if (/creativecommons\.org|openstreetmap\.org\/copyright|naturalearthdata\.com|data\.linz\.govt\.nz|linz\.govt\.nz/i.test(href)) return true;
     return false;
   };

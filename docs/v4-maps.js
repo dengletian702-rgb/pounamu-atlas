@@ -170,10 +170,14 @@
       .filter(g => g.dataset.legend)
       .sort((a, b) => Number(a.dataset.ord) - Number(b.dataset.ord));
     if (rows.length) {
+      const note = document.createElement('p');
+      note.className = 'v4-map-legend-note';
+      note.textContent = state.lang === 'en' ? 'Numbered in stop order, not by day.' : '按站点顺序编号，不是按天数。';
       const list = document.createElement('ul');
       list.className = 'v4-map-name-list';
       list.innerHTML = rows.map(g => `<li>${esc(g.dataset.legend)} ${esc(g.dataset.name || '')}</li>`).join('');
       svg.after(list);
+      svg.after(note);
     } else {
       const names = [...el.querySelectorAll('.v4-map-name')].map(t => t.textContent.trim()).filter(Boolean);
       if (names.length) {

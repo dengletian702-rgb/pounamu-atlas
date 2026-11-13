@@ -567,6 +567,13 @@
   function pointBoxDist(x, y, box) {
     return Math.hypot(Math.max(box.left - x, x - box.right, 0), Math.max(box.top - y, y - box.bottom, 0));
   }
+  function distPointSeg(px, py, x1, y1, x2, y2) {
+    const dx = x2 - x1, dy = y2 - y1;
+    const len2 = dx * dx + dy * dy;
+    if (len2 < 1e-6) return Math.hypot(px - x1, py - y1);
+    const t = Math.max(0, Math.min(1, ((px - x1) * dx + (py - y1) * dy) / len2));
+    return Math.hypot(px - (x1 + t * dx), py - (y1 + t * dy));
+  }
   function clipLength(x1, y1, x2, y2, rect) {
     let t0 = 0, t1 = 1;
     const dx = x2 - x1, dy = y2 - y1;
@@ -612,7 +619,12 @@
       return { x1: cx, y1: cy, x2: x - dx / len * 1.5, y2: y - dy / len * 1.5, len: len - 1.5 };
     };
     const clearOf = (rect, ends) => {
-      if (dotCenters().some(d => Math.hypot(d.x - ends.ownX, d.y - ends.ownY) > 2 && coversPoint(rect, d.x, d.y))) return false;
+      for (const d of dotCenters()) {
+        if (Math.hypot(d.x - ends.ownX, d.y - ends.ownY) <= 2) continue;
+        const rad = Math.min(d.r.width, d.r.height) / 2;
+        if (pointBoxDist(d.x, d.y, rect) <= rad + 5) return false;
+        if (ends.draw && distPointSeg(d.x, d.y, ends.x1, ends.y1, ends.x2, ends.y2) <= rad + 2) return false;
+      }
       if (!ends.draw) return true;
       if (ends.len > 48) return false;
       return !placed.some(p => clipLength(ends.x1, ends.y1, ends.x2, ends.y2, p.rect) > 0.2);
@@ -692,7 +704,7 @@
         fit = sit(text, circle, gap);
         if (fit) break;
       }
-      if (!fit) {
+      if (!fit && schematic) {
         for (const gap of [18, 26, 34, 42]) {
           fit = sit(text, circle, gap);
           if (fit) break;
@@ -718,7 +730,12 @@
       const live = [...svg.querySelectorAll('text')].filter(textShown);
       const own = live.find(t => pointBoxDist(b.x, b.y, t.getBoundingClientRect()) <= 3);
       const crosses = live.some(t => t !== own && clipLength(a.x, a.y, b.x, b.y, t.getBoundingClientRect()) > 0.2);
-      if (len > 48 || crosses) {
+      const throughDot = dotCenters().some(d => {
+        if (Math.hypot(d.x - a.x, d.y - a.y) <= 2) return false;
+        const rad = Math.min(d.r.width, d.r.height) / 2;
+        return distPointSeg(d.x, d.y, a.x, a.y, b.x, b.y) <= rad + 2;
+      });
+      if (len > 48 || crosses || throughDot) {
         line.remove();
         if (own) { own.classList.add('is-off', 'is-unplaced'); own.style.setProperty('display', 'none', 'important'); }
       }

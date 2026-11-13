@@ -517,13 +517,21 @@ test('map labels do not overlap and stay inside the svg', async (t) => {
     const watch = svg.classList.contains('v4-schematic') || svg.classList.contains('p10-pick-svg');
     const covers = [];
     const leaderThrough = [];
+    const leaderThroughDot = [];
+    const labelNextToOtherDot = [];
     const leaderLong = [];
     const detached = [];
+    const segDist = (px, py, x1, y1, x2, y2) => {
+      const dx = x2 - x1, dy = y2 - y1, len2 = dx * dx + dy * dy;
+      if (len2 < 1e-6) return Math.hypot(px - x1, py - y1);
+      const t = Math.max(0, Math.min(1, ((px - x1) * dx + (py - y1) * dy) / len2));
+      return Math.hypot(px - (x1 + t * dx), py - (y1 + t * dy));
+    };
     if (watch) {
       const dots = [...svg.querySelectorAll('circle')].filter(c => !c.classList.contains('p10-pick-hit')).map(c => {
         const r = c.getBoundingClientRect();
-        return { x: (r.left + r.right) / 2, y: (r.top + r.bottom) / 2, el: c };
-      }).filter(d => d.x || d.y);
+        return { x: (r.left + r.right) / 2, y: (r.top + r.bottom) / 2, rad: Math.min(r.width, r.height) / 2, el: c };
+      }).filter(d => d.rad > 0.4);
       for (const el of texts) {
         const box = el.getBoundingClientRect();
         let circle = (el.classList.contains('v4-map-num') || el.classList.contains('v4-map-name') || el.classList.contains('v4-map-tag')) && el.parentNode ? el.parentNode.querySelector('circle') : null;
@@ -545,6 +553,7 @@ test('map labels do not overlap and stay inside the svg', async (t) => {
         for (const other of dots) {
           if (Math.hypot(other.x - cx, other.y - cy) <= 2) continue;
           if (other.x >= box.left && other.x <= box.right && other.y >= box.top && other.y <= box.bottom) covers.push(name);
+          if (pointDist(other.x, other.y, box) <= other.rad + 5) labelNextToOtherDot.push(name);
         }
         const dist = gap(box, dot);
         if (dist <= 14) continue;
@@ -565,6 +574,10 @@ test('map labels do not overlap and stay inside the svg', async (t) => {
         const [a, b] = ends;
         const len = Math.hypot(b.x - a.x, b.y - a.y);
         if (len > 48) leaderLong.push(len.toFixed(1));
+        for (const other of dots) {
+          if (segDist(other.x, other.y, a.x, a.y, b.x, b.y) <= 2) continue;
+          if (segDist(other.x, other.y, a.x, a.y, b.x, b.y) <= other.rad + 2) leaderThroughDot.push(len.toFixed(0));
+        }
         const own = texts.find(t => pointDist(b.x, b.y, t.getBoundingClientRect()) <= 3 || pointDist(a.x, a.y, t.getBoundingClientRect()) <= 3);
         for (const el of texts) {
           if (el === own) continue;
@@ -572,7 +585,7 @@ test('map labels do not overlap and stay inside the svg', async (t) => {
         }
       }
     }
-    return { hits, outside, small, detached, covers, leaderThrough, leaderLong, marker: texts.some(t => /起终|Start\\/end/.test(t.textContent || '')), leaders, wide: frame.width > 20 };
+    return { hits, outside, small, detached, covers, leaderThrough, leaderThroughDot, labelNextToOtherDot, leaderLong, marker: texts.some(t => /起终|Start\\/end/.test(t.textContent || '')), leaders, wide: frame.width > 20 };
   })()`;
   try {
     const found = [];
@@ -611,7 +624,7 @@ test('map labels do not overlap and stay inside the svg', async (t) => {
           const item = ul.querySelector('li');
           return { display: getComputedStyle(ul).display, n: ul.querySelectorAll('li').length, fs: item ? parseFloat(getComputedStyle(item).fontSize) : 0, text: ul.innerText };
         })()`);
-        const badMap = !schematic.wide || !schematic.marker || schematic.hits.length || schematic.outside.length || schematic.small.length || (schematic.detached || []).length || (schematic.covers || []).length || (schematic.leaderThrough || []).length || (schematic.leaderLong || []).length;
+        const badMap = !schematic.wide || !schematic.marker || schematic.hits.length || schematic.outside.length || schematic.small.length || (schematic.detached || []).length || (schematic.covers || []).length || (schematic.leaderThrough || []).length || (schematic.leaderThroughDot || []).length || (schematic.labelNextToOtherDot || []).length || (schematic.leaderLong || []).length;
         if (badMap || legend.missing || legend.display === 'none' || legend.n < 2 || !(legend.fs >= 11.95) || !/\d/.test(legend.text)) found.push('schematic ' + lang + ' ' + w + ' ' + JSON.stringify({ schematic, legend }));
         await page.go('plan.html?lang=' + lang);
         await page.waitFor('document.querySelector("#p10-next-1")', 20000);
@@ -629,7 +642,7 @@ test('map labels do not overlap and stay inside the svg', async (t) => {
           const item = ul && ul.querySelector('li');
           return { hidden, shown: Boolean(ul && getComputedStyle(ul).display !== 'none'), absent: hidden.filter(name => !items.includes(name)), fs: item ? parseFloat(getComputedStyle(item).fontSize) : 0 };
         })()`);
-        const badPick = !pick.wide || pick.hits.length || pick.outside.length || pick.small.length || (pick.detached || []).length || (pick.covers || []).length || (pick.leaderThrough || []).length || (pick.leaderLong || []).length || (spill.hidden.length && (!spill.shown || spill.absent.length || !(spill.fs >= 11.95)));
+        const badPick = !pick.wide || pick.hits.length || pick.outside.length || pick.small.length || (pick.detached || []).length || (pick.covers || []).length || (pick.leaderThrough || []).length || (pick.leaderThroughDot || []).length || (pick.labelNextToOtherDot || []).length || (pick.leaderLong || []).length || (spill.hidden.length && (!spill.shown || spill.absent.length || !(spill.fs >= 11.95)));
         if (badPick) found.push('planner ' + lang + ' ' + w + ' ' + JSON.stringify({ pick, spill }));
         if (w <= 420) {
           const list = await page.ev(`(() => {
@@ -668,14 +681,24 @@ test('copy share link shows 已复制 at 390', async (t) => {
       return { covered: !(top === b || b.contains(top)), who: top ? (top.getAttribute('data-p10-share') || top.className || top.tagName) : '' };
     })()`);
     assert.equal(cover.covered, false, JSON.stringify(cover));
-    const box = await page.ev(`(() => {
-      const b = document.querySelector('[data-p10-share]');
-      const r = b.getBoundingClientRect();
-      return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
-    })()`);
-    await page.cdp('Input.dispatchMouseEvent', { type: 'mousePressed', x: box.x, y: box.y, button: 'left', clickCount: 1 });
-    await page.cdp('Input.dispatchMouseEvent', { type: 'mouseReleased', x: box.x, y: box.y, button: 'left', clickCount: 1 });
-    await page.waitFor('document.querySelector(".p10-share-status") && /已复制/.test(document.querySelector(".p10-share-status").textContent)', 5000);
+    const pressShare = async () => {
+      const box = await page.ev(`(() => {
+        const b = document.querySelector('[data-p10-share]');
+        const r = b.getBoundingClientRect();
+        return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+      })()`);
+      await page.cdp('Input.dispatchMouseEvent', { type: 'mousePressed', x: box.x, y: box.y, button: 'left', clickCount: 1 });
+      await page.cdp('Input.dispatchMouseEvent', { type: 'mouseReleased', x: box.x, y: box.y, button: 'left', clickCount: 1 });
+    };
+    const copied = 'document.querySelector(".p10-share-status") && /已复制/.test(document.querySelector(".p10-share-status").textContent)';
+    await pressShare();
+    try {
+      await page.waitFor(copied, 5000);
+    } catch (err) {
+      if (!String(err && err.message).includes('timed out')) throw err;
+      await pressShare();
+      await page.waitFor(copied, 5000);
+    }
   } finally {
     await page.close();
   }

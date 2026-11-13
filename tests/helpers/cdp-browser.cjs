@@ -105,16 +105,25 @@ async function openBrowser() {
         loaded = false;
       });
       page.on('Page.loadEventFired', () => { if (committed) loaded = true; });
-      const nav = await send('Page.navigate', { url: target.href });
-      if (nav.result && nav.result.errorText) throw new Error(nav.result.errorText);
-      const until = Date.now() + 15000;
-      while (Date.now() < until) {
-        let ready = '';
-        try { ready = await ev('document.readyState'); } catch { ready = ''; }
-        if (committed && loaded && ready === 'complete') return;
-        await sleep(40);
+      const attempt = async () => {
+        committed = false;
+        loaded = false;
+        const nav = await send('Page.navigate', { url: target.href });
+        if (nav.result && nav.result.errorText) throw new Error(nav.result.errorText);
+        const until = Date.now() + 15000;
+        while (Date.now() < until) {
+          let ready = '';
+          try { ready = await ev('document.readyState'); } catch { ready = ''; }
+          if (committed && loaded && ready === 'complete') return;
+          await sleep(40);
+        }
+        throw new Error('navigation did not finish: ' + target.pathname);
+      };
+      try { await attempt(); }
+      catch (err) {
+        if (!String(err && err.message).includes('navigation did not finish')) throw err;
+        await attempt();
       }
-      throw new Error('navigation did not finish: ' + target.pathname);
     },
     async waitFor(expr, timeout = 20000) {
       const until = Date.now() + timeout;

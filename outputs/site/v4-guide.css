@@ -44,7 +44,8 @@
 .v4-g-dot{width:16px;height:16px;border-radius:50%;border:2px solid #203a2e;background:#f7f6ef;font-size:var(--type-xs);color:#203a2e;display:flex;align-items:center;justify-content:center}
 .v4-g-dot.is-on{background:#203a2e;color:#f7f6ef}
 .v4-map-stop text{fill:#203a2e}
-.v4-map-name-list{display:flex;flex-wrap:wrap;gap:8px;list-style:none;margin:8px 0 0;padding:0}
+.v4-map-legend-note{margin:8px 0 0;font-size:var(--type-sm);line-height:1.4;color:#203a2e}
+.v4-map-name-list{display:flex;flex-wrap:wrap;gap:8px;list-style:none;margin:4px 0 0;padding:0}
 .v4-map-name-list li{font-size:var(--type-sm);line-height:1.4}
 .v4-google-map{width:100%;min-height:420px}
 .v4-place{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid #d5decc}

@@ -60,8 +60,8 @@
 .v3-sport-filters{margin:6px 0 4px;display:flex;flex-wrap:wrap}
 @media(max-width:1000px){.v3-venue-grid,.v3-city-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.v3-track{grid-template-columns:1fr}.v3-track dl{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:750px){.v3-venue-grid,.v3-city-grid{grid-template-columns:1fr;gap:18px}.v3-table{font-size:13px}.v3-table tbody th{white-space:normal}.v3-track-controls .route-count{margin-left:0}.journey-facts>div .v3-tv,.journey-facts>div .v3-ok{margin-top:6px}}
-.v3-track h3,.v3-venue h3,.v3-city h3,.v3-table,.v3-verify h2,.v3-safety h2,.v3-sports h2{font-family:var(--sans,-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif)}
-.v3-track h3,.v3-venue h3{font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB',sans-serif;letter-spacing:0}
+.v3-track h3,.v3-venue h3,.v3-city h3,.v3-table,.v3-verify h2,.v3-safety h2,.v3-sports h2{}
+.v3-track h3,.v3-venue h3{letter-spacing:0}
 .v3-venue-art .v3-kind{position:absolute;left:12px;top:12px;background:#f6f5ef;color:#1e3c32;font-size:11px;line-height:1;padding:6px 10px;border-radius:999px;border:1px solid #ccd5c6}
 @media(min-width:751px){.v3-table td:last-child{white-space:nowrap}}
 /* v3.1 — six nav items on a phone: two rows of three, nothing scrolls or clips (James review 3) */

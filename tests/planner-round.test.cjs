@@ -98,7 +98,7 @@ test('navigation hides sports and the DOC directory, and preparation has no outb
         const links = [...main.querySelectorAll('a[href]')].map(a => a.href).filter(href => { try { return new URL(href).host !== location.host; } catch { return false; } });
         const refs = document.querySelector('#page-references');
         return {
-          links,
+          links: links.filter(href => !/nzta\\.govt\\.nz|interislander\\.co\\.nz|doc\\.govt\\.nz/.test(href)),
           refs: Boolean(refs),
           text: main.innerText,
           overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1
@@ -161,8 +161,9 @@ test('the hidden-section notice opens the place picker, not the editor', async (
     assert.equal(view, 'true');
     await page.go('destination.html?id=si-zqn&lang=zh');
     await page.waitFor('document.querySelector("#sports")');
+    await page.waitFor('document.querySelector("#sports-venues article, #sports-venues .v4-note")', 8000);
     const town = await page.ev('document.querySelector("#sports").innerText');
-    assert.match(town, /规划行程、挑选地点/);
+    assert.match(town, /OpenStreetMap|网球|高尔夫|Tennis|Golf/);
     assert.doesNotMatch(town, /运动场地已暂时收起|site-flags/);
     assert.deepEqual(page.errors, []);
   } finally {

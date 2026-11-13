@@ -6,7 +6,7 @@
 #p10-island button[aria-pressed=true],#p10-region button[aria-pressed=true]{background:#203a2e;color:#f7f6ef}
 
 .v4-search{padding-top:28px;padding-bottom:12px}
-.v4-search h2{font-family:var(--serif);font-weight:400;font-size:clamp(32px,4vw,48px);margin:0 0 8px}
+.v4-search h2{font-weight:400;font-size:clamp(32px,4vw,48px);margin:0 0 8px}
 .v4-search-lead,.v4-note,.v4-help{font-size:14px;line-height:1.6}
 .v4-nz-sources{margin:0 0 8px;padding-left:1.2em}
 .v4-nz-sources a,.v4-en-name{overflow-wrap:anywhere}
@@ -22,7 +22,7 @@
 .v4-suggest button{display:block;width:100%;text-align:left;background:none;border:0;font:inherit;padding:8px 0;min-height:44px;cursor:pointer}
 .v4-results{display:grid;gap:14px;margin:16px 0 28px}
 .v4-card{border:1px solid #c5d0bc;padding:14px 16px;background:#f7f6ef}
-.v4-card h3{margin:6px 0;font-family:var(--serif);font-weight:400;font-size:28px}
+.v4-card h3{margin:6px 0;font-weight:400;font-size:28px}
 .v4-card p{margin:6px 0}
 .v4-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
 .v4-actions a,.v4-actions button,.v4-primary{font:inherit;display:inline-flex;align-items:center;min-height:44px;padding:8px 14px;border:1px solid #203a2e;background:#203a2e;color:#f7f6ef;text-decoration:none;cursor:pointer}
@@ -95,7 +95,7 @@
 .v4-prepare-extra{display:grid;gap:16px}
 .v4-prepare-extra:empty{display:none}
 .v4-prepare-extra section{border-top:1px solid #c5d0bc;padding-top:12px}
-.v4-prepare-extra h2{font-family:var(--serif);font-weight:400;font-size:clamp(24px,3vw,34px);margin:0 0 8px}
+.v4-prepare-extra h2{font-weight:400;font-size:clamp(24px,3vw,34px);margin:0 0 8px}
 .v4-prepare-extra ul{padding-left:1.2em;line-height:1.7}
 .v4-prepare-extra a,.v4-topic a{overflow-wrap:anywhere}
 .v4-src{font-size:13px;line-height:1.5;color:#45574c}
@@ -105,7 +105,7 @@
 
 .pounamu-paused a{color:#98532f;text-decoration:underline;text-underline-offset:3px}
 .page-references{margin-top:28px;padding-top:22px;border-top:1px solid #d4dbcf;color:#50665b;font-size:14px;line-height:1.7}
-.page-references h2{font-family:var(--serif,Georgia,serif);color:#1a3d32;font-size:28px;margin:0 0 10px}
+.page-references h2{color:#1a3d32;font-size:28px;margin:0 0 10px}
 .page-references li{margin:0.35em 0;overflow-wrap:anywhere}
 .v4-map-name{font-size:11px;fill:#1a3d32}
 .v4-schematic text{font-size:11px;fill:#1a3d32}

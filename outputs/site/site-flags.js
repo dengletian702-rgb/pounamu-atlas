@@ -38,6 +38,7 @@ function pounamuSealContent() {
     const href = a.getAttribute('href') || '';
     if (!/^https?:/i.test(href)) return true;
     if (a.closest('.page-references, .pounamu-paused, .v3-licence, .map-attribution, .photo-band-credit, .image-credits, figcaption, .v4-dest-photo')) return true;
+    if (a.dataset.keepLink != null || a.classList.contains('v4-gmaps') || a.classList.contains('v4-source')) return true;
     if (/creativecommons\.org|openstreetmap\.org\/copyright|naturalearthdata\.com|data\.linz\.govt\.nz|linz\.govt\.nz/i.test(href)) return true;
     return false;
   };

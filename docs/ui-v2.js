@@ -73,8 +73,8 @@
     }
     let last = 0;
     function frame(now) {
-      if (!on) return;
-      if (doc.hidden || now - last < 33) { raf(frame); return; }
+      if (!on || reduced() || doc.hidden) { on = false; return; }
+      if (now - last < 33) { raf(frame); return; }
       last = now;
       ctx.clearRect(0, 0, w, h);
       for (const p of pts) {
@@ -258,17 +258,35 @@
     } catch (e) {}
     try {
       const cat = await fetch('data/v4-catalog.json').then(r => r.ok ? r.json() : null);
-      for (const p of (cat && cat.places) || []) if (p.type === 'town') list.push({ k: en ? 'Place' : '目的地', t: en ? p.name_en : p.name_zh, s: en ? p.name_zh : p.name_en, h: `destination.html?id=${encodeURIComponent(p.place_id)}&lang=${lang}` });
+      for (const p of (cat && cat.places) || []) {
+        if (p.type === 'town') list.push({ k: en ? 'Place' : '目的地', t: en ? p.name_en : p.name_zh, s: en ? p.name_zh : p.name_en, h: `destination.html?id=${encodeURIComponent(p.place_id)}&lang=${lang}` });
+        else if (/hot pool|温泉|hot spring/i.test(`${p.name_en} ${p.name_zh}`)) list.push({ k: en ? 'Activity' : '活动', t: en ? p.name_en : p.name_zh, s: 'hot pools 温泉', h: `destination.html?id=${encodeURIComponent(p.place_id)}&lang=${lang}#p-${encodeURIComponent(p.place_id)}` });
+      }
     } catch (e) {}
-    items = list.map(x => Object.assign(x, { f: fold(`${x.t} ${x.s || ''}`) }));
+    try {
+      const ski = await fetch('data/ski-fields.json').then(r => r.ok ? r.json() : null);
+      for (const f of (ski && ski.fields) || []) list.push({ k: en ? 'Ski' : '滑雪', t: en ? f.name_en : f.name_zh, s: (f.aliases || []).join(' '), aliases: f.aliases || [], h: `prepare.html?lang=${lang}#ski-${encodeURIComponent(f.id)}` });
+    } catch (e) {}
+    list.push(
+      { k: en ? 'Page' : '页面', t: en ? 'Safety and 111' : '安全与 111', s: 'safety emergency 紧急 安全', h: `prepare.html?lang=${lang}#safety` },
+      { k: en ? 'Page' : '页面', t: en ? 'Keep left, overseas licence' : '靠左行驶与驾照翻译', s: 'driving licence keep left 驾照翻译 左行', h: `prepare.html?lang=${lang}#driving` },
+      { k: en ? 'Page' : '页面', t: en ? 'Campervan' : '房车', s: 'campervan 房车 freedom camping', h: `prepare.html?lang=${lang}#campervan` },
+      { k: en ? 'Route' : '线路', t: en ? 'Great Walks' : '大步道', s: 'great walks milford 米尔福德', h: `route.html?id=milford-track&lang=${lang}` },
+      { k: en ? 'Activity' : '活动', t: en ? 'Short, easy walks' : '少走路的短途', s: '少走路 easy walk low walking', h: `routes.html?mode=walk&lang=${lang}` },
+      { k: en ? 'Sport' : '运动', t: en ? 'Tennis, golf and basketball' : '网球、高尔夫、篮球', s: 'tennis golf basketball 网球 高尔夫 篮球', h: `destination.html?id=ni-akl&lang=${lang}#sports` }
+    );
+    items = list.map(x => Object.assign(x, { f: fold(`${x.t} ${x.s || ''} ${(x.aliases || []).join(' ')}`) }));
     return items;
   }
   function score(item, q) {
     if (!q) return 1;
-    const i = item.f.indexOf(q); if (i >= 0) return 100 - i;
+    if (item.f === q || item.aliases && item.aliases.some(a => fold(a) === q)) return 240;
+    if (item.f.startsWith(q)) return 200;
+    const i = item.f.indexOf(q); if (i >= 0) return 140 - Math.min(i, 30);
     let pos = 0, gaps = 0;
     for (const ch of q) { const at = item.f.indexOf(ch, pos); if (at < 0) return 0; gaps += at - pos; pos = at + 1; }
-    return Math.max(1, 40 - gaps);
+    if (gaps > q.length * 2) return 0;
+    return Math.max(1, 30 - gaps);
   }
   function render(q) {
     const f = fold(q);
@@ -377,5 +395,21 @@
     const own = n => { const el = n.nodeType === 1 ? n : n.parentElement; return !!(el && el.closest && el.closest('.ui2-hud, .ui2-readout, .ui2-palette, .ui2-particles, .ui2-progress')); };
     new MutationObserver(muts => { if (muts.every(m => own(m.target))) return; clearTimeout(timer); timer = setTimeout(enhance, 120); }).observe(doc.body, { childList: true, subtree: true });
   }
-  if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', start); else start();
+  function skipFocus() {
+    const main = doc.querySelector('main');
+    if (main) main.tabIndex = -1;
+    doc.querySelectorAll('a.skip-link').forEach(a => {
+      if (a.dataset.skipBound) return;
+      a.dataset.skipBound = '1';
+      a.addEventListener('click', ev => {
+        const target = doc.querySelector(a.getAttribute('href'));
+        if (!target) return;
+        ev.preventDefault();
+        target.tabIndex = -1;
+        target.focus();
+      });
+    });
+  }
+  new MutationObserver(() => { items = null; if (palette && palette.classList.contains('on')) { const q = palette.querySelector('input').value; loadItems().then(() => render(q)); } }).observe(root, { attributes: true, attributeFilter: ['lang'] });
+  if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', () => { skipFocus(); start(); }); else { skipFocus(); start(); }
 })();

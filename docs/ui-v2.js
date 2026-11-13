@@ -602,7 +602,12 @@
     if (!texts.length) { syncPickList(svg); return; }
     const ns = 'http://www.w3.org/2000/svg';
     const inside = r => r.left >= frame.left - 0.5 && r.right <= frame.right + 0.5 && r.top >= frame.top - 0.5 && r.bottom <= frame.bottom + 0.5;
-    const dirs = [[0, -1, 'middle'], [0, 1, 'middle'], [-1, 0, 'end'], [1, 0, 'start'], [-0.75, -0.75, 'end'], [0.75, -0.75, 'start'], [-0.75, 0.75, 'end'], [0.75, 0.75, 'start']];
+    const dirs = [];
+    for (let i = 0; i < 16; i++) {
+      const ang = -Math.PI / 2 + i * Math.PI / 8;
+      const dx = Math.cos(ang), dy = Math.sin(ang);
+      dirs.push([dx, dy, Math.abs(dx) < 0.35 ? 'middle' : (dx < 0 ? 'end' : 'start')]);
+    }
     const placed = [];
     const dotCenters = () => [...svg.querySelectorAll('circle')].filter(c => !c.classList.contains('p10-pick-hit')).map(c => {
       const r = c.getBoundingClientRect();
@@ -619,10 +624,11 @@
       return { x1: cx, y1: cy, x2: x - dx / len * 1.5, y2: y - dy / len * 1.5, len: len - 1.5 };
     };
     const clearOf = (rect, ends) => {
+      const pad = schematic ? 2 : 5;
       for (const d of dotCenters()) {
         if (Math.hypot(d.x - ends.ownX, d.y - ends.ownY) <= 2) continue;
         const rad = Math.min(d.r.width, d.r.height) / 2;
-        if (pointBoxDist(d.x, d.y, rect) <= rad + 5) return false;
+        if (pointBoxDist(d.x, d.y, rect) <= rad + pad) return false;
         if (ends.draw && distPointSeg(d.x, d.y, ends.x1, ends.y1, ends.x2, ends.y2) <= rad + 2) return false;
       }
       if (!ends.draw) return true;
@@ -662,6 +668,7 @@
       const c = circle.getBoundingClientRect();
       const ccx = (c.left + c.right) / 2, ccy = (c.top + c.bottom) / 2;
       const rad = Math.min(c.width, c.height) / 2;
+      let best = null;
       for (const [dx, dy, anchor] of dirs) {
         const len = Math.hypot(dx, dy) || 1;
         const ux = dx / len, uy = dy / len;
@@ -690,10 +697,21 @@
         const ends = leaderEnds(circle, r);
         ends.ownX = ccx;
         ends.ownY = ccy;
-        ends.draw = gap > 14;
-        if (inside(r) && gap >= 2 && gap <= gapScreen + 1.5 && !placed.some(o => overlaps(r, o.rect)) && clearOf(r, ends)) return { r, ends };
+        ends.draw = schematic && gap > 14;
+        const maxGap = schematic ? gapScreen + 1.5 : Math.min(14, gapScreen + 1.5);
+        if (!(inside(r) && gap >= 2 && gap <= maxGap && !placed.some(o => overlaps(r, o.rect)) && clearOf(r, ends))) continue;
+        let clear = Infinity;
+        for (const d of dotCenters()) {
+          if (Math.hypot(d.x - ccx, d.y - ccy) <= 2) continue;
+          clear = Math.min(clear, pointBoxDist(d.x, d.y, r) - Math.min(d.r.width, d.r.height) / 2);
+        }
+        if (!best || clear > best.clear) best = { clear, x: text.getAttribute('x'), y: text.getAttribute('y'), anchor, r, ends };
       }
-      return null;
+      if (!best) return null;
+      text.setAttribute('text-anchor', best.anchor);
+      text.setAttribute('x', best.x);
+      text.setAttribute('y', best.y);
+      return { r: text.getBoundingClientRect(), ends: best.ends };
     };
     for (const text of ordered) {
       text.classList.remove('is-unplaced');
@@ -705,12 +723,13 @@
         if (fit) break;
       }
       if (!fit && schematic) {
-        for (const gap of [18, 26, 34, 42]) {
+        for (const gap of [18, 22, 26, 30, 34, 38, 42, 46]) {
           fit = sit(text, circle, gap);
           if (fit) break;
         }
       }
       if (!fit) {
+        if (schematic) continue;
         text.classList.add('is-off', 'is-unplaced');
         text.style.setProperty('display', 'none', 'important');
         continue;
@@ -737,7 +756,7 @@
       });
       if (len > 48 || crosses || throughDot) {
         line.remove();
-        if (own) { own.classList.add('is-off', 'is-unplaced'); own.style.setProperty('display', 'none', 'important'); }
+        if (own && !schematic) { own.classList.add('is-off', 'is-unplaced'); own.style.setProperty('display', 'none', 'important'); }
       }
     }
     syncPickList(svg);

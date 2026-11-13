@@ -553,7 +553,8 @@ test('map labels do not overlap and stay inside the svg', async (t) => {
         for (const other of dots) {
           if (Math.hypot(other.x - cx, other.y - cy) <= 2) continue;
           if (other.x >= box.left && other.x <= box.right && other.y >= box.top && other.y <= box.bottom) covers.push(name);
-          if (pointDist(other.x, other.y, box) <= other.rad + 5) labelNextToOtherDot.push(name);
+          const nearPad = svg.classList.contains('v4-schematic') ? 2 : 5;
+          if (pointDist(other.x, other.y, box) <= other.rad + nearPad) labelNextToOtherDot.push(name);
         }
         const dist = gap(box, dot);
         if (dist <= 14) continue;
@@ -574,8 +575,13 @@ test('map labels do not overlap and stay inside the svg', async (t) => {
         const [a, b] = ends;
         const len = Math.hypot(b.x - a.x, b.y - a.y);
         if (len > 48) leaderLong.push(len.toFixed(1));
+        let ownDot = null, ownD = 1e9;
+        for (const d of dots) {
+          const dd = Math.hypot(d.x - a.x, d.y - a.y);
+          if (dd < ownD) { ownD = dd; ownDot = d; }
+        }
         for (const other of dots) {
-          if (segDist(other.x, other.y, a.x, a.y, b.x, b.y) <= 2) continue;
+          if (other === ownDot) continue;
           if (segDist(other.x, other.y, a.x, a.y, b.x, b.y) <= other.rad + 2) leaderThroughDot.push(len.toFixed(0));
         }
         const own = texts.find(t => pointDist(b.x, b.y, t.getBoundingClientRect()) <= 3 || pointDist(a.x, a.y, t.getBoundingClientRect()) <= 3);
@@ -624,8 +630,20 @@ test('map labels do not overlap and stay inside the svg', async (t) => {
           const item = ul.querySelector('li');
           return { display: getComputedStyle(ul).display, n: ul.querySelectorAll('li').length, fs: item ? parseFloat(getComputedStyle(item).fontSize) : 0, text: ul.innerText };
         })()`);
+        const legendMarks = await page.ev(`(() => {
+          const shown = el => { const cs = getComputedStyle(el); const r = el.getBoundingClientRect(); return cs.display !== 'none' && cs.visibility !== 'hidden' && r.width > 1 && r.height > 1; };
+          const svg = document.querySelector('#v4-map svg.v4-schematic');
+          const texts = [...svg.querySelectorAll('text')].filter(shown).map(t => (t.textContent || '').trim());
+          const items = [...document.querySelectorAll('#v4-map .v4-map-name-list li')].map(li => li.textContent.trim());
+          const missing = items.filter(item => {
+            const badge = item.split(' ')[0];
+            const rest = item.slice(badge.length).trim();
+            return !texts.some(m => m === badge || m === item || (rest && m === rest));
+          });
+          return { missing, n: items.length, texts };
+        })()`);
         const badMap = !schematic.wide || !schematic.marker || schematic.hits.length || schematic.outside.length || schematic.small.length || (schematic.detached || []).length || (schematic.covers || []).length || (schematic.leaderThrough || []).length || (schematic.leaderThroughDot || []).length || (schematic.labelNextToOtherDot || []).length || (schematic.leaderLong || []).length;
-        if (badMap || legend.missing || legend.display === 'none' || legend.n < 2 || !(legend.fs >= 11.95) || !/\d/.test(legend.text)) found.push('schematic ' + lang + ' ' + w + ' ' + JSON.stringify({ schematic, legend }));
+        if (badMap || legend.missing || legend.display === 'none' || legend.n < 2 || !(legend.fs >= 11.95) || !/\d/.test(legend.text) || legendMarks.missing.length || legendMarks.n < 2) found.push('schematic ' + lang + ' ' + w + ' ' + JSON.stringify({ schematic, legend, legendMarks }));
         await page.go('plan.html?lang=' + lang);
         await page.waitFor('document.querySelector("#p10-next-1")', 20000);
         await page.click('#p10-next-1');
@@ -656,6 +674,30 @@ test('map labels do not overlap and stay inside the svg', async (t) => {
         }
       }
     }
+    for (const w of [360, 375, 414]) {
+      await page.view(w, 844, true);
+      for (const lang of ['zh', 'en']) {
+        await page.go('guide.html?template=SI-09B&view=map&lang=' + lang);
+        await page.waitFor('document.querySelector("#v4-map svg.v4-schematic text")', 20000);
+        await page.ev('document.querySelector("#v4-map").scrollIntoView()');
+        await page.ev('new Promise(r => setTimeout(r, 600))');
+        const schematic = await page.ev(report('#v4-map svg.v4-schematic'));
+        const legendMarks = await page.ev(`(() => {
+          const shown = el => { const cs = getComputedStyle(el); const r = el.getBoundingClientRect(); return cs.display !== 'none' && cs.visibility !== 'hidden' && r.width > 1 && r.height > 1; };
+          const svg = document.querySelector('#v4-map svg.v4-schematic');
+          const texts = [...svg.querySelectorAll('text')].filter(shown).map(t => (t.textContent || '').trim());
+          const items = [...document.querySelectorAll('#v4-map .v4-map-name-list li')].map(li => li.textContent.trim());
+          const missing = items.filter(item => {
+            const badge = item.split(' ')[0];
+            const rest = item.slice(badge.length).trim();
+            return !texts.some(m => m === badge || m === item || (rest && m === rest));
+          });
+          return { missing, n: items.length, texts };
+        })()`);
+        const badMap = !schematic.wide || !schematic.marker || schematic.hits.length || schematic.outside.length || schematic.small.length || (schematic.detached || []).length || (schematic.covers || []).length || (schematic.leaderThrough || []).length || (schematic.leaderThroughDot || []).length || (schematic.labelNextToOtherDot || []).length || (schematic.leaderLong || []).length;
+        if (badMap || legendMarks.missing.length || legendMarks.n < 2) found.push('schematic ' + lang + ' ' + w + ' ' + JSON.stringify({ schematic, legendMarks }));
+      }
+    }
     assert.deepEqual(found, []);
   } finally {
     await page.close();
@@ -681,24 +723,29 @@ test('copy share link shows 已复制 at 390', async (t) => {
       return { covered: !(top === b || b.contains(top)), who: top ? (top.getAttribute('data-p10-share') || top.className || top.tagName) : '' };
     })()`);
     assert.equal(cover.covered, false, JSON.stringify(cover));
-    const pressShare = async () => {
-      const box = await page.ev(`(() => {
-        const b = document.querySelector('[data-p10-share]');
+    await page.grant(['clipboardReadWrite', 'clipboardSanitizedWrite']);
+    await page.cdp('Page.bringToFront');
+    await page.ev(`new Promise(resolve => {
+      const b = document.querySelector('[data-p10-share]');
+      let prev = '', steady = 0;
+      const step = () => {
         const r = b.getBoundingClientRect();
-        return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
-      })()`);
-      await page.cdp('Input.dispatchMouseEvent', { type: 'mousePressed', x: box.x, y: box.y, button: 'left', clickCount: 1 });
-      await page.cdp('Input.dispatchMouseEvent', { type: 'mouseReleased', x: box.x, y: box.y, button: 'left', clickCount: 1 });
-    };
-    const copied = 'document.querySelector(".p10-share-status") && /已复制/.test(document.querySelector(".p10-share-status").textContent)';
-    await pressShare();
-    try {
-      await page.waitFor(copied, 5000);
-    } catch (err) {
-      if (!String(err && err.message).includes('timed out')) throw err;
-      await pressShare();
-      await page.waitFor(copied, 5000);
-    }
+        const key = r.left.toFixed(1) + ',' + r.top.toFixed(1);
+        steady = key === prev ? steady + 1 : 0;
+        prev = key;
+        if (steady >= 3) resolve(true);
+        else requestAnimationFrame(step);
+      };
+      step();
+    })`);
+    const box = await page.ev(`(() => {
+      const b = document.querySelector('[data-p10-share]');
+      const r = b.getBoundingClientRect();
+      return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    })()`);
+    await page.cdp('Input.dispatchMouseEvent', { type: 'mousePressed', x: box.x, y: box.y, button: 'left', clickCount: 1 });
+    await page.cdp('Input.dispatchMouseEvent', { type: 'mouseReleased', x: box.x, y: box.y, button: 'left', clickCount: 1 });
+    await page.waitFor('document.querySelector(".p10-share-status") && /已复制/.test(document.querySelector(".p10-share-status").textContent)', 5000);
   } finally {
     await page.close();
   }

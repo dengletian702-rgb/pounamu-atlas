@@ -129,6 +129,7 @@
   function stayLine(night, tier, people, a, stayKind) {
     if (!night) return { min: 0, max: 0, verify: false, kind: 'stay', empty: true };
     const kind = stayKind || 'city';
+    if (kind === 'closed') return { min: 0, max: 0, verify: false, closed: true, kind: 'stay' };
     if (kind === 'doc-camp' && tier === 'budget') return { min: round(a.docLow * people), max: round(a.docHigh * people), verify: false, kind: 'stay', range: a.docLow !== a.docHigh, source: 'docCamp' };
     if (kind === 'doc-hut' && tier === 'budget') return { min: round(15 * people), max: round(25 * people), verify: false, kind: 'stay', range: true, source: 'docHut' };
     if (kind === 'alpine-hut' && tier === 'budget') return { min: round(50 * people), max: round(62 * people), verify: false, kind: 'stay', range: true, source: 'alpineHut' };
@@ -171,6 +172,13 @@
     const a = normalise(assumptions);
     const info = dayInput(day);
     const stay = day.noStay ? { min: 0, max: 0, verify: false, kind: 'stay', empty: true } : stayLine(info.night, a.tier, a.people, a, day.stayKind);
+    if (day.campNzd != null && stay && !stay.empty && !stay.closed && a.tier === 'budget') {
+      const amount = round(Number(day.campNzd) * a.people);
+      stay.min = amount;
+      stay.max = amount;
+      stay.range = false;
+      stay.verify = false;
+    }
     if (day.unconfirmed && stay && !stay.empty) {
       if (stay.free) stay.verify = true;
       else { stay.min = 0; stay.max = 0; stay.verify = true; stay.range = false; }
@@ -228,6 +236,7 @@
     const fmt = n => cur + Math.round(Number(n) || 0).toLocaleString('en-NZ');
     if (!part) return lang === 'zh' ? '待核' : 'To verify';
     if (part.empty) return '—';
+    if (part.closed) return lang === 'zh' ? '关闭' : 'Closed';
     if (part.free) {
       const base = lang === 'zh' ? 'NZ$0（DOC：免费）' : 'NZ$0 (DOC: free)';
       return part.verify ? base + (lang === 'zh' ? '＋待核' : ' + to verify') : base;

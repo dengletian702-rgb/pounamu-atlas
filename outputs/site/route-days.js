@@ -40,16 +40,16 @@
       { noStay: true, kind: 'none', titleEn: 'Back to Aoraki/Mount Cook Village', titleZh: '回到 Aoraki/Mount Cook Village', noteEn: 'Descend to Aoraki/Mount Cook Village.', noteZh: '下到 Aoraki/Mount Cook Village，这一天不住。', query: 'Aoraki Mount Cook Village' }
     ],
     'heaphy-track': [
-      { stay: 'Perry Saddle Hut', zh: 'Perry Saddle Hut', kind: 'great-walk', hut: true, ix: [0], titleEn: 'Brown Hut → Perry Saddle Hut', titleZh: 'Brown Hut → Perry Saddle Hut', query: 'Perry Saddle Hut', moveEn: '5 hr, 17.5 km (DOC)', moveZh: '5 小时，17.5 公里（DOC）' },
-      { stay: 'Saxon Hut', zh: 'Saxon Hut', kind: 'great-walk', hut: true, ix: [1, 2], titleEn: 'Perry Saddle → Gouland Downs → Saxon Hut', titleZh: 'Perry Saddle → Gouland Downs → Saxon Hut', query: 'Saxon Hut Heaphy Track', moveEn: '2 hr + 1 hr 30 min, 7 km + 5.4 km (DOC)', moveZh: '2 小时 + 1 小时 30 分，7 公里 + 5.4 公里（DOC）' },
-      { stay: 'James Mackay Hut', zh: 'James Mackay Hut', kind: 'great-walk', hut: true, ix: [3], titleEn: 'Saxon Hut → James Mackay Hut', titleZh: 'Saxon Hut → James Mackay Hut', query: 'James Mackay Hut', moveEn: '3 hr, 11.8 km (DOC)', moveZh: '3 小时，11.8 公里（DOC）' },
-      { stay: 'Heaphy Hut', zh: 'Heaphy Hut', kind: 'great-walk', hut: true, ix: [4], titleEn: 'James Mackay Hut → Heaphy Hut via Lewis Shelter', titleZh: 'James Mackay Hut → 经 Lewis Shelter → Heaphy Hut', query: 'Heaphy Hut', moveEn: '6 hr, 20.5 km (DOC)', moveZh: '6 小时，20.5 公里（DOC）' },
-      { noStay: true, kind: 'none', ix: [5], titleEn: 'Out to Kohaihai', titleZh: '到 Kohaihai 出山', query: 'Kohaihai Heaphy Track', moveEn: '5 hr, 16.2 km (DOC)', moveZh: '5 小时，16.2 公里（DOC）' }
+      { stay: 'Perry Saddle Hut', zh: 'Perry Saddle Hut', kind: 'great-walk', hut: true, ix: [0], titleEn: 'Brown Hut → Perry Saddle Hut', titleZh: 'Brown Hut → Perry Saddle Hut', query: 'Perry Saddle Hut', moveEn: '5 hr walking, 2 hr 30 min–3 hr 30 min mountain biking; 17.5 km (DOC)', moveZh: '步行 5 小时，山地车 2.5–3.5 小时；17.5 公里（DOC）' },
+      { stay: 'Saxon Hut', zh: 'Saxon Hut', kind: 'great-walk', hut: true, ix: [1, 2], titleEn: 'Perry Saddle → Gouland Downs → Saxon Hut', titleZh: 'Perry Saddle → Gouland Downs → Saxon Hut', query: 'Saxon Hut Heaphy Track', moveEn: '2 hr walking, 1–2 hr mountain biking, 7 km; then 1 hr 30 min walking, 1–2 hr mountain biking, 5.4 km (DOC)', moveZh: '步行 2 小时，山地车 1–2 小时；7 公里（DOC）。步行 1 小时 30 分，山地车 1–2 小时；5.4 公里（DOC）' },
+      { stay: 'James Mackay Hut', zh: 'James Mackay Hut', kind: 'great-walk', hut: true, ix: [3], titleEn: 'Saxon Hut → James Mackay Hut', titleZh: 'Saxon Hut → James Mackay Hut', query: 'James Mackay Hut', moveEn: '3 hr walking, 2–3 hr mountain biking; 11.8 km (DOC)', moveZh: '步行 3 小时，山地车 2–3 小时；11.8 公里（DOC）' },
+      { stay: 'Heaphy Hut', zh: 'Heaphy Hut', kind: 'great-walk', hut: true, ix: [4], titleEn: 'James Mackay Hut → Heaphy Hut via Lewis Shelter', titleZh: 'James Mackay Hut → 经 Lewis Shelter → Heaphy Hut', query: 'Heaphy Hut', moveEn: '6 hr walking, 2.5–4.5 hr mountain biking; 20.5 km (DOC)', moveZh: '步行 6 小时，山地车 2.5–4.5 小时；20.5 公里（DOC）' },
+      { noStay: true, kind: 'none', ix: [5], titleEn: 'Out to Kohaihai', titleZh: '到 Kohaihai 出山', query: 'Kohaihai Heaphy Track', moveEn: '5 hr walking, 3–4 hr mountain biking; 16.2 km (DOC)', moveZh: '步行 5 小时，山地车 3–4 小时；16.2 公里（DOC）' }
     ],
     'queen-charlotte-track': [
-      { stay: 'Schoolhouse Bay Campsite', zh: 'Schoolhouse Bay Campsite', kind: 'doc-camp', titleEn: 'Ship Cove → Resolution Bay', titleZh: 'Ship Cove → Resolution Bay', noteEn: 'Night at Schoolhouse Bay Campsite, in Resolution Bay.', noteZh: '当晚住 Resolution Bay 的 Schoolhouse Bay Campsite。', query: 'Schoolhouse Bay Campsite Queen Charlotte Track' },
-      { stay: 'Camp Bay Campsite', zh: 'Camp Bay Campsite', kind: 'doc-camp', titleEn: 'Resolution Bay → Endeavour Inlet → Camp Bay', titleZh: 'Resolution Bay → Endeavour Inlet → Camp Bay', noteEn: 'Night at Camp Bay Campsite.', noteZh: '当晚住 Camp Bay Campsite。', query: 'Camp Bay Campsite Queen Charlotte Track' },
-      { stay: 'Cowshed Bay Campsite', zh: 'Cowshed Bay Campsite', kind: 'doc-camp', titleEn: 'Camp Bay → Torea Saddle', titleZh: 'Camp Bay → Torea Saddle', noteEn: 'Night at Cowshed Bay Campsite, near Torea Saddle and Portage.', noteZh: '当晚住 Torea Saddle / Portage 附近的 Cowshed Bay Campsite。', query: 'Cowshed Bay Campsite Queen Charlotte Track' },
+      { stay: 'Schoolhouse Bay Campsite', zh: 'Schoolhouse Bay Campsite', kind: 'doc-camp', campNzd: 10, titleEn: 'Ship Cove → Resolution Bay', titleZh: 'Ship Cove → Resolution Bay', noteEn: 'Night at Schoolhouse Bay Campsite, in Resolution Bay. DOC adult fee: $10 a night.', noteZh: '当晚住 Resolution Bay 的 Schoolhouse Bay Campsite。DOC：成人每晚 $10。', query: 'Schoolhouse Bay Campsite Queen Charlotte Track', officialUrl: 'https://www.doc.govt.nz/parks-and-recreation/places-to-go/marlborough/places/queen-charlotte-sound-totaranui-area/things-to-do/campsites/schoolhouse-bay-campsite/', officialLabelEn: 'DOC Schoolhouse Bay Campsite', officialLabelZh: 'DOC Schoolhouse Bay 营地' },
+      { stay: 'Camp Bay Campsite', zh: 'Camp Bay Campsite', kind: 'doc-camp', campNzd: 10, titleEn: 'Resolution Bay → Endeavour Inlet → Camp Bay', titleZh: 'Resolution Bay → Endeavour Inlet → Camp Bay', noteEn: 'Night at Camp Bay Campsite. DOC adult fee: $10 a night.', noteZh: '当晚住 Camp Bay Campsite。DOC：成人每晚 $10。', query: 'Camp Bay Campsite Queen Charlotte Track' },
+      { stay: 'Cowshed Bay Campsite', zh: 'Cowshed Bay Campsite', kind: 'doc-camp', campNzd: 10, titleEn: 'Camp Bay → Torea Saddle', titleZh: 'Camp Bay → Torea Saddle', noteEn: 'Night at Cowshed Bay Campsite, near Torea Saddle and Portage. DOC adult fee: $10 a night.', noteZh: '当晚住 Torea Saddle / Portage 附近的 Cowshed Bay Campsite。DOC：成人每晚 $10。', query: 'Cowshed Bay Campsite Queen Charlotte Track' },
       { noStay: true, kind: 'none', titleEn: 'Out to Anakiwa', titleZh: '到 Anakiwa 结束', noteEn: 'Walk out to Anakiwa.', noteZh: '走到 Anakiwa 结束。', query: 'Anakiwa' }
     ],
     'abel-tasman': [
@@ -59,9 +59,9 @@
       { noStay: true, kind: 'none', titleEn: 'Out to Wainui', titleZh: '到 Wainui 出山', noteEn: 'Walk out to Wainui. Tōtaranui is the other usual finish. No hut tonight.', noteZh: '走到 Wainui 出山。Tōtaranui 是另一个常用终点。这一天不住。', query: 'Wainui Abel Tasman' }
     ],
     'te-paki-coastal': [
-      { stay: 'Pandora Campsite', zh: 'Pandora Campsite', kind: 'doc-free', unconfirmed: true, titleEn: 'Kapowairua → Pandora', titleZh: 'Kapowairua → Pandora', noteEn: 'DOC lists Pandora Campsite as free. DOC alert on the Te Paki Recreation Reserve page (last reviewed 16 September 2026, read 13 November 2026): Kapowairua (Spirits Bay) to Pandora is closed after storm damage, and Pandora Campsite is closed. This night is to verify.', noteZh: 'DOC 写明 Pandora 营地免费。DOC 在 Te Paki Recreation Reserve 页的公告（最近复核 2026-09-16，本页查阅 2026-11-13）：Kapowairua（Spirits Bay）至 Pandora 因风暴损坏关闭，Pandora 营地关闭。这一晚待核。', query: 'Pandora Campsite Te Paki', officialUrl: 'https://www.doc.govt.nz/parks-and-recreation/places-to-go/northland/places/te-paki-recreation-reserve/things-to-do/campsites/pandora-campsite/', officialLabelEn: 'DOC Pandora Campsite', officialLabelZh: 'DOC Pandora 营地' },
-      { stay: 'Tapotupotu Campsite', zh: 'Tapotupotu Campsite', kind: 'doc-camp', unconfirmed: true, titleEn: 'Pandora → Tapotupotu', titleZh: 'Pandora → Tapotupotu', noteEn: 'DOC alert on the same page (read 13 November 2026): Pandora to Tapotupotu Bay is closed, and DOC is not taking bookings for Tapotupotu Campsite. This night is to verify. The open section runs from Cape Reinga to Te Paki Stream.', noteZh: 'DOC 公告（同一页，查阅 2026-11-13）：Pandora 至 Tapotupotu Bay 关闭，Tapotupotu 营地目前不接受预订。这一晚待核。开放段从 Cape Reinga 到 Te Paki Stream。', query: 'Tapotupotu Campsite' },
-      { stay: 'Twilight Campsite', zh: 'Twilight Campsite', kind: 'doc-camp', titleEn: 'Cape Reinga → Twilight Beach', titleZh: 'Cape Reinga → Twilight Beach', noteEn: 'Night at Twilight Campsite.', noteZh: '当晚住 Twilight Campsite。', query: 'Twilight Campsite Te Paki' },
+      { stay: 'Closed (DOC alert)', zh: '已关闭（DOC 公告）', kind: 'closed', titleEn: 'Kapowairua → Pandora', titleZh: 'Kapowairua → Pandora', noteEn: 'Closed (DOC alert, reviewed 16 September 2026): Kapowairua to Pandora is closed after storm damage, and Pandora Campsite is closed.', noteZh: '已关闭（DOC 公告，复核 2026-09-16）：Kapowairua 至 Pandora 段因风暴损坏关闭，Pandora 营地关闭。', query: 'Pandora Campsite Te Paki', officialUrl: 'https://www.doc.govt.nz/parks-and-recreation/places-to-go/northland/places/te-paki-recreation-reserve/', officialLabelEn: 'DOC Te Paki alerts', officialLabelZh: 'DOC Te Paki 公告' },
+      { stay: 'Closed (DOC alert)', zh: '已关闭（DOC 公告）', kind: 'closed', titleEn: 'Pandora → Tapotupotu', titleZh: 'Pandora → Tapotupotu', noteEn: 'Closed (DOC alert, reviewed 16 September 2026): Pandora to Tapotupotu Bay is closed, and bookings are paused at Tapotupotu Campsite.', noteZh: '已关闭（DOC 公告，复核 2026-09-16）：Pandora 至 Tapotupotu Bay 段关闭，Tapotupotu 营地暂停预订。', query: 'Tapotupotu Campsite' },
+      { stay: 'Twilight Campsite', zh: 'Twilight Campsite', kind: 'doc-camp', titleEn: 'Cape Reinga → Twilight Beach', titleZh: 'Cape Reinga → Twilight Beach', noteEn: 'The Tapotupotu to Cape Reinga section is closed. Start at Cape Reinga. Night at Twilight Campsite, which is open.', noteZh: 'Tapotupotu 至 Cape Reinga 段关闭，从 Cape Reinga 出发。当晚住 Twilight Campsite。', query: 'Twilight Campsite Te Paki' },
       { noStay: true, kind: 'none', titleEn: 'Out to Te Paki Stream', titleZh: '到 Te Paki Stream 结束', noteEn: 'Finish at Te Paki Stream. No camp booked for tonight.', noteZh: '在 Te Paki Stream 结束，这一天不扎营。', query: 'Te Paki Stream' }
     ],
     'ni-timber': [
@@ -81,7 +81,7 @@
     ],
     'ni-coromandel': [
       { stay: 'Coromandel', zh: '科罗曼德镇', kind: 'city', titleEn: 'Auckland → Coromandel town', titleZh: '奥克兰 → 科罗曼德镇', noteEn: 'The afternoon follows the Thames coast toward Coromandel town.', noteZh: '下午沿泰晤士海岸开往科罗曼德镇。', query: 'Coromandel' },
-      { stay: 'Whitianga', zh: '维蒂昂加', kind: 'city', titleEn: 'Thames coast → Mercury Bay', titleZh: '泰晤士海岸 → 水星湾', noteEn: 'Night in Whitianga. Hot Water Beach is a visit, not the stay.', noteZh: '当晚住维蒂昂加。热水海滩是去看的地方，不是住处。', query: 'Whitianga' },
+      { stay: 'Whitianga', zh: '维蒂昂加', kind: 'city', titleEn: 'Thames coast → Mercury Bay', titleZh: '泰晤士海岸 → 水星湾', noteEn: 'Night in Whitianga. Hot Water Beach is a stop on the way.', noteZh: '当晚住维蒂昂加。白天可以去热水海滩。', query: 'Whitianga' },
       { noStay: true, kind: 'none', titleEn: 'Hahei, then back', titleZh: 'Hahei，然后返回', noteEn: 'Hahei in the morning, then the drive back. No extra night.', noteZh: '上午去 Hahei，然后开车返回。', query: 'Hahei' }
     ],
     'ni-volcanicloop': [
@@ -89,8 +89,8 @@
       { noStay: true, kind: 'none', titleEn: 'Back to Taupō', titleZh: '回到陶波', noteEn: 'Return across the Desert Road to Taupō.', noteZh: '经沙漠公路回到陶波。', query: 'Taupō Desert Road' }
     ],
     catlins: [
-      { stay: 'Owaka', zh: '奥瓦卡', kind: 'city', titleEn: 'Dunedin → the Catlins', titleZh: '但尼丁 → 卡特林斯', noteEn: 'Night in Owaka. Nugget Point is a stop, not the stay.', noteZh: '当晚住奥瓦卡。Nugget Point 是停留点，不是住处。', query: 'Owaka' },
-      { noStay: true, kind: 'none', titleEn: 'On to Invercargill', titleZh: '继续到因弗卡吉尔', noteEn: 'Finish toward Invercargill. No second night on this page.', noteZh: '向因弗卡吉尔结束。', query: 'Invercargill' }
+      { stay: 'Owaka', zh: '奥瓦卡', kind: 'city', titleEn: 'Dunedin → the Catlins', titleZh: '但尼丁 → 卡特林斯', noteEn: 'Night in Owaka. Nugget Point is a stop along the way.', noteZh: '当晚住奥瓦卡。途中可以看 Nugget Point。', query: 'Owaka' },
+      { noStay: true, kind: 'none', titleEn: 'On to Invercargill', titleZh: '继续到因弗卡吉尔', noteEn: 'Finish toward Invercargill.', noteZh: '向因弗卡吉尔结束。', query: 'Invercargill' }
     ],
     aorakidrive: [
       { stay: 'Lake Tekapo', zh: '特卡波', kind: 'city', titleEn: 'Christchurch → Lake Tekapo', titleZh: '基督城 → 特卡波', noteEn: 'Night at Lake Tekapo.', noteZh: '当晚住特卡波。', query: 'Lake Tekapo' },
@@ -119,7 +119,7 @@
       { noStay: true, kind: 'none', titleEn: 'Out to Hopuruahine', titleZh: '到 Hopuruahine 出山', noteEn: 'Walk out to Hopuruahine Landing.', noteZh: '走到 Hopuruahine 码头出山。', query: 'Hopuruahine Landing' }
     ],
     'hump-ridge-track': [
-      { stay: 'Ōkaka Lodge', zh: 'Ōkaka Lodge', kind: 'trust', hut: false, titleEn: 'Rarakau → Ōkaka Lodge', titleZh: 'Rarakau → Ōkaka Lodge', noteEn: 'The Hump Ridge Trust sets this price. It is not a DOC Great Walk hut fee.', noteZh: '房价由 Hump Ridge Trust 定，不套 DOC 大步道小屋价。金额待核。', query: 'Okaka Lodge Hump Ridge', officialUrl: 'https://www.doc.govt.nz/parks-and-recreation/places-to-go/fiordland/places/fiordland-national-park/things-to-do/tracks/hump-ridge-track/', officialLabelEn: 'DOC Hump Ridge Track', officialLabelZh: 'DOC Hump Ridge 步道' },
+      { stay: 'Ōkaka Lodge', zh: 'Ōkaka Lodge', kind: 'trust', hut: false, titleEn: 'Rarakau → Ōkaka Lodge', titleZh: 'Rarakau → Ōkaka Lodge', noteEn: 'The Hump Ridge Trust sets this price. Amount to verify.', noteZh: '房价由 Hump Ridge Trust 定。金额待核。', query: 'Okaka Lodge Hump Ridge', officialUrl: 'https://www.doc.govt.nz/parks-and-recreation/places-to-go/fiordland/places/fiordland-national-park/things-to-do/tracks/hump-ridge-track/', officialLabelEn: 'DOC Hump Ridge Track', officialLabelZh: 'DOC Hump Ridge 步道' },
       { stay: 'Port Craig Lodge', zh: 'Port Craig Lodge', kind: 'trust', hut: false, titleEn: 'Ōkaka Lodge → Port Craig Lodge', titleZh: 'Ōkaka Lodge → Port Craig Lodge', noteEn: 'The Hump Ridge Trust sets this price. Amount to verify.', noteZh: '房价由 Hump Ridge Trust 定。金额待核。', query: 'Port Craig Lodge', officialUrl: 'https://www.doc.govt.nz/parks-and-recreation/places-to-go/fiordland/places/fiordland-national-park/things-to-do/tracks/hump-ridge-track/', officialLabelEn: 'DOC Hump Ridge Track', officialLabelZh: 'DOC Hump Ridge 步道' },
       { noStay: true, kind: 'none', titleEn: 'Back to Rarakau', titleZh: '回到 Rarakau', noteEn: 'Walk back to the Rarakau car park.', noteZh: '走回 Rarakau 停车场。', query: 'Rarakau car park' }
     ],
@@ -159,6 +159,7 @@
         textEn, textZh,
         query: day.query,
         stayKind: day.noStay ? 'none' : day.kind,
+        campNzd: day.campNzd == null ? null : day.campNzd,
         unconfirmed: !!day.unconfirmed,
         hut: !!day.hut,
         officialUrl: day.officialUrl || '',
@@ -169,7 +170,28 @@
       };
     });
   }
+  const DAY_DIR = {
+    milford: { origin: 'Te Anau', destination: 'Milford Sound', mode: 'driving' },
+    'ni-martinborough': { origin: 'Wellington', destination: 'Martinborough', mode: 'driving' },
+    'ni-kapitirail': { origin: 'Wellington Station', destination: 'Waikanae Station', mode: 'transit' }
+  };
+  const WALK_QUERY = {
+    'tasman-glacier-view': 'Tasman Glacier View Track Tasman Valley Road',
+    'franz-josef-glacier-walk': 'Franz Josef Glacier/Kā Roimata o Hine Hukatere Walk Franz Josef Glacier car park',
+    'pancake-rocks': 'Punakaiki Pancake Rocks and Blowholes Walk Punakaiki',
+    'hokitika-gorge': 'Hokitika Gorge Walk Hokitika Gorge',
+    'waikoropupu-springs': 'Te Waikoropupū Springs Walk Te Waikoropupū Springs',
+    'mount-robert-circuit': 'Mount Robert Circuit Mount Robert car park',
+    'cathedral-cove': 'Mautohe Cathedral Cove Track Hahei Visitor Car Park',
+    'tane-mahuta': 'Tāne Mahuta Walk Waipoua Forest',
+    'tama-lakes': 'Tama Lakes Track Whakapapa Village'
+  };
   function oneDayLink(route) {
+    if (DAY_DIR[route.id]) {
+      const dir = DAY_DIR[route.id];
+      return { dir, query: dir.origin + ' ' + dir.destination };
+    }
+    if (WALK_QUERY[route.id]) return { query: WALK_QUERY[route.id] };
     const ends = clean(pick(route.ends, true) || route.name);
     const parts = ends.split(/\s*(?:→|->)\s*/).map(s => s.trim()).filter(Boolean);
     const junk = /^(same|return|loop|car park|village|end of the trail)\b/i;

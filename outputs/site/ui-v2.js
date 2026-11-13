@@ -377,7 +377,23 @@
   }
 
   /* ---------- run, and again whenever the page scripts render more ---------- */
+  function fitSvgText(svg) {
+    const box = svg.getBoundingClientRect();
+    const vb = (svg.viewBox && svg.viewBox.baseVal && svg.viewBox.baseVal.width) || 0;
+    const scale = box.width > 0 && vb ? box.width / vb : 0;
+    if (!scale) return;
+    svg.querySelectorAll('text, tspan').forEach(node => {
+      const cs = getComputedStyle(node);
+      if (cs.display === 'none' || cs.visibility === 'hidden') return;
+      const ctm = node.getScreenCTM && node.getScreenCTM();
+      const sc = ctm ? Math.hypot(ctm.a, ctm.b) : scale;
+      if (!(sc > 0)) return;
+      if (parseFloat(cs.fontSize) * sc < 12) node.style.setProperty('font-size', (13 / sc).toFixed(2) + 'px', 'important');
+    });
+  }
+  function fitMaps() { $$('svg').forEach(fitSvgText); }
   function enhance() {
+    fitMaps();
     $$('main img, .plan-result img').forEach(blurUp);
     $$('.route-card, .v4-results .v4-card, .walk-recommendation').forEach(tilt);
     $$('.cinema-copy .button, .v4-primary, .planner-button, .p10-step-nav .button').forEach(magnetic);

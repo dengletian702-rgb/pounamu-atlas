@@ -139,6 +139,25 @@
     el.dataset.mapKind = 'svg';
     el.innerHTML = schematicSvg(state);
     bindSvg(el, state);
+    const svg = el.querySelector('svg');
+    const fit = () => {
+      if (!svg) return;
+      const box = svg.getBoundingClientRect();
+      const vb = svg.viewBox.baseVal.width || 680;
+      const scale = box.width > 0 ? box.width / vb : 0;
+      if (!scale) return;
+      svg.querySelectorAll('text').forEach(t => t.style.setProperty('font-size', (13 / scale).toFixed(2) + 'px', 'important'));
+    };
+    fit();
+    requestAnimationFrame(fit);
+    setTimeout(fit, 80);
+    const names = [...el.querySelectorAll('.v4-map-name')].map(t => t.textContent.trim()).filter(Boolean);
+    if (names.length && !el.querySelector('.v4-map-name-list')) {
+      const list = document.createElement('ul');
+      list.className = 'v4-map-name-list';
+      list.innerHTML = names.map(name => `<li>${esc(name)}</li>`).join('');
+      svg.after(list);
+    }
     return { kind: 'svg' };
   }
   function loadGoogle(key) {

@@ -120,7 +120,7 @@
       if (br.height > 2 && br.top < window.innerHeight * 0.92 && br.bottom > 80) { sticky.hidden = true; return; }
     }
     const box = sticky.getBoundingClientRect();
-    const targets = document.querySelectorAll('.gday-sub, .gday-budget, .gday-actions, .map-legend, .p10-map-day-list, .ui2-kbtn, #p10-budget');
+    const targets = document.querySelectorAll('.gday-sub, .gday-budget, .gday-actions, .map-legend, .p10-map-day-list, .ui2-kbtn, #p10-budget, .te-paki-alert, .v3-closure');
     let hit = false;
     for (const el of targets) {
       const r = el.getBoundingClientRect();
@@ -189,6 +189,19 @@
     host.innerHTML = `<div class="p10-map-day-list">${(stops || []).map((s, i) => `<button type="button" data-gday-focus="${i + 1}">${zh ? '第 ' + (i + 1) + ' 天' : 'Day ' + (i + 1)}</button>`).join('')}</div>
       <svg class="p10-trip-svg gcoast" viewBox="0 0 680 820" role="img" aria-label="${zh ? '新西兰海岸与停留点' : 'New Zealand coastline and stops'}"><rect width="680" height="820" fill="#e2ece8"/><path class="p10-coast" data-coast="${coastD ? 'natural-earth' : 'schematic'}" d="${d}"/><polyline points="${line}" fill="none" stroke="#244c39" stroke-width="3"/>${dots}</svg>
       <p class="v4-note">${zh ? '海岸线来自 Natural Earth（公有领域），连线是示意，不能导航。' : 'Coastline: Natural Earth (public domain). The line is a sketch, not for navigation.'} <a href="https://www.naturalearthdata.com/about/terms-of-use/" target="_blank" rel="noopener" data-keep-link="1">Natural Earth</a></p>`;
+    const svg = host.querySelector('svg');
+    const fit = () => {
+      if (!svg) return;
+      const box = svg.getBoundingClientRect();
+      const vb = svg.viewBox.baseVal.width || 680;
+      const scale = box.width > 0 ? box.width / vb : 0;
+      if (!scale) return;
+      svg.style.setProperty('--k', (1 / scale).toFixed(3));
+      svg.querySelectorAll('text').forEach(t => t.style.setProperty('font-size', (13 / scale).toFixed(2) + 'px', 'important'));
+    };
+    fit();
+    requestAnimationFrame(fit);
+    setTimeout(fit, 80);
     host.addEventListener('click', ev => {
       const b = ev.target.closest('[data-gday-focus]');
       if (!b) return;
@@ -233,10 +246,20 @@
     const src = (route.sources && route.sources[0]) || {};
     const when = route.checkedAt || (src && src.checkedAt) || '2026-11-13';
     const sourceLine = src.url ? `<p class="v4-note"><a class="v4-source" href="${esc(src.url)}" target="_blank" rel="noopener" data-keep-link="1">${zh ? '官方页面' : 'Official page'}</a> · ${esc(when)}</p>` : '';
+    const tePakiZh = 'DOC 公告（复核 2026-09-16）：Kapowairua 至 Pandora、Pandora 至 Tapotupotu Bay、Tapotupotu 至 Cape Reinga 三段因风暴损坏关闭；Pandora 营地关闭；Tapotupotu 和 Kapowairua 营地暂停预订；目前开放的是 Cape Reinga 至 Te Paki Stream，Twilight 营地开放。';
+    const tePakiEn = 'DOC alert (reviewed 16 September 2026): Kapowairua to Pandora, Pandora to Tapotupotu Bay, and Tapotupotu to Cape Reinga are closed after storm damage. Pandora Campsite is closed. Bookings are paused at Tapotupotu and Kapowairua campsites. The open section is Cape Reinga to Te Paki Stream, and Twilight Campsite is open.';
+    if (route.id === 'te-paki-coastal' && !document.querySelector('.te-paki-alert')) {
+      const banner = document.createElement('aside');
+      banner.className = 'v3-closure v3-closure-on section te-paki-alert';
+      banner.setAttribute('role', 'alert');
+      banner.innerHTML = `<p><strong>${zh ? '东段关闭中' : 'East section closed'}</strong> ${esc(zh ? tePakiZh : tePakiEn)}</p><p class="v3-closure-src"><a href="https://www.doc.govt.nz/parks-and-recreation/places-to-go/northland/places/te-paki-recreation-reserve/" target="_blank" rel="noopener">DOC</a> · 2026-09-16</p>`;
+      const facts = document.querySelector('.journey-facts');
+      if (facts) facts.before(banner);
+    }
     const short = [
       { h: zh ? '预订与交通' : 'Booking and transport', p: brief(pair(route.booking) || pair(route.access)), extra: sourceLine },
       { h: zh ? '装备与补给' : 'Gear and supplies', p: brief(pair(route.gear) || pair(route.food)), extra: sourceLine },
-      { h: zh ? '季节与封闭' : 'Season and closures', p: brief(pair(route.season)), extra: sourceLine }
+      { h: zh ? '季节与封闭' : 'Season and closures', p: route.id === 'te-paki-coastal' ? (zh ? tePakiZh : tePakiEn) : brief(pair(route.season)), extra: sourceLine }
     ];
     const intro = document.querySelector('#journey-overview .journey-intro');
     if (intro) intro.outerHTML = short.map(card => `<article class="gplace"><h3>${esc(card.h)}</h3><p>${esc(card.p)}</p>${card.extra || ''}</article>`).join('');
@@ -260,7 +283,7 @@
     if (!box.querySelector('#p10-budget') && !document.querySelector('#journey-timeline #p10-budget')) {
       box.insertAdjacentHTML('beforeend', budgetShell(L));
     }
-    const priced = days.map(s => ({ kind: s.noStay || s.stayKind === 'none' ? 'depart' : 'activity', stayKind: s.stayKind === 'verify' ? 'city' : s.stayKind, noStay: !!s.noStay, unconfirmed: !!s.unconfirmed, legs: [], activities: [{}] }));
+    const priced = days.map(s => ({ kind: s.noStay || s.stayKind === 'none' ? 'depart' : 'activity', stayKind: s.stayKind === 'verify' ? 'city' : s.stayKind, noStay: !!s.noStay, unconfirmed: !!s.unconfirmed, campNzd: s.campNzd, legs: [], activities: [{}] }));
     bindBudget(box, priced);
   }
 

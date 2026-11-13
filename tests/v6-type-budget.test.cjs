@@ -237,21 +237,31 @@ test('every route stay is a place, not a stage verb', () => {
   assert.equal(free.lines.stay.free, true);
   assert.match(budget.formatMoney(free.lines.stay, 'zh'), /DOC：免费/);
   assert.equal(routeDays(routes.find(route => route.id === 'ni-timber'))[0].stayKind, 'doc-free');
-  assert.equal(routeDays(routes.find(route => route.id === 'te-paki-coastal'))[0].stayKind, 'doc-free');
   const tePaki = routeDays(routes.find(route => route.id === 'te-paki-coastal'));
   assert.equal(tePaki[2].stayEn, 'Twilight Campsite');
-  assert.equal(tePaki[0].unconfirmed, true);
-  assert.equal(tePaki[1].unconfirmed, true);
-  assert.match(tePaki[0].textZh, /Pandora 营地关闭/);
-  assert.match(tePaki[1].textZh, /这一晚待核/);
-  const closedFree = budget.priceDay({ kind: 'activity', stayKind: 'doc-free', unconfirmed: true }, budget.normalise({ tier: 'budget', people: 1 }));
-  assert.match(budget.formatMoney(closedFree.lines.stay, 'zh'), /NZ\$0（DOC：免费）＋待核/);
-  const closedCamp = budget.priceDay({ kind: 'activity', stayKind: 'doc-camp', unconfirmed: true }, budget.normalise({ tier: 'budget', people: 1, docLow: 10, docHigh: 20 }));
-  assert.equal(closedCamp.lines.stay.verify, true);
-  assert.equal(closedCamp.lines.stay.min, 0);
-  assert.equal(budget.formatMoney(closedCamp.lines.stay, 'zh'), '待核');
+  assert.equal(tePaki[0].stayZh, '已关闭（DOC 公告）');
+  assert.equal(tePaki[1].stayZh, '已关闭（DOC 公告）');
+  assert.equal(tePaki[0].stayKind, 'closed');
+  assert.doesNotMatch(tePaki[0].textZh + tePaki[0].stayZh, /免费|free/i);
+  assert.doesNotMatch(tePaki[1].textZh + tePaki[1].stayZh, /免费|free/i);
+  assert.match(tePaki[2].textZh, /Tapotupotu 至 Cape Reinga 段关闭，从 Cape Reinga 出发/);
+  const shut = budget.priceDay({ kind: 'activity', stayKind: 'closed' }, budget.normalise({ tier: 'budget', people: 1 }));
+  assert.equal(budget.formatMoney(shut.lines.stay, 'zh'), '关闭');
+  assert.doesNotMatch(budget.formatMoney(shut.lines.stay, 'en'), /free/i);
+  const qct = budget.priceDay({ kind: 'activity', stayKind: 'doc-camp', campNzd: 10 }, budget.normalise({ tier: 'budget', people: 1, docLow: 10, docHigh: 20 }));
+  assert.equal(qct.lines.stay.min, 10);
+  assert.equal(qct.lines.stay.max, 10);
+  assert.match(heaphyDays[0].moveZh, /步行 5 小时，山地车 2\.5–3\.5 小时；17\.5 公里（DOC）/);
   assert.match(heaphyDays[3].textEn, /Lewis Shelter/);
   assert.match(heaphyDays[3].moveEn, /20\.5 km/);
+  for (const route of routes.filter(item => !(Number(item.planDays) > 1))) {
+    const linked = routeDays(route)[0];
+    if (linked.dir) assert.notEqual(linked.dir.origin, linked.dir.destination, route.id);
+  }
+  assert.equal(routeDays(routes.find(route => route.id === 'milford'))[0].dir.destination, 'Milford Sound');
+  assert.equal(routeDays(routes.find(route => route.id === 'ni-martinborough'))[0].dir.destination, 'Martinborough');
+  assert.equal(routeDays(routes.find(route => route.id === 'ni-kapitirail'))[0].dir.destination, 'Waikanae Station');
+  assert.doesNotMatch(fs.readFileSync(path.join(__dirname, '..', 'docs/route-days.js'), 'utf8'), /不是住处|not the stay|No second night|不套 DOC/);
   assert.equal(routeDays(routes.find(route => route.id === 'hump-ridge-track'))[0].hut, false);
   assert.equal(routeDays(routes.find(route => route.id === 'hump-ridge-track'))[0].stayEn, 'Ōkaka Lodge');
   assert.equal(routeDays(routes.find(route => route.id === 'lake-waikaremoana'))[2].stayEn, 'Marauiti Hut');
@@ -396,6 +406,41 @@ test('svg map text is at least 12px on screen', async (t) => {
       await page.ev('new Promise(r => setTimeout(r, 200))');
       const planHits = await page.ev(measure);
       assert.deepEqual(planHits, [], 'plan ' + w + ' ' + JSON.stringify(planHits));
+      for (const [label, url, ready] of [
+        ['home', 'index.html?lang=zh', 'document.querySelector(".nz-map text")'],
+        ['destination', 'destination.html?id=ni-akl&lang=zh', 'document.querySelector("#v4-dest-map text")'],
+        ['template', 'guide.html?template=SI-09B&lang=zh', 'document.querySelector("#gcoast text")']
+      ]) {
+        await page.go(url);
+        await page.waitFor(ready, 20000);
+        await page.ev(`document.querySelector("${label === 'home' ? '.nz-map' : label === 'destination' ? '#v4-dest-map' : '#gcoast'}").scrollIntoView()`);
+        await page.ev('new Promise(r => setTimeout(r, 250))');
+        const hits = await page.ev(measure);
+        assert.deepEqual(hits, [], label + ' ' + w + ' ' + JSON.stringify(hits));
+      }
+    }
+    assert.deepEqual(page.errors, []);
+  } finally {
+    await page.close();
+  }
+});
+
+test('te paki page states the east-section closure and does not call closed nights free', async (t) => {
+  const page = await openBrowser();
+  if (!page) { t.skip('Chrome is not installed here'); return; }
+  try {
+    for (const lang of ['zh', 'en']) {
+      await page.go('route.html?id=te-paki-coastal&lang=' + lang);
+      await page.waitFor('document.querySelectorAll(".gday").length >= 4');
+      const body = await page.ev(`(() => {
+        const days = [...document.querySelectorAll('.gday')];
+        return { page: document.body.innerText, d1: days[0].innerText, d2: days[1].innerText, d3: days[2].innerText };
+      })()`);
+      assert.match(body.page, lang === 'zh' ? /关闭/ : /closed/i);
+      assert.match(body.page, lang === 'zh' ? /Cape Reinga 至 Te Paki Stream/ : /Cape Reinga to Te Paki Stream/);
+      assert.doesNotMatch(body.d1, /免费|free/i);
+      assert.doesNotMatch(body.d2, /免费|free/i);
+      if (lang === 'zh') assert.match(body.d3, /Tapotupotu 至 Cape Reinga 段关闭，从 Cape Reinga 出发/);
     }
     assert.deepEqual(page.errors, []);
   } finally {

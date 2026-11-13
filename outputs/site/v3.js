@@ -26,7 +26,8 @@ function v3Badge(r, key) {
 function v3FactCell(r, label, value, key) {
   if (key && !v3FieldShown(r, key)) return '';
   const shown = value ? escapeHtml(value) : `<span class="v3-missing">${v3L('No checked value yet', '暂无已核实的数值')}</span>`;
-  return `<div><span>${label}</span><strong>${shown}</strong>${key ? v3Badge(r, key) : ''}</div>`;
+  const east = key === 'time' && r && r.id === 'te-paki-coastal' ? `<span class="v3-east-closed">${v3L('East section closed', '东段关闭中')}</span>` : '';
+  return `<div><span>${label}</span><strong>${shown}</strong>${key ? v3Badge(r, key) : ''}${east}</div>`;
 }
 function v3SideFact(r, key) {
   if (!v3FieldShown(r, key)) return '';

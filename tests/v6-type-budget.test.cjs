@@ -191,7 +191,7 @@ test('every route stay is a place, not a stage verb', () => {
       assert.doesNotMatch(day.query || '', /Leave Routeburn|Climb through the high forest|Lunch in Marlborough/, route.id);
       if (day.stayKind === 'city') assert.doesNotMatch(day.stayEn, /hut|campsite/i, route.id + ' ' + day.stayEn);
       const next = days[i + 1];
-      if (next) assert.notEqual(day.stayEn + '|' + day.query, next.stayEn + '|' + next.query, route.id + ' day ' + (i + 1));
+      if (next && !/续住/.test(next.stayZh || '')) assert.notEqual(day.stayEn + '|' + day.query, next.stayEn + '|' + next.query, route.id + ' day ' + (i + 1));
     }
   }
   const expectStay = {
@@ -219,6 +219,56 @@ test('every route stay is a place, not a stage verb', () => {
   assert.equal(wh[0].stayKind, 'great-walk');
   const train = routeDays(routes.find(route => route.id === 'tranzalpine'));
   assert.equal(train[0].dir.destination, 'Greymouth Railway Station');
+  const queen = routeDays(routes.find(route => route.id === 'queen-charlotte-track'));
+  assert.deepEqual(queen.map(day => day.stayEn), ['Schoolhouse Bay Campsite', 'Camp Bay Campsite', 'Cowshed Bay Campsite', '']);
+  assert.equal(queen[0].titleEn, 'Ship Cove → Resolution Bay');
+  const heaphyDays = routeDays(routes.find(route => route.id === 'heaphy-track'));
+  assert.deepEqual(heaphyDays.map(day => day.stayEn), ['Perry Saddle Hut', 'Saxon Hut', 'James Mackay Hut', 'Heaphy Hut', '']);
+  assert.match(heaphyDays[0].moveEn, /17\.5 km/);
+  const tieke = routeDays(routes.find(route => route.id === 'whanganui-journey'))[3];
+  assert.equal(tieke.stayKind, 'great-walk');
+  assert.equal(tieke.hut, true);
+  const mueller = routeDays(routes.find(route => route.id === 'mueller-hut'))[0];
+  assert.equal(mueller.stayKind, 'alpine-hut');
+  const alpine = budget.priceDay({ kind: 'activity', stayKind: 'alpine-hut' }, budget.normalise({ tier: 'budget', people: 1 }));
+  assert.equal(alpine.lines.stay.min, 50);
+  assert.equal(alpine.lines.stay.max, 62);
+  const free = budget.priceDay({ kind: 'activity', stayKind: 'doc-free' }, budget.normalise({ tier: 'budget', people: 1 }));
+  assert.equal(free.lines.stay.free, true);
+  assert.match(budget.formatMoney(free.lines.stay, 'zh'), /DOC：免费/);
+  assert.equal(routeDays(routes.find(route => route.id === 'ni-timber'))[0].stayKind, 'doc-free');
+  assert.equal(routeDays(routes.find(route => route.id === 'te-paki-coastal'))[0].stayKind, 'doc-free');
+  const tePaki = routeDays(routes.find(route => route.id === 'te-paki-coastal'));
+  assert.equal(tePaki[2].stayEn, 'Twilight Campsite');
+  assert.equal(tePaki[0].unconfirmed, true);
+  assert.equal(tePaki[1].unconfirmed, true);
+  assert.match(tePaki[0].textZh, /Pandora 营地关闭/);
+  assert.match(tePaki[1].textZh, /这一晚待核/);
+  const closedFree = budget.priceDay({ kind: 'activity', stayKind: 'doc-free', unconfirmed: true }, budget.normalise({ tier: 'budget', people: 1 }));
+  assert.match(budget.formatMoney(closedFree.lines.stay, 'zh'), /NZ\$0（DOC：免费）＋待核/);
+  const closedCamp = budget.priceDay({ kind: 'activity', stayKind: 'doc-camp', unconfirmed: true }, budget.normalise({ tier: 'budget', people: 1, docLow: 10, docHigh: 20 }));
+  assert.equal(closedCamp.lines.stay.verify, true);
+  assert.equal(closedCamp.lines.stay.min, 0);
+  assert.equal(budget.formatMoney(closedCamp.lines.stay, 'zh'), '待核');
+  assert.match(heaphyDays[3].textEn, /Lewis Shelter/);
+  assert.match(heaphyDays[3].moveEn, /20\.5 km/);
+  assert.equal(routeDays(routes.find(route => route.id === 'hump-ridge-track'))[0].hut, false);
+  assert.equal(routeDays(routes.find(route => route.id === 'hump-ridge-track'))[0].stayEn, 'Ōkaka Lodge');
+  assert.equal(routeDays(routes.find(route => route.id === 'lake-waikaremoana'))[2].stayEn, 'Marauiti Hut');
+  assert.equal(routeDays(routes.find(route => route.id === 'ni-thermalexplorer'))[2].query, 'Taupō');
+  assert.match(routeDays(routes.find(route => route.id === 'ni-twincoast-drive'))[2].stayZh, /续住/);
+  const bannedQuery = /\bsame\b|\breturn\b|\bloop\b|end of the trail/i;
+  for (const route of routes.filter(item => !(Number(item.planDays) > 1))) {
+    const day = routeDays(route)[0];
+    const words = day.query || '';
+    assert.doesNotMatch(words, bannedQuery, route.id + ' ' + words);
+    assert.doesNotMatch(words, /^(car park|village)$/i, route.id);
+    const start = String((route.ends && route.ends[0]) || '').split(/\s*(?:→|->)\s*/)[0];
+    assert.ok(words.includes(route.name) || words.includes(start) || (day.dir && (day.dir.origin.includes(start) || start.includes(day.dir.origin))), route.id + ' ' + words);
+  }
+  assert.match(routeDays(routes.find(route => route.id === 'hooker'))[0].query, /White Horse Hill car park Hooker Valley Track/);
+  assert.match(routeDays(routes.find(route => route.id === 'ni-rangitoto'))[0].query, /Rangitoto Wharf/);
+  assert.equal(routeDays(routes.find(route => route.id === 'bus'))[0].dir.mode, 'transit');
 });
 
 test('literal font-size stays in the type scale file', () => {
@@ -290,6 +340,7 @@ test('route day cards render on first load and the sticky line does not cover co
             action: overlaps(sticky, action),
             search: overlaps(sticky, search),
             legend: legendBox ? overlaps(sticky, legendBox) : false,
+            sub: [...document.querySelectorAll('.gday-sub')].some(el => overlaps(sticky, el.getBoundingClientRect())),
             nowrap: cs.whiteSpace === 'nowrap',
             line: document.querySelector('.gday-sticky').innerText.replace(/\\s+/g, ' ')
           };
@@ -297,9 +348,54 @@ test('route day cards render on first load and the sticky line does not cover co
         assert.equal(hit.action, false, w + lang);
         assert.equal(hit.search, false, w + lang);
         assert.equal(hit.legend, false, w + lang);
+        assert.equal(hit.sub, false, w + lang + ' running total');
         assert.equal(hit.nowrap, true, w + lang);
         assert.match(hit.line, lang === 'zh' ? /^合计/ : /^Total/);
       }
+    }
+    assert.deepEqual(page.errors, []);
+  } finally {
+    await page.close();
+  }
+});
+
+test('svg map text is at least 12px on screen', async (t) => {
+  const page = await openBrowser();
+  if (!page) { t.skip('Chrome is not installed here'); return; }
+  const measure = `(() => {
+    const hits = [];
+    for (const el of document.querySelectorAll('svg text')) {
+      const cs = getComputedStyle(el);
+      if (cs.display === 'none' || cs.visibility === 'hidden') continue;
+      const box = el.getBoundingClientRect();
+      if (box.width < 1 || box.height < 1) continue;
+      const ctm = el.getScreenCTM();
+      if (!ctm) continue;
+      const screen = parseFloat(cs.fontSize) * Math.hypot(ctm.a, ctm.b);
+      if (screen < 11.5) hits.push((el.textContent || '').trim().slice(0, 28) + ' ' + screen.toFixed(1));
+      if (hits.length > 8) break;
+    }
+    return hits;
+  })()`;
+  try {
+    for (const w of [320, 390, 1440]) {
+      await page.view(w, w === 1440 ? 900 : 844, w < 800);
+      await page.go('route.html?id=routeburn-track&lang=en');
+      await page.waitFor('document.querySelector(".route-map-svg")');
+      await page.ev('document.querySelector("#routeMap").scrollIntoView()');
+      await page.ev('new Promise(r => setTimeout(r, 120))');
+      const routeHits = await page.ev(measure);
+      assert.deepEqual(routeHits, [], 'route ' + w + ' ' + JSON.stringify(routeHits));
+      await page.go('plan.html?lang=en');
+      await page.waitFor('document.readyState === "complete"', 20000);
+      await page.click('#p10-next-1');
+      await page.click('#p10-next-2');
+      await page.click('button[type=submit]');
+      await page.waitFor('document.querySelector(".p10-trip-svg text")', 15000);
+      await page.ev('document.querySelector(".p10-trip-svg").scrollIntoView()');
+      await page.ev('new Promise(r => setTimeout(r, 200))');
+      const planHits = await page.ev(measure);
+      assert.deepEqual(planHits, [], 'plan ' + w + ' ' + JSON.stringify(planHits));
     }
     assert.deepEqual(page.errors, []);
   } finally {

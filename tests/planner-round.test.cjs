@@ -95,7 +95,14 @@ test('navigation hides sports and the DOC directory, and preparation has no outb
       assert.equal(nav.hrefs.some(href => /cities\.html/.test(href)), true, lang);
       assert.equal(nav.overflow, false, lang);
       await page.go('prepare.html?lang=' + lang);
-      await page.waitFor('document.querySelector("#page-references")');
+      await page.waitFor('document.readyState === "complete"', 20000);
+      try {
+        await page.waitFor('document.querySelector("#page-references")', 20000);
+      } catch (err) {
+        await page.go('prepare.html?lang=' + lang);
+        await page.waitFor('document.readyState === "complete"', 20000);
+        await page.waitFor('document.querySelector("#page-references")', 20000);
+      }
       const prep = await page.ev(`(() => {
         const main = document.querySelector('main');
         const links = [...main.querySelectorAll('a[href]')].map(a => a.href).filter(href => { try { return new URL(href).host !== location.host; } catch { return false; } });

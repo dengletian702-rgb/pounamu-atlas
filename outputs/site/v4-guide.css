@@ -43,7 +43,7 @@
 .p10-unscheduled-dot{fill:none;stroke:#9e4a2e;stroke-width:1.6;stroke-dasharray:3 2}
 .v4-g-dot{width:16px;height:16px;border-radius:50%;border:2px solid #203a2e;background:#f7f6ef;font-size:var(--type-xs);color:#203a2e;display:flex;align-items:center;justify-content:center}
 .v4-g-dot.is-on{background:#203a2e;color:#f7f6ef}
-.v4-map-stop text{font-size:var(--type-xs);fill:#203a2e}
+.v4-map-stop text{fill:#203a2e}
 .v4-google-map{width:100%;min-height:420px}
 .v4-place{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid #d5decc}
 .v4-place input{width:20px;height:20px;margin-top:4px}

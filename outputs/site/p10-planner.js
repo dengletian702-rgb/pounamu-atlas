@@ -1131,16 +1131,17 @@ globalThis.P10_NODES = NODES;
     const extra=day==='all'?[...panel.querySelectorAll('.p10-unscheduled-dot')].map(c=>[Number(c.getAttribute('cx')),Number(c.getAttribute('cy'))]):[];
     const points=(current?[current]:lines).flatMap(line=>line.dataset.points.split(' ').map(p=>p.split(',').map(Number))).concat(extra);if(!points.length)return;
     const xs=points.map(p=>p[0]),ys=points.map(p=>p[1]);
-    const cx=(Math.min(...xs)+Math.max(...xs))/2,cy=(Math.min(...ys)+Math.max(...ys))/2;
-    // Extra width on the right so a town name is not cut off at 320px.
-    const h=Math.min(820,Math.max(280,(Math.max(...ys)-Math.min(...ys))*1.7+110,((Math.max(...xs)-Math.min(...xs))*1.7+240)*820/680)),w=h*680/820+80;
+    const cx=(Math.min(...xs)+Math.max(...xs))/2+20,cy=(Math.min(...ys)+Math.max(...ys))/2;
+    const h=Math.min(820,Math.max(260,(Math.max(...ys)-Math.min(...ys))*1.6+90,((Math.max(...xs)-Math.min(...xs))*1.6+160)*820/680)),w=h*680/820;
     svg.setAttribute('viewBox',`${cx-w/2} ${cy-h/2} ${w} ${h}`);
     // Size the names for the map as it is drawn on screen: about 12px on a wide map, 10.5px on a phone.
     const box=svg.getBoundingClientRect(),scale=box.width&&box.height?Math.min(box.width/w,box.height/h):0,narrow=box.width>0&&box.width<420;
     svg.classList.toggle('p10-map-narrow',narrow);
-    const k=scale?(narrow?10.5:12)/12/scale:w/680;
-    svg.style.setProperty('--k',k.toFixed(3));
-    p10PlaceLabels(svg,k);
+    const fitLabels=()=>{const b=svg.getBoundingClientRect();const sc=b.width&&b.height?Math.min(b.width/w,b.height/h):0;if(!sc)return;const layout=1/sc;svg.style.setProperty('--k',layout.toFixed(3));svg.querySelectorAll('.p10-map-label,.p10-map-tag').forEach(t=>t.style.setProperty('font-size',(12/sc).toFixed(2)+'px','important'));p10PlaceLabels(svg,Math.max(layout,0.8));};
+    fitLabels();requestAnimationFrame(fitLabels);setTimeout(fitLabels,80);
+    let nameList=panel.querySelector('.p10-map-name-list');
+    if(!nameList){nameList=document.createElement('ul');nameList.className='p10-map-name-list';svg.after(nameList);}
+    nameList.innerHTML=[...svg.querySelectorAll('.p10-map-label,.p10-map-tag')].map(t=>`<li>${t.textContent}</li>`).join('');
   }
   // Keep town names from sitting on top of each other (Picton and Wellington, Queenstown and Te Anau):
   // try right of the dot, then left, then just below or above.
@@ -1241,7 +1242,7 @@ globalThis.P10_NODES = NODES;
       const title=zh?s.titleZh:s.titleEn, text=zh?s.textZh:s.textEn, stay=zh?s.stayZh:s.stayEn;
       const href=s.dir&&api?api.dirUrl({origin:s.dir.origin,destination:s.dir.destination,mode:s.dir.mode||'transit'}):(api?api.searchUrl({name:s.query||stay||title}):'');
       const link=href?`<a class="v4-gmaps" href="${p10Esc(href)}" target="_blank" rel="noopener" data-keep-link="1">${s.dir?(zh?'Google Maps 当天路线':'Google Maps for this day'):(zh?'在谷歌地图打开':'Open in Google Maps')}</a>`:'';
-      const hut=s.hut?`<p class="gday-official"><a href="https://www.doc.govt.nz/parks-and-recreation/places-to-stay/stay-in-a-hut/hut-categories/" target="_blank" rel="noopener" data-keep-link="1">${zh?'DOC 小屋分类与费用':'DOC hut categories and fees'}</a> · 2026-11-13</p>`:'';
+      const hut=s.officialUrl?`<p class="gday-official"><a href="${p10Esc(s.officialUrl)}" target="_blank" rel="noopener" data-keep-link="1">${p10Esc(zh?(s.officialLabelZh||'DOC'):(s.officialLabelEn||'DOC'))}</a> · 2026-11-13</p>`:(s.hut?`<p class="gday-official"><a href="https://www.doc.govt.nz/parks-and-recreation/places-to-stay/stay-in-a-hut/hut-categories/" target="_blank" rel="noopener" data-keep-link="1">${zh?'DOC 小屋分类与费用':'DOC hut categories and fees'}</a> · 2026-11-13</p>`:'');
       const stayRow=s.noStay?'':`<div><dt>${zh?'住哪里':'STAY'}</dt><dd>${p10Esc(stay||(zh?'待核':'To verify'))}</dd></div>`;
       return `<article class="plan-day gday" id="day-${i+1}" data-gday="${i+1}"><div class="gday-date"><b>DAY ${String(i+1).padStart(2,'0')}</b><span>${zh?'日期待核':'Date to verify'}</span></div><h3 class="plan-day-title">${p10Esc(title)}</h3><dl class="gday-meta">${stayRow}<div><dt>${moveLabel}</dt><dd>${p10Esc(zh?s.moveZh:s.moveEn)}</dd></div></dl><div class="gday-budget" data-gday-budget="${i}"></div><p>${p10Esc(text)}</p><p class="gday-actions">${link}</p>${hut}</article>`;
     }).join('');
@@ -1249,7 +1250,7 @@ globalThis.P10_NODES = NODES;
     p10EnsureBudget();
     const budget=globalThis.pounamuGuide?globalThis.pounamuGuide.budgetShell(zh?'zh':'en'):'';
     el.innerHTML=`<h2 class="p10-result-title" tabindex="-1">${p10Esc(zh?pack.zh:pack.name)} · ${pack.planDays} ${zh?'天':'days'}</h2><p class="v4-note">${zh?'下面按这条线路自己的天数排，没有改成城际自驾。':'These days follow this route. They are not a driving tour.'}</p>${transfers}<div class="p10-days" id="p10-days">${cards}</div>${budget}`;
-    const priced=pack.days.map(s=>({kind:s.noStay||s.stayKind==='none'?'depart':'activity',stayKind:s.stayKind==='verify'?'city':s.stayKind,noStay:!!s.noStay,legs:[],activities:[{}]}));
+    const priced=pack.days.map(s=>({kind:s.noStay||s.stayKind==='none'?'depart':'activity',stayKind:s.stayKind==='verify'?'city':s.stayKind,noStay:!!s.noStay,unconfirmed:!!s.unconfirmed,legs:[],activities:[{}]}));
     delete el.dataset.budgetBound;if(globalThis.pounamuGuide) globalThis.pounamuGuide.bindBudget(el, priced);
     else if(globalThis.pounamuBudget){p10View={days:priced,token:result};p10PaintBudget();}
   }
@@ -1469,6 +1470,8 @@ globalThis.P10_NODES = NODES;
     const svg=document.querySelector('#p10-pick-map .p10-pick-svg');if(!svg)return;
     const vb=svg.viewBox.baseVal,box=svg.getBoundingClientRect();
     const k=box.width&&box.height?Math.max(vb.width/box.width,vb.height/box.height):vb.width/360;
+    const fitPick=()=>{const b=svg.getBoundingClientRect();if(!b.width||!vb.width)return;const sc=b.width/vb.width;svg.querySelectorAll('text').forEach(t=>t.style.setProperty('font-size',(12/sc).toFixed(2)+'px','important'));};
+    fitPick();requestAnimationFrame(fitPick);setTimeout(fitPick,120);
     svg.style.setProperty('--k',k.toFixed(3));
     for(const g of svg.querySelectorAll('.p10-pick-dot')){const town=g.classList.contains('is-town');g.querySelector('.p10-pick-mark').setAttribute('r',((town?3.5:5.5)*k).toFixed(2));g.querySelector('.p10-pick-hit').setAttribute('r',(11*k).toFixed(2));}
     const tags=[...svg.querySelectorAll('.p10-pick-tag')];

@@ -131,6 +131,9 @@
     const kind = stayKind || 'city';
     if (kind === 'doc-camp' && tier === 'budget') return { min: round(a.docLow * people), max: round(a.docHigh * people), verify: false, kind: 'stay', range: a.docLow !== a.docHigh, source: 'docCamp' };
     if (kind === 'doc-hut' && tier === 'budget') return { min: round(15 * people), max: round(25 * people), verify: false, kind: 'stay', range: true, source: 'docHut' };
+    if (kind === 'alpine-hut' && tier === 'budget') return { min: round(50 * people), max: round(62 * people), verify: false, kind: 'stay', range: true, source: 'alpineHut' };
+    if (kind === 'doc-free') return { min: 0, max: 0, verify: false, free: true, kind: 'stay', source: 'docFree' };
+    if (kind === 'trust') return { min: 0, max: 0, verify: true, kind: 'stay', source: 'humpRidge' };
     if (kind === 'great-walk') return { min: 0, max: 0, verify: true, kind: 'stay', source: 'greatWalk' };
     if (tier !== 'budget') {
       const rate = tier === 'high' ? a.highNightly : a.midNightly;
@@ -168,6 +171,10 @@
     const a = normalise(assumptions);
     const info = dayInput(day);
     const stay = day.noStay ? { min: 0, max: 0, verify: false, kind: 'stay', empty: true } : stayLine(info.night, a.tier, a.people, a, day.stayKind);
+    if (day.unconfirmed && stay && !stay.empty) {
+      if (stay.free) stay.verify = true;
+      else { stay.min = 0; stay.max = 0; stay.verify = true; stay.range = false; }
+    }
     const fuel = fuelLine(info.km, a);
     if (info.kmUnknown && !fuel.verify) fuel.verify = true;
     const food = info.kind === 'depart' && !info.activities
@@ -221,6 +228,10 @@
     const fmt = n => cur + Math.round(Number(n) || 0).toLocaleString('en-NZ');
     if (!part) return lang === 'zh' ? '待核' : 'To verify';
     if (part.empty) return '—';
+    if (part.free) {
+      const base = lang === 'zh' ? 'NZ$0（DOC：免费）' : 'NZ$0 (DOC: free)';
+      return part.verify ? base + (lang === 'zh' ? '＋待核' : ' + to verify') : base;
+    }
     const has = Number(part.min) > 0 || Number(part.max) > 0;
     if (!has) return part.verify ? (lang === 'zh' ? '待核' : 'To verify') : '—';
     const body = part.min === part.max ? fmt(part.min) : fmt(part.min) + '–' + fmt(part.max);

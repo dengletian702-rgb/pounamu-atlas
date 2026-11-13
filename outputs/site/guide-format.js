@@ -120,7 +120,7 @@
       if (br.height > 2 && br.top < window.innerHeight * 0.92 && br.bottom > 80) { sticky.hidden = true; return; }
     }
     const box = sticky.getBoundingClientRect();
-    const targets = document.querySelectorAll('.gday, .gday-actions, .gday-meta, .gday-body, .gplace, .journey-endpoints, .gday-jumpmap, .map-legend, .p10-map-day-list, .journey-facts, .ui2-kbtn, #p10-budget');
+    const targets = document.querySelectorAll('.gday-sub, .gday-budget, .gday-actions, .map-legend, .p10-map-day-list, .ui2-kbtn, #p10-budget');
     let hit = false;
     for (const el of targets) {
       const r = el.getBoundingClientRect();
@@ -154,7 +154,7 @@
     }
     const sticky = root.querySelector('#p10-budget-sticky');
     if (sticky) {
-      sticky.innerHTML = `<a href="#p10-budget">${zh ? '合计' : 'Total'} ${esc(api.formatMoney(trip.total, zh ? 'zh' : 'en'))}</a>`;
+      sticky.innerHTML = `<a href="#p10-budget">${zh ? '合计' : 'Total'}</a>`;
       placeSticky(sticky);
     }
     return state;
@@ -220,7 +220,7 @@
       moveLabel, move: zh ? s.moveZh : s.moveEn, must: false,
       body: `<p>${esc(zh ? s.textZh : s.textEn)}</p>`,
       mapsHtml: s.dir ? dirLinks([{ name: s.dir.origin }, { name: s.dir.destination }], s.dir.mode || 'transit', L) : searchLink({ name: s.query || s.stayEn }, L),
-      official: s.hut ? `<p class="gday-official"><a href="https://www.doc.govt.nz/parks-and-recreation/places-to-stay/stay-in-a-hut/hut-categories/" target="_blank" rel="noopener" data-keep-link="1">${zh ? 'DOC 小屋分类与费用' : 'DOC hut categories and fees'}</a> · 2026-11-13</p>` : ''
+      official: s.officialUrl ? `<p class="gday-official"><a href="${esc(s.officialUrl)}" target="_blank" rel="noopener" data-keep-link="1">${esc(zh ? (s.officialLabelZh || 'DOC') : (s.officialLabelEn || 'DOC'))}</a> · 2026-11-13</p>` : (s.hut ? `<p class="gday-official"><a href="https://www.doc.govt.nz/parks-and-recreation/places-to-stay/stay-in-a-hut/hut-categories/" target="_blank" rel="noopener" data-keep-link="1">${zh ? 'DOC 小屋分类与费用' : 'DOC hut categories and fees'}</a> · 2026-11-13</p>` : '')
     })).join('');
     const old = box.querySelector('.journey-timeline');
     const host = old || box;
@@ -260,7 +260,7 @@
     if (!box.querySelector('#p10-budget') && !document.querySelector('#journey-timeline #p10-budget')) {
       box.insertAdjacentHTML('beforeend', budgetShell(L));
     }
-    const priced = days.map(s => ({ kind: s.noStay || s.stayKind === 'none' ? 'depart' : 'activity', stayKind: s.stayKind === 'verify' ? 'city' : s.stayKind, noStay: !!s.noStay, legs: [], activities: [{}] }));
+    const priced = days.map(s => ({ kind: s.noStay || s.stayKind === 'none' ? 'depart' : 'activity', stayKind: s.stayKind === 'verify' ? 'city' : s.stayKind, noStay: !!s.noStay, unconfirmed: !!s.unconfirmed, legs: [], activities: [{}] }));
     bindBudget(box, priced);
   }
 

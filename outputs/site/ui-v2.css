@@ -233,5 +233,9 @@ h1 .v4-en-name{font-family:"Iowan Old Style","Palatino Linotype",Georgia,serif;f
   .header .motion-toggle,.header .language{white-space:nowrap;min-height:44px;min-width:44px}
   .header .motion-toggle{font-size:10px;letter-spacing:0;padding:6px 3px}
   .header .language{font-size:11px;padding:6px 6px}
+  /* The floating search button owns the bottom-right corner. The toast is the only other bar fixed to the bottom; keep its Undo control to the left of that button. */
+  .v4-toast{right:84px}
+  .v4-toast>span{flex:1 1 auto;min-width:0}
+  .v4-toast [data-v4-undo]{flex:0 0 auto}
 }
 @media (max-width:760px){.ui2-pal li a em{display:none}.ui2-pal{border-radius:16px}}

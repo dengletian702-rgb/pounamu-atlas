@@ -264,3 +264,81 @@ test('mobile header P1: one row, search button clear of the bar', { timeout: 180
     await page.close();
   }
 });
+
+const KEPT_DRAFT = JSON.stringify({
+  edited: true, title: 'HITKEEP', requestedDays: 3,
+  days: [{ uid: 'a', placeId: 'si-zqn', label_zh: '皇后镇', label_en: 'Queenstown', from: '', to: '', via: '', parts: [], notes: '', ferry: false, source_url: '', est_date: '', nameVerify: false, km: '', rawTime: '' }],
+  unscheduled: [], chosen: ['si-zqn'], island: 'all', regions: [], hideVerify: false, view: 'edit', minimum: 0, templateId: ''
+});
+
+// Fixed controls other than the search button: every hit point on each button or link must land on that control.
+const FIXED_HITS = `(() => {
+  const k = document.querySelector('.ui2-kbtn');
+  const point = (el, ratio) => {
+    const b = el.getBoundingClientRect();
+    const x = b.left + b.width * ratio;
+    const y = b.top + b.height * 0.5;
+    const hit = document.elementFromPoint(x, y);
+    return { ratio, x, y, own: !!(hit && (hit === el || el.contains(hit))), cls: hit ? String(hit.className || hit.id || hit.tagName).slice(0, 40) : '' };
+  };
+  const controls = [...document.querySelectorAll('button, a, input')].filter(el => {
+    const b = el.getBoundingClientRect();
+    if (b.width < 2 || b.height < 2) return false;
+    if (k && (el === k || k.contains(el))) return false;
+    let n = el;
+    while (n && n !== document.body) {
+      if (getComputedStyle(n).position === 'fixed') return true;
+      n = n.parentElement;
+    }
+    return false;
+  });
+  return controls.map(el => {
+    const b = el.getBoundingClientRect();
+    const hits = [0.15, 0.5, 0.85].map(ratio => point(el, ratio));
+    return { t: (el.innerText || el.id || '').trim().slice(0, 32), x: b.x, y: b.y, w: b.width, h: b.height, r: b.right, hits, covered: hits.some(h => !h.own) };
+  });
+})()`;
+
+test('phone toast Undo is not covered by the search button', { timeout: 120000 }, async t => {
+  const page = await openBrowser();
+  if (!page) { t.skip('Chrome is not installed here'); return; }
+  try {
+    const report = [];
+    for (const w of [320, 390, 430]) {
+      await page.view(w, 844, true);
+      for (const lang of ['zh', 'en']) {
+        await page.go('guide.html?lang=' + lang);
+        await page.waitFor('document.querySelector(".ui2-kbtn")');
+        await page.ev('localStorage.setItem("pounamu-v4-draft", ' + JSON.stringify(KEPT_DRAFT) + ')');
+        await page.go('guide.html?template=SI-07A&lang=' + lang);
+        await page.waitFor('document.querySelector("[data-do-replace]")');
+        const modal = await page.ev(FIXED_HITS);
+        assert.equal(modal.filter(c => c.covered).length, 0, w + ' ' + lang + ' modal covered ' + JSON.stringify(modal.filter(c => c.covered)));
+        await page.click('[data-do-replace]');
+        await page.waitFor('document.querySelector("#v4-toast [data-v4-undo]")');
+        const hits = await page.ev(FIXED_HITS);
+        const undo = hits.find(c => c.t === (lang === 'zh' ? '撤销' : 'Undo'));
+        assert.ok(undo, w + ' ' + lang + ' missing undo ' + JSON.stringify(hits.map(c => c.t)));
+        assert.equal(undo.covered, false, w + ' ' + lang + ' undo covered ' + JSON.stringify(undo));
+        const k = await page.ev(`(() => { const b = document.querySelector('.ui2-kbtn').getBoundingClientRect(); return { x: b.x, y: b.y, r: b.right }; })()`);
+        assert.ok(undo.r <= k.x - 8, w + ' ' + lang + ' undo still reaches the search button ' + JSON.stringify({ undo, k }));
+        report.push({ w, lang, undo: { x: Math.round(undo.x), y: Math.round(undo.y), w: Math.round(undo.w), h: Math.round(undo.h) }, hits: undo.hits.map(h => ({ ratio: h.ratio, own: h.own, cls: h.cls })), kLeft: Math.round(k.x) });
+        if (w === 390) {
+          const mid = undo.hits.find(h => h.ratio === 0.5);
+          await clickAt(page, mid.x, mid.y);
+          await page.waitFor('document.querySelector("#v4-app h1") && document.querySelector("#v4-app h1").textContent.includes("HITKEEP")');
+        }
+      }
+    }
+    await page.view(390, 844, true);
+    for (const file of ['index.html?lang=en', 'plan.html?lang=zh', 'prepare.html?lang=en']) {
+      await page.go(file);
+      await page.waitFor('document.querySelector(".ui2-kbtn")');
+      const hits = await page.ev(FIXED_HITS);
+      assert.equal(hits.filter(c => c.covered).length, 0, file + ' fixed control covered ' + JSON.stringify(hits.filter(c => c.covered)));
+    }
+    console.log('toast-undo hits ' + JSON.stringify(report));
+  } finally {
+    await page.close();
+  }
+});

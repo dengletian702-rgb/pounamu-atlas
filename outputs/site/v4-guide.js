@@ -504,7 +504,7 @@
   function stripEntryParams() {
     const q = new URLSearchParams(location.search);
     let changed = false;
-    for (const key of ['template', 'add', 'blank', 'demo', 'fromPlan']) {
+    for (const key of ['template', 'add', 'blank', 'demo', 'fromPlan', 'view']) {
       if (q.has(key)) { q.delete(key); changed = true; }
     }
     if (!changed) return;
@@ -572,6 +572,13 @@
       return;
     }
     state.draft = saved || draftFromTemplate('SI-09B');
+    // A bare ?view=pick must beat the saved trip or the SI-09B default, both of which open on edit.
+    const requestedView = q.get('view');
+    if (requestedView && ['pick', 'edit', 'map', 'chosen'].includes(requestedView)) {
+      state.draft.view = requestedView;
+      persist();
+    }
+    stripEntryParams();
   }
   function persist() {
     try { localStorage.setItem(DRAFT_KEY, JSON.stringify(state.draft)); } catch { /* private mode */ }
@@ -1185,7 +1192,7 @@
       ${skiNear.length ? `<section class="v4-block" id="ski"><h2>${esc(t('skiNear'))}</h2>${skiHtml}</section>` : ''}
       <section class="v4-block" id="sports"><h2>${esc(t('paddleSports'))}</h2>
         <h3>${esc(t('paddleBlock'))}</h3>${boats.map(row).join('')}${paddleRoutes.length ? `<p>${esc(t('paddleNearby'))}: ${paddleRoutes.map(r => `<a href="route.html?id=${esc(r.id)}&amp;lang=${state.lang}">${esc(L === 'en' ? r.name : (r.zh || r.name))}</a>`).join(' · ')}</p>` : ''}${!boats.length && !paddleRoutes.length ? `<p>${esc(t('paddleNone'))}</p>` : ''}
-        <h3>${esc(t('sportsBlock'))}</h3>${(window.pounamuFlag && !window.pounamuFlag('sports')) ? `<p>${esc(state.lang === 'en' ? 'Sports venues are switched off.' : '运动场地已暂时收起。')}</p>` : (sport ? `<p><a href="city.html?id=${esc(sport.id)}&amp;lang=${state.lang}">${esc(t('openSports'))}</a></p>` : `<p><a href="cities.html?lang=${state.lang}">${esc(t('openSports'))}</a></p>`)}
+        <h3>${esc(t('sportsBlock'))}</h3>${(window.pounamuFlag && !window.pounamuFlag('sports')) ? `<p class="pounamu-paused">${state.lang === 'en' ? `This section is being updated. Meanwhile <a href="guide.html?view=pick&amp;lang=en">Plan a trip and pick places</a>, or see the <a href="https://www.doc.govt.nz/">DOC website</a>.` : `本栏目更新中。可先<a href="guide.html?view=pick&amp;lang=zh">规划行程、挑选地点</a>，或看 <a href="https://www.doc.govt.nz/">DOC 官网</a>。`}</p>` : (sport ? `<p><a href="city.html?id=${esc(sport.id)}&amp;lang=${state.lang}">${esc(t('openSports'))}</a></p>` : `<p><a href="cities.html?lang=${state.lang}">${esc(t('openSports'))}</a></p>`)}
         <h3>${esc(t('routeBlock'))}</h3><p><a href="routes.html?island=${town.island}&amp;lang=${state.lang}">${esc(t('readGuide'))}</a></p>
       </section>
       <section class="v4-block" id="links"><h2>${esc(t('officialLinks'))}</h2>${[town, ...visible].filter(k => k.source_url).slice(0, 12).map(k => safeHttp(k.source_url) ? `<p><a href="${esc(k.source_url)}" target="_blank" rel="noopener noreferrer">${esc(nameOf(k))}</a>${k.summary_accessed ? ' · ' + esc(k.summary_accessed) : ''}</p>` : `<p>${esc(nameOf(k))} · ${esc(t('sourceToVerify'))}</p>`).join('')}</section>

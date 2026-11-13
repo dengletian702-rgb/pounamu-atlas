@@ -139,3 +139,53 @@ test('navigation hides sports and the DOC directory, and preparation has no outb
     await page.close();
   }
 });
+
+test('the hidden-section notice opens the place picker, not the editor', async (t) => {
+  const page = await openBrowser();
+  if (!page) { t.skip('Chrome is not installed here'); return; }
+  try {
+    await page.go('tracks.html?lang=en');
+    await page.waitFor('document.querySelector(".pounamu-paused a[href*=\\"guide.html\\"]")');
+    const notice = await page.ev(`(() => {
+      const a = document.querySelector('.pounamu-paused a[href*="guide.html"]');
+      const cs = getComputedStyle(a);
+      return { href: a.getAttribute('href'), text: a.textContent, underline: cs.textDecorationLine, color: cs.color };
+    })()`);
+    assert.match(notice.href, /view=pick/);
+    assert.match(notice.text, /Plan a trip and pick places/);
+    assert.equal(notice.underline, 'underline');
+    await page.ev(`localStorage.setItem('pounamu-v4-draft', JSON.stringify({days:[{uid:'kept',placeId:'',label_en:'Kept',label_zh:'保留'}],view:'edit',edited:true,chosen:[],requestedDays:7}))`);
+    await page.go(notice.href);
+    await page.waitFor('document.querySelector("#v4-app.v4-show-pick")', 15000);
+    const view = await page.ev(`document.querySelector('[data-view="pick"]').getAttribute('aria-pressed')`);
+    assert.equal(view, 'true');
+    await page.go('destination.html?id=si-zqn&lang=zh');
+    await page.waitFor('document.querySelector("#sports")');
+    const town = await page.ev('document.querySelector("#sports").innerText');
+    assert.match(town, /规划行程、挑选地点/);
+    assert.doesNotMatch(town, /运动场地已暂时收起|site-flags/);
+    assert.deepEqual(page.errors, []);
+  } finally {
+    await page.close();
+  }
+});
+
+test('changing the start or end city updates which area button is pressed', async (t) => {
+  const page = await openBrowser();
+  if (!page) { t.skip('Chrome is not installed here'); return; }
+  try {
+    await page.go('plan.html?lang=en');
+    await page.waitFor('document.querySelector("[data-p10-area=south]")');
+    await page.ev(`(() => { const set = (id, value) => { const el = document.querySelector(id); el.value = value; el.dispatchEvent(new Event('change', { bubbles: true })); }; set('#p10-start', 'auckland'); set('#p10-end', 'wellington'); })()`);
+    const north = await page.ev(`document.querySelector('[data-p10-area="north"]').getAttribute('aria-pressed')`);
+    const south = await page.ev(`document.querySelector('[data-p10-area="south"]').getAttribute('aria-pressed')`);
+    assert.equal(north, 'true');
+    assert.equal(south, 'false');
+    await page.ev(`(() => { const el = document.querySelector('#p10-end'); el.value = 'christchurch'; el.dispatchEvent(new Event('change', { bubbles: true })); })()`);
+    const none = await page.ev(`[...document.querySelectorAll('[data-p10-area]')].every(b => b.getAttribute('aria-pressed') === 'false')`);
+    assert.equal(none, true);
+    assert.deepEqual(page.errors, []);
+  } finally {
+    await page.close();
+  }
+});

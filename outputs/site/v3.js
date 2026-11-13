@@ -162,10 +162,10 @@ const v3Region = k => lang === 'zh' ? (V3_REGION_ZH[k] || k) : (v3Tracks?.region
 let v3Tracks = null, v3TrackState = {island: 'all', region: 'all', time: 'all', q: '', shown: 60};
 const V3_BUCKET = {short: ['Under 1 hour', '1 小时以内'], half: ['1–4 hours', '1–4 小时'], day: ['Over 4 hours, same day', '4 小时以上（当天）'], multi: ['Overnight or longer', '过夜或多日'], unknown: ['Time not stated', '未注明用时']};
 function v3PausedNotice() {
-  const cities = `guide.html?view=pick&lang=${lang === 'zh' ? 'zh' : 'en'}`;
+  const pick = `guide.html?view=pick&lang=${lang === 'zh' ? 'zh' : 'en'}`;
   return `<section class="page-intro section pounamu-paused"><h1>${v3L('This section is being updated.', '本栏目更新中。')}</h1><p>${v3L(
-    `Meanwhile see the <a href="${cities}">Cities page</a> or the <a href="https://www.doc.govt.nz/">DOC website</a>.`,
-    `可先看<a href="${cities}">城市页</a>或 <a href="https://www.doc.govt.nz/">DOC 官网</a>。`
+    `Meanwhile <a href="${pick}">Plan a trip and pick places</a>, or see the <a href="https://www.doc.govt.nz/">DOC website</a>.`,
+    `可先<a href="${pick}">规划行程、挑选地点</a>，或看 <a href="https://www.doc.govt.nz/">DOC 官网</a>。`
   )}</p></section>`;
 }
 function v3ConcealIntro() {

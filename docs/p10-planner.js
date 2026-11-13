@@ -1471,7 +1471,7 @@ globalThis.P10_NODES = NODES;
       if(t.id==='p10-transport')p10SyncTransport();
       if(t.id==='preference'||t.id==='p10-start'||t.id==='p10-end'||t.id==='days'||t.id==='p10-pace')p10FillRank();
       if(t.id==='p10-stay'&&p10Result){p10Result.input={...p10Result.input,stay:p10Stay()};try{localStorage.setItem('p10-road-plan',JSON.stringify(p10Result.input));}catch{}p10Show(p10Result);}
-      if(t.id==='p10-start'||t.id==='p10-end')p10RenderPickMap(p10PickItems);
+      if(t.id==='p10-start'||t.id==='p10-end'){p10SyncAreaPressed();p10RenderPickMap(p10PickItems);}
     });
     // The map lives outside the form on a wide screen, so its clicks and hovers are handled on the document.
     document.addEventListener('click',event=>{

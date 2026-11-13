@@ -312,7 +312,18 @@
     b.innerHTML = `${isEn() ? 'Search' : '搜索'} <kbd>${mac ? '⌘' : 'Ctrl'} K</kbd>`;
     b.setAttribute('aria-label', isEn() ? 'Quick search' : '快速搜索');
     b.addEventListener('click', openPalette);
-    nav.after(b);
+    // The phone rule positions this button with position:fixed. A backdrop-filter
+    // on .header (the glass bar) would become its containing block and pin it over
+    // the language control, so on that layout the button hangs off body instead.
+    const phone = matchMedia('(max-width: 760px)');
+    const place = () => {
+      if (phone.matches) { if (b.parentElement !== doc.body) doc.body.append(b); }
+      else if (b.previousElementSibling !== nav) nav.after(b);
+    };
+    place();
+    if (phone.addEventListener) phone.addEventListener('change', place);
+    else phone.addListener(place);
+    addEventListener('resize', place);
   }
   doc.addEventListener('keydown', ev => {
     const typing = /^(INPUT|TEXTAREA|SELECT)$/.test((ev.target && ev.target.tagName) || '') || (ev.target && ev.target.isContentEditable);

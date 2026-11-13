@@ -219,8 +219,19 @@ h1 .v4-en-name{font-family:"Iowan Old Style","Palatino Linotype",Georgia,serif;f
 /* 21. Entrance animations start from a visible state, so a slow or background tab never shows a blank title. */
 @keyframes hero-v2-arrive{from{opacity:.4;transform:translateY(10px)}to{opacity:1;transform:none}}
 @keyframes ink-arrive{from{opacity:.4;transform:translateY(.12em)}to{opacity:1;transform:none}}
-/* 22. Phone: quick search is a floating button, so the header keeps its one row. */
+/* 22. Phone: quick search is a floating button (hung on body, see ui-v2.js) and the bar stays one row.
+   backdrop-filter on .header would trap a fixed descendant, so the button must not live inside the bar.
+   The glass blur itself stays. Brand, menu, motion and language share one row in both languages down to 320px;
+   the opened menu still drops to the next line. */
 @media (max-width:760px){
   .ui2-kbtn{position:fixed;right:16px;bottom:20px;z-index:900;font-size:0;width:52px;height:52px;padding:0;justify-content:center;border-radius:50%;border:1px solid rgba(255,255,255,.25);opacity:1;background:var(--ink) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' stroke='%23ffffff' stroke-width='2'%3E%3Ccircle cx='8.5' cy='8.5' r='6'/%3E%3Cpath d='m13 13 5 5'/%3E%3C/svg%3E") center/20px no-repeat;box-shadow:0 10px 26px -8px rgba(11,31,24,.6),0 0 0 6px rgba(92,200,160,.15)}
+  .header,body[data-page=index] .header{align-items:center;column-gap:4px;row-gap:0;height:auto;min-height:0;padding:8px;box-sizing:border-box}
+  .header .brand{flex:0 0 auto;min-width:0}
+  .header .brand>span:last-child{font-size:clamp(13px,4.1vw,18px);white-space:nowrap;letter-spacing:-.04em}
+  .header .v4-nav-toggle{flex:0 0 auto;padding:6px 7px;font-size:12px;line-height:1.2;white-space:nowrap;min-height:44px;min-width:44px}
+  .header .header-settings{flex:0 0 auto;gap:2px}
+  .header .motion-toggle,.header .language{white-space:nowrap;min-height:44px;min-width:44px}
+  .header .motion-toggle{font-size:10px;letter-spacing:0;padding:6px 3px}
+  .header .language{font-size:11px;padding:6px 6px}
 }
 @media (max-width:760px){.ui2-pal li a em{display:none}.ui2-pal{border-radius:16px}}

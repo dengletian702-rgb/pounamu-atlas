@@ -118,7 +118,8 @@ test('a route import keeps Milford stages and does not become a road trip', () =
   const plan = planner.p10PlanFromRoute(route);
   assert.equal(plan.routeImport.planDays, 4);
   assert.equal(plan.routeImport.days.length, 4);
-  assert.deepEqual(plan.routeImport.days.map(day => day.stayEn), ['Clinton Hut', 'Mintaro Hut', 'Dumpling Hut', 'Sandfly Point']);
+  assert.deepEqual(plan.routeImport.days.map(day => day.stayEn), ['Clinton Hut', 'Mintaro Hut', 'Dumpling Hut', '']);
+  assert.equal(plan.routeImport.days[3].noStay, true);
   assert.equal(plan.routeImport.transfers.length, 0);
   assert.equal(plan.input.car, false);
 });
@@ -132,7 +133,9 @@ test('Whanganui import stays a paddle with a separate land transfer', () => {
     ]
   };
   const plan = planner.p10PlanFromRoute(route);
-  assert.equal(plan.routeImport.days.length, 1);
+  assert.equal(plan.routeImport.days.length, 5);
+  assert.equal(plan.routeImport.days[0].stayEn, 'Ohinepane Campsite');
+  assert.equal(plan.routeImport.days[4].noStay, true);
   assert.match(plan.routeImport.transfers[0].titleEn, /Land transfer/);
   assert.equal(plan.input.start, 'taumarunui');
   assert.equal(plan.input.end, 'pipiriki');
@@ -178,13 +181,37 @@ test('every route stay is a place, not a stage verb', () => {
     } else {
       assert.ok(days.length >= 1 && days.length <= Number(route.planDays), route.id + ' ' + days.length);
     }
-    for (const day of days) {
+    const last = days[days.length - 1];
+    if (multi) assert.equal(last.noStay || (last.stayEn && last.stayEn !== 'To verify'), true, route.id + ' last day');
+    for (let i = 0; i < days.length; i++) {
+      const day = days[i];
       if (day.noStay) continue;
       assert.doesNotMatch(day.stayEn, verb, route.id + ' stay ' + day.stayEn);
       assert.doesNotMatch(day.titleEn, verb, route.id + ' title ' + day.titleEn);
       assert.doesNotMatch(day.query || '', /Leave Routeburn|Climb through the high forest|Lunch in Marlborough/, route.id);
+      if (day.stayKind === 'city') assert.doesNotMatch(day.stayEn, /hut|campsite/i, route.id + ' ' + day.stayEn);
+      const next = days[i + 1];
+      if (next) assert.notEqual(day.stayEn + '|' + day.query, next.stayEn + '|' + next.query, route.id + ' day ' + (i + 1));
     }
   }
+  const expectStay = {
+    'routeburn-track': ['Routeburn Falls Hut', 'Lake Mackenzie Hut', ''],
+    'kepler-track': ['Luxmore Hut', 'Iris Burn Hut', 'Moturau Hut', ''],
+    'tongariro-northern-circuit': ['Mangatepopo Hut', 'Oturere Hut', 'Waihohonu Hut', ''],
+    'rakiura-track': ['Port William Hut', 'North Arm Hut', ''],
+    'mueller-hut': ['Mueller Hut', ''],
+    'abel-tasman': ['Anchorage Hut', 'Bark Bay Hut', 'Awaroa Hut', ''],
+    'ni-timber': ['Piropiro Campsite', '']
+  };
+  for (const [id, stays] of Object.entries(expectStay)) {
+    const got = routeDays(routes.find(route => route.id === id)).map(day => day.stayEn);
+    assert.deepEqual(got, stays, id);
+  }
+  const heaphy = routeDays(routes.find(route => route.id === 'heaphy-track'));
+  assert.equal(heaphy.some(day => /via Lewis/i.test(day.stayEn)), false);
+  assert.equal(heaphy[heaphy.length - 1].noStay, true);
+  const milfordDays = routeDays(routes.find(route => route.id === 'milford-track'));
+  assert.equal(milfordDays[0].textEn === milfordDays[1].textEn, false);
   const milford = routeDays(routes.find(route => route.id === 'milford-track'));
   assert.equal(milford[1].textEn.includes('usual second night'), false);
   assert.match(milford[3].moveEn, /Boat out the same day/);

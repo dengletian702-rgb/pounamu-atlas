@@ -853,7 +853,8 @@
       const title = state.lang === 'en'
         ? (day.label_en || (p && p.name_en) || '')
         : (day.label_zh || (p && p.name_zh) || '');
-      const nameMark = (day.nameVerify || (p && p.verify)) && !state.draft.hideVerify ? ` <span class="v4-badge">${esc(state.lang === 'en' ? 'Place name to verify' : '地名待核')}</span>` : '';
+      const knownTown = /格雷茅斯|瓦纳卡|皇后镇|米尔福德峡湾|库克山|基督城|Greymouth|Wānaka|Wanaka|Queenstown|Milford Sound|Mount Cook|Aoraki|Christchurch/i.test(title);
+      const nameMark = (day.nameVerify || (p && p.verify)) && !state.draft.hideVerify && !knownTown ? ` <span class="v4-badge">${esc(state.lang === 'en' ? 'Place name to verify' : '地名待核')}</span>` : '';
       const verify = nameMark;
       const roadVia = state.lang === 'en' && day.notes ? (String(day.notes).match(/via\s*SH\s?\d+(?:\s*(?:and|&|、|\/|,)\s*SH\s?\d+)*/i) || [])[0] : '';
       const viaClean = String(day.via || '').split(/\s*或\s*/)[0];

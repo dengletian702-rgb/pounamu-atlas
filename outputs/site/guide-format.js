@@ -107,7 +107,18 @@
 
   function placeSticky(sticky) {
     if (!sticky || typeof document === 'undefined') return;
+    if (!placeSticky.bound) {
+      placeSticky.bound = true;
+      const again = () => { const chip = document.querySelector('.gday-sticky'); if (chip) placeSticky(chip); };
+      window.addEventListener('scroll', again, { passive: true });
+      window.addEventListener('resize', again);
+    }
     sticky.hidden = false;
+    const budget = document.querySelector('#p10-budget');
+    if (budget) {
+      const br = budget.getBoundingClientRect();
+      if (br.height > 2 && br.top < window.innerHeight * 0.92 && br.bottom > 80) { sticky.hidden = true; return; }
+    }
     const box = sticky.getBoundingClientRect();
     const targets = document.querySelectorAll('.gday, .gday-actions, .gday-meta, .gday-body, .gplace, .journey-endpoints, .gday-jumpmap, .map-legend, .p10-map-day-list, .journey-facts, .ui2-kbtn, #p10-budget');
     let hit = false;
@@ -117,12 +128,6 @@
       if (!(box.right < r.left || box.left > r.right || box.bottom < r.top || box.top > r.bottom)) { hit = true; break; }
     }
     sticky.hidden = hit;
-    if (!placeSticky.bound) {
-      placeSticky.bound = true;
-      const again = () => { const chip = document.querySelector('.gday-sticky'); if (chip) placeSticky(chip); };
-      window.addEventListener('scroll', again, { passive: true });
-      window.addEventListener('resize', again);
-    }
   }
 
   function paint(root, days, state) {
@@ -229,7 +234,6 @@
     const when = route.checkedAt || (src && src.checkedAt) || '2026-11-13';
     const sourceLine = src.url ? `<p class="v4-note"><a class="v4-source" href="${esc(src.url)}" target="_blank" rel="noopener" data-keep-link="1">${zh ? '官方页面' : 'Official page'}</a> · ${esc(when)}</p>` : '';
     const short = [
-      { h: zh ? '安全' : 'Safety', p: zh ? '紧急情况拨 111。出发前看 DOC 公告和 MetService 预警，不要只靠这一页。' : 'In an emergency call 111. Read the DOC alerts and the MetService warning before you go.', extra: `<p class="v4-note"><a class="v4-source" href="https://www.doc.govt.nz/parks-and-recreation/know-before-you-go/alerts/" target="_blank" rel="noopener" data-keep-link="1">DOC</a> · <a class="v4-source" href="https://www.metservice.com/warnings/home" target="_blank" rel="noopener" data-keep-link="1">MetService</a> · ${esc(when)}</p>` },
       { h: zh ? '预订与交通' : 'Booking and transport', p: brief(pair(route.booking) || pair(route.access)), extra: sourceLine },
       { h: zh ? '装备与补给' : 'Gear and supplies', p: brief(pair(route.gear) || pair(route.food)), extra: sourceLine },
       { h: zh ? '季节与封闭' : 'Season and closures', p: brief(pair(route.season)), extra: sourceLine }
@@ -247,6 +251,11 @@
       det.append(...verify.childNodes);
       sources.appendChild(det);
       verify.remove();
+    }
+    if (sources) {
+      sources.querySelectorAll('h2').forEach(heading => { if (!heading.textContent.trim()) heading.remove(); });
+      const heading = sources.querySelector('h2');
+      if (heading && !heading.textContent.trim()) heading.textContent = zh ? '资料来源' : 'Sources';
     }
     if (!box.querySelector('#p10-budget') && !document.querySelector('#journey-timeline #p10-budget')) {
       box.insertAdjacentHTML('beforeend', budgetShell(L));

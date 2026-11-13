@@ -1131,9 +1131,9 @@ globalThis.P10_NODES = NODES;
     const extra=day==='all'?[...panel.querySelectorAll('.p10-unscheduled-dot')].map(c=>[Number(c.getAttribute('cx')),Number(c.getAttribute('cy'))]):[];
     const points=(current?[current]:lines).flatMap(line=>line.dataset.points.split(' ').map(p=>p.split(',').map(Number))).concat(extra);if(!points.length)return;
     const xs=points.map(p=>p[0]),ys=points.map(p=>p[1]);
-    const cx=(Math.min(...xs)+Math.max(...xs))/2+20,cy=(Math.min(...ys)+Math.max(...ys))/2;
-    // Leave room around the stops for the names and the start/end tags.
-    const h=Math.min(820,Math.max(260,(Math.max(...ys)-Math.min(...ys))*1.6+90,((Math.max(...xs)-Math.min(...xs))*1.6+160)*820/680)),w=h*680/820;
+    const cx=(Math.min(...xs)+Math.max(...xs))/2,cy=(Math.min(...ys)+Math.max(...ys))/2;
+    // Extra width on the right so a town name is not cut off at 320px.
+    const h=Math.min(820,Math.max(280,(Math.max(...ys)-Math.min(...ys))*1.7+110,((Math.max(...xs)-Math.min(...xs))*1.7+240)*820/680)),w=h*680/820+80;
     svg.setAttribute('viewBox',`${cx-w/2} ${cy-h/2} ${w} ${h}`);
     // Size the names for the map as it is drawn on screen: about 12px on a wide map, 10.5px on a phone.
     const box=svg.getBoundingClientRect(),scale=box.width&&box.height?Math.min(box.width/w,box.height/h):0,narrow=box.width>0&&box.width<420;
@@ -1146,15 +1146,17 @@ globalThis.P10_NODES = NODES;
   // try right of the dot, then left, then just below or above.
   function p10PlaceLabels(svg,k){
     const boxes=[...svg.querySelectorAll('.p10-map-tag')].map(t=>{try{return t.getBBox();}catch{return null;}}).filter(b=>b&&b.width);
+    const vb=svg.viewBox.baseVal;
+    const inside=b=>b&&b.width&&(!vb.width||(b.x>=vb.x-1&&b.y>=vb.y-4&&b.x+b.width<=vb.x+vb.width-4&&b.y+b.height<=vb.y+vb.height+12));
     const hit=(a,b)=>a.x<b.x+b.width&&b.x<a.x+a.width&&a.y<b.y+b.height&&b.y<a.y+a.height;
     for(const t of svg.querySelectorAll('.p10-map-label')){
       const px=Number(t.dataset.px),py=Number(t.dataset.py);if(!Number.isFinite(px))continue;
       const gap=7*Math.max(k,0.6),line=13*k;
-      const tries=[[px+gap,py+4*k,'start'],[px-gap,py+4*k,'end'],[px+gap,py+4*k+line,'start'],[px+gap,py+4*k-line,'start'],[px-gap,py+4*k+line,'end'],[px-gap,py+4*k-line,'end']];
+      const tries=[[px-gap,py+4*k,'end'],[px+gap,py+4*k,'start'],[px-gap,py+4*k+line,'end'],[px-gap,py+4*k-line,'end'],[px+gap,py+4*k+line,'start'],[px,py+4*k+line,'middle']];
       const put=([x,y,anchor])=>{t.setAttribute('x',x.toFixed(1));t.setAttribute('y',y.toFixed(1));t.setAttribute('text-anchor',anchor);try{return t.getBBox();}catch{return null;}};
       let box=null,free=false;
-      for(const spot of tries){box=put(spot);if(!box||!box.width||!boxes.some(b=>hit(box,b))){free=true;break;}}
-      if(!free)box=put(tries[0]);
+      for(const spot of tries){box=put(spot);if(box&&inside(box)&&!boxes.some(b=>hit(box,b))){free=true;break;}}
+      if(!free)box=put([px-gap,py+4*k,'end']);
       if(box&&box.width)boxes.push(box);
     }
   }

@@ -437,12 +437,102 @@ test('te paki page states the east-section closure and does not call closed nigh
         return { page: document.body.innerText, d1: days[0].innerText, d2: days[1].innerText, d3: days[2].innerText };
       })()`);
       assert.match(body.page, lang === 'zh' ? /关闭/ : /closed/i);
+      assert.match(body.page, lang === 'zh' ? /DOC 公告更新于 2026-09-16/ : /DOC alert last reviewed 16 September 2026/);
+      assert.doesNotMatch(body.page, /复核/);
       assert.match(body.page, lang === 'zh' ? /Cape Reinga 至 Te Paki Stream/ : /Cape Reinga to Te Paki Stream/);
       assert.doesNotMatch(body.d1, /免费|free/i);
       assert.doesNotMatch(body.d2, /免费|free/i);
       if (lang === 'zh') assert.match(body.d3, /Tapotupotu 至 Cape Reinga 段关闭，从 Cape Reinga 出发/);
     }
     assert.deepEqual(page.errors, []);
+  } finally {
+    await page.close();
+  }
+});
+
+test('map labels do not overlap and stay inside the svg', async (t) => {
+  const page = await openBrowser();
+  if (!page) { t.skip('Chrome is not installed here'); return; }
+  const report = sel => `(() => {
+    const svg = document.querySelector(${JSON.stringify(sel)});
+    if (!svg) return { missing: true, hits: ['missing'], outside: [] };
+    const frame = svg.getBoundingClientRect();
+    const texts = [...svg.querySelectorAll('text')].filter(el => {
+      const cs = getComputedStyle(el);
+      if (cs.display === 'none' || cs.visibility === 'hidden') return false;
+      const r = el.getBoundingClientRect();
+      return r.width > 1 && r.height > 1;
+    });
+    const hits = [];
+    const outside = [];
+    for (let i = 0; i < texts.length; i++) {
+      const a = texts[i].getBoundingClientRect();
+      if (a.left < frame.left - 1 || a.right > frame.right + 1 || a.top < frame.top - 1 || a.bottom > frame.bottom + 1) outside.push((texts[i].textContent || '').trim().slice(0, 24));
+      for (let j = i + 1; j < texts.length; j++) {
+        const b = texts[j].getBoundingClientRect();
+        if (a.right > b.left + 0.5 && a.left < b.right - 0.5 && a.bottom > b.top + 0.5 && a.top < b.bottom - 0.5) hits.push((texts[i].textContent || '').trim().slice(0, 18) + ' | ' + (texts[j].textContent || '').trim().slice(0, 18));
+      }
+    }
+    return { hits, outside };
+  })()`;
+  try {
+    const found = [];
+    for (const w of [320, 390, 1440]) {
+      await page.view(w, w === 1440 ? 900 : 844, w < 800);
+      for (const lang of ['zh', 'en']) {
+        await page.go('index.html?lang=' + lang);
+        await page.waitFor('document.querySelector(".nz-map text")');
+        await page.ev('document.querySelector(".nz-map").scrollIntoView()');
+        await page.ev('new Promise(r => setTimeout(r, 400))');
+        const home = await page.ev(report('.nz-map'));
+        if (home.hits.length || home.outside.length) found.push('home ' + lang + ' ' + w + ' ' + JSON.stringify(home));
+      }
+      await page.go('destination.html?id=ni-akl&lang=zh');
+      await page.waitFor('document.querySelector("#v4-dest-map text")', 20000);
+      await page.ev('document.querySelector("#v4-dest-map").scrollIntoView()');
+      await page.ev('new Promise(r => setTimeout(r, 400))');
+      const dest = await page.ev(report('#v4-dest-map svg'));
+      if (dest.hits.length || dest.outside.length) found.push('destination ' + w + ' ' + JSON.stringify(dest));
+      await page.go('guide.html?template=SI-09B&lang=zh');
+      await page.waitFor('document.querySelector("#gcoast text")', 20000);
+      await page.ev('document.querySelector("#gcoast").scrollIntoView()');
+      await page.ev('new Promise(r => setTimeout(r, 500))');
+      const tpl = await page.ev(report('#gcoast svg'));
+      if (tpl.hits.length || tpl.outside.length) found.push('template ' + w + ' ' + JSON.stringify(tpl));
+    }
+    assert.deepEqual(found, []);
+  } finally {
+    await page.close();
+  }
+});
+
+test('copy share link shows 已复制 at 390', async (t) => {
+  const page = await openBrowser();
+  if (!page) { t.skip('Chrome is not installed here'); return; }
+  try {
+    await page.view(390, 844, true);
+    await page.go('plan.html?lang=zh');
+    await page.waitFor('document.readyState === "complete"', 20000);
+    await page.click('#p10-next-1');
+    await page.click('#p10-next-2');
+    await page.click('button[type=submit]');
+    await page.waitFor('document.querySelector("[data-p10-share]")', 15000);
+    await page.ev('document.querySelector("[data-p10-share]").scrollIntoView({block:"center"})');
+    const cover = await page.ev(`(() => {
+      const b = document.querySelector('[data-p10-share]');
+      const r = b.getBoundingClientRect();
+      const top = document.elementFromPoint(r.left + r.width / 2, r.top + Math.min(20, r.height / 2));
+      return { covered: !(top === b || b.contains(top)), who: top ? (top.getAttribute('data-p10-share') || top.className || top.tagName) : '' };
+    })()`);
+    assert.equal(cover.covered, false, JSON.stringify(cover));
+    const box = await page.ev(`(() => {
+      const b = document.querySelector('[data-p10-share]');
+      const r = b.getBoundingClientRect();
+      return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    })()`);
+    await page.cdp('Input.dispatchMouseEvent', { type: 'mousePressed', x: box.x, y: box.y, button: 'left', clickCount: 1 });
+    await page.cdp('Input.dispatchMouseEvent', { type: 'mouseReleased', x: box.x, y: box.y, button: 'left', clickCount: 1 });
+    await page.waitFor('document.querySelector(".p10-share-status") && /已复制/.test(document.querySelector(".p10-share-status").textContent)', 5000);
   } finally {
     await page.close();
   }

@@ -246,8 +246,8 @@
     const src = (route.sources && route.sources[0]) || {};
     const when = route.checkedAt || (src && src.checkedAt) || '2026-11-13';
     const sourceLine = src.url ? `<p class="v4-note"><a class="v4-source" href="${esc(src.url)}" target="_blank" rel="noopener" data-keep-link="1">${zh ? '官方页面' : 'Official page'}</a> · ${esc(when)}</p>` : '';
-    const tePakiZh = 'DOC 公告（复核 2026-09-16）：Kapowairua 至 Pandora、Pandora 至 Tapotupotu Bay、Tapotupotu 至 Cape Reinga 三段因风暴损坏关闭；Pandora 营地关闭；Tapotupotu 和 Kapowairua 营地暂停预订；目前开放的是 Cape Reinga 至 Te Paki Stream，Twilight 营地开放。';
-    const tePakiEn = 'DOC alert (reviewed 16 September 2026): Kapowairua to Pandora, Pandora to Tapotupotu Bay, and Tapotupotu to Cape Reinga are closed after storm damage. Pandora Campsite is closed. Bookings are paused at Tapotupotu and Kapowairua campsites. The open section is Cape Reinga to Te Paki Stream, and Twilight Campsite is open.';
+    const tePakiZh = 'DOC 公告更新于 2026-09-16：Kapowairua 至 Pandora、Pandora 至 Tapotupotu Bay、Tapotupotu 至 Cape Reinga 三段因风暴损坏关闭；Pandora 营地关闭；Tapotupotu 和 Kapowairua 营地暂停预订；目前开放的是 Cape Reinga 至 Te Paki Stream，Twilight 营地开放。';
+    const tePakiEn = 'DOC alert last reviewed 16 September 2026: Kapowairua to Pandora, Pandora to Tapotupotu Bay, and Tapotupotu to Cape Reinga are closed after storm damage. Pandora Campsite is closed. Bookings are paused at Tapotupotu and Kapowairua campsites. The open section is Cape Reinga to Te Paki Stream, and Twilight Campsite is open.';
     if (route.id === 'te-paki-coastal' && !document.querySelector('.te-paki-alert')) {
       const banner = document.createElement('aside');
       banner.className = 'v3-closure v3-closure-on section te-paki-alert';

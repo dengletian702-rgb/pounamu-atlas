@@ -27,13 +27,14 @@
       if (extra) pool = [extra, ...pool];
     }
     const pts = lineStops.map(s => ({ ...s, xy: project(Number(s.lat), Number(s.lon)) }));
-    const endId = state.endId || (pts.length ? pts[pts.length - 1].id : '');
+    const endId = state.endId || '';
     const line = pts.length > 1 ? pts.map(p => p.xy.map(n => n.toFixed(1)).join(',')).join(' ') : '';
     const dots = pool.map(p => {
       const xy = project(Number(p.lat), Number(p.lon));
       const label = zh ? (p.name_zh || p.name_en || '') : (p.name_en || p.name_zh || '');
-      const isStart = Boolean(state.startId) && p.id === state.startId;
-      const isEnd = Boolean(endId) && p.id === endId;
+      const samePlace = Boolean(state.startId) && state.startId === endId;
+      const isStart = Boolean(state.startId) && p.id === state.startId && !samePlace;
+      const isEnd = Boolean(endId) && p.id === endId && !samePlace;
       const tag = isStart && isEnd ? (zh ? '起终' : 'Start/end') : isStart ? (zh ? '起' : 'S') : isEnd ? (zh ? '终' : 'E') : '';
       const cls = [
         'v4-map-stop',
@@ -43,7 +44,7 @@
       return `<g class="${cls}" data-place="${esc(p.id)}" tabindex="0" role="button" aria-pressed="${p.selected ? 'true' : 'false'}" aria-label="${esc(label)}" transform="translate(${xy[0].toFixed(1)} ${xy[1].toFixed(1)})">
         <circle r="${p.selected ? 7 : 5}"><title>${esc(label)}</title></circle>
         ${tag ? `<text y="-10" text-anchor="middle">${esc(tag)}</text>` : ''}
-        ${(p.selected || isStart || isEnd) && label ? `<text class="v4-map-name" y="16" text-anchor="middle">${esc(label)}</text>` : ''}
+        ${(p.selected || isStart || isEnd || (samePlace && p.id === state.startId)) && label ? `<text class="v4-map-name" y="16" text-anchor="middle">${esc(label)}</text>` : ''}
       </g>`;
     }).join('');
     const coast = coastPath();

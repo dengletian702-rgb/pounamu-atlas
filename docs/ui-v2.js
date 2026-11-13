@@ -390,6 +390,143 @@
       if (!(sc > 0)) return;
       if (parseFloat(cs.fontSize) * sc < 12) node.style.setProperty('font-size', (13 / sc).toFixed(2) + 'px', 'important');
     });
+    layoutNzMap(svg, scale);
+    spreadDayNumbers(svg, scale);
+  }
+  function textShown(el) {
+    const cs = getComputedStyle(el);
+    if (cs.display === 'none' || cs.visibility === 'hidden') return false;
+    const r = el.getBoundingClientRect();
+    return r.width > 1 && r.height > 1;
+  }
+  function overlaps(a, b) {
+    return a.right > b.left + 0.5 && a.left < b.right - 0.5 && a.bottom > b.top + 0.5 && a.top < b.bottom - 0.5;
+  }
+  function shiftText(t, dx, dy) {
+    if (!dx && !dy) return;
+    const x = (parseFloat(t.getAttribute('x')) || 0) + dx;
+    const y = (parseFloat(t.getAttribute('y')) || 0) + dy;
+    t.setAttribute('x', x.toFixed(1));
+    t.setAttribute('y', y.toFixed(1));
+    t.querySelectorAll('tspan').forEach(s => {
+      if (s.hasAttribute('x')) s.setAttribute('x', ((parseFloat(s.getAttribute('x')) || 0) + dx).toFixed(1));
+    });
+  }
+  function layoutNzMap(svg, scale) {
+    if (!svg.classList.contains('nz-map')) return;
+    const narrow = window.matchMedia('(max-width:760px)').matches;
+    const en = (doc.documentElement.lang || '').toLowerCase().startsWith('en');
+    svg.querySelectorAll('.nzmap-label-zh').forEach(el => {
+      if (en || narrow) el.style.setProperty('display', 'none', 'important');
+      else {
+        el.style.removeProperty('display');
+        el.setAttribute('dy', Math.max(18, 18 / scale).toFixed(1));
+      }
+    });
+    const shortName = { 'NORTH ISLAND': ['北岛', 'North Island'], 'SOUTH ISLAND': ['南岛', 'South Island'], 'TASMAN SEA': ['塔斯曼海', 'Tasman Sea'], 'PACIFIC OCEAN': ['太平洋', 'Pacific'], 'RAKIURA / STEWART ISLAND': ['拉奇乌拉', 'Rakiura'] };
+    svg.querySelectorAll('.nzmap-island-label, .nzmap-water, .nzmap-label').forEach(el => {
+      if (el.hasAttribute('data-i18n')) return;
+      if (!el.dataset.bilingual) el.dataset.bilingual = el.innerHTML;
+      if (!narrow) { if (el.innerHTML !== el.dataset.bilingual) el.innerHTML = el.dataset.bilingual; return; }
+      const hold = doc.createElement('div');
+      hold.innerHTML = el.dataset.bilingual;
+      const sub = hold.querySelector('tspan');
+      const english = hold.childNodes[0] && hold.childNodes[0].nodeType === 3 ? hold.childNodes[0].textContent.trim() : (hold.querySelector('[data-map-label-en]') || {}).textContent || '';
+      const pair = shortName[english];
+      if (!pair) return;
+      el.textContent = en ? pair[1] : pair[0];
+    });
+    svg.querySelectorAll('text').forEach(t => {
+      if (!t.dataset.ox) {
+        t.dataset.ox = t.getAttribute('x') || '0';
+        t.dataset.oy = t.getAttribute('y') || '0';
+        t.querySelectorAll('tspan').forEach(s => { if (s.hasAttribute('x')) s.dataset.ox = s.getAttribute('x'); });
+      }
+      t.setAttribute('x', t.dataset.ox);
+      t.setAttribute('y', t.dataset.oy);
+      t.querySelectorAll('tspan').forEach(s => { if (s.dataset.ox) s.setAttribute('x', s.dataset.ox); });
+    });
+    const frame = svg.getBoundingClientRect();
+    const texts = [...svg.querySelectorAll('text')].filter(textShown);
+    const clamp = t => {
+      const r = t.getBoundingClientRect();
+      let dxs = 0, dys = 0;
+      if (r.left < frame.left + 1) dxs = frame.left + 1 - r.left;
+      else if (r.right > frame.right - 1) dxs = frame.right - 1 - r.right;
+      if (r.top < frame.top + 1) dys = frame.top + 1 - r.top;
+      else if (r.bottom > frame.bottom - 1) dys = frame.bottom - 1 - r.bottom;
+      if (dxs || dys) shiftText(t, dxs / scale, dys / scale);
+    };
+    texts.forEach(clamp);
+    for (let pass = 0; pass < 24; pass++) {
+      let moved = false;
+      for (let i = 0; i < texts.length; i++) {
+        for (let j = i + 1; j < texts.length; j++) {
+          const a = texts[i].getBoundingClientRect();
+          const b = texts[j].getBoundingClientRect();
+          if (!overlaps(a, b)) continue;
+          const options = [[0, a.bottom - b.top + 4], [0, a.top - b.bottom - 4], [a.right - b.left + 4, 0], [a.left - b.right - 4, 0]];
+          for (const [dxs, dys] of options) {
+            shiftText(texts[j], dxs / scale, dys / scale);
+            const r = texts[j].getBoundingClientRect();
+            const inside = r.left >= frame.left - 0.5 && r.right <= frame.right + 0.5 && r.top >= frame.top - 0.5 && r.bottom <= frame.bottom + 0.5;
+            if (inside && !overlaps(texts[i].getBoundingClientRect(), r)) { moved = true; break; }
+            shiftText(texts[j], -dxs / scale, -dys / scale);
+          }
+        }
+      }
+      if (!moved) break;
+    }
+  }
+  function spreadDayNumbers(svg, scale) {
+    if (!svg.classList.contains('gcoast')) return;
+    const texts = [...svg.querySelectorAll('.gday-stop text')];
+    texts.forEach(t => {
+      if (!t.dataset.ox) { t.dataset.ox = t.getAttribute('x'); t.dataset.oy = t.getAttribute('y'); }
+      t.setAttribute('x', t.dataset.ox);
+      t.setAttribute('y', t.dataset.oy);
+    });
+    const live = texts.filter(textShown);
+    const frame = svg.getBoundingClientRect();
+    for (let pass = 0; pass < 20; pass++) {
+      let moved = false;
+      for (let i = 0; i < live.length; i++) {
+        for (let j = i + 1; j < live.length; j++) {
+          const a = live[i].getBoundingClientRect();
+          const b = live[j].getBoundingClientRect();
+          if (!overlaps(a, b)) continue;
+          const ox = Math.min(a.right, b.right) - Math.max(a.left, b.left);
+          const oy = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.bottom);
+          const side = (j % 2 === 0 ? 1 : -1);
+          shiftText(live[j], side * (ox + 4) / scale, (oy + 4) / scale * (j % 3 === 0 ? -1 : 1) * 0.35);
+          moved = true;
+        }
+      }
+      for (const t of live) {
+        const r = t.getBoundingClientRect();
+        let dxs = 0, dys = 0;
+        if (r.left < frame.left + 1) dxs = frame.left + 1 - r.left;
+        else if (r.right > frame.right - 1) dxs = frame.right - 1 - r.right;
+        if (r.top < frame.top + 1) dys = frame.top + 1 - r.top;
+        else if (r.bottom > frame.bottom - 1) dys = frame.bottom - 1 - r.bottom;
+        if (dxs || dys) { shiftText(t, dxs / scale, dys / scale); moved = true; }
+      }
+      if (!moved) break;
+    }
+    const ns = 'http://www.w3.org/2000/svg';
+    for (const t of live) {
+      const g = t.parentNode;
+      const circle = g && g.querySelector('circle');
+      if (!circle) continue;
+      const far = Math.hypot(parseFloat(t.getAttribute('x')) - parseFloat(t.dataset.ox), parseFloat(t.getAttribute('y')) - parseFloat(t.dataset.oy)) > 8;
+      let line = g.querySelector('.gday-leader');
+      if (!far) { if (line) line.remove(); continue; }
+      if (!line) { line = doc.createElementNS(ns, 'line'); line.setAttribute('class', 'gday-leader'); line.setAttribute('stroke', '#244c39'); line.setAttribute('stroke-width', '1'); g.insertBefore(line, t); }
+      line.setAttribute('x1', circle.getAttribute('cx'));
+      line.setAttribute('y1', circle.getAttribute('cy'));
+      line.setAttribute('x2', t.getAttribute('x'));
+      line.setAttribute('y2', t.getAttribute('y'));
+    }
   }
   function fitMaps() { $$('svg').forEach(fitSvgText); }
   function enhance() {

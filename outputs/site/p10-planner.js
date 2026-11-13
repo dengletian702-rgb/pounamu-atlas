@@ -1658,8 +1658,19 @@ globalThis.P10_NODES = NODES;
       }
       if(event.target.closest('[data-p10-share]')&&p10Result){
         const url=p10ShareUrl(p10Result.input),status=p10$('.p10-share-status');
-        try{await navigator.clipboard.writeText(url);if(status)status.textContent=zh?'链接已复制，可以发给同行的人。':'Link copied; send it to your travel companions.';}
-        catch{if(status)status.innerHTML=`${zh?'复制失败，请手动复制：':'Copy this link: '}<input class="p10-share-url" readonly value="${p10Esc(url)}">`;status?.querySelector('input')?.select();}
+        let copied=false;
+        try{if(navigator.clipboard&&navigator.clipboard.writeText){await navigator.clipboard.writeText(url);copied=true;}}catch{copied=false;}
+        if(!copied){
+          const area=document.createElement('textarea');
+          area.value=url;area.setAttribute('readonly','');area.style.position='fixed';area.style.left='0';area.style.top='0';area.style.opacity='0';
+          document.body.appendChild(area);area.focus();area.select();
+          try{copied=document.execCommand('copy');}catch{copied=false;}
+          area.remove();
+        }
+        if(status){
+          status.textContent=copied?(zh?'已复制':'Copied'):(zh?'请选中链接再复制':'Select the link, then copy');
+          if(!copied){const input=document.createElement('input');input.className='p10-share-url';input.readOnly=true;input.value=url;status.appendChild(input);input.focus();input.select();}
+        }
         return;
       }
       const edit=event.target.closest('[data-p10-edit]');

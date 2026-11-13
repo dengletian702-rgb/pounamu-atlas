@@ -41,7 +41,7 @@
 /* Result header and tools */
 .p10-result-title{font-size:var(--type-xl);line-height:1.3;margin:28px 0 10px;letter-spacing:0}
 .p10-result-title:focus{outline:none}
-.p10-result-tools{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 14px}
+.p10-result-tools{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 14px;position:relative;z-index:60}
 .p10-share-status{font-size:var(--type-sm);color:#355446}
 .p10-share-url{font:inherit;font-size:var(--type-xs);width:min(100%,420px);padding:4px 6px}
 /* Day cards: the day and its title first, the reorder tools small and to the side */

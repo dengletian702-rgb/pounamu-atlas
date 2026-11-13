@@ -455,25 +455,44 @@ test('map labels do not overlap and stay inside the svg', async (t) => {
   if (!page) { t.skip('Chrome is not installed here'); return; }
   const report = sel => `(() => {
     const svg = document.querySelector(${JSON.stringify(sel)});
-    if (!svg) return { missing: true, hits: ['missing'], outside: [] };
+    if (!svg) return { missing: true, hits: ['missing'], outside: [], small: [], marker: false, leaders: [] };
     const frame = svg.getBoundingClientRect();
-    const texts = [...svg.querySelectorAll('text')].filter(el => {
+    const shown = el => {
       const cs = getComputedStyle(el);
       if (cs.display === 'none' || cs.visibility === 'hidden') return false;
       const r = el.getBoundingClientRect();
       return r.width > 1 && r.height > 1;
-    });
+    };
+    const texts = [...svg.querySelectorAll('text')].filter(shown);
     const hits = [];
     const outside = [];
+    const small = [];
     for (let i = 0; i < texts.length; i++) {
       const a = texts[i].getBoundingClientRect();
+      const cs = getComputedStyle(texts[i]);
+      const ctm = texts[i].getScreenCTM();
+      const screen = ctm ? parseFloat(cs.fontSize) * Math.hypot(ctm.a, ctm.b) : 0;
+      if (!(screen >= 11.5)) small.push((texts[i].textContent || '').trim().slice(0, 18) + ' ' + screen.toFixed(1));
       if (a.left < frame.left - 1 || a.right > frame.right + 1 || a.top < frame.top - 1 || a.bottom > frame.bottom + 1) outside.push((texts[i].textContent || '').trim().slice(0, 24));
       for (let j = i + 1; j < texts.length; j++) {
         const b = texts[j].getBoundingClientRect();
         if (a.right > b.left + 0.5 && a.left < b.right - 0.5 && a.bottom > b.top + 0.5 && a.top < b.bottom - 0.5) hits.push((texts[i].textContent || '').trim().slice(0, 18) + ' | ' + (texts[j].textContent || '').trim().slice(0, 18));
       }
     }
-    return { hits, outside };
+    const lin = c => c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    const lum = rgb => { const m = String(rgb).match(/\\d+/g); if (!m) return 0; return 0.2126 * lin(m[0] / 255) + 0.7152 * lin(m[1] / 255) + 0.0722 * lin(m[2] / 255); };
+    const bg = svg.querySelector('rect');
+    const leaders = [...svg.querySelectorAll('.gday-leader')].map(line => {
+      const cs = getComputedStyle(line);
+      const w = parseFloat(cs.strokeWidth) || 0;
+      const non = (line.getAttribute('vector-effect') || '') === 'non-scaling-stroke';
+      const lctm = line.getScreenCTM();
+      const rendered = non ? w : w * (lctm ? Math.hypot(lctm.a, lctm.b) : 1);
+      const L1 = lum(cs.stroke), L2 = lum(bg ? getComputedStyle(bg).fill : 'rgb(226,236,232)');
+      const ratio = (Math.max(L1, L2) + 0.05) / (Math.min(L1, L2) + 0.05);
+      return { rendered: Math.round(rendered * 100) / 100, ratio: Math.round(ratio * 100) / 100 };
+    });
+    return { hits, outside, small, marker: texts.some(t => /起终|Start\\/end/.test(t.textContent || '')), leaders, wide: frame.width > 20 };
   })()`;
   try {
     const found = [];
@@ -485,20 +504,39 @@ test('map labels do not overlap and stay inside the svg', async (t) => {
         await page.ev('document.querySelector(".nz-map").scrollIntoView()');
         await page.ev('new Promise(r => setTimeout(r, 400))');
         const home = await page.ev(report('.nz-map'));
-        if (home.hits.length || home.outside.length) found.push('home ' + lang + ' ' + w + ' ' + JSON.stringify(home));
+        if (home.hits.length || home.outside.length || home.small.length) found.push('home ' + lang + ' ' + w + ' ' + JSON.stringify(home));
       }
       await page.go('destination.html?id=ni-akl&lang=zh');
       await page.waitFor('document.querySelector("#v4-dest-map text")', 20000);
       await page.ev('document.querySelector("#v4-dest-map").scrollIntoView()');
       await page.ev('new Promise(r => setTimeout(r, 400))');
       const dest = await page.ev(report('#v4-dest-map svg'));
-      if (dest.hits.length || dest.outside.length) found.push('destination ' + w + ' ' + JSON.stringify(dest));
+      if (dest.hits.length || dest.outside.length || dest.small.length) found.push('destination ' + w + ' ' + JSON.stringify(dest));
       await page.go('guide.html?template=SI-09B&lang=zh');
       await page.waitFor('document.querySelector("#gcoast text")', 20000);
       await page.ev('document.querySelector("#gcoast").scrollIntoView()');
       await page.ev('new Promise(r => setTimeout(r, 500))');
       const tpl = await page.ev(report('#gcoast svg'));
-      if (tpl.hits.length || tpl.outside.length) found.push('template ' + w + ' ' + JSON.stringify(tpl));
+      const faint = (tpl.leaders || []).filter(line => line.rendered < 1 || line.ratio < 3);
+      if (tpl.hits.length || tpl.outside.length || tpl.small.length || !tpl.leaders.length || faint.length) found.push('template ' + w + ' ' + JSON.stringify(tpl));
+      for (const lang of ['zh', 'en']) {
+        await page.go('guide.html?template=SI-09B&view=map&lang=' + lang);
+        await page.waitFor('document.querySelector("#v4-map svg.v4-schematic text")', 20000);
+        await page.ev('document.querySelector("#v4-map").scrollIntoView()');
+        await page.ev('new Promise(r => setTimeout(r, 600))');
+        const schematic = await page.ev(report('#v4-map svg.v4-schematic'));
+        if (!schematic.wide || !schematic.marker || schematic.hits.length || schematic.outside.length || schematic.small.length) found.push('schematic ' + lang + ' ' + w + ' ' + JSON.stringify(schematic));
+        await page.go('plan.html?lang=' + lang);
+        await page.waitFor('document.querySelector("#p10-next-1")', 20000);
+        await page.click('#p10-next-1');
+        await page.click('#p10-next-2');
+        await page.ev('const details = document.querySelector("#p10-more"); if (details) details.open = true');
+        await page.waitFor('document.querySelector("#p10-pick-map svg.p10-pick-svg")', 20000);
+        await page.ev('document.querySelector("#p10-pick-map").scrollIntoView()');
+        await page.ev('new Promise(r => setTimeout(r, 600))');
+        const pick = await page.ev(report('#p10-pick-map svg.p10-pick-svg'));
+        if (!pick.wide || pick.hits.length || pick.outside.length || pick.small.length) found.push('planner ' + lang + ' ' + w + ' ' + JSON.stringify(pick));
+      }
     }
     assert.deepEqual(found, []);
   } finally {

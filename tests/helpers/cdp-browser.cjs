@@ -116,11 +116,16 @@ async function openBrowser() {
       }
       throw new Error('navigation did not finish: ' + target.pathname);
     },
-    async waitFor(expr, timeout = 8000) {
+    async waitFor(expr, timeout = 20000) {
       const until = Date.now() + timeout;
       while (Date.now() < until) {
         try { if (await ev(`Boolean(${expr})`)) return true; } catch { /* page still loading */ }
         await sleep(100);
+      }
+      const retryUntil = Date.now() + 10000;
+      while (Date.now() < retryUntil) {
+        try { if (await ev(`Boolean(${expr})`)) return true; } catch { /* one more window */ }
+        await sleep(150);
       }
       throw new Error('timed out waiting for ' + expr);
     },

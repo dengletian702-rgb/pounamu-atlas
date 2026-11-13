@@ -35,7 +35,9 @@
       const samePlace = Boolean(state.startId) && state.startId === endId;
       const isStart = Boolean(state.startId) && p.id === state.startId && !samePlace;
       const isEnd = Boolean(endId) && p.id === endId && !samePlace;
-      const tag = isStart && isEnd ? (zh ? '起终' : 'Start/end') : isStart ? (zh ? '起' : 'S') : isEnd ? (zh ? '终' : 'E') : '';
+      const tag = samePlace && p.id === state.startId
+        ? (zh ? '起终' : 'Start/end')
+        : isStart && isEnd ? (zh ? '起终' : 'Start/end') : isStart ? (zh ? '起' : 'S') : isEnd ? (zh ? '终' : 'E') : '';
       const cls = [
         'v4-map-stop',
         p.selected ? 'is-on' : 'is-off',
@@ -43,8 +45,8 @@
       ].filter(Boolean).join(' ');
       return `<g class="${cls}" data-place="${esc(p.id)}" tabindex="0" role="button" aria-pressed="${p.selected ? 'true' : 'false'}" aria-label="${esc(label)}" transform="translate(${xy[0].toFixed(1)} ${xy[1].toFixed(1)})">
         <circle r="${p.selected ? 7 : 5}"><title>${esc(label)}</title></circle>
-        ${tag ? `<text y="-10" text-anchor="middle">${esc(tag)}</text>` : ''}
-        ${(p.selected || isStart || isEnd || (samePlace && p.id === state.startId)) && label ? `<text class="v4-map-name" y="16" text-anchor="middle">${esc(label)}</text>` : ''}
+        ${tag ? `<text class="v4-map-tag" y="-28" text-anchor="middle">${esc(tag)}</text>` : ''}
+        ${(p.selected || isStart || isEnd || (samePlace && p.id === state.startId)) && label ? `<text class="v4-map-name" y="22" text-anchor="middle">${esc(label)}</text>` : ''}
       </g>`;
     }).join('');
     const coast = coastPath();

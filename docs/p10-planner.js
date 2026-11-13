@@ -1470,7 +1470,7 @@ globalThis.P10_NODES = NODES;
     const svg=document.querySelector('#p10-pick-map .p10-pick-svg');if(!svg)return;
     const vb=svg.viewBox.baseVal,box=svg.getBoundingClientRect();
     const k=box.width&&box.height?Math.max(vb.width/box.width,vb.height/box.height):vb.width/360;
-    const fitPick=()=>{const b=svg.getBoundingClientRect();if(!b.width||!vb.width)return;const sc=b.width/vb.width;svg.querySelectorAll('text').forEach(t=>t.style.setProperty('font-size',(12/sc).toFixed(2)+'px','important'));};
+    const fitPick=()=>{const b=svg.getBoundingClientRect();if(!b.width||!vb.width)return;const sc=b.width/vb.width;svg.querySelectorAll('text').forEach(t=>t.style.setProperty('font-size',(13/sc).toFixed(2)+'px','important'));if(window.pounamuSettleLabels)window.pounamuSettleLabels(svg,sc);};
     fitPick();requestAnimationFrame(fitPick);setTimeout(fitPick,120);
     svg.style.setProperty('--k',k.toFixed(3));
     for(const g of svg.querySelectorAll('.p10-pick-dot')){const town=g.classList.contains('is-town');g.querySelector('.p10-pick-mark').setAttribute('r',((town?3.5:5.5)*k).toFixed(2));g.querySelector('.p10-pick-hit').setAttribute('r',(11*k).toFixed(2));}
@@ -1483,7 +1483,10 @@ globalThis.P10_NODES = NODES;
       t.classList.remove('is-off');
       if(t.classList.contains('is-town')&&!on){t.classList.add('is-off');continue;}
       const gap=8*k,line=13*k;
-      const tries=[[px+gap,py+4*k,'start'],[px-gap,py+4*k,'end'],[px,py+4*k+line,'middle'],[px,py-gap,'middle']];
+      const tries=[];
+      for(const dy of [4*k,-gap,-line,line*2,-line*2,line*3,-line*3,line*4,-line*4,line*5,-line*5]){
+        tries.push([px+gap,py+dy,'start'],[px-gap,py+dy,'end'],[px,py+dy,'middle']);
+      }
       const put=([x,y,anchor])=>{t.setAttribute('x',x.toFixed(1));t.setAttribute('y',y.toFixed(1));t.setAttribute('text-anchor',anchor);try{return t.getBBox();}catch{return null;}};
       let spot=null;
       const inside=b=>b.x>=vb.x&&b.y>=vb.y&&b.x+b.width<=vb.x+vb.width&&b.y+b.height<=vb.y+vb.height;

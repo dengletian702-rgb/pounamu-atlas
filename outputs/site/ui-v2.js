@@ -392,6 +392,7 @@
     });
     layoutNzMap(svg, scale);
     spreadDayNumbers(svg, scale);
+    settleMapLabels(svg, scale);
   }
   function textShown(el) {
     const cs = getComputedStyle(el);
@@ -521,13 +522,92 @@
       const far = Math.hypot(parseFloat(t.getAttribute('x')) - parseFloat(t.dataset.ox), parseFloat(t.getAttribute('y')) - parseFloat(t.dataset.oy)) > 8;
       let line = g.querySelector('.gday-leader');
       if (!far) { if (line) line.remove(); continue; }
-      if (!line) { line = doc.createElementNS(ns, 'line'); line.setAttribute('class', 'gday-leader'); line.setAttribute('stroke', '#244c39'); line.setAttribute('stroke-width', '1'); g.insertBefore(line, t); }
+      if (!line) { line = doc.createElementNS(ns, 'line'); line.setAttribute('class', 'gday-leader'); g.insertBefore(line, t); }
+      line.setAttribute('stroke', '#163528');
+      line.setAttribute('stroke-width', '1.5');
+      line.setAttribute('vector-effect', 'non-scaling-stroke');
       line.setAttribute('x1', circle.getAttribute('cx'));
       line.setAttribute('y1', circle.getAttribute('cy'));
       line.setAttribute('x2', t.getAttribute('x'));
       line.setAttribute('y2', t.getAttribute('y'));
     }
   }
+  function settleMapLabels(svg, scale) {
+    if (!svg || (!svg.classList.contains('v4-schematic') && !svg.classList.contains('p10-pick-svg'))) return;
+    const frame = svg.getBoundingClientRect();
+    if (!(frame.width > 2) || !(scale > 0)) return;
+    const texts = [...svg.querySelectorAll('text')].filter(textShown);
+    if (!texts.length) return;
+    const gap = 3;
+    const inside = r => r.left >= frame.left - 0.5 && r.right <= frame.right + 0.5 && r.top >= frame.top - 0.5 && r.bottom <= frame.bottom + 0.5;
+    const hitsAny = (el, r) => texts.some(other => other !== el && overlaps(r, other.getBoundingClientRect()));
+    const nudge = (el, dxs, dys) => {
+      shiftText(el, dxs / scale, dys / scale);
+      const r = el.getBoundingClientRect();
+      if (inside(r) && !hitsAny(el, r)) return true;
+      shiftText(el, -dxs / scale, -dys / scale);
+      return false;
+    };
+    const clamp = t => {
+      const r = t.getBoundingClientRect();
+      let dxs = 0, dys = 0;
+      if (r.width > frame.width - 2) dxs = (frame.left + frame.width / 2) - (r.left + r.width / 2);
+      else if (r.left < frame.left + 1) dxs = frame.left + 1 - r.left;
+      else if (r.right > frame.right - 1) dxs = frame.right - 1 - r.right;
+      if (r.top < frame.top + 1) dys = frame.top + 1 - r.top;
+      else if (r.bottom > frame.bottom - 1) dys = frame.bottom - 1 - r.bottom;
+      if (dxs || dys) shiftText(t, dxs / scale, dys / scale);
+    };
+    if (svg.classList.contains('v4-schematic')) {
+      const mid = frame.left + frame.width / 2;
+      const columns = [[], []];
+      texts.forEach(t => {
+        const r = t.getBoundingClientRect();
+        columns[(r.left + r.width / 2) < mid ? 0 : 1].push({ t, cy: r.top, h: r.height });
+      });
+      columns.forEach(col => {
+        if (!col.length) return;
+        col.sort((a, b) => a.cy - b.cy);
+        const total = col.reduce((sum, item) => sum + item.h, 0) + gap * (col.length - 1);
+        let y = frame.top + 2;
+        if (total < frame.height - 4) y = Math.max(frame.top + 2, Math.min(col[0].cy, frame.bottom - 2 - total));
+        col.forEach(item => {
+          const r = item.t.getBoundingClientRect();
+          let left = r.left;
+          if (r.width >= frame.width - 4) left = frame.left + 2;
+          else if (left < frame.left + 1) left = frame.left + 1;
+          else if (left + r.width > frame.right - 1) left = frame.right - 1 - r.width;
+          const dx = left - r.left, dy = y - r.top;
+          if (Math.abs(dx) > 0.4 || Math.abs(dy) > 0.4) shiftText(item.t, dx / scale, dy / scale);
+          y += r.height + gap;
+        });
+      });
+    }
+    texts.forEach(clamp);
+    for (let pass = 0; pass < texts.length * 4; pass++) {
+      let moved = false;
+      const items = texts.map(t => ({ t, r: t.getBoundingClientRect() })).sort((a, b) => a.r.top - b.r.top || a.r.left - b.r.left);
+      for (let i = 0; i < items.length; i++) {
+        for (let j = i + 1; j < items.length; j++) {
+          if (!overlaps(items[i].r, items[j].r)) continue;
+          const need = items[i].r.bottom + gap - items[j].r.top;
+          const options = [
+            [items[j].t, 0, need],
+            [items[i].t, 0, -need],
+            [items[j].t, items[i].r.right + gap - items[j].r.left, 0],
+            [items[j].t, items[i].r.left - gap - items[j].r.right, 0],
+            [items[i].t, items[j].r.right + gap - items[i].r.left, 0],
+            [items[i].t, items[j].r.left - gap - items[i].r.right, 0]
+          ];
+          if (options.some(([el, dx, dy]) => nudge(el, dx, dy))) { moved = true; break; }
+        }
+        if (moved) break;
+      }
+      if (!moved) break;
+    }
+    texts.forEach(clamp);
+  }
+  window.pounamuSettleLabels = settleMapLabels;
   function fitMaps() { $$('svg').forEach(fitSvgText); }
   function enhance() {
     fitMaps();

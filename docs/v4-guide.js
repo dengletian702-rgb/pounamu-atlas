@@ -214,7 +214,46 @@
     stay: /budget|cheap|hostel|backpack|luxury|lodge|camping|campsite|holiday park|motel|hotel|accommodation|青旅|背包|露营|营地|高端|豪华|奢华|省钱|预算|住宿|酒店|旅馆|民宿/i,
     sport: /tennis|golf|basketball|网球|高尔夫|篮球|球场/i,
     boat: /boat|boating|kayak|canoe|paddl|jet ?boat|cruise|划船|皮划艇|独木舟|游船|快艇|泛舟/i,
+    family: /亲子|带娃|带孩子|孩子|小孩|儿童|家庭|一家|family|kids?\b|children|child|toddler|easy walk/i,
   };
+  function routeHours(r) {
+    const text = String((Array.isArray(r.time) ? r.time[0] : r.time) || '').toLowerCase();
+    const h = text.match(/([\d.]+)\s*(?:–|-)?\s*[\d.]*\s*(?:hr|hour|h\b)/);
+    if (h) return Number(h[1]);
+    const m = text.match(/([\d.]+)\s*min/);
+    return m ? Number(m[1]) / 60 : Infinity;
+  }
+  function familyRoutes() {
+    if (typeof routes === 'undefined') return [];
+    return routes.filter(r => r.mode === 'walk' && /^(easy|wheelchair)/i.test(String(Array.isArray(r.level) ? r.level[0] : r.level || '')) && routeHours(r) <= 2)
+      .sort((a, b) => routeHours(a) - routeHours(b)).slice(0, 8);
+  }
+  // "Did you mean": town and route names within one edit (Chinese) or two edits (English) of the query.
+  function editDistance(a, b) {
+    if (Math.abs(a.length - b.length) > 2) return 9;
+    const row = Array.from({ length: b.length + 1 }, (_, i) => i);
+    for (let i = 1; i <= a.length; i++) {
+      let prev = row[0]; row[0] = i;
+      for (let j = 1; j <= b.length; j++) { const cur = row[j]; row[j] = Math.min(row[j] + 1, row[j - 1] + 1, prev + (a[i - 1] === b[j - 1] ? 0 : 1)); prev = cur; }
+    }
+    return row[b.length];
+  }
+  function didYouMean(query) {
+    const q = fold(query);
+    if (!q || q.length < 2) return [];
+    const cjk = /[\u4e00-\u9fff]/.test(q);
+    const names = new Set();
+    for (const p of towns()) for (const n of [p.name_zh, p.name_en, p.town]) if (n) names.add(String(n).replace(/[（(].*$/, '').trim());
+    if (typeof routes !== 'undefined') for (const r of routes) for (const n of [r.zh, r.name]) if (n) names.add(String(n));
+    const out = [];
+    for (const n of names) {
+      const f = fold(n);
+      if (!f || f === q || /[\u4e00-\u9fff]/.test(f) !== cjk) continue;
+      const limit = cjk ? 1 : (q.length > 5 ? 2 : 1);
+      if (editDistance(q, f.slice(0, q.length + 1)) <= limit || editDistance(q, f) <= limit) out.push(n);
+    }
+    return out.sort((a, b) => a.length - b.length).slice(0, 4);
+  }
   function skiMatches(q) {
     const fields = (state.ski && state.ski.fields) || [];
     const f = fold(q);
@@ -228,7 +267,7 @@
     const out = [];
     const ski = skiMatches(q);
     if (ski.length) out.push({ id: 'ski', fields: ski });
-    for (const id of ['stay', 'sport', 'boat']) {
+    for (const id of ['stay', 'sport', 'boat', 'family']) {
       if (id === 'sport' && window.pounamuFlag && !window.pounamuFlag('sports')) continue;
       if (TOPICS[id].test(q)) out.push({ id });
     }
@@ -244,6 +283,10 @@
     if (topic.id === 'stay') {
       const tiers = ((state.stays && state.stays.tiers) || []).map(tier => `<li><strong>${esc(L === 'en' ? tier.en : tier.zh)}</strong>: ${esc(L === 'en' ? tier.types_en : tier.types_zh)}</li>`).join('');
       return `<article class="v4-card v4-topic" data-topic="stay"><h3>${esc(t('topicStayTitle'))}</h3><p>${esc(t('topicStayLead'))}</p>${tiers ? `<ul>${tiers}</ul>` : ''}<div class="v4-actions">${link(`prepare.html?lang=${L}#money`, t('topicStayMore'))}${link(`guide.html?view=pick&lang=${L}`, t('browseDest'))}</div></article>`;
+    }
+    if (topic.id === 'family') {
+      const list = familyRoutes().map(r => `<li><a href="route.html?id=${esc(r.id)}&amp;lang=${L}">${esc(L === 'en' ? r.name : r.zh)}</a> · ${esc(Array.isArray(r.time) ? r.time[L === 'en' ? 0 : 1] : '')}</li>`).join('');
+      return `<article class="v4-card v4-topic" data-topic="family"><h3>${esc(L === 'en' ? 'Short, easy walks for families' : '适合带孩子的轻松短途步道')}</h3><p>${esc(L === 'en' ? 'The site has no separate family tag. These walks are DOC-graded easy and take about 2 hours or less; check each route’s safety notes for your children.' : '本站没有单独的亲子标签。下面这些步道按 DOC 分级为简易、用时约 2 小时以内；是否适合你的孩子，请看各线路的安全提示。')}</p>${list ? `<ul>${list}</ul>` : ''}<div class="v4-actions">${link(`routes.html?mode=walk&amp;lang=${L}`, L === 'en' ? 'All walks' : '全部徒步线路')}</div></article>`;
     }
     if (topic.id === 'sport') return `<article class="v4-card v4-topic" data-topic="sport"><h3>${esc(t('topicSportTitle'))}</h3><p>${esc(t('topicSportLead'))}</p><div class="v4-actions">${link(`cities.html?lang=${L}`, t('topicSportMore'))}</div></article>`;
     return `<article class="v4-card v4-topic" data-topic="boat"><h3>${esc(t('topicBoatTitle'))}</h3><p>${esc(t('topicBoatLead'))}</p><div class="v4-actions">${link(`routes.html?mode=paddle&lang=${L}`, t('topicBoatMore'))}</div></article>`;
@@ -310,6 +353,10 @@
     host.querySelector('#v4-results').addEventListener('click', event => {
       const clear = event.target.closest('[data-v4-clear]');
       if (clear) { writeSearch({ q: readSearch().q, scope: 'all', days: 'any', exact: '', activity: 'all' }, true); renderSearch(); }
+      const again = event.target.closest('[data-v4-q]');
+      if (again) { writeSearch(Object.assign(readSearch(), { q: again.dataset.v4Q }), false); renderSearch(); return; }
+      const more = event.target.closest('[data-v4-more]');
+      if (more) { host.querySelectorAll('.v4-card[data-folded]').forEach(c => c.removeAttribute('data-folded')); more.remove(); return; }
       const south = event.target.closest('[data-v4-south]');
       if (south) { writeSearch({ q: '', island: 'south', days: '7-10', activity: 'drive', scope: 'itineraries', exact: '' }, true); renderSearch(); }
     });
@@ -330,7 +377,9 @@
     if (empty) {
       const unrelated = suggestionTemplates(filters);
       const suggested = unrelated.length ? `<p class="v4-note">${esc(t('unrelated'))}</p>${unrelated.map(cardTemplate).join('')}` : '';
-      return `<div class="v4-alert"><h3>${esc(t('noResults', { q: filters.q }))}</h3><p>${esc(t('noResultsWhy'))}</p>
+      const close = didYouMean(filters.q);
+      const mean = close.length ? `<p class="v4-did-you-mean">${esc(state.lang === 'en' ? 'Did you mean: ' : '你是不是要找：')}${close.map(n => `<button type="button" data-v4-q="${esc(n)}">${esc(n)}</button>`).join(' ')}</p>` : '';
+      return `<div class="v4-alert"><h3>${esc(t('noResults', { q: filters.q }))}</h3>${mean}<p>${esc(t('noResultsWhy'))}</p>
         <div class="v4-actions"><button type="button" data-v4-clear>${esc(t('clearFilters'))}</button>
         <button type="button" data-v4-south>${esc(t('seeSouth'))}</button>
         <a href="plan.html?lang=${state.lang}">${esc(t('usePlanner'))}</a>
@@ -348,7 +397,9 @@
         }
         return String(a.id).localeCompare(String(b.id));
       });
-      cards.push(...pool.map(item => cardTemplate(item)));
+      const fold6 = filters.days === 'any' && !filters.exact && filters.activity === 'all' && filters.island === 'all' && pool.length > 6;
+      cards.push(...pool.map((item, i) => fold6 && i >= 6 ? cardTemplate(item).replace('<article class="v4-card"', '<article class="v4-card" data-folded') : cardTemplate(item)));
+      if (fold6) cards.push(`<button type="button" class="v4-more" data-v4-more>${esc(state.lang === 'en' ? `Show all ${pool.length} trip templates` : `显示全部 ${pool.length} 个行程模板`)}</button>`);
     } else cards.push(...templates.map(item => cardTemplate(item, nine && item.id === 'SI-09A')));
     cards.unshift(...topics.map(cardTopic));
     cards.push(...places.map(cardPlace));
@@ -356,7 +407,11 @@
     cards.push(...guides.map(cardGuide));
     // templates are all self-drive: say so when another way of travelling is picked, and point to its routes and the planner
     const modeLinks = `<div class="v4-actions"><a href="routes.html?${filters.activity !== 'all' ? 'mode=' + esc(filters.activity) + '&amp;' : ''}${filters.island !== 'all' ? 'island=' + esc(filters.island) + '&amp;' : ''}lang=${state.lang}">${esc(t('seeRoutesByMode'))}</a><a href="plan.html?lang=${state.lang}">${esc(t('usePlanner'))}</a><a class="v4-alt" href="guide.html?view=pick&amp;lang=${state.lang}">${esc(t('browseDest'))}</a></div>`;
-    if (!cards.length) return `<div class="v4-alert v4-empty-help"><p>${esc(t('noTemplateMatch'))}</p>${modeLinks}</div>`;
+    if (!cards.length) {
+      const span = { '1-3': 3, '4-6': 5, '7-10': 8, '11-14': 12, '15+': 15 }[filters.days] || Number(filters.exact) || 7;
+      const north = filters.island === 'north' ? `<div class="v4-actions"><a class="v4-primary-link" href="plan.html?from=auckland&amp;to=wellington&amp;days=${span}&amp;lang=${state.lang}">${esc(state.lang === 'en' ? `Plan ${span} days in the North Island (Auckland → Wellington)` : `用规划工具排北岛 ${span} 天（奥克兰 → 惠灵顿）`)}</a></div>` : '';
+      return `<div class="v4-alert v4-empty-help"><p>${esc(t('noTemplateMatch'))}</p>${north}${modeLinks}</div>`;
+    }
     if (filters.activity !== 'all' && filters.activity !== 'drive') cards.unshift(`<div class="v4-note v4-mode-note"><p>${esc(t('templatesAreDrive'))}</p>${modeLinks}</div>`);
     return cards.join('');
   }

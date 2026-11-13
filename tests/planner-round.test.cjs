@@ -12,9 +12,9 @@ const planner = require('../docs/p10-planner.js');
 
 const linked = ['si-gle', 'si-bhe', 'ni-whk', 'si-crm', 'ni-cor', 'ni-ktt', 'ni-opo', 'ni-whg', 'ni-wmt', 'ni-str', 'ni-wmo', 'ni-mtb'];
 
-test('sports and the DOC directory are switched off in the site flag', () => {
+test('sports is on and the DOC directory stays off', () => {
   const flags = fs.readFileSync(path.join(root, 'docs/site-flags.js'), 'utf8');
-  assert.match(flags, /sports:\s*false/);
+  assert.match(flags, /sports:\s*true/);
   assert.match(flags, /docDirectory:\s*false/);
   for (const file of ['docs/index.html', 'docs/plan.html', 'docs/prepare.html', 'docs/routes.html']) {
     const html = fs.readFileSync(path.join(root, file), 'utf8');
@@ -32,16 +32,18 @@ test('prepare copy names 111, the Mountain Safety Council and NZTA', () => {
   assert.match(body, /NZTA/);
   assert.match(body, /https:\/\/www\.mountainsafety\.org\.nz\//);
   assert.match(body, /https:\/\/www\.journeys\.nzta\.govt\.nz\/highway-conditions/);
-  assert.equal(body.includes('href="http'), false);
+  assert.match(body, /rel="noopener"/);
+  assert.match(body, /nzta\.govt\.nz\/travelling-on-our-roads/);
 });
 
-test('preparation copy has no outbound anchors in the renderer', () => {
+test('preparation copy links the official driving, ferry and campsite pages', () => {
   const app = fs.readFileSync(path.join(root, 'docs/app.js'), 'utf8');
   const start = app.indexOf('function renderPrepare()');
   const end = app.indexOf('function render()', start);
   const body = app.slice(start, end);
-  assert.equal(body.includes('target="_blank"'), false);
-  assert.equal(body.includes('href="http'), false);
+  assert.match(body, /rel="noopener"/);
+  assert.match(body, /interislander\.co\.nz\/plan\/dangerous-goods/);
+  assert.match(body, /doc\.govt\.nz\/parks-and-recreation\/places-to-stay\/stay-at-a-campsite/);
   assert.match(body, /page-references/);
   assert.match(body, /NZeTA/);
   assert.match(body, /Interislander/);
@@ -89,7 +91,8 @@ test('navigation hides sports and the DOC directory, and preparation has no outb
         const hrefs = [...document.querySelectorAll('nav a')].map(a => a.getAttribute('href') || '');
         return { hrefs, overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1 };
       })()`);
-      assert.equal(nav.hrefs.some(href => /cities\.html|city\.html|tracks\.html/.test(href)), false, lang);
+      assert.equal(nav.hrefs.some(href => /tracks\.html/.test(href)), false, lang);
+      assert.equal(nav.hrefs.some(href => /cities\.html/.test(href)), true, lang);
       assert.equal(nav.overflow, false, lang);
       await page.go('prepare.html?lang=' + lang);
       await page.waitFor('document.querySelector("#page-references")');
@@ -114,7 +117,11 @@ test('navigation hides sports and the DOC directory, and preparation has no outb
       assert.match(prep.text, lang === 'zh' ? /mountainsafety\.org\.nz/ : /mountainsafety\.org\.nz/);
       assert.equal(prep.overflow, false);
     }
-    for (const [file, gone] of [['cities.html', /网球场|Tennis courts/], ['tracks.html', /全量目录|Every DOC walk|待核实/]]) {
+    await page.go('cities.html?lang=zh');
+    const cities = await page.ev(`document.querySelector('main').innerText`);
+    assert.match(cities, /网球场|Tennis/);
+    assert.doesNotMatch(cities, /本栏目更新中/);
+    for (const [file, gone] of [['tracks.html', /全量目录|Every DOC walk|待核实/]]) {
       await page.go(file + '?lang=zh');
       const hidden = await page.ev(`(() => {
         const main = document.querySelector('main');

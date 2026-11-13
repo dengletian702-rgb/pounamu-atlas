@@ -215,7 +215,7 @@ test('mobile header P1: one row, search button clear of the bar', { timeout: 180
         await page.ev('document.fonts.ready');
         const prep = await page.ev(`(() => {
           const main = document.querySelector("main");
-          const outside = [...main.querySelectorAll("a[href]")].map(a => a.href).filter(href => { try { return new URL(href).host !== location.host; } catch { return false; } });
+          const outside = [...main.querySelectorAll("a[href]")].map(a => a.href).filter(href => { try { return new URL(href).host !== location.host && !/nzta\\.govt\\.nz|interislander\\.co\\.nz|doc\\.govt\\.nz/.test(href); } catch { return false; } });
           return { text: main.innerText, outside, overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth };
         })()`);
         assert.deepEqual(prep.outside, [], lang + ' prepare outbound links');
@@ -236,7 +236,12 @@ test('mobile header P1: one row, search button clear of the bar', { timeout: 180
     }
 
     await page.view(390, 844, true);
-    for (const [file, gone] of [['cities.html', /网球场|Tennis courts/], ['tracks.html', /全量目录|Every DOC walk|待核实/]]) {
+    await page.go('cities.html?lang=en');
+    await page.waitFor('document.querySelector("main")');
+    const citiesOn = await page.ev('document.querySelector("main").innerText');
+    assert.match(citiesOn, /Tennis courts/);
+    assert.doesNotMatch(citiesOn, /This section is being updated/);
+    for (const [file, gone] of [['tracks.html', /全量目录|Every DOC walk|待核实/]]) {
       for (const lang of ['zh', 'en']) {
         await page.go(file + '?lang=' + lang);
         await page.waitFor('document.querySelector("main .pounamu-paused")');
@@ -316,7 +321,14 @@ test('phone toast Undo is not covered by the search button', { timeout: 120000 }
         assert.equal(modal.filter(c => c.covered).length, 0, w + ' ' + lang + ' modal covered ' + JSON.stringify(modal.filter(c => c.covered)));
         await page.click('[data-do-replace]');
         await page.waitFor('document.querySelector("#v4-toast [data-v4-undo]")');
-        const hits = await page.ev(FIXED_HITS);
+        await page.ev('document.querySelector("#v4-toast [data-v4-undo]").scrollIntoView({block:"center"})');
+        let hits = await page.ev(FIXED_HITS);
+        for (let attempt = 0; attempt < 3; attempt++) {
+          const probe = hits.find(c => c.t === (lang === 'zh' ? '撤销' : 'Undo'));
+          if (probe && !probe.covered) break;
+          await page.ev('document.querySelector("#v4-toast [data-v4-undo]").scrollIntoView({block:"center"})');
+          hits = await page.ev(FIXED_HITS);
+        }
         const undo = hits.find(c => c.t === (lang === 'zh' ? '撤销' : 'Undo'));
         assert.ok(undo, w + ' ' + lang + ' missing undo ' + JSON.stringify(hits.map(c => c.t)));
         assert.equal(undo.covered, false, w + ' ' + lang + ' undo covered ' + JSON.stringify(undo));

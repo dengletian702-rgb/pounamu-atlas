@@ -41,6 +41,18 @@
       checkedAt: '2026-11-13',
       en: 'MBIE weekly fuel-price monitoring is the place to read a pump price. This page did not copy a litre price, so the default is to verify until you type one.',
       zh: '油价请看 MBIE 每周油价监测。本页没有抄入每升价格，所以默认待核，你可以自己填。'
+    },
+    docHut: {
+      url: 'https://www.doc.govt.nz/parks-and-recreation/places-to-stay/stay-in-a-hut/hut-categories/',
+      checkedAt: '2026-11-13',
+      en: 'DOC hut categories, read 2026-11-13: Standard hut adult $15 a night; Serviced hut adult $25. Great Walk huts are priced separately, with a different rate for international visitors. This page did not copy a Great Walk dollar figure.',
+      zh: 'DOC 小屋分类页，2026-11-13 读到：标准小屋成人每晚 $15，服务型小屋成人每晚 $25。Great Walk 小屋另有价格，国际访客与本地不同。这一页没有抄入 Great Walk 的具体金额。'
+    },
+    cityStay: {
+      url: 'https://datainfoplus.stats.govt.nz/Item/nz.govt.stats/38574cd6-b696-41a5-b311-41bfa5611a99/121',
+      checkedAt: '2026-11-12',
+      en: 'A night in town (hostel or holiday park) has no official nightly rate in Stats NZ’s Accommodation Survey. That line stays to verify.',
+      zh: '城里住一晚（青旅或假日公园）没有统计局公布的每晚价格，这一项待核。'
     }
   };
 
@@ -90,27 +102,42 @@
   }
 
   function encodeState(raw) {
-    return encodeURIComponent(JSON.stringify(normalise(raw)));
+    return JSON.stringify(normalise(raw));
   }
 
   function decodeState(text) {
     if (!text) return blankAssumptions();
-    try { return normalise(JSON.parse(decodeURIComponent(text))); } catch { return blankAssumptions(); }
+    let raw = String(text);
+    for (let i = 0; i < 2; i++) {
+      try {
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object') return normalise(parsed);
+      } catch { /* try one more decode */ }
+      try { raw = decodeURIComponent(raw); } catch { break; }
+    }
+    return blankAssumptions();
   }
 
   function addRange(total, part) {
-    if (!part || part.verify) { total.verify = true; return total; }
-    total.min += part.min;
-    total.max += part.max;
+    if (!part || part.empty) return total;
+    const has = Number(part.min) > 0 || Number(part.max) > 0;
+    if (has) { total.min += part.min || 0; total.max += part.max || 0; }
+    if (part.verify) total.verify = true;
     return total;
   }
 
-  function stayLine(night, tier, people, a) {
-    if (!night) return { min: 0, max: 0, verify: false, kind: 'stay' };
-    if (tier === 'budget') return { min: round(a.docLow * people), max: round(a.docHigh * people), verify: false, kind: 'stay', range: a.docLow !== a.docHigh };
-    const rate = tier === 'high' ? a.highNightly : a.midNightly;
-    if (rate == null) return { min: 0, max: 0, verify: true, kind: 'stay' };
-    return { min: round(rate), max: round(rate), verify: false, kind: 'stay' };
+  function stayLine(night, tier, people, a, stayKind) {
+    if (!night) return { min: 0, max: 0, verify: false, kind: 'stay', empty: true };
+    const kind = stayKind || 'city';
+    if (kind === 'doc-camp' && tier === 'budget') return { min: round(a.docLow * people), max: round(a.docHigh * people), verify: false, kind: 'stay', range: a.docLow !== a.docHigh, source: 'docCamp' };
+    if (kind === 'doc-hut' && tier === 'budget') return { min: round(15 * people), max: round(25 * people), verify: false, kind: 'stay', range: true, source: 'docHut' };
+    if (kind === 'great-walk') return { min: 0, max: 0, verify: true, kind: 'stay', source: 'greatWalk' };
+    if (tier !== 'budget') {
+      const rate = tier === 'high' ? a.highNightly : a.midNightly;
+      if (rate == null) return { min: 0, max: 0, verify: true, kind: 'stay', source: 'city' };
+      return { min: round(rate), max: round(rate), verify: false, kind: 'stay', source: 'city' };
+    }
+    return { min: 0, max: 0, verify: true, kind: 'stay', source: 'city' };
   }
 
   function round(n) { return Math.round(n * 100) / 100; }
@@ -140,7 +167,7 @@
   function priceDay(day, assumptions) {
     const a = normalise(assumptions);
     const info = dayInput(day);
-    const stay = stayLine(info.night, a.tier, a.people, a);
+    const stay = stayLine(info.night, a.tier, a.people, a, day.stayKind);
     const fuel = fuelLine(info.km, a);
     if (info.kmUnknown && !fuel.verify) fuel.verify = true;
     const food = info.kind === 'depart' && !info.activities
@@ -189,14 +216,16 @@
     return { days: priced, categories, total, perPerson: per(a.people), cny, assumptions: a };
   }
 
-  function formatMoney(part, lang) {
+  function formatMoney(part, lang, prefix) {
+    const cur = prefix || 'NZ$';
+    const fmt = n => cur + Math.round(Number(n) || 0).toLocaleString('en-NZ');
     if (!part) return lang === 'zh' ? '待核' : 'To verify';
-    if (part.empty) return lang === 'zh' ? '—' : '—';
-    if (part.verify && !(part.min || part.max)) return lang === 'zh' ? '待核' : 'To verify';
-    const mark = lang === 'zh' ? '估算' : 'est.';
-    const money = n => 'NZ$' + (Math.round(n) === n ? String(n) : n.toFixed(2));
-    const body = part.min === part.max ? money(part.min) : money(part.min) + '–' + money(part.max);
-    return part.verify ? body + (lang === 'zh' ? '＋待核' : ' + to verify') : mark + ' ' + body;
+    if (part.empty) return '—';
+    const has = Number(part.min) > 0 || Number(part.max) > 0;
+    if (part.verify && !has) return lang === 'zh' ? '待核' : 'To verify';
+    const body = part.min === part.max ? fmt(part.min) : fmt(part.min) + '–' + fmt(part.max);
+    const mark = lang === 'zh' ? '估算 ' : 'est. ';
+    return part.verify ? mark + body + (lang === 'zh' ? '＋待核' : ' + to verify') : mark + body;
   }
 
   return { SOURCES, blankAssumptions, normalise, encodeState, decodeState, priceDay, priceTrip, formatMoney, dayInput };

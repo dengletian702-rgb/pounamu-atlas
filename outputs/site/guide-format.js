@@ -70,9 +70,9 @@
         <div><dt>${lang === 'en' ? 'Days' : '几天'}</dt><dd>${esc(o.days || (lang === 'en' ? 'To verify' : '待核'))}</dd></div>
         <div><dt>${lang === 'en' ? 'Season' : '季节'}</dt><dd>${esc(o.season || (lang === 'en' ? 'To verify' : '待核'))}</dd></div>
         <div><dt>${lang === 'en' ? 'Getting there' : '怎么到'}</dt><dd>${esc(o.access || (lang === 'en' ? 'See the map link' : '看地图链接'))} ${mapsLink}</dd></div>
-        <div><dt>${lang === 'en' ? 'A night, estimate' : '住一晚，估算'}</dt><dd>${esc(o.cost || (lang === 'en' ? 'DOC standard campsite, adult NZ$10–20 (read 2026-11-12). Meals and tickets to verify.' : 'DOC 标准营地成人 NZ$10–20（查阅 2026-11-12）。餐饮和门票待核。'))}</dd></div>
+        <div><dt>${lang === 'en' ? 'A night, estimate' : '住一晚，估算'}</dt><dd>${esc(o.cost || (lang === 'en' ? 'A night in town (hostel or holiday park) is to verify. Stats NZ does not publish a nightly rate (read 2026-11-12).' : '城里住一晚（青旅或假日公园）待核。统计局不公布每晚房价（查阅 2026-11-12）。'))}</dd></div>
       </dl>
-      <p class="v4-note"><a href="https://www.doc.govt.nz/parks-and-recreation/places-to-stay/stay-at-a-campsite/facilities-and-fees/" target="_blank" rel="noopener" data-keep-link="1">DOC campsite fees</a> · 2026-11-12</p>
+      <p class="v4-note"><a href="https://datainfoplus.stats.govt.nz/Item/nz.govt.stats/38574cd6-b696-41a5-b311-41bfa5611a99/121" target="_blank" rel="noopener" data-keep-link="1">${lang === 'en' ? 'Stats NZ Accommodation Survey' : '统计局住宿调查'}</a> · 2026-11-12</p>
     </section>`;
   }
 
@@ -82,7 +82,7 @@
     const zh = lang !== 'en';
     const a = api.blankAssumptions();
     const field = (key, label) => `<label>${esc(label)} <input data-budget="${key}" type="number" min="0" step="1" value="${a[key] == null ? '' : a[key]}"></label>`;
-    return `<section class="p10-budget" id="p10-budget"><h2>${zh ? '预算功能区' : 'Budget panel'}</h2>
+    return `<section class="p10-budget" id="p10-budget"><h2>${zh ? '预算 / Trip budget' : '预算 / Trip budget'}</h2>
       <p class="v4-note">${zh ? '数字都是估算。没有来源的标待核。' : 'Figures are estimates. Anything without a source is marked to verify.'}</p>
       <div class="p10-budget-controls"><label>${zh ? '档位' : 'Tier'} <select data-budget="tier"><option value="budget">${zh ? '经济' : 'Budget'}</option><option value="mid">${zh ? '舒适' : 'Comfort'}</option><option value="high">${zh ? '高端' : 'High-end'}</option></select></label>
       <label>${zh ? '人数' : 'People'} <input data-budget="people" type="number" min="1" max="12" value="2"></label>
@@ -104,6 +104,26 @@
     return api.normalise(next);
   }
 
+  function placeSticky(sticky) {
+    if (!sticky || typeof document === 'undefined') return;
+    sticky.hidden = false;
+    const box = sticky.getBoundingClientRect();
+    const targets = document.querySelectorAll('.gday-actions, .gday-meta, .gday-jumpmap, .map-legend, .p10-map-day-list, .journey-facts, .ui2-kbtn, #p10-budget');
+    let hit = false;
+    for (const el of targets) {
+      const r = el.getBoundingClientRect();
+      if (r.width < 2 || r.bottom < 0 || r.top > window.innerHeight) continue;
+      if (!(box.right < r.left || box.left > r.right || box.bottom < r.top || box.top > r.bottom)) { hit = true; break; }
+    }
+    sticky.hidden = hit;
+    if (!placeSticky.bound) {
+      placeSticky.bound = true;
+      const again = () => { const chip = document.querySelector('.gday-sticky'); if (chip) placeSticky(chip); };
+      window.addEventListener('scroll', again, { passive: true });
+      window.addEventListener('resize', again);
+    }
+  }
+
   function paint(root, days, state) {
     const api = budgetApi();
     if (!api || !root) return state;
@@ -123,11 +143,14 @@
       const cat = Object.entries(trip.categories).map(([key, line]) => `<li><span>${names[key]}</span><span>${esc(api.formatMoney(line, zh ? 'zh' : 'en'))}</span></li>`).join('');
       const byDay = trip.days.map((day, i) => `<li><span>${zh ? '第' : 'Day '}${i + 1}${zh ? '天' : ''}</span><span>${esc(api.formatMoney(day.subtotal, zh ? 'zh' : 'en'))}</span></li>`).join('');
       const rate = state.nzdCny;
-      const cny = state.showCny ? `<p>${zh ? '人民币' : 'CNY'} ${rate == null ? (zh ? '待核（先填汇率）' : 'To verify (type a rate)') : esc(api.formatMoney({ min: trip.cny.min, max: trip.cny.max, verify: trip.cny.verify }, zh ? 'zh' : 'en').replaceAll('NZ$', 'CN¥'))}${state.nzdCnyDate ? ' · ' + esc(state.nzdCnyDate) : ''}</p>` : '';
+      const cny = state.showCny ? `<p>${zh ? '人民币' : 'CNY'} ${rate == null ? (zh ? '待核（先填汇率）' : 'To verify (type a rate)') : esc(api.formatMoney(trip.cny, zh ? 'zh' : 'en', 'CN¥'))}${state.nzdCnyDate ? ' · ' + esc(state.nzdCnyDate) : ''}</p>` : '';
       box.innerHTML = `<p class="p10-budget-total"><b>${zh ? '行程合计' : 'Trip total'}</b> ${esc(api.formatMoney(trip.total, zh ? 'zh' : 'en'))}</p><p><b>${zh ? '每人' : 'Per person'}</b> ${esc(api.formatMoney(trip.perPerson, zh ? 'zh' : 'en'))}</p>${cny}<h3>${zh ? '按类别' : 'By category'}</h3><ul class="p10-budget-split">${cat}</ul><h3>${zh ? '按天' : 'By day'}</h3><ul class="p10-budget-split">${byDay}</ul>`;
     }
     const sticky = root.querySelector('#p10-budget-sticky');
-    if (sticky) sticky.innerHTML = `<a href="#p10-budget">${zh ? '合计' : 'Total'} ${esc(api.formatMoney(trip.total, zh ? 'zh' : 'en'))}</a>`;
+    if (sticky) {
+      sticky.innerHTML = `<a href="#p10-budget">${zh ? '合计' : 'Total'} ${esc(api.formatMoney(trip.total, zh ? 'zh' : 'en'))}</a>`;
+      placeSticky(sticky);
+    }
     return state;
   }
 
@@ -173,5 +196,62 @@
     return Array.from({ length: n }, () => ({ kind: 'activity', legs: [], activities: [{}] }));
   }
 
-  return { esc, dayCard, placeCard, glance, budgetShell, paint, bindBudget, coastMap, searchLink, dirLinks, asBudgetDays };
+  function routeDayPlan(route) {
+    if (typeof globalThis.p10RouteDays === 'function') return globalThis.p10RouteDays(route);
+    const pick = (pair, en) => Array.isArray(pair) ? pair[en ? 0 : 1] : '';
+    const stages = (route.timeline || []).map(s => ({ titleEn: pick(s.title, true), titleZh: pick(s.title, false), textEn: pick(s.text, true), textZh: pick(s.text, false) }));
+    const time = Array.isArray(route.time) ? route.time : ['', ''];
+    if (route.id === 'milford-track') {
+      return [
+        { stayEn: 'Clinton Hut', stayZh: 'Clinton Hut', titleEn: 'Glade Wharf to Clinton Hut', titleZh: 'Glade Wharf → Clinton Hut', textEn: (stages[0] && stages[0].textEn) + ' ' + (stages[1] && stages[1].textEn), textZh: (stages[0] && stages[0].textZh) + ' ' + (stages[1] && stages[1].textZh), query: 'Clinton Hut Milford Track', stayKind: 'great-walk', hut: true, moveEn: time[0], moveZh: time[1] },
+        { stayEn: 'Mintaro Hut', stayZh: 'Mintaro Hut', titleEn: 'On to Mintaro Hut', titleZh: '前往 Mintaro Hut', textEn: 'DOC’s usual second night on the 4-day Milford Track booking is Mintaro Hut.', textZh: '米尔福德步道 4 天预订通常第二晚住 Mintaro Hut。', query: 'Mintaro Hut Milford Track', stayKind: 'great-walk', hut: true, moveEn: time[0], moveZh: time[1] },
+        { stayEn: 'Dumpling Hut', stayZh: 'Dumpling Hut', titleEn: 'Over Mackinnon Pass to Dumpling Hut', titleZh: '翻 Mackinnon Pass → Dumpling Hut', textEn: stages[2] && stages[2].textEn, textZh: stages[2] && stages[2].textZh, query: 'Dumpling Hut Milford Track', stayKind: 'great-walk', hut: true, moveEn: time[0], moveZh: time[1] },
+        { stayEn: 'Sandfly Point', stayZh: 'Sandfly Point', titleEn: 'To Sandfly Point, then the boat', titleZh: '到 Sandfly Point，再乘船', textEn: (stages[3] && stages[3].textEn) + ' ' + (stages[4] && stages[4].textEn), textZh: (stages[3] && stages[3].textZh) + ' ' + (stages[4] && stages[4].textZh), query: 'Sandfly Point Milford Track', stayKind: 'none', hut: false, moveEn: time[0], moveZh: time[1] }
+      ];
+    }
+    const planDays = Math.max(1, Number(route.planDays) || 1);
+    if (planDays <= 1) {
+      return [{ stayEn: 'To verify', stayZh: '待核', titleEn: route.name, titleZh: route.zh || route.name, textEn: stages.map(s => s.textEn).join(' '), textZh: stages.map(s => s.textZh).join(' '), query: route.name, stayKind: 'city', hut: false, moveEn: time[0], moveZh: time[1] }];
+    }
+    return stages.slice(0, planDays).map(s => {
+      const name = (s.titleEn || '').split(/\s*(?:→|->| to )\s*/i).pop();
+      const hut = /hut/i.test(name);
+      const camp = /camp/i.test(name);
+      return { stayEn: name || 'To verify', stayZh: (s.titleZh || '').split(/→/).pop().trim() || name || '待核', titleEn: s.titleEn, titleZh: s.titleZh, textEn: s.textEn, textZh: s.textZh, query: name || route.name, hut, stayKind: hut ? 'great-walk' : camp ? 'doc-camp' : 'city', moveEn: time[0], moveZh: time[1] };
+    });
+  }
+
+  function renderRoutePage(route, lang) {
+    if (!route || typeof document === 'undefined') return;
+    const box = document.querySelector('#journey-timeline');
+    if (!box) return;
+    const zh = (lang || document.documentElement.lang || '').startsWith('zh') || lang === 'zh';
+    const L = zh ? 'zh' : 'en';
+    const days = routeDayPlan(route);
+    const moveLabel = route.mode === 'paddle' ? (zh ? '划多久' : 'PADDLE') : route.mode === 'walk' ? (zh ? '走多久' : 'WALK') : route.mode === 'cycle' ? (zh ? '骑多久' : 'RIDE') : route.mode === 'transit' ? (zh ? '车上多久' : 'TRANSIT') : (zh ? '开车多久' : 'DRIVE');
+    const cards = days.map((s, i) => dayCard({
+      lang: L, n: i + 1, title: zh ? s.titleZh : s.titleEn, stay: zh ? s.stayZh : s.stayEn,
+      moveLabel, move: zh ? s.moveZh : s.moveEn, must: false,
+      body: `<p>${esc(zh ? s.textZh : s.textEn)}</p>`,
+      mapsHtml: searchLink({ name: s.query || s.stayEn }, L),
+      official: s.hut ? `<p class="gday-official"><a href="https://www.doc.govt.nz/parks-and-recreation/places-to-stay/stay-in-a-hut/hut-categories/" target="_blank" rel="noopener" data-keep-link="1">${zh ? 'DOC 小屋分类与费用' : 'DOC hut categories and fees'}</a> · 2026-11-13</p>` : ''
+    })).join('');
+    const old = box.querySelector('.journey-timeline');
+    const host = old || box;
+    host.outerHTML = `<div class="p10-days" id="p10-days">${cards}</div>`;
+    const safety = [];
+    if (route.safety) safety.push(`<article class="gplace"><h3>${zh ? '安全' : 'Safety'}</h3><p>${esc(Array.isArray(route.safety) ? route.safety[zh ? 1 : 0] : route.safety)}</p></article>`);
+    if (route.booking) safety.push(`<article class="gplace"><h3>${zh ? '预订' : 'Booking'}</h3><p>${esc(Array.isArray(route.booking) ? route.booking[zh ? 1 : 0] : route.booking)}</p></article>`);
+    const intro = document.querySelector('#journey-overview .journey-intro');
+    if (intro) intro.outerHTML = `<article class="gplace"><h3>${zh ? '这段路' : 'This route'}</h3><p>${esc(Array.isArray(route.summary) ? route.summary[zh ? 1 : 0] : '')}</p></article>${safety.join('')}`;
+    const tips = document.querySelector('#journey-notes .journey-tip-grid');
+    if (tips && Array.isArray(route.tips)) tips.innerHTML = route.tips.map(tip => `<article class="gplace"><h3>${esc(Array.isArray(tip.title) ? tip.title[zh ? 1 : 0] : '')}</h3><p>${esc(Array.isArray(tip.text) ? tip.text[zh ? 1 : 0] : '')}</p></article>`).join('');
+    if (!box.querySelector('#p10-budget') && !document.querySelector('#journey-timeline #p10-budget')) {
+      box.insertAdjacentHTML('beforeend', budgetShell(L));
+    }
+    const priced = days.map(s => ({ kind: s.stayKind === 'none' ? 'depart' : 'activity', stayKind: s.stayKind, legs: [], activities: [{}] }));
+    bindBudget(box, priced);
+  }
+
+  return { esc, dayCard, placeCard, glance, budgetShell, paint, bindBudget, coastMap, searchLink, dirLinks, asBudgetDays, renderRoutePage, routeDayPlan };
 });

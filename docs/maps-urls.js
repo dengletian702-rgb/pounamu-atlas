@@ -18,9 +18,12 @@
 
   function searchUrl(opts) {
     const o = opts || {};
-    const query = Number.isFinite(Number(o.lat)) && Number.isFinite(Number(o.lng))
-      ? Number(o.lat) + ',' + Number(o.lng)
-      : [o.name, o.town, 'New Zealand'].filter(Boolean).join(' ');
+    let query;
+    if (Number.isFinite(Number(o.lat)) && Number.isFinite(Number(o.lng))) query = Number(o.lat) + ',' + Number(o.lng);
+    else {
+      const name = [o.name, o.town].filter(Boolean).join(' ').replace(/\s+New Zealand\s*$/i, '').trim();
+      query = name ? name + ' New Zealand' : 'New Zealand';
+    }
     return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(query);
   }
 

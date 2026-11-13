@@ -42,7 +42,7 @@ test('type.css defines one body, one heading, one mono and a size scale', () => 
 
 test('budget totals add up and a missing price stays to verify', () => {
   const days = [
-    { kind: 'activity', legs: [{ km: 100, mode: 'car' }], activities: [{}] },
+    { kind: 'activity', stayKind: 'doc-camp', legs: [{ km: 100, mode: 'car' }], activities: [{}] },
     { kind: 'depart', legs: [{ km: 0, mode: 'ferry' }], activities: [] }
   ];
   const assumptions = budget.normalise({
@@ -117,8 +117,9 @@ test('a route import keeps Milford stages and does not become a road trip', () =
   };
   const plan = planner.p10PlanFromRoute(route);
   assert.equal(plan.routeImport.planDays, 4);
-  assert.equal(plan.routeImport.days.length, 2);
-  assert.equal(plan.routeImport.transfers.length, 1);
+  assert.equal(plan.routeImport.days.length, 4);
+  assert.deepEqual(plan.routeImport.days.map(day => day.stayEn), ['Clinton Hut', 'Mintaro Hut', 'Dumpling Hut', 'Sandfly Point']);
+  assert.equal(plan.routeImport.transfers.length, 0);
   assert.equal(plan.input.car, false);
 });
 
@@ -135,4 +136,75 @@ test('Whanganui import stays a paddle with a separate land transfer', () => {
   assert.match(plan.routeImport.transfers[0].titleEn, /Land transfer/);
   assert.equal(plan.input.start, 'taumarunui');
   assert.equal(plan.input.end, 'pipiriki');
+});
+
+test('a city night stays to verify while known amounts remain in the total', () => {
+  const trip = budget.priceTrip(
+    [{ kind: 'activity', legs: [{ km: 100, mode: 'car' }], activities: [] }],
+    budget.normalise({ people: 2, tier: 'budget', fuelNzdPerL: 3, litresPer100: 10, mealNzd: 20, mealsPerDay: 2 })
+  );
+  assert.equal(trip.days[0].lines.stay.verify, true);
+  assert.equal(trip.days[0].lines.stay.min, 0);
+  assert.ok(trip.total.min >= 30);
+  assert.equal(trip.total.verify, true);
+  assert.match(budget.formatMoney(trip.total, 'zh'), /待核/);
+  assert.match(budget.formatMoney({ min: 1200, max: 2400 }, 'en', 'CN¥'), /CN¥1,200–CN¥2,400/);
+  const once = budget.encodeState({ people: 2, tier: 'mid' });
+  assert.equal(once.includes('%'), false);
+  assert.equal(budget.decodeState(encodeURIComponent(encodeURIComponent(once))).people, 2);
+});
+
+test('a two-day same-city trip visits that city even when it is not ticked', () => {
+  const plan = planner.p10Plan({ start: 'christchurch', end: 'christchurch', days: 2, pace: 5, preference: 'easy', car: true, wishes: [] });
+  const view = planner.p10Present(plan);
+  assert.ok(view.days.some(day => day.activities.some(item => item.wish.id === 'christchurch')));
+  const far = planner.p10SuggestPool(plan.input, new Set(['christchurch']));
+  assert.ok(far.every(item => item.base === 'christchurch' || planner.p10Net(true).hours('christchurch', item.base) <= 1.5));
+});
+
+const { openBrowser } = require('./helpers/cdp-browser.cjs');
+
+test('route day cards render on first load and the sticky line does not cover controls', async (t) => {
+  const page = await openBrowser();
+  if (!page) { t.skip('Chrome is not installed here'); return; }
+  try {
+    for (const id of ['milford-track', 'whanganui-journey']) {
+      await page.go('route.html?id=' + id + '&lang=zh');
+      await page.waitFor('document.querySelectorAll(".gday").length > 0');
+      const count = await page.ev('document.querySelectorAll(".gday").length');
+      assert.ok(count > 0, id + ' ' + count);
+      if (id === 'milford-track') assert.equal(count, 4);
+    }
+    for (const w of [390, 320]) {
+      await page.view(w, 844, true);
+      for (const lang of ['zh', 'en']) {
+        await page.go('route.html?id=milford-track&lang=' + lang);
+        await page.waitFor('document.querySelector(".gday-actions a") && document.querySelector(".gday-sticky") && document.querySelector(".ui2-kbtn")');
+        const hit = await page.ev(`(() => {
+          const overlaps = (a, b) => a && b && !(a.right < b.left || a.left > b.right || a.bottom < b.top || a.top > b.bottom);
+          const sticky = document.querySelector('.gday-sticky').getBoundingClientRect();
+          const action = document.querySelector('.gday-actions a').getBoundingClientRect();
+          const search = document.querySelector('.ui2-kbtn').getBoundingClientRect();
+          const legend = document.querySelector('.map-legend, .p10-map-day-list');
+          const legendBox = legend ? legend.getBoundingClientRect() : null;
+          const cs = getComputedStyle(document.querySelector('.gday-sticky'));
+          return {
+            action: overlaps(sticky, action),
+            search: overlaps(sticky, search),
+            legend: legendBox ? overlaps(sticky, legendBox) : false,
+            nowrap: cs.whiteSpace === 'nowrap',
+            line: document.querySelector('.gday-sticky').innerText.replace(/\\s+/g, ' ')
+          };
+        })()`);
+        assert.equal(hit.action, false, w + lang);
+        assert.equal(hit.search, false, w + lang);
+        assert.equal(hit.legend, false, w + lang);
+        assert.equal(hit.nowrap, true, w + lang);
+        assert.match(hit.line, lang === 'zh' ? /^合计/ : /^Total/);
+      }
+    }
+    assert.deepEqual(page.errors, []);
+  } finally {
+    await page.close();
+  }
 });

@@ -1,7 +1,7 @@
 // One switch for each hidden section. Set a flag to true to show it again in
 // navigation, search, town pages and its own URL.
 window.POUNAMU_FLAGS = {
-  sports: false,
+  sports: true,
   docDirectory: false
 };
 

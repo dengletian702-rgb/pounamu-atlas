@@ -259,7 +259,7 @@
     try {
       const cat = await fetch('data/v4-catalog.json').then(r => r.ok ? r.json() : null);
       for (const p of (cat && cat.places) || []) {
-        if (p.type === 'town') list.push({ k: en ? 'Place' : '目的地', t: en ? p.name_en : p.name_zh, s: en ? p.name_zh : p.name_en, h: `destination.html?id=${encodeURIComponent(p.place_id)}&lang=${lang}` });
+        if (p.type === 'town') list.push({ k: en ? 'Place' : '目的地', t: en ? p.name_en : p.name_zh, s: en ? p.name_zh : p.name_en, sub: en ? p.name_zh : p.name_en, h: `destination.html?id=${encodeURIComponent(p.place_id)}&lang=${lang}` });
         else if (/hot pool|温泉|hot spring/i.test(`${p.name_en} ${p.name_zh}`)) list.push({ k: en ? 'Activity' : '活动', t: en ? p.name_en : p.name_zh, s: 'hot pools 温泉', h: `destination.html?id=${encodeURIComponent(p.place_id)}&lang=${lang}#p-${encodeURIComponent(p.place_id)}` });
       }
     } catch (e) {}
@@ -271,7 +271,11 @@
       { k: en ? 'Page' : '页面', t: en ? 'Safety and 111' : '安全与 111', s: 'safety emergency 紧急 安全', h: `prepare.html?lang=${lang}#safety` },
       { k: en ? 'Page' : '页面', t: en ? 'Keep left, overseas licence' : '靠左行驶与驾照翻译', s: 'driving licence keep left 驾照翻译 左行', h: `prepare.html?lang=${lang}#driving` },
       { k: en ? 'Page' : '页面', t: en ? 'Campervan' : '房车', s: 'campervan 房车 freedom camping', h: `prepare.html?lang=${lang}#campervan` },
-      { k: en ? 'Route' : '线路', t: en ? 'Great Walks' : '大步道', s: 'great walks milford 米尔福德', h: `route.html?id=milford-track&lang=${lang}` },
+      { k: en ? 'Route' : '线路', t: en ? 'Milford Track' : '米尔福德步道', s: 'great walk great walks 大步道', h: `route.html?id=milford-track&lang=${lang}` },
+      { k: en ? 'Route' : '线路', t: en ? 'Routeburn Track' : '路特本步道', s: 'great walk great walks 大步道', h: `route.html?id=routeburn-track&lang=${lang}` },
+      { k: en ? 'Route' : '线路', t: en ? 'Kepler Track' : '开普勒步道', s: 'great walk great walks 大步道', h: `route.html?id=kepler-track&lang=${lang}` },
+      { k: en ? 'Route' : '线路', t: en ? 'Abel Tasman Coast Track' : '亚伯塔斯曼海岸步道', s: 'great walk great walks 大步道', h: `route.html?id=abel-tasman&lang=${lang}` },
+      { k: en ? 'Route' : '线路', t: en ? 'Whanganui Journey' : '旺格努伊河之旅', s: 'great walk great walks 大步道', h: `route.html?id=whanganui-journey&lang=${lang}` },
       { k: en ? 'Activity' : '活动', t: en ? 'Short, easy walks' : '少走路的短途', s: '少走路 easy walk low walking', h: `routes.html?mode=walk&lang=${lang}` },
       { k: en ? 'Sport' : '运动', t: en ? 'Tennis, golf and basketball' : '网球、高尔夫、篮球', s: 'tennis golf basketball 网球 高尔夫 篮球', h: `destination.html?id=ni-akl&lang=${lang}#sports` }
     );
@@ -293,7 +297,7 @@
     shown = (items || []).map(x => [score(x, f), x]).filter(([s]) => s > 0).sort((a, b) => b[0] - a[0]).slice(0, 12).map(([, x]) => x);
     sel = 0;
     const ul = palette.querySelector('ul');
-    ul.innerHTML = shown.length ? shown.map((x, i) => `<li role="option" id="ui2-opt-${i}" aria-selected="${i === sel}"><a href="${x.h}"><small>${x.k}</small><span>${x.t.replace(/[&<>]/g, '')}</span>${x.s ? `<em>${String(x.s).replace(/[&<>]/g, '')}</em>` : ''}</a></li>`).join('')
+    ul.innerHTML = shown.length ? shown.map((x, i) => `<li role="option" id="ui2-opt-${i}" aria-selected="${i === sel}"><a href="${x.h}"><small>${x.k}</small><span>${x.t.replace(/[&<>]/g, '')}</span>${x.sub ? `<em>${String(x.sub).replace(/[&<>]/g, '')}</em>` : ''}</a></li>`).join('')
       : `<li><a href="index.html?q=${encodeURIComponent(q)}&lang=${isEn() ? 'en' : 'zh'}#v4-search"><small>${isEn() ? 'Search' : '搜索'}</small><span>${isEn() ? 'Search the site for' : '在站内搜索'} “${q.replace(/[&<>]/g, '')}”</span></a></li>`;
     palette.querySelector('input').setAttribute('aria-activedescendant', shown.length ? 'ui2-opt-0' : '');
   }
@@ -410,6 +414,14 @@
       });
     });
   }
-  new MutationObserver(() => { items = null; if (palette && palette.classList.contains('on')) { const q = palette.querySelector('input').value; loadItems().then(() => render(q)); } }).observe(root, { attributes: true, attributeFilter: ['lang'] });
+  function paletteChrome() {
+    if (!palette) return;
+    const foot = palette.querySelector('footer');
+    if (foot) foot.innerHTML = `<span>↑↓ ${isEn() ? 'move' : '选择'}</span><span>↵ ${isEn() ? 'open' : '打开'}</span><span>esc ${isEn() ? 'close' : '关闭'}</span>`;
+    const input = palette.querySelector('input');
+    if (input) input.placeholder = isEn() ? 'Search routes, places and pages…' : '搜线路、目的地、页面……';
+    palette.setAttribute('aria-label', isEn() ? 'Quick search' : '快速搜索');
+  }
+  new MutationObserver(() => { items = null; paletteChrome(); if (palette && palette.classList.contains('on')) { const q = palette.querySelector('input').value; loadItems().then(() => render(q)); } }).observe(root, { attributes: true, attributeFilter: ['lang'] });
   if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', () => { skipFocus(); start(); }); else { skipFocus(); start(); }
 })();

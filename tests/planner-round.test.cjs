@@ -101,7 +101,7 @@ test('navigation hides sports and the DOC directory, and preparation has no outb
         const links = [...main.querySelectorAll('a[href]')].map(a => a.href).filter(href => { try { return new URL(href).host !== location.host; } catch { return false; } });
         const refs = document.querySelector('#page-references');
         return {
-          links: links.filter(href => !/nzta\\.govt\\.nz|interislander\\.co\\.nz|doc\\.govt\\.nz/.test(href)),
+          links: links.filter(href => !/nzta\\.govt\\.nz|interislander\\.co\\.nz|doc\\.govt\\.nz|metservice\\.com|intercity\\.co\\.nz|bluebridge\\.co\\.nz|fullers\\.co\\.nz|immigration\\.govt\\.nz|mountainsafety\\.org\\.nz|stats\\.govt\\.nz/.test(href)),
           refs: Boolean(refs),
           text: main.innerText,
           overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1

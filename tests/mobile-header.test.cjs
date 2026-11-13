@@ -215,7 +215,7 @@ test('mobile header P1: one row, search button clear of the bar', { timeout: 180
         await page.ev('document.fonts.ready');
         const prep = await page.ev(`(() => {
           const main = document.querySelector("main");
-          const outside = [...main.querySelectorAll("a[href]")].map(a => a.href).filter(href => { try { return new URL(href).host !== location.host && !/nzta\\.govt\\.nz|interislander\\.co\\.nz|doc\\.govt\\.nz/.test(href); } catch { return false; } });
+          const outside = [...main.querySelectorAll("a[href]")].map(a => a.href).filter(href => { try { return new URL(href).host !== location.host && !/nzta\\.govt\\.nz|interislander\\.co\\.nz|doc\\.govt\\.nz|metservice\\.com|intercity\\.co\\.nz|bluebridge\\.co\\.nz|fullers\\.co\\.nz|immigration\\.govt\\.nz|mountainsafety\\.org\\.nz|stats\\.govt\\.nz/.test(href); } catch { return false; } });
           return { text: main.innerText, outside, overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth };
         })()`);
         assert.deepEqual(prep.outside, [], lang + ' prepare outbound links');

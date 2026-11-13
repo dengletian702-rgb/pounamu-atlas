@@ -136,6 +136,7 @@ function v3SportFilters(counts) {
 const v3OsmCredit = () => `<p class="v3-attribution">${v3L('Venue data', '场地数据')} ${v3Link('https://www.openstreetmap.org/copyright', '© OpenStreetMap contributors')}, ${v3Link('https://opendatacommons.org/licenses/odbl/', 'ODbL 1.0')}. ${v3L(`Fetched ${v3Sports?.index?.fetchedAt?.slice(0, 10) || ''} and stored with the site; nothing is requested from OpenStreetMap while you browse. Details may be out of date: check with the venue.`, `于 ${v3Sports?.index?.fetchedAt?.slice(0, 10) || ''} 抓取后随站点保存，浏览时不会向 OpenStreetMap 发请求。信息可能过期，请向场地确认。`)}</p>`;
 function v3SportsPanel(r) {
   if (!v3Flag('sports')) return '';
+  if (r && (r.mode === 'walk' || r.mode === 'paddle')) return '';
   const head = `<section class="journey-section v3-sports" id="journey-sports"><p class="section-label">${v3L('SPORTS NEARBY', '沿线运动场地')}</p><h2>${v3L('Tennis, golf and basketball near this route', '这条线路附近的网球、高尔夫和篮球场地')}</h2>`;
   if (!v3Sports) return head + `<p class="v3-lead">${v3L('Loading…', '加载中……')}</p></section>`;
   const near = v3Sports.routesNear[r.id];

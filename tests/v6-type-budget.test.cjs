@@ -162,6 +162,63 @@ test('a two-day same-city trip visits that city even when it is not ticked', () 
   assert.ok(far.every(item => item.base === 'christchurch' || planner.p10Net(true).hours('christchurch', item.base) <= 1.5));
 });
 
+test('every route stay is a place, not a stage verb', () => {
+  const { routeDays } = require('../docs/route-days.js');
+  const source = fs.readFileSync(path.join(__dirname, '..', 'docs/app.js'), 'utf8');
+  const start = source.indexOf('const routes=');
+  const end = source.indexOf('];\n', start);
+  const routes = eval(source.slice(start + 'const routes='.length, end + 1));
+  const verb = /^(Leave|Climb|Lunch|Follow|Start|Pause|Ride|Walk|Cross|Check|Arrive|Return|Ease|Give|Make|Choose|Continue|Watch|Pass|Transfer|Settle|Finish|Side trip|Bridges|Decide)\b/;
+  for (const route of routes) {
+    const days = routeDays(route);
+    const multi = Number(route.planDays) > 1;
+    if (!multi) {
+      assert.equal(days.length, 1, route.id);
+      assert.equal(days[0].noStay, true, route.id);
+    } else {
+      assert.ok(days.length >= 1 && days.length <= Number(route.planDays), route.id + ' ' + days.length);
+    }
+    for (const day of days) {
+      if (day.noStay) continue;
+      assert.doesNotMatch(day.stayEn, verb, route.id + ' stay ' + day.stayEn);
+      assert.doesNotMatch(day.titleEn, verb, route.id + ' title ' + day.titleEn);
+      assert.doesNotMatch(day.query || '', /Leave Routeburn|Climb through the high forest|Lunch in Marlborough/, route.id);
+    }
+  }
+  const milford = routeDays(routes.find(route => route.id === 'milford-track'));
+  assert.equal(milford[1].textEn.includes('usual second night'), false);
+  assert.match(milford[3].moveEn, /Boat out the same day/);
+  const wh = routeDays(routes.find(route => route.id === 'whanganui-journey'));
+  assert.equal(wh[0].stayKind, 'great-walk');
+  const train = routeDays(routes.find(route => route.id === 'tranzalpine'));
+  assert.equal(train[0].dir.destination, 'Greymouth Railway Station');
+});
+
+test('literal font-size stays in the type scale file', () => {
+  const files = [];
+  const walk = dir => {
+    for (const name of fs.readdirSync(dir)) {
+      if (name === 'data' || name === 'assets') continue;
+      const full = path.join(dir, name);
+      if (fs.statSync(full).isDirectory()) walk(full);
+      else if (/\.(css|html|js)$/.test(name) && name !== 'type.css') files.push(full);
+    }
+  };
+  walk(path.join(__dirname, '..', 'docs'));
+  const bad = [];
+  for (const file of files) {
+    const text = fs.readFileSync(file, 'utf8');
+    const re = /font-size\s*:\s*([^;}{"']+)/g;
+    let match;
+    while ((match = re.exec(text))) {
+      const value = match[1].trim();
+      if (value.startsWith('var(') || value === 'inherit' || value === 'unset') continue;
+      bad.push(path.relative(path.join(__dirname, '..'), file) + ' ' + value.slice(0, 40));
+    }
+  }
+  assert.deepEqual(bad, []);
+});
+
 const { openBrowser } = require('./helpers/cdp-browser.cjs');
 
 test('route day cards render on first load and the sticky line does not cover controls', async (t) => {
@@ -174,6 +231,20 @@ test('route day cards render on first load and the sticky line does not cover co
       const count = await page.ev('document.querySelectorAll(".gday").length');
       assert.ok(count > 0, id + ' ' + count);
       if (id === 'milford-track') assert.equal(count, 4);
+      const small = await page.ev(`(() => {
+        const hits = [];
+        for (const el of document.querySelectorAll('body *')) {
+          const text = [...el.childNodes].some(n => n.nodeType === 3 && n.textContent.trim());
+          if (!text) continue;
+          const cs = getComputedStyle(el);
+          if (cs.display === 'none' || cs.visibility === 'hidden') continue;
+          const size = parseFloat(cs.fontSize);
+          if (size < 12) hits.push((el.className || el.tagName) + ' ' + size);
+          if (hits.length > 6) break;
+        }
+        return hits;
+      })()`);
+      assert.deepEqual(small, [], id);
     }
     for (const w of [390, 320]) {
       await page.view(w, 844, true);

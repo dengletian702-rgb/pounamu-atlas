@@ -277,7 +277,7 @@
       { k: en ? 'Route' : '线路', t: en ? 'Abel Tasman Coast Track' : '亚伯塔斯曼海岸步道', s: 'great walk great walks 大步道', h: `route.html?id=abel-tasman&lang=${lang}` },
       { k: en ? 'Route' : '线路', t: en ? 'Whanganui Journey' : '旺格努伊河之旅', s: 'great walk great walks 大步道', h: `route.html?id=whanganui-journey&lang=${lang}` },
       { k: en ? 'Activity' : '活动', t: en ? 'Short, easy walks' : '少走路的短途', s: '少走路 easy walk low walking', h: `routes.html?mode=walk&lang=${lang}` },
-      { k: en ? 'Sport' : '运动', t: en ? 'Tennis, golf and basketball' : '网球、高尔夫、篮球', s: 'tennis golf basketball 网球 高尔夫 篮球', h: `destination.html?id=ni-akl&lang=${lang}#sports` }
+      ...(typeof pounamuFlag === 'function' && !pounamuFlag('sports') ? [] : [['auckland','Auckland','奥克兰'],['wellington','Wellington','惠灵顿'],['christchurch','Christchurch','基督城'],['queenstown','Queenstown','皇后镇'],['dunedin','Dunedin','但尼丁'],['rotorua','Rotorua','罗托鲁瓦'],['taupo','Taupō','陶波'],['nelson','Nelson','纳尔逊'],['hamilton','Hamilton','汉密尔顿'],['tauranga','Tauranga','陶朗加'],['napier','Napier','内皮尔'],['wanaka','Wānaka','瓦纳卡']].map(([id, enName, zhName]) => ({ k: en ? 'Sport' : '运动', t: en ? enName : zhName, s: 'tennis golf basketball 网球 高尔夫 篮球', h: `city.html?id=${id}&lang=${lang}` })))
     );
     items = list.map(x => Object.assign(x, { f: fold(`${x.t} ${x.s || ''} ${(x.aliases || []).join(' ')}`) }));
     return items;

@@ -167,7 +167,7 @@
   function priceDay(day, assumptions) {
     const a = normalise(assumptions);
     const info = dayInput(day);
-    const stay = stayLine(info.night, a.tier, a.people, a, day.stayKind);
+    const stay = day.noStay ? { min: 0, max: 0, verify: false, kind: 'stay', empty: true } : stayLine(info.night, a.tier, a.people, a, day.stayKind);
     const fuel = fuelLine(info.km, a);
     if (info.kmUnknown && !fuel.verify) fuel.verify = true;
     const food = info.kind === 'depart' && !info.activities
@@ -222,7 +222,7 @@
     if (!part) return lang === 'zh' ? '待核' : 'To verify';
     if (part.empty) return '—';
     const has = Number(part.min) > 0 || Number(part.max) > 0;
-    if (part.verify && !has) return lang === 'zh' ? '待核' : 'To verify';
+    if (!has) return part.verify ? (lang === 'zh' ? '待核' : 'To verify') : '—';
     const body = part.min === part.max ? fmt(part.min) : fmt(part.min) + '–' + fmt(part.max);
     const mark = lang === 'zh' ? '估算 ' : 'est. ';
     return part.verify ? mark + body + (lang === 'zh' ? '＋待核' : ' + to verify') : mark + body;

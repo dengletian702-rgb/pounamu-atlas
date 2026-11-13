@@ -532,80 +532,158 @@
       line.setAttribute('y2', t.getAttribute('y'));
     }
   }
+  function boxGap(a, b) {
+    const dx = Math.max(b.left - a.right, a.left - b.right, 0);
+    const dy = Math.max(b.top - a.bottom, a.top - b.bottom, 0);
+    return Math.hypot(dx, dy);
+  }
+  function labelDot(svg, text) {
+    const g = text.parentNode;
+    if (text.classList.contains('v4-map-name') || text.classList.contains('v4-map-tag')) {
+      const circle = g && g.querySelector && g.querySelector('circle');
+      if (circle) return circle;
+    }
+    const id = text.getAttribute('data-p10-pick-label');
+    if (id) {
+      const mark = svg.querySelector('[data-p10-pick="' + (window.CSS && CSS.escape ? CSS.escape(id) : id) + '"] .p10-pick-mark');
+      if (mark) return mark;
+    }
+    const px = parseFloat(text.getAttribute('data-px'));
+    const py = parseFloat(text.getAttribute('data-py'));
+    if (!Number.isFinite(px)) return null;
+    let best = null, bestD = Infinity;
+    svg.querySelectorAll('circle').forEach(circle => {
+      const cx = parseFloat(circle.getAttribute('cx'));
+      const cy = parseFloat(circle.getAttribute('cy'));
+      if (!Number.isFinite(cx)) return;
+      const d = Math.hypot(cx - px, cy - py);
+      if (d < bestD) { bestD = d; best = circle; }
+    });
+    return bestD < 3 ? best : null;
+  }
   function settleMapLabels(svg, scale) {
     if (!svg || (!svg.classList.contains('v4-schematic') && !svg.classList.contains('p10-pick-svg'))) return;
     const frame = svg.getBoundingClientRect();
     if (!(frame.width > 2) || !(scale > 0)) return;
-    const texts = [...svg.querySelectorAll('text')].filter(textShown);
+    const schematic = svg.classList.contains('v4-schematic');
+    const texts = [...svg.querySelectorAll(schematic ? '.v4-map-name, .v4-map-tag' : '.p10-pick-label, .p10-pick-tag')].filter(textShown);
     if (!texts.length) return;
-    const gap = 3;
+    svg.querySelectorAll('.v4-map-leader, .p10-pick-leader').forEach(line => line.remove());
+    const ns = 'http://www.w3.org/2000/svg';
     const inside = r => r.left >= frame.left - 0.5 && r.right <= frame.right + 0.5 && r.top >= frame.top - 0.5 && r.bottom <= frame.bottom + 0.5;
-    const hitsAny = (el, r) => texts.some(other => other !== el && overlaps(r, other.getBoundingClientRect()));
-    const nudge = (el, dxs, dys) => {
-      shiftText(el, dxs / scale, dys / scale);
-      const r = el.getBoundingClientRect();
-      if (inside(r) && !hitsAny(el, r)) return true;
-      shiftText(el, -dxs / scale, -dys / scale);
-      return false;
-    };
-    const clamp = t => {
-      const r = t.getBoundingClientRect();
-      let dxs = 0, dys = 0;
-      if (r.width > frame.width - 2) dxs = (frame.left + frame.width / 2) - (r.left + r.width / 2);
-      else if (r.left < frame.left + 1) dxs = frame.left + 1 - r.left;
-      else if (r.right > frame.right - 1) dxs = frame.right - 1 - r.right;
-      if (r.top < frame.top + 1) dys = frame.top + 1 - r.top;
-      else if (r.bottom > frame.bottom - 1) dys = frame.bottom - 1 - r.bottom;
-      if (dxs || dys) shiftText(t, dxs / scale, dys / scale);
-    };
-    if (svg.classList.contains('v4-schematic')) {
-      const mid = frame.left + frame.width / 2;
-      const columns = [[], []];
-      texts.forEach(t => {
-        const r = t.getBoundingClientRect();
-        columns[(r.left + r.width / 2) < mid ? 0 : 1].push({ t, cy: r.top, h: r.height });
-      });
-      columns.forEach(col => {
-        if (!col.length) return;
-        col.sort((a, b) => a.cy - b.cy);
-        const total = col.reduce((sum, item) => sum + item.h, 0) + gap * (col.length - 1);
-        let y = frame.top + 2;
-        if (total < frame.height - 4) y = Math.max(frame.top + 2, Math.min(col[0].cy, frame.bottom - 2 - total));
-        col.forEach(item => {
-          const r = item.t.getBoundingClientRect();
-          let left = r.left;
-          if (r.width >= frame.width - 4) left = frame.left + 2;
-          else if (left < frame.left + 1) left = frame.left + 1;
-          else if (left + r.width > frame.right - 1) left = frame.right - 1 - r.width;
-          const dx = left - r.left, dy = y - r.top;
-          if (Math.abs(dx) > 0.4 || Math.abs(dy) > 0.4) shiftText(item.t, dx / scale, dy / scale);
-          y += r.height + gap;
-        });
-      });
-    }
-    texts.forEach(clamp);
-    for (let pass = 0; pass < texts.length * 4; pass++) {
-      let moved = false;
-      const items = texts.map(t => ({ t, r: t.getBoundingClientRect() })).sort((a, b) => a.r.top - b.r.top || a.r.left - b.r.left);
-      for (let i = 0; i < items.length; i++) {
-        for (let j = i + 1; j < items.length; j++) {
-          if (!overlaps(items[i].r, items[j].r)) continue;
-          const need = items[i].r.bottom + gap - items[j].r.top;
-          const options = [
-            [items[j].t, 0, need],
-            [items[i].t, 0, -need],
-            [items[j].t, items[i].r.right + gap - items[j].r.left, 0],
-            [items[j].t, items[i].r.left - gap - items[j].r.right, 0],
-            [items[i].t, items[j].r.right + gap - items[i].r.left, 0],
-            [items[i].t, items[j].r.left - gap - items[i].r.right, 0]
-          ];
-          if (options.some(([el, dx, dy]) => nudge(el, dx, dy))) { moved = true; break; }
-        }
-        if (moved) break;
+    const dirs = [[0, -1, 'middle'], [0, 1, 'middle'], [-1, 0, 'end'], [1, 0, 'start'], [-0.75, -0.75, 'end'], [0.75, -0.75, 'start'], [-0.75, 0.75, 'end'], [0.75, 0.75, 'start']];
+    const placed = [];
+    const ordered = [
+      ...texts.filter(t => t.classList.contains('v4-map-name') || t.classList.contains('p10-pick-label')),
+      ...texts.filter(t => t.classList.contains('v4-map-tag') || t.classList.contains('p10-pick-tag'))
+    ];
+    const paintLeader = (text, circle) => {
+      const c = circle.getBoundingClientRect();
+      const r = text.getBoundingClientRect();
+      const ccx = (c.left + c.right) / 2, ccy = (c.top + c.bottom) / 2;
+      const tx = Math.max(r.left, Math.min(ccx, r.right));
+      const ty = Math.max(r.top, Math.min(ccy, r.bottom));
+      const line = doc.createElementNS(ns, 'line');
+      line.setAttribute('class', schematic ? 'v4-map-leader' : 'p10-pick-leader');
+      line.setAttribute('stroke', '#163528');
+      line.setAttribute('stroke-width', '1.5');
+      line.setAttribute('vector-effect', 'non-scaling-stroke');
+      if (schematic) {
+        line.setAttribute('x1', circle.getAttribute('cx') || '0');
+        line.setAttribute('y1', circle.getAttribute('cy') || '0');
+        line.setAttribute('x2', ((tx - ccx) / scale).toFixed(1));
+        line.setAttribute('y2', ((ty - ccy) / scale).toFixed(1));
+        text.parentNode.insertBefore(line, text);
+      } else {
+        const box = svg.getBoundingClientRect();
+        const vb = svg.viewBox.baseVal;
+        const xOf = sx => vb.x + (sx - box.left) / scale;
+        const yOf = sy => vb.y + (sy - box.top) / (box.height / vb.height || scale);
+        line.setAttribute('x1', xOf(ccx).toFixed(1));
+        line.setAttribute('y1', yOf(ccy).toFixed(1));
+        line.setAttribute('x2', xOf(tx).toFixed(1));
+        line.setAttribute('y2', yOf(ty).toFixed(1));
+        const host = svg.querySelector('.p10-pick-labels') || text.parentNode;
+        host.insertBefore(line, host.firstChild);
       }
-      if (!moved) break;
+    };
+    const sit = (text, circle, gapScreen) => {
+      const c = circle.getBoundingClientRect();
+      const ccx = (c.left + c.right) / 2, ccy = (c.top + c.bottom) / 2;
+      const rad = Math.min(c.width, c.height) / 2;
+      for (const [dx, dy, anchor] of dirs) {
+        const len = Math.hypot(dx, dy) || 1;
+        const ux = dx / len, uy = dy / len;
+        text.setAttribute('text-anchor', anchor);
+        text.setAttribute('x', '0');
+        text.setAttribute('y', '0');
+        const r0 = text.getBoundingClientRect();
+        if (!(r0.width > 1)) continue;
+        const half = Math.abs(ux) * r0.width / 2 + Math.abs(uy) * r0.height / 2;
+        const dist = rad + gapScreen + half;
+        const tcx = (r0.left + r0.right) / 2, tcy = (r0.top + r0.bottom) / 2;
+        shiftText(text, (ccx + ux * dist - tcx) / scale, (ccy + uy * dist - tcy) / scale);
+        let r = text.getBoundingClientRect();
+        let gap = boxGap(r, c);
+        if (gap > gapScreen + 1) {
+          const cx = (r.left + r.right) / 2, cy = (r.top + r.bottom) / 2;
+          const d = Math.hypot(cx - ccx, cy - ccy) || 1;
+          shiftText(text, (ccx - cx) / d * (gap - gapScreen) / scale, (ccy - cy) / d * (gap - gapScreen) / scale);
+          r = text.getBoundingClientRect();
+          gap = boxGap(r, c);
+        }
+        if (gap < 2) {
+          shiftText(text, ux * (3 - gap) / scale, uy * (3 - gap) / scale);
+          r = text.getBoundingClientRect();
+          gap = boxGap(r, c);
+        }
+        if (inside(r) && gap >= 2 && gap <= gapScreen + 1.5 && !placed.some(o => overlaps(r, o))) return { r, gap };
+      }
+      return null;
+    };
+    for (const text of ordered) {
+      const circle = labelDot(svg, text);
+      if (!circle) continue;
+      let fit = null;
+      for (const gap of [4, 8, 12]) {
+        fit = sit(text, circle, gap);
+        if (fit) break;
+      }
+      let led = false;
+      if (!fit) {
+        for (const gap of [18, 28, 40, 56, 76, 100, 130, 170]) {
+          fit = sit(text, circle, gap);
+          if (fit) { led = fit.gap > 12; break; }
+        }
+      }
+      if (!fit) {
+        text.setAttribute('text-anchor', 'start');
+        text.setAttribute('x', '0');
+        text.setAttribute('y', '0');
+        const seed = text.getBoundingClientRect();
+        const c = circle.getBoundingClientRect();
+        const tops = [];
+        const prefer = (c.top + c.bottom) / 2 - seed.height / 2;
+        for (let y = prefer; y >= frame.top + 2; y -= 10) tops.push(y);
+        for (let y = prefer + 10; y <= frame.bottom - seed.height - 2; y += 10) tops.push(y);
+        const edges = seed.width < frame.width - 6 ? [['start', frame.left + 2], ['end', frame.right - 2]] : [['start', frame.left + 2]];
+        for (const [anchor, edge] of edges) {
+          if (fit) break;
+          for (const top of tops) {
+            text.setAttribute('text-anchor', anchor);
+            text.setAttribute('x', '0');
+            text.setAttribute('y', '0');
+            const cur = text.getBoundingClientRect();
+            shiftText(text, ((anchor === 'start' ? edge - cur.left : edge - cur.right)) / scale, (top - cur.top) / scale);
+            const r = text.getBoundingClientRect();
+            const gap = boxGap(r, c);
+            if (inside(r) && gap >= 2 && !placed.some(o => overlaps(r, o))) { fit = { r, gap }; led = gap > 12; break; }
+          }
+        }
+      }
+      if (fit) placed.push(fit.r);
+      if (led) paintLeader(text, circle);
     }
-    texts.forEach(clamp);
   }
   window.pounamuSettleLabels = settleMapLabels;
   function fitMaps() { $$('svg').forEach(fitSvgText); }

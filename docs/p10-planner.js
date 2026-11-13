@@ -1461,7 +1461,8 @@ globalThis.P10_NODES = NODES;
     const label=i=>`<text class="p10-pick-label${i.kind==='town'?' is-town':''}" data-p10-pick-label="${p10Esc(i.id)}" data-px="${f(i.xy[0])}" data-py="${f(i.xy[1])}" x="${f(i.xy[0]+7)}" y="${f(i.xy[1]+4)}">${p10Esc(i.short)}</text>`;
     const tag=(id,text)=>{const p=p10MapPoint(id);return p?`<text class="p10-map-tag p10-pick-tag" data-px="${f(p[0])}" data-py="${f(p[1])}" x="${f(p[0])}" y="${f(p[1]-9)}" text-anchor="middle">${text}</text>`:'';};
     const tags=start===end?tag(start,zh?'起 / 终':'Start / end'):tag(start,zh?'起':'Start')+tag(end,zh?'终':'End');
-    host.innerHTML=`<div class="p10-pick-head"><strong>${zh?'在地图上选地点':'Pick places on the map'}</strong><span>${zh?'点圆点加入或取消，和列表同步。大圆点是景点，小圆点是城镇，深色是已选。':'Click a dot to add or remove a place; the list stays in step. Large dots are sights, small dots towns, dark ones are picked.'}</span></div><svg class="p10-pick-svg" viewBox="${vb.map(f).join(' ')}" aria-hidden="true"><rect class="p10-pick-sea" x="-2000" y="-2000" width="5000" height="5000"/><path class="p10-pick-land" d="${P10_COAST}"/><g class="p10-pick-dots">${[...order].reverse().map(dot).join('')}</g><g class="p10-pick-labels">${tags}${order.map(label).join('')}</g></svg><p class="p10-pick-status" aria-live="polite"></p>`;
+    const names=p10PickItems.map(i=>`<li>${p10Esc(i.short)}</li>`).join('');
+    host.innerHTML=`<div class="p10-pick-head"><strong>${zh?'在地图上选地点':'Pick places on the map'}</strong><span>${zh?'点圆点加入或取消，和列表同步。大圆点是景点，小圆点是城镇，深色是已选。':'Click a dot to add or remove a place; the list stays in step. Large dots are sights, small dots towns, dark ones are picked.'}</span></div><svg class="p10-pick-svg" viewBox="${vb.map(f).join(' ')}" aria-hidden="true"><rect class="p10-pick-sea" x="-2000" y="-2000" width="5000" height="5000"/><path class="p10-pick-land" d="${P10_COAST}"/><g class="p10-pick-dots">${[...order].reverse().map(dot).join('')}</g><g class="p10-pick-labels">${tags}${order.map(label).join('')}</g></svg><ul class="p10-pick-name-list">${names}</ul><p class="p10-pick-status" aria-live="polite"></p>`;
     p10PickLayout();
   }
   // Dots, names and start/end tags are sized for the map as drawn on screen; a name that would sit on another one is
@@ -1491,7 +1492,7 @@ globalThis.P10_NODES = NODES;
       let spot=null;
       const inside=b=>b.x>=vb.x&&b.y>=vb.y&&b.x+b.width<=vb.x+vb.width&&b.y+b.height<=vb.y+vb.height;
       for(const s of tries){const b=put(s);if(!b||!b.width){spot=b;break;}if(inside(b)&&!boxes.some(o=>hit(b,o))){spot=b;break;}}
-      if(!spot){if(on)spot=put(tries[0]);else{put(tries[0]);t.classList.add('is-off');continue;}}
+      if(!spot){if(on||!t.classList.contains('is-town'))spot=put(tries[0]);else{put(tries[0]);t.classList.add('is-off');continue;}}
       if(spot&&spot.width)boxes.push(spot);
     }
   }

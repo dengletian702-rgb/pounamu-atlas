@@ -382,7 +382,7 @@ test('svg map text is at least 12px on screen', async (t) => {
       const ctm = el.getScreenCTM();
       if (!ctm) continue;
       const screen = parseFloat(cs.fontSize) * Math.hypot(ctm.a, ctm.b);
-      if (screen < 11.5) hits.push((el.textContent || '').trim().slice(0, 28) + ' ' + screen.toFixed(1));
+      if (screen < 11.95) hits.push((el.textContent || '').trim().slice(0, 28) + ' ' + screen.toFixed(1));
       if (hits.length > 8) break;
     }
     return hits;
@@ -472,7 +472,7 @@ test('map labels do not overlap and stay inside the svg', async (t) => {
       const cs = getComputedStyle(texts[i]);
       const ctm = texts[i].getScreenCTM();
       const screen = ctm ? parseFloat(cs.fontSize) * Math.hypot(ctm.a, ctm.b) : 0;
-      if (!(screen >= 11.5)) small.push((texts[i].textContent || '').trim().slice(0, 18) + ' ' + screen.toFixed(1));
+      if (!(screen >= 11.95)) small.push((texts[i].textContent || '').trim().slice(0, 18) + ' ' + screen.toFixed(1));
       if (a.left < frame.left - 1 || a.right > frame.right + 1 || a.top < frame.top - 1 || a.bottom > frame.bottom + 1) outside.push((texts[i].textContent || '').trim().slice(0, 24));
       for (let j = i + 1; j < texts.length; j++) {
         const b = texts[j].getBoundingClientRect();
@@ -492,7 +492,39 @@ test('map labels do not overlap and stay inside the svg', async (t) => {
       const ratio = (Math.max(L1, L2) + 0.05) / (Math.min(L1, L2) + 0.05);
       return { rendered: Math.round(rendered * 100) / 100, ratio: Math.round(ratio * 100) / 100 };
     });
-    return { hits, outside, small, marker: texts.some(t => /起终|Start\\/end/.test(t.textContent || '')), leaders, wide: frame.width > 20 };
+    const gap = (a, b) => Math.hypot(Math.max(b.left - a.right, a.left - b.right, 0), Math.max(b.top - a.bottom, a.top - b.bottom, 0));
+    const touch = (a, b, pad) => a.right >= b.left - pad && a.left <= b.right + pad && a.bottom >= b.top - pad && a.top <= b.bottom + pad;
+    const detached = [];
+    for (const el of texts) {
+      if (!el.classList.contains('v4-map-name') && !el.classList.contains('p10-pick-label') && !el.classList.contains('p10-pick-tag')) continue;
+      let circle = el.parentNode && el.parentNode.querySelector && el.classList.contains('v4-map-name') ? el.parentNode.querySelector('circle') : null;
+      const id = el.getAttribute('data-p10-pick-label');
+      if (!circle && id) circle = svg.querySelector('[data-p10-pick="' + CSS.escape(id) + '"] .p10-pick-mark');
+      if (!circle && el.hasAttribute('data-px')) {
+        const px = parseFloat(el.getAttribute('data-px')), py = parseFloat(el.getAttribute('data-py'));
+        let best = null, bestD = 1e9;
+        svg.querySelectorAll('.p10-pick-mark').forEach(mark => {
+          const d = Math.hypot(parseFloat(mark.getAttribute('cx')) - px, parseFloat(mark.getAttribute('cy')) - py);
+          if (d < bestD) { bestD = d; best = mark; }
+        });
+        if (bestD < 3) circle = best;
+      }
+      if (!circle) continue;
+      const box = el.getBoundingClientRect();
+      const dot = circle.getBoundingClientRect();
+      const dist = gap(box, dot);
+      if (dist <= 14) continue;
+      const lines = [...(el.parentNode.querySelectorAll ? el.parentNode.querySelectorAll('.v4-map-leader') : []), ...svg.querySelectorAll('.p10-pick-leader')];
+      const linked = lines.some(line => {
+        const cs = getComputedStyle(line);
+        if (cs.display === 'none' || cs.visibility === 'hidden') return false;
+        const width = parseFloat(cs.strokeWidth) || 0;
+        const lb = line.getBoundingClientRect();
+        return width >= 1.4 && /22,\\s*53,\\s*40/.test(cs.stroke) && touch(lb, dot, 6) && touch(lb, box, 6) && (lb.width > 2 || lb.height > 2);
+      });
+      if (!linked) detached.push((el.textContent || '').trim().slice(0, 22) + ' ' + dist.toFixed(1));
+    }
+    return { hits, outside, small, detached, marker: texts.some(t => /起终|Start\\/end/.test(t.textContent || '')), leaders, wide: frame.width > 20 };
   })()`;
   try {
     const found = [];
@@ -525,7 +557,7 @@ test('map labels do not overlap and stay inside the svg', async (t) => {
         await page.ev('document.querySelector("#v4-map").scrollIntoView()');
         await page.ev('new Promise(r => setTimeout(r, 600))');
         const schematic = await page.ev(report('#v4-map svg.v4-schematic'));
-        if (!schematic.wide || !schematic.marker || schematic.hits.length || schematic.outside.length || schematic.small.length) found.push('schematic ' + lang + ' ' + w + ' ' + JSON.stringify(schematic));
+        if (!schematic.wide || !schematic.marker || schematic.hits.length || schematic.outside.length || schematic.small.length || (schematic.detached || []).length) found.push('schematic ' + lang + ' ' + w + ' ' + JSON.stringify(schematic));
         await page.go('plan.html?lang=' + lang);
         await page.waitFor('document.querySelector("#p10-next-1")', 20000);
         await page.click('#p10-next-1');
@@ -535,7 +567,17 @@ test('map labels do not overlap and stay inside the svg', async (t) => {
         await page.ev('document.querySelector("#p10-pick-map").scrollIntoView()');
         await page.ev('new Promise(r => setTimeout(r, 600))');
         const pick = await page.ev(report('#p10-pick-map svg.p10-pick-svg'));
-        if (!pick.wide || pick.hits.length || pick.outside.length || pick.small.length) found.push('planner ' + lang + ' ' + w + ' ' + JSON.stringify(pick));
+        if (!pick.wide || pick.hits.length || pick.outside.length || pick.small.length || (w === 1440 && (pick.detached || []).length)) found.push('planner ' + lang + ' ' + w + ' ' + JSON.stringify(pick));
+        if (w <= 420) {
+          const list = await page.ev(`(() => {
+            const ul = document.querySelector('#p10-pick-map .p10-pick-name-list');
+            if (!ul) return { missing: true };
+            const item = ul.querySelector('li');
+            const fs = item ? parseFloat(getComputedStyle(item).fontSize) : 0;
+            return { display: getComputedStyle(ul).display, n: ul.querySelectorAll('li').length, fs };
+          })()`);
+          if (list.missing || list.display === 'none' || !list.n || !(list.fs >= 11.95)) found.push('planner list ' + lang + ' ' + w + ' ' + JSON.stringify(list));
+        }
       }
     }
     assert.deepEqual(found, []);

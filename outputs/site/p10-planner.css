@@ -66,11 +66,11 @@
 .p10-tight{margin:0 0 12px}
 @media(max-width:600px){.p10-day-tools{opacity:1}.p10-day-head .plan-day-title{flex-basis:100%;order:-1}}
 /* Map: town names that stay the same size when a day is zoomed in, and clear start/end tags */
-.p10-map-name-list{display:none;list-style:none;margin:8px 0 0;padding:0;gap:8px}
-.p10-map-name-list li{font-size:var(--type-xs)}
+.p10-map-name-list,.p10-pick-name-list{display:none;list-style:none;margin:8px 0 0;padding:0;gap:6px 14px}
+.p10-map-name-list li,.p10-pick-name-list li{font-size:var(--type-sm);line-height:1.4}
 @media(max-width:420px){
   .p10-map-label,.p10-map-tag,.p10-pick-label{display:none!important}
-  .p10-map-name-list{display:flex;flex-wrap:wrap}
+  .p10-map-name-list,.p10-pick-name-list{display:flex;flex-wrap:wrap}
 }
 .p10-map-label{fill:#203a2e;stroke:#eef3ef;stroke-width:calc(var(--k,1) * 3.5px);stroke-linejoin:round;paint-order:stroke}
 .p10-map-label-off{fill:#9e4a2e;font-style:italic}

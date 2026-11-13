@@ -281,7 +281,7 @@ h1 .v4-en-name{font-style:italic;font-weight:400;font-size:var(--type-xs);letter
   .journey-facts div,.journey-facts strong{min-width:0;overflow-wrap:anywhere}
   .map-canvas,.route-map-svg,.p10-trip-svg{overflow:visible}
   .route-map-svg .map-compass text,.route-map-svg .map-region-label{display:none}
-  .gday-leader{stroke:#163528;stroke-width:1.5px;vector-effect:non-scaling-stroke}
+  .gday-leader,.v4-map-leader,.p10-pick-leader{stroke:#163528;stroke-width:1.5px;vector-effect:non-scaling-stroke;fill:none;pointer-events:none}
   @media(max-width:420px){.journey-facts{display:grid;grid-template-columns:1fr}}
 }
 @media print{

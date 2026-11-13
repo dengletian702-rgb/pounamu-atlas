@@ -71,6 +71,19 @@ const NODES = {
   masterton: { at: [-40.95, 175.66], en: 'Masterton', zh: '马斯特顿' },
   // South Island, added for ticket D
   alexandra: { at: [-45.26, 169.39], en: 'Alexandra', zh: '亚历山德拉' },
+  // Catalogue towns that were off the network. Coordinates are the catalogue's own points.
+  glenorchy: { at: [-44.84975, 168.38520], en: 'Glenorchy', zh: '格林诺奇' },
+  blenheim: { at: [-41.51187, 173.95459], en: 'Blenheim', zh: '布伦海姆' },
+  waiheke: { at: [-36.78192, 175.00981], en: 'Waiheke Island', zh: '怀希基岛' },
+  cromwell: { at: [-45.03713, 169.19729], en: 'Cromwell', zh: '克伦威尔' },
+  coromandel: { at: [-36.76016, 175.49727], en: 'Coromandel Town', zh: '科罗曼德镇' },
+  kaitaia: { at: [-35.11413, 173.264], en: 'Kaitaia', zh: '凯塔亚' },
+  opononi: { at: [-35.51167, 173.39173], en: 'Opononi', zh: '奥波诺尼' },
+  whangarei: { at: [-35.72753, 174.31942], en: 'Whangārei', zh: '旺格雷' },
+  whangamata: { at: [-37.20633, 175.87197], en: 'Whangamatā', zh: '旺格玛塔' },
+  stratford: { at: [-39.33969, 174.28409], en: 'Stratford', zh: '斯特拉福德' },
+  whangamomona: { at: [-39.14466, 174.73563], en: 'Whangamōmona', zh: '旺格摩摩纳' },
+  martinborough: { at: [-41.21833, 175.45949], en: 'Martinborough', zh: '马丁堡' },
 };
 
 // en/zh are the label when travelling from→to as stored. enRev/zhRev are the label in the other direction.
@@ -159,6 +172,21 @@ const EDGES = [
   ['queenstown', 'alexandra', 1.25, 94, R('SH6 and SH8 via Cromwell', 'SH6、SH8 经克伦威尔'), null],
   ['dunedin', 'alexandra', 2.25, 180, R('SH1 and SH8', 'SH1、SH8'), null],
   ['national-park', 'taumarunui', 0.5, 43, R('SH4', 'SH4'), null],
+  // Spur links for the 12 catalogue towns (2026-11-12). Each driving spur touches only one town already on the
+  // network, so it does not shorten an existing highway. Hours are the OSRM duration rounded to 15 minutes; km is the
+  // OSRM distance. Road names are not invented. Waiheke is the Fullers360 ferry, not a drive.
+  ['queenstown', 'glenorchy', 0.75, 46, R('OSRM driving route, town centre to town centre', 'OSRM 驾车路线，镇中心到镇中心'), null],
+  ['picton', 'blenheim', 0.5, 28, R('OSRM driving route, town centre to town centre', 'OSRM 驾车路线，镇中心到镇中心'), null],
+  ['queenstown', 'cromwell', 0.75, 61, R('OSRM driving route, town centre to town centre', 'OSRM 驾车路线，镇中心到镇中心'), null],
+  ['hahei', 'coromandel', 1, 54, R('OSRM driving route, town centre to town centre', 'OSRM 驾车路线，镇中心到镇中心'), null],
+  ['paihia', 'kaitaia', 1.5, 102, R('OSRM driving route, town centre to town centre', 'OSRM 驾车路线，镇中心到镇中心'), null],
+  ['paihia', 'opononi', 1.25, 86, R('OSRM driving route, town centre to town centre', 'OSRM 驾车路线，镇中心到镇中心'), null],
+  ['auckland', 'whangarei', 2.25, 156, R('OSRM driving route, town centre to town centre', 'OSRM 驾车路线，镇中心到镇中心'), null],
+  ['hahei', 'whangamata', 0.75, 61, R('OSRM driving route, town centre to town centre', 'OSRM 驾车路线，镇中心到镇中心'), null],
+  ['new-plymouth', 'stratford', 0.5, 40, R('OSRM driving route, town centre to town centre', 'OSRM 驾车路线，镇中心到镇中心'), null],
+  ['stratford', 'whangamomona', 0.75, 62, R('OSRM driving route, town centre to town centre', 'OSRM 驾车路线，镇中心到镇中心'), null],
+  ['masterton', 'martinborough', 0.75, 43, R('OSRM driving route, town centre to town centre', 'OSRM 驾车路线，镇中心到镇中心'), null],
+  ['auckland', 'waiheke', 0.75, 0, R('Fullers360 ferry, Downtown Auckland to Matiatia (about 40–45 minutes)', 'Fullers360 渡轮，奥克兰市区码头到马蒂亚蒂亚（约 40–45 分钟）'), 'ferry'],
 ];
 
 
@@ -243,6 +271,18 @@ const EDGE_SOURCES = {
   "queenstown|alexandra": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJX96o1_Ed1akRAKZ5hIbvAAU&b=ChIJaYcwd_UlK6gRAKeW54jvAAo", checkedAt: "2026-11-12", nzta: { from: "皇后镇, 新西兰", to: "Alexandra, 新西兰", route: "State Hwy 6和State Hwy 8", time: "1h 11m", minutes: 71, traffic: "1 min faster than normal", readAt: "2026-11-11T15:03:35.614Z" }, hoursBefore: 1.25, estimate: true, km: { status: "osrm", source: "OSRM demo route (router.project-osrm.org) on OpenStreetMap data, town centre to town centre", checkedAt: "2026-11-12" } },
   "dunedin|alexandra": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJPVFfD-DkK6gRQZl5hIbvAAU&b=ChIJaYcwd_UlK6gRAKeW54jvAAo", checkedAt: "2026-11-12", nzta: { from: "但尼丁, 新西兰", to: "Alexandra, 新西兰", route: "SH 1和State Hwy 8", time: "2h 22m", minutes: 142, traffic: "1 min faster than normal", readAt: "2026-11-11T15:03:38.751Z" }, hoursBefore: 2.25, estimate: true, km: { status: "osrm", source: "OSRM demo route (router.project-osrm.org) on OpenStreetMap data, town centre to town centre", checkedAt: "2026-11-12" } },
   "national-park|taumarunui": { status: 'nzta-time-read', check: 'NZTA Journey Planner', url: "https://www.journeys.nzta.govt.nz/journey-planner/commute/0?a=ChIJHVFNwkYca20RkOiiQ2HvAAU&b=ChIJCySntd1Ga20RwAmjQ2HvAAU", checkedAt: "2026-11-12", nzta: { from: "國家公園村, 新西兰", to: "陶马鲁努伊, 新西兰", route: "State Hwy 4", time: "32 mins", minutes: 32, traffic: "1 min slower than normal", readAt: "2026-11-11T15:03:42.588Z" }, hoursBefore: 0.5, estimate: true, km: { status: "osrm", source: "OSRM demo route (router.project-osrm.org) on OpenStreetMap data, town centre to town centre", checkedAt: "2026-11-12" } },
+  "queenstown|glenorchy": { status: 'osrm', check: 'OSRM', url: 'https://router.project-osrm.org/', checkedAt: '2026-11-12', osrm: { minutes: 39, km: 46 }, km: { status: 'osrm', km: 46, source: 'OSRM demo route (router.project-osrm.org) on OpenStreetMap, town centre to town centre', checkedAt: '2026-11-12' } },
+  "picton|blenheim": { status: 'osrm', check: 'OSRM', url: 'https://router.project-osrm.org/', checkedAt: '2026-11-12', osrm: { minutes: 25, km: 28 }, km: { status: 'osrm', km: 28, source: 'OSRM demo route (router.project-osrm.org) on OpenStreetMap, town centre to town centre', checkedAt: '2026-11-12' } },
+  "queenstown|cromwell": { status: 'osrm', check: 'OSRM', url: 'https://router.project-osrm.org/', checkedAt: '2026-11-12', osrm: { minutes: 52, km: 61 }, km: { status: 'osrm', km: 61, source: 'OSRM demo route (router.project-osrm.org) on OpenStreetMap, town centre to town centre', checkedAt: '2026-11-12' } },
+  "hahei|coromandel": { status: 'osrm', check: 'OSRM', url: 'https://router.project-osrm.org/', checkedAt: '2026-11-12', osrm: { minutes: 59, km: 54 }, km: { status: 'osrm', km: 54, source: 'OSRM demo route (router.project-osrm.org) on OpenStreetMap, town centre to town centre', checkedAt: '2026-11-12' } },
+  "paihia|kaitaia": { status: 'osrm', check: 'OSRM', url: 'https://router.project-osrm.org/', checkedAt: '2026-11-12', osrm: { minutes: 84, km: 102 }, km: { status: 'osrm', km: 102, source: 'OSRM demo route (router.project-osrm.org) on OpenStreetMap, town centre to town centre', checkedAt: '2026-11-12' } },
+  "paihia|opononi": { status: 'osrm', check: 'OSRM', url: 'https://router.project-osrm.org/', checkedAt: '2026-11-12', osrm: { minutes: 74, km: 86 }, km: { status: 'osrm', km: 86, source: 'OSRM demo route (router.project-osrm.org) on OpenStreetMap, town centre to town centre', checkedAt: '2026-11-12' } },
+  "auckland|whangarei": { status: 'osrm', check: 'OSRM', url: 'https://router.project-osrm.org/', checkedAt: '2026-11-12', osrm: { minutes: 129, km: 156 }, km: { status: 'osrm', km: 156, source: 'OSRM demo route (router.project-osrm.org) on OpenStreetMap, town centre to town centre', checkedAt: '2026-11-12' } },
+  "hahei|whangamata": { status: 'osrm', check: 'OSRM', url: 'https://router.project-osrm.org/', checkedAt: '2026-11-12', osrm: { minutes: 52, km: 61 }, km: { status: 'osrm', km: 61, source: 'OSRM demo route (router.project-osrm.org) on OpenStreetMap, town centre to town centre', checkedAt: '2026-11-12' } },
+  "new-plymouth|stratford": { status: 'osrm', check: 'OSRM', url: 'https://router.project-osrm.org/', checkedAt: '2026-11-12', osrm: { minutes: 36, km: 40 }, km: { status: 'osrm', km: 40, source: 'OSRM demo route (router.project-osrm.org) on OpenStreetMap, town centre to town centre', checkedAt: '2026-11-12' } },
+  "stratford|whangamomona": { status: 'osrm', check: 'OSRM', url: 'https://router.project-osrm.org/', checkedAt: '2026-11-12', osrm: { minutes: 48, km: 62 }, km: { status: 'osrm', km: 62, source: 'OSRM demo route (router.project-osrm.org) on OpenStreetMap, town centre to town centre', checkedAt: '2026-11-12' } },
+  "masterton|martinborough": { status: 'osrm', check: 'OSRM', url: 'https://router.project-osrm.org/', checkedAt: '2026-11-12', osrm: { minutes: 37, km: 43 }, km: { status: 'osrm', km: 43, source: 'OSRM demo route (router.project-osrm.org) on OpenStreetMap, town centre to town centre', checkedAt: '2026-11-12' } },
+  "auckland|waiheke": { status: 'operator', check: 'Fullers360', url: 'https://www.fullers.co.nz/destinations-and-experiences/destinations/waiheke-island', checkedAt: '2026-11-12', km: { status: '待核', source: 'Fullers360 states about 40 to 45 minutes and does not give a distance used here', checkedAt: '2026-11-12' } },
 };
 const P10_NZTA_DATE = Object.values(EDGE_SOURCES).map(s => s.checkedAt).sort().pop();
 // Day-card notes for roads that need care (tickets D and E); each names its public source and the date it was read.
@@ -301,15 +341,19 @@ function p10LegTag(l, zh) {
   const road = nz ? (zh ? s.nzta.route : s.nzta.route.replace(/和/g, ' and ').replace(/、/g, ', ')) : '';
   // A quiet note, not a warning badge: the full reading is in the tooltip and the method is explained once below the plan.
   // Segments added later (ticket D) are labelled as estimates: NZTA shows Google's suggested time, also on local roads.
-  const label = nz ? (s.estimate ? (zh ? `NZTA ${s.checkedAt} 估算` : `NZTA estimate ${s.checkedAt}`) : (zh ? `NZTA ${s.checkedAt} 读数` : `NZTA reading ${s.checkedAt}`)) : (zh ? '时刻表为准' : 'check timetable');
+  const label = nz ? (s.estimate ? (zh ? `NZTA ${s.checkedAt} 估算` : `NZTA estimate ${s.checkedAt}`) : (zh ? `NZTA ${s.checkedAt} 读数` : `NZTA reading ${s.checkedAt}`)) : s.status === 'osrm' ? (zh ? `OSRM ${s.checkedAt} 估算` : `OSRM estimate ${s.checkedAt}`) : (zh ? '时刻表为准' : 'check timetable');
   const kmNote = s.km && s.km.status === 'checked'
     ? (zh ? `里程 ${s.km.km} km：${s.km.source}（查阅 ${s.km.checkedAt}）。` : `Distance ${s.km.km} km: ${s.km.source} (read ${s.km.checkedAt}).`)
-    : s.km && s.km.status === '待核'
+    : s.km && s.km.status === 'osrm'
+      ? (zh ? `里程 ${s.km.km} km：${s.km.source}（查阅 ${s.km.checkedAt}）。` : `Distance ${s.km.km} km: ${s.km.source} (read ${s.km.checkedAt}).`)
+      : s.km && s.km.status === '待核'
       ? (zh ? '这一段里程待核，不计入合计。' : 'This segment’s distance is still to be verified and is not included in the total.')
       : (zh ? 'NZTA 不显示里程，里程为规划估算。' : 'NZTA shows no distance; km is a planning estimate.');
   const title = nz
     ? (zh ? `NZTA Journey Planner ${s.checkedAt} 读数：${road}，${s.nzta.time}${s.nzta.traffic ? '（' + s.nzta.traffic + '）' : ''}；取整到 15 分钟。${kmNote}`
           : `NZTA Journey Planner reading on ${s.checkedAt}: ${road}, ${s.nzta.time}${s.nzta.traffic ? ' (' + s.nzta.traffic + ')' : ''}; rounded to 15 minutes. ${kmNote}`)
+    : s.status === 'osrm'
+      ? (zh ? `OSRM（OpenStreetMap）2026-11-12 估算，取整到 15 分钟。${kmNote}` : `OSRM estimate on OpenStreetMap data, 2026-11-12, rounded to 15 minutes. ${kmNote}`)
     : (zh ? '规划用估算值；公共交通和渡轮以运营商时刻表为准。' : 'Planning estimate; for coaches, trains and ferries check the operator’s timetable.');
   const esc = v => String(v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   return `<abbr class="p10-src" title="${esc(title)}">${label}</abbr>`;
@@ -591,7 +635,7 @@ function p10Build(input, wanted) {
 // Catalogue towns: one that is the same place as a road-network town (within 15 km, or Stewart Island's Oban) plans
 // as that town. A town off the network gets no invented drive time; it stays under "arrange separately".
 function p10Km(a,b){const r=x=>x*Math.PI/180,dl=r(b[0]-a[0]),dn=r(b[1]-a[1]);const h=Math.sin(dl/2)**2+Math.cos(r(a[0]))*Math.cos(r(b[0]))*Math.sin(dn/2)**2;return 2*6371*Math.asin(Math.sqrt(h));}
-const P10_NO_ALIAS = new Set(['ni-whk']); // Waiheke is across the water from Auckland, not part of it
+const P10_NO_ALIAS = new Set(); // Waiheke has its own ferry node, so it no longer needs to be kept off Auckland
 function p10CatalogBase(town){
   const lat=Number(town.lat),lon=Number(town.lon);if(!Number.isFinite(lat)||!Number.isFinite(lon))return null;
   if(town.place_id==='si-sti')return 'oban';
@@ -634,12 +678,36 @@ function p10WishById(id) {
 // How much a place is worth keeping when the days run short (1 = ordinary). The headline sights weigh most, so a
 // short loop keeps Milford Sound and Queenstown and leaves out a detour such as Kaikōura or Abel Tasman.
 const P10_WISH_WEIGHT = { milford: 4, queenstown: 4, aoraki: 3, tekapo: 2.5, glaciers: 2, wanaka: 2, kaikoura: 1.5, 'abel-tasman': 1.5, dunedin: 1.2, punakaiki: 0.8, 'arthurs-pass': 0.8, 'te-anau': 0.8, oamaru: 0.7, picton: 0.6, hokitika: 0.6, haast: 0.5, rotorua: 4, hobbiton: 3, waitomo: 2.5, tongariro: 2, 'bay-of-islands': 2, coromandel: 1.8, taupo: 1.5, auckland: 1.2, wellington: 1.2 };
+// What each way of travelling should float to the top of the recommended list. Used only when the planner is
+// suggesting places, so a visitor's own ticks keep their previous weights.
+const P10_PREF_FOCUS = {
+  walk: new Set(['tongariro', 'abel-tasman', 'aoraki', 'wanaka', 'punakaiki', 'te-anau', 'auckland']),
+  cycle: new Set(['queenstown', 'wellington', 'christchurch']),
+  drive: new Set(['tekapo', 'haast', 'kaikoura', 'arthurs-pass', 'milford', 'catlins', 'akaroa', 'oamaru']),
+  easy: new Set(['rotorua', 'hobbiton', 'waitomo', 'taupo', 'queenstown', 'tekapo', 'dunedin', 'napier', 'wellington', 'oamaru', 'picton'])
+};
+function p10PrefFactor(w, preference) {
+  const pref = preference === 'transit' ? 'drive' : (preference || 'easy');
+  const focus = P10_PREF_FOCUS[pref] || P10_PREF_FOCUS.easy;
+  if (focus.has(w.id)) return pref === 'easy' ? 2.4 : 2.8;
+  if (pref === 'easy' && (w.id === 'tongariro' || w.id === 'abel-tasman' || w.id === 'stewart')) return 0.35;
+  if (pref === 'walk' && (w.id === 'hobbiton' || w.id === 'dunedin' || w.id === 'napier')) return 0.55;
+  if (pref === 'cycle' && w.id !== 'queenstown') return 0.85;
+  if (pref === 'drive' && (w.id === 'tongariro' || w.id === 'abel-tasman')) return 0.6;
+  return 1;
+}
 // A stay one day shorter than planned (Queenstown for one day instead of two) keeps most of its worth.
 const P10_SHORT_WORTH = 0.7, P10_ROAD_COST = 0.25;
 function p10Island(id){const a=NODES[id]&&NODES[id].at;if(!a)return null;return a[0]>-40.4||(a[0]>-41.7&&a[1]>174.4)?'north':'south';}
 function p10Worth(input,w,suggest){
-  const v=P10_WISH_WEIGHT[w.id]||(w.catalog?0.8:1);
+  const base=P10_WISH_WEIGHT[w.id]||(w.catalog?0.8:1);
+  const v=suggest?base*p10PrefFactor(w,input.preference):base;
   return !suggest&&(w.base===input.start||w.base===input.end)?v*3:v;
+}
+function p10Rank(input){
+  const taken=new Set(input.wishes||[]);
+  const pool=p10SuggestPool(input, taken);
+  return pool.map(w=>({id:w.id,en:w.en,zh:w.zh,worth:+p10Worth(input,w,true).toFixed(2)})).sort((a,b)=>b.worth-a.worth||a.id.localeCompare(b.id));
 }
 // Choose how long to stay at each place so the trip fits the days and keeps the most worthwhile stays. Each place is
 // a full stay (level 2), one day shorter (1, for stays of two days or more) or left out (0). A greedy pass trims the
@@ -735,7 +803,7 @@ function p10DropOptions(input, keep) {
   return all.sort((a, b) => (a.pinned - b.pinned) || (enough(b) - enough(a)) || (enough(a) ? weight(a) - weight(b) || a.saves - b.saves : score(b) - score(a)) || (a.days - b.days));
 }
 function p10Plan(input) {
-  if (!NODES[input.start]?.hub || !NODES[input.end]?.hub || !Number.isInteger(input.days)||input.days<3||input.days>21 || !Array.isArray(input.wishes)) throw new Error('invalid_input');
+  if (!NODES[input.start]?.hub || !NODES[input.end]?.hub || !Number.isInteger(input.days)||input.days<1||input.days>30 || !Array.isArray(input.wishes)) throw new Error('invalid_input');
   // An old shared link or saved trip may still name a merged place (Mount Maunganui -> Tauranga): use the new id.
   input={...input,wishes:[...new Set(input.wishes.map(p10AliasId))]};
   // A ticked town that is the same place as a ticked sight (Queenstown the town, Queenstown the stay) counts once.
@@ -954,7 +1022,7 @@ function p10KmSum(legs) {
   return { km, unknown };
 }
 
-if (typeof module !== 'undefined' && module.exports) module.exports={p10RoadNotes,P10_ROAD_NOTES,P10_WINTER_EDGES,p10AliasId,P10_PLACE_ALIASES,p10Plan,p10Extras,p10CatalogBase,p10TownIsSight,p10Choose,p10Island,P10_WISH_WEIGHT,p10Timeline,p10Present,p10Fitted,p10DropChoices,p10Build,p10Removable,p10ShortfallNote,p10StillTight,p10AlongWay,p10Duration,p10DailyTime,p10BreakStops,p10Net,p10Suggestions,p10LegDescription,p10JevIsland,p10JevRouteName,P10_WISH_TIPS,P10_WISH_GUIDES,NODES,WISHES,p10WayTitle,p10RegionEntries,p10LegKm,p10KmSum,P10_WISH_REGION};
+if (typeof module !== 'undefined' && module.exports) module.exports={p10RoadNotes,P10_ROAD_NOTES,P10_WINTER_EDGES,p10AliasId,P10_PLACE_ALIASES,p10Plan,p10Extras,p10CatalogBase,p10TownIsSight,p10Choose,p10Island,P10_WISH_WEIGHT,p10Rank,p10Timeline,p10Present,p10Fitted,p10DropChoices,p10Build,p10Removable,p10ShortfallNote,p10StillTight,p10AlongWay,p10Duration,p10DailyTime,p10BreakStops,p10Net,p10Suggestions,p10LegDescription,p10JevIsland,p10JevRouteName,P10_WISH_TIPS,P10_WISH_GUIDES,NODES,WISHES,p10WayTitle,p10RegionEntries,p10LegKm,p10KmSum,P10_WISH_REGION};
 globalThis.P10_NODES = NODES;
 
   if (typeof window !== 'undefined') {
@@ -967,11 +1035,11 @@ globalThis.P10_NODES = NODES;
   window.P10_WISHES = WISHES;
   const p10$=selector=>document.querySelector(selector);
   const p10Text=()=>document.documentElement.lang.startsWith('zh') ? {
-    start:'从哪里出发',end:'从哪里离开',days:'旅行天数',month:'出行月份（选 6–10 月会提示冬季山路）',monthUnknown:'还没定',stay:'住宿档位（可选：每晚显示这一档的住宿入口）',stayNone:'不显示',stayBudget:'省钱',stayMid:'中档',stayHigh:'高端',pace:'每天自驾节奏',pace35:'最多 3.5 小时',pace5:'最多 5 小时',pace65:'最多 6.5 小时',places:'想去哪些地方？',island:'这次去哪一座岛？',region:'地区',choose:'选择多个目的地',transport:'城市之间怎么走',car:'自驾',public:'公共交通',preference:'想怎么玩',prefEasy:'轻松观光，不排长步道',prefWalk:'徒步',prefCycle:'骑行',prefDrive:'风景公路与火车',method:'是否使用 Jev 推荐',local:'本地规划',jev:'Jev 辅助推荐',submit:'生成行程',
+    start:'从哪里出发',end:'从哪里离开',days:'旅行天数（1–30）',month:'出行月份（选 6–10 月会提示冬季山路）',monthUnknown:'还没定',stay:'住宿档位（可选）',stayNone:'不显示',stayBudget:'省钱',stayMid:'中档',stayHigh:'高端',pace:'每天在路上的节奏',pace35:'慢一点，最多 3.5 小时',pace5:'普通，最多 5 小时',pace65:'赶一点，最多 6.5 小时',places:'想去哪些地方？（不选也会按天数推荐）',island:'这次去哪一座岛？',region:'地区',choose:'选择多个目的地',transport:'城市之间怎么走',car:'自驾',public:'巴士和渡轮',preference:'想怎么玩（会改变推荐顺序）',prefEasy:'轻松观光，不排长步道',prefWalk:'徒步',prefCycle:'骑行',prefDrive:'风景公路与火车',method:'是否使用 Jev 推荐',local:'本地规划',jev:'Jev 辅助推荐',submit:'生成这一天一天的行程',step1:'几天、什么季节',step2:'去哪、怎么走',step3:'看行程',next:'下一步',back:'上一步',more:'更多选项（城市、地点、住宿、玩法）',area:'大致去哪',areaSouth:'南岛：基督城出发，皇后镇离开',areaLoop:'南岛环线：从基督城回到基督城',areaNorth:'北岛：奥克兰出发，惠灵顿离开',areaNorthLoop:'北岛环线：从奥克兰回到奥克兰',areaBoth:'两岛都去：奥克兰出发，皇后镇离开',rankLive:'换一种玩法，下面的推荐顺序会跟着变',editor:'把这几日放进编辑器细调',
     consent:'只有勾选同意，才会把所选岛屿、天数和活动方式发送给 TypeSafe，服务方也会收到请求 IP；地点和起终点不会发送。',statusConsent:'请先同意，再使用 Jev 推荐。',loading:'正在请求 Jev 推荐…',error:'Jev 推荐暂不可用，下面仍显示本地规划。',reco:'Jev 推荐',
     disclaimer:'出发前请查看 NZTA 路况和各线路链接的官方信息。',min:'至少需要',have:'你选择了',drop:'可增加天数或移除',unreachable:'以下地点目前无法按所选交通方式衔接，需另行安排',disconnected:'起点与终点之间缺少可用的交通连接，请改选交通方式或另行安排。',unknownNight:'',day:'第',dayEnd:'天',arrive:'抵达',depart:'离开',night:'住',check:'',activity:'安排时间游览',localTransport:'景点与步道起点的当地接驳不包含在行程中。',ferry:'渡轮',train:'火车',coach:'大巴',shuttle:'接驳车',road:'自驾',hour:'小时',dropNo:'请减少目的地或增加天数。',sources:'路况与交通来源'
   } : {
-    start:'Start city',end:'Departure city',days:'Days available',month:'Travel month (June–October adds winter road notes)',monthUnknown:'Not sure yet',stay:'Stay budget (optional: shows stay links for each night)',stayNone:'Not shown',stayBudget:'Budget',stayMid:'Mid-range',stayHigh:'High-end',pace:'Daily driving pace',pace35:'Up to 3.5 hours',pace5:'Up to 5 hours',pace65:'Up to 6.5 hours',places:'Where would you like to go?',island:'Which island this time?',region:'Region',choose:'Choose multiple destinations',transport:'Between towns',car:'Drive',public:'Public transport',preference:'How do you like to explore?',prefEasy:'Easy sightseeing, no long hikes',prefWalk:'Walking',prefCycle:'Cycling',prefDrive:'Scenic roads and trains',method:'Jev suggestions',local:'Local plan',jev:'Jev-assisted suggestion',submit:'Build itinerary',
+    start:'Start city',end:'Departure city',days:'Days (1–30)',month:'Travel month (June–October adds winter road notes)',monthUnknown:'Not sure yet',stay:'Stay budget (optional)',stayNone:'Not shown',stayBudget:'Budget',stayMid:'Mid-range',stayHigh:'High-end',pace:'Time on the road each day',pace35:'Slow, up to 3.5 hours',pace5:'Steady, up to 5 hours',pace65:'Longer, up to 6.5 hours',places:'Anywhere in particular? (Leave this blank and we suggest a route.)',island:'Which island this time?',region:'Region',choose:'Choose multiple destinations',transport:'Between towns',car:'Rental car',public:'Bus and ferry',preference:'How do you like to travel? (This changes the recommended order.)',prefEasy:'Easy sightseeing, no long hikes',prefWalk:'Walking',prefCycle:'Cycling',prefDrive:'Scenic roads and trains',method:'Jev suggestions',local:'Local plan',jev:'Jev-assisted suggestion',submit:'Build the day-by-day plan',step1:'How long, and when',step2:'Where, and how you travel',step3:'Your plan',next:'Next',back:'Back',more:'More options (cities, places, stays, style)',area:'Roughly where',areaSouth:'South Island: Christchurch to Queenstown',areaLoop:'South Island loop: back to Christchurch',areaNorth:'North Island: Auckland to Wellington',areaNorthLoop:'North Island loop: back to Auckland',areaBoth:'Both islands: Auckland to Queenstown',rankLive:'Change the style and this recommended order changes',editor:'Adjust these days in the editor',
     consent:'Only with your consent, the selected island, days and activity type are sent to TypeSafe, which also receives the request IP. Your selected places and start/end are not sent.',statusConsent:'Please consent before using Jev.',loading:'Requesting a Jev suggestion…',error:'Jev is unavailable; the local plan is shown below.',reco:'Jev recommendation',
     disclaimer:'Check NZTA road conditions and the linked official information before you go.',min:'Minimum days',have:'Days selected',drop:'Removing this destination may reduce the trip to',unreachable:'These places need separate transport with the selected mode',disconnected:'No available connection is modelled between the start and end. Choose another mode or arrange this separately.',unknownNight:'',day:'Day ',dayEnd:'',arrive:'Arrive in',depart:'Depart from',night:'Overnight',check:'',activity:'Allow time to explore',localTransport:'Check local transport to sights and trailheads and return separately.',ferry:'Ferry',train:'Train',coach:'Coach',shuttle:'Shuttle',road:'Drive',hour:'h',dropNo:'Remove a destination or add more days.',sources:'Road and transport sources'
   };
@@ -1091,8 +1159,8 @@ globalThis.P10_NODES = NODES;
   function p10StayLinks(tierId,at,zh){
     if(!tierId)return '';if(!p10Stays){p10LoadStays();return '';}
     const tier=p10Stays.find(t=>t.id===tierId);if(!tier)return '';const town=NODES[at]?.en||at;
-    const links=tier.links.map(l=>{const href=l.kind==='maps'?`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(l.query+' '+town+' New Zealand')}`:l.url;return `<a href="${p10Esc(href)}" target="_blank" rel="noopener noreferrer">${p10Esc(zh?l.label_zh:l.label_en)}</a>`;}).join(' · ');
-    return `<p class="p10-stay-links" data-p10-stay="${p10Esc(tier.id)}">${p10Esc(zh?`${tier.zh}住宿：`:`${tier.en} stays: `)}${links}</p>`;
+    const links=tier.links.map(l=>{const href=l.kind==='maps'?`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(l.query+' '+town+' New Zealand')}`:l.url;return `${zh?l.label_zh:l.label_en} ${href}`;}).join(' · ');
+    return `<p class="p10-stay-links" data-p10-stay="${p10Esc(tier.id)}">${p10Esc(zh?`${tier.zh}住宿：`:`${tier.en} stays: `)}${p10Esc(links)}</p>`;
   }
   function p10Show(result){
     const el=p10$('#planResult');if(!el)return;if(!result){el.innerHTML='';return;}const x=p10Text(),zh=p10Lang()==='zh',lang=p10Lang();
@@ -1104,7 +1172,7 @@ globalThis.P10_NODES = NODES;
       // When the trip was fitted, offer to drop only places that were left out; the kept ones are the trip shown.
       const choices=p10DropChoices(result).filter(c=>!(early.fitted&&result.fits&&result.fits.keep.includes(c.id)));
       const drops=choices.map(c=>`<button type="button" class="p10-add-stop" data-p10-trim="1" data-p10-drop="${p10Esc(c.id)}">${zh?`去掉${p10Esc(c.zh)}（省 ${c.saves} 天）`:`Drop ${p10Esc(c.en)} (saves ${c.saves} day${c.saves>1?'s':''})`}</button>`).join(' ');
-      const more=result.minimum<=21?`<button type="button" class="p10-add-stop" data-p10-days="${result.minimum}">${zh?`把天数改成 ${result.minimum}`:`Change to ${result.minimum} days`}</button>`:'';
+      const more=result.minimum<=30?`<button type="button" class="p10-add-stop" data-p10-days="${result.minimum}">${zh?`把天数改成 ${result.minimum}`:`Change to ${result.minimum} days`}</button>`:'';
       const southTrip=!P10_NORTH_HUBS.has(result.input.start)&&!P10_NORTH_HUBS.has(result.input.end)&&result.order.every(w=>w.island!=='north');
       const tmpl=southTrip&&result.input.days>=7?`<a class="p10-add-stop" href="guide.html?template=SI-09B&amp;lang=${lang}">${zh?'看 9 天南岛线路模板':'See the 9-day South Island template'}</a>`:'';
       const direct=p10Build(result.input,[]).days.length;
@@ -1119,6 +1187,9 @@ globalThis.P10_NODES = NODES;
       const names=result.order.map(w=>`${p10Esc(p10WishLabel(WISHES.find(x=>x.id===w.id)||w))}${w.shortened?(zh?`（${w.days} 天）`:` (${w.days} day${w.days>1?'s':''})`):''}`).join(zh?'、':', ');
       notices.push(`<div class="p10-suggested" role="status"><p><strong>${zh?`你还没选地点，这是按 ${result.input.days} 天推荐的路线，可以增删。`:`You have not picked any places yet, so this is a suggested ${result.input.days}-day route. Add or remove places as you like.`}</strong></p><p>${zh?'推荐地点：':'Suggested places: '}${names}</p><div class="p10-along"><button type="button" class="p10-add-stop" data-p10-adopt="1">${zh?'把这些地点加入我的勾选':'Make these my picks'}</button><button type="button" class="p10-add-stop" data-p10-edit="1">${zh?'去地图和列表里增删':'Change places on the map or list'}</button></div></div>`);
     }
+    const prefName={easy:zh?'轻松观光':'easy sightseeing',walk:zh?'徒步':'walking',cycle:zh?'骑行':'cycling',drive:zh?'风景公路':'scenic roads'}[result.input.preference]||result.input.preference;
+    const ranked=p10Rank(result.input).slice(0,5);
+    if(ranked.length)notices.push(`<div class="p10-rank-box" data-p10-rank="${p10Esc(result.input.preference)}"><p><strong>${zh?`按「${prefName}」，推荐顺序是：`:`For ${prefName}, the recommended order is:`}</strong></p><ol class="p10-rank">${ranked.map(w=>`<li>${p10Esc(zh?w.zh:w.en)}</li>`).join('')}</ol><button type="button" class="p10-add-stop" data-p10-editor="1">${p10Esc(x.editor)}</button></div>`);
     const offNetwork=result.inaccessible.filter(w=>w.catalog&&w.base===w.id),noService=result.inaccessible.filter(w=>!offNetwork.includes(w));
     if(noService.length)notices.push(`<p class="p10-warning">${x.unreachable}：${noService.map(w=>p10Esc(w[lang])).join(zh?'、':', ')}。</p>`);
     if(offNetwork.length)notices.push(`<p class="p10-warning">${zh?'这些城镇还没有核实过的道路时间，没有排进每日行程，请自行安排：':'These towns have no checked road times yet, so they are not in the daily plan; arrange them separately: '}${offNetwork.map(w=>p10Esc(w[lang])).join(zh?'、':', ')}${zh?'。':'.'}</p>`);
@@ -1328,6 +1399,25 @@ globalThis.P10_NODES = NODES;
   function p10Month(){return Number(p10$('#p10-month')?.value)||0;}
   function p10Stay(){const v=p10$('#p10-stay')?.value||'';return ['budget','mid','high'].includes(v)?v:'';}
   function p10SyncTransport(){const car=p10$('#p10-transport')?.value!=='public';const field=p10$('#p10-pace-field');if(field)field.hidden=!car;}
+  function p10Step(n){
+    document.querySelectorAll('[data-p10-panel]').forEach(p=>{p.hidden=String(p.dataset.p10Panel)!==String(n);});
+    document.querySelectorAll('[data-p10-step]').forEach(b=>b.setAttribute('aria-current',b.dataset.p10Step===String(n)?'step':'false'));
+  }
+  function p10FillRank(){
+    const host=p10$('#p10-rank-live'); if(!host||!p10$('#p10-start'))return;
+    const zh=p10Lang()==='zh';
+    const input={start:p10$('#p10-start').value,end:p10$('#p10-end').value,days:Number(p10$('#days').value)||7,pace:Number(p10$('#p10-pace').value)||5,preference:p10$('#preference')?.value||'easy',car:p10$('#p10-transport')?.value!=='public',wishes:[]};
+    let ranked=[]; try{ranked=p10Rank(input).slice(0,5);}catch{ranked=[];}
+    host.innerHTML=ranked.map(w=>`<li>${p10Esc(zh?w.zh:w.en)}</li>`).join('');
+  }
+  function p10SyncAreaPressed(){
+    const start=p10$('#p10-start')?.value, end=p10$('#p10-end')?.value;
+    document.querySelectorAll('[data-p10-area]').forEach(b=>{
+      const pair=P10_AREAS[b.dataset.p10Area];
+      b.setAttribute('aria-pressed', pair && pair[0]===start && pair[1]===end ? 'true' : 'false');
+    });
+  }
+  const P10_AREAS={south:['christchurch','queenstown'],'south-loop':['christchurch','christchurch'],north:['auckland','wellington'],'north-loop':['auckland','auckland'],both:['auckland','queenstown']};
   let p10LinkWishes=null;
   function p10LinkNote(lang){
     if(!p10LinkWishes||!Array.isArray(globalThis.P10_CATALOG_TOWNS))return;
@@ -1347,6 +1437,11 @@ globalThis.P10_NODES = NODES;
     p10SyncTransport();
     p10Show(p10Result);
     p10LinkNote(lang);
+    for(const [id,key] of [['p10-step1-label','step1'],['p10-step2-label','step2'],['p10-step3-label','step3'],['p10-next-1','next'],['p10-next-2','next'],['p10-back-2','back'],['p10-back-3','back'],['p10-more-label','more'],['p10-area-label','area'],['p10-area-south','areaSouth'],['p10-area-loop','areaLoop'],['p10-area-north','areaNorth'],['p10-area-north-loop','areaNorthLoop'],['p10-area-both','areaBoth'],['p10-rank-label','rankLive']]){const el=document.getElementById(id);if(el)el.textContent=x[key];}
+    p10FillRank();
+    p10SyncAreaPressed();
+    const lead=document.getElementById('p10-step-lead');
+    if(lead)lead.textContent=zh?'下面直接生成逐日行程。地点、住宿和玩法都有默认值，想改再打开更多选项。':'This builds the day-by-day plan. Cities, stays and style already have defaults. Open more options only if you want to change them.';
   };
   window.setupP10Planner=function(){
     const form=p10$('#plannerForm');if(!form||form.dataset.p10Ready)return;form.dataset.p10Ready='1';
@@ -1354,7 +1449,7 @@ globalThis.P10_NODES = NODES;
     const options=north=>hubs.filter(([id])=>P10_NORTH_HUBS.has(id)===north).map(([key,n])=>`<option value="${key}">${p10Esc(n.zh)}</option>`).join('');
     for(const id of ['p10-start','p10-end'])p10$('#'+id).innerHTML=`<optgroup data-p10-group="south" label="南岛">${options(false)}</optgroup><optgroup data-p10-group="north" label="北岛">${options(true)}</optgroup>`;
     p10$('#p10-start').value='christchurch';p10$('#p10-end').value='queenstown';
-    p10$('#days').innerHTML=Array.from({length:19},(_,i)=>`<option value="${i+3}">${i+3}</option>`).join('');p10$('#days').value='7';
+    p10$('#days').innerHTML=Array.from({length:30},(_,i)=>`<option value="${i+1}">${i+1}</option>`).join('');p10$('#days').value='7';
     const method=p10$('#plannerMethod'), jevAvailable=false;
     const methodLabel=p10$('#p10-method-label'), jevOption=p10$('#p10-jev-label');
     method.hidden=!jevAvailable;if(methodLabel)methodLabel.hidden=!jevAvailable;if(jevOption)jevOption.disabled=!jevAvailable;
@@ -1374,8 +1469,9 @@ globalThis.P10_NODES = NODES;
       const t=event.target;
       if(t.name==='p10-wish'){if(t.checked)p10Selected.add(t.value);else p10Selected.delete(t.value);p10RenderSelected();}
       if(t.id==='p10-transport')p10SyncTransport();
+      if(t.id==='preference'||t.id==='p10-start'||t.id==='p10-end'||t.id==='days'||t.id==='p10-pace')p10FillRank();
       if(t.id==='p10-stay'&&p10Result){p10Result.input={...p10Result.input,stay:p10Stay()};try{localStorage.setItem('p10-road-plan',JSON.stringify(p10Result.input));}catch{}p10Show(p10Result);}
-      if(t.id==='p10-start'||t.id==='p10-end')p10RenderPickMap(p10PickItems);
+      if(t.id==='p10-start'||t.id==='p10-end'){p10SyncAreaPressed();p10RenderPickMap(p10PickItems);}
     });
     // The map lives outside the form on a wide screen, so its clicks and hovers are handled on the document.
     document.addEventListener('click',event=>{
@@ -1416,6 +1512,11 @@ globalThis.P10_NODES = NODES;
     p10$('#planResult').addEventListener('click',async event=>{
       const zh=p10Lang()==='zh';
       const focus=event.target.closest('[data-p10-focus],[data-p10-map-day]');if(focus){const day=focus.dataset.p10Focus||focus.dataset.p10MapDay;p10FocusDay(day);if(focus.dataset.p10Focus)p10$('#p10-trip-map')?.scrollIntoView({behavior:'auto',block:'start'});return;}
+      if(event.target.closest('[data-p10-editor]')&&p10Result){
+        try{sessionStorage.setItem('pounamu-plan-handoff',JSON.stringify({input:p10Result.input}));}catch{}
+        location.href=`guide.html?fromPlan=1&lang=${p10Lang()}`;
+        return;
+      }
       if(event.target.closest('[data-p10-print]')){window.print();return;}
       if(event.target.closest('[data-p10-share]')&&p10Result){
         const url=p10ShareUrl(p10Result.input),status=p10$('.p10-share-status');
@@ -1424,7 +1525,7 @@ globalThis.P10_NODES = NODES;
         return;
       }
       const edit=event.target.closest('[data-p10-edit]');
-      if(edit){document.getElementById('p10-wishes-label')?.scrollIntoView({behavior:'auto',block:'start'});return;}
+      if(edit){p10Step(3);const more=document.getElementById('p10-more');if(more)more.open=true;document.getElementById('p10-wishes-label')?.scrollIntoView({behavior:'auto',block:'start'});return;}
       if(event.target.closest('[data-p10-adopt]')&&p10Result&&p10Result.suggested){
         for(const id of p10Result.suggested)p10Selected.add(id);
         for(const box of form.querySelectorAll('[name=p10-wish]'))box.checked=p10Selected.has(box.value);p10RenderSelected();
@@ -1470,6 +1571,17 @@ globalThis.P10_NODES = NODES;
       }catch{p10Status(p10Lang()==='zh'?'请检查出发地、终点和天数。':'Check the start, destination and days.');}
     });
     window.renderP10Planner();
+    form.addEventListener('click',event=>{
+      const step=event.target.closest('[data-p10-step],[data-p10-goto]');
+      if(step){event.preventDefault();p10Step(step.dataset.p10Step||step.dataset.p10Goto);return;}
+      const area=event.target.closest('[data-p10-area]');
+      if(!area)return;
+      const pair=P10_AREAS[area.dataset.p10Area]; if(!pair)return;
+      p10$('#p10-start').value=pair[0]; p10$('#p10-end').value=pair[1];
+      form.querySelectorAll('[data-p10-area]').forEach(b=>b.setAttribute('aria-pressed',b===area?'true':'false'));
+      p10FillRank();
+    });
+    p10Step(saved?3:1);
   };
 }
 

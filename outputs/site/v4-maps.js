@@ -43,6 +43,7 @@
       return `<g class="${cls}" data-place="${esc(p.id)}" tabindex="0" role="button" aria-pressed="${p.selected ? 'true' : 'false'}" aria-label="${esc(label)}" transform="translate(${xy[0].toFixed(1)} ${xy[1].toFixed(1)})">
         <circle r="${p.selected ? 7 : 5}"><title>${esc(label)}</title></circle>
         ${tag ? `<text y="-10" text-anchor="middle">${esc(tag)}</text>` : ''}
+        ${(p.selected || isStart || isEnd) && label ? `<text class="v4-map-name" y="16" text-anchor="middle">${esc(label)}</text>` : ''}
       </g>`;
     }).join('');
     const coast = coastPath();

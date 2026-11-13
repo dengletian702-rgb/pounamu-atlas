@@ -201,7 +201,7 @@ test('F: the planner\'s optional stay tier adds that tier\'s links under every n
     const r = await page.ev(`({nights: document.querySelectorAll('#planResult .p10-night').length, stays: [...document.querySelectorAll('#planResult .p10-stay-links')].map(p => ({tier: p.dataset.p10Stay, text: p.innerText, hrefs: [...p.querySelectorAll('a')].map(a => a.href)})), select: document.querySelector('#p10-stay').value, label: document.querySelector('#p10-stay-label').textContent})`);
     assert.equal(r.select, 'budget');
     assert.equal(r.stays.length, r.nights);
-    assert.ok(r.stays.every(s => s.tier === 'budget' && s.hrefs.some(h => /doc\.govt\.nz/.test(h)) && s.hrefs.some(h => /google\.com\/maps\/search/.test(h))));
+    assert.ok(r.stays.every(s => s.tier === 'budget' && /doc\.govt\.nz/.test(s.text) && /google\.com\/maps\/search/.test(s.text) && s.hrefs.length === 0));
     assert.match(r.label, lang === 'zh' ? /住宿档位/ : /Stay budget/);
     assert.match(r.stays[0].text, lang === 'zh' ? /^省钱住宿：/ : /^Budget stays: /);
     // switching to high-end redraws the same days with the high-end links; switching off removes them
@@ -244,7 +244,7 @@ test('F: a failed stay fetch is not cached, so the links appear on the retry', a
   assert.ok(failed >= 1);
   const first = await page.ev(`({text: document.querySelector('.p10-stay-links').innerText, hrefs: [...document.querySelectorAll('.p10-stay-links a')].map(a => a.href)})`);
   assert.match(first.text, /^Budget stays: /);
-  assert.ok(first.hrefs.some(h => /doc\.govt\.nz/.test(h)));
+  assert.match(first.text, /doc\.govt\.nz/);
   await page.ev(`(()=>{const s=document.querySelector('#p10-stay');s.value='high';s.dispatchEvent(new Event('change',{bubbles:true}));})()`);
   await page.waitFor('document.querySelector(\'.p10-stay-links[data-p10-stay="high"]\')');
   assert.match(await page.ev('document.querySelector(".p10-stay-links").innerText'), /^High-end stays: /);

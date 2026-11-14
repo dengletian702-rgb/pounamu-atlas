@@ -33,7 +33,7 @@
   function contourSlice(st) {
     const { step, n, val, levels } = st;
     const start = performance.now();
-    const budget = 16;
+    const budget = 5;
     while (st.gridRow <= n && performance.now() - start < budget) {
       const j = st.gridRow;
       val[j] = [];
@@ -387,14 +387,22 @@
 
   /* ---------- 9. Scroll state and progress ---------- */
   function bumpSvgFonts() {
-    $$('svg text').forEach(node => {
-      const m = node.getScreenCTM && node.getScreenCTM();
-      if (!m) return;
-      const cs = getComputedStyle(node);
-      if (cs.display === 'none' || cs.visibility === 'hidden') return;
-      const sc = Math.hypot(m.a, m.b);
-      if (sc > 0 && parseFloat(cs.fontSize) * sc < 11.95) node.style.setProperty('font-size', (13 / sc).toFixed(2) + 'px', 'important');
-    });
+    const nodes = $$('svg text');
+    let i = 0;
+    const step = () => {
+      const start = performance.now();
+      while (i < nodes.length && performance.now() - start < 5) {
+        const node = nodes[i++];
+        const m = node.getScreenCTM && node.getScreenCTM();
+        if (!m) continue;
+        const cs = getComputedStyle(node);
+        if (cs.display === 'none' || cs.visibility === 'hidden') continue;
+        const sc = Math.hypot(m.a, m.b);
+        if (sc > 0 && parseFloat(cs.fontSize) * sc < 11.95) node.style.setProperty('font-size', (13 / sc).toFixed(2) + 'px', 'important');
+      }
+      if (i < nodes.length) setTimeout(step, 0);
+    };
+    step();
   }
   function scroll() {
     const bar = doc.createElement('div'); bar.className = 'ui2-progress'; bar.setAttribute('aria-hidden', 'true'); doc.body.append(bar);

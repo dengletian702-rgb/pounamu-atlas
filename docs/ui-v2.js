@@ -572,6 +572,7 @@
     if (!Number.isFinite(px)) return null;
     let best = null, bestD = Infinity;
     svg.querySelectorAll('circle').forEach(circle => {
+      if (circle.classList.contains('p10-pick-hit')) return;
       const cx = parseFloat(circle.getAttribute('cx'));
       const cy = parseFloat(circle.getAttribute('cy'));
       if (!Number.isFinite(cx)) return;
@@ -631,11 +632,28 @@
     const placed = [];
     const dotCenters = () => [...svg.querySelectorAll('circle')].filter(c => !c.classList.contains('p10-pick-hit')).map(c => {
       const r = c.getBoundingClientRect();
-      return { x: (r.left + r.right) / 2, y: (r.top + r.bottom) / 2, r };
+      return { x: (r.left + r.right) / 2, y: (r.top + r.bottom) / 2, r, el: c };
     }).filter(d => d.r.width > 0.5);
-    const ordered = texts.slice().sort((a, b) => schematic
-      ? (a.textContent || '').length - (b.textContent || '').length
-      : (b.textContent || '').length - (a.textContent || '').length);
+    const tagCity = new Set();
+    for (const tag of texts) {
+      if (!tag.classList.contains('p10-pick-tag')) continue;
+      const mark = labelDot(svg, tag);
+      const id = mark && mark.closest && mark.closest('[data-p10-pick]') && mark.closest('[data-p10-pick]').dataset.p10Pick;
+      if (id) tagCity.add(id);
+    }
+    const pin = el => {
+      if (el.classList.contains('v4-map-num') || el.classList.contains('gday-num')) return 0;
+      if (tagCity.has(el.getAttribute('data-p10-pick-label'))) return 1;
+      if (el.classList.contains('p10-pick-tag')) return 2;
+      return 3;
+    };
+    const ordered = texts.slice().sort((a, b) => {
+      const pa = pin(a), pb = pin(b);
+      if (pa !== pb) return pa - pb;
+      return schematic
+        ? (a.textContent || '').length - (b.textContent || '').length
+        : (b.textContent || '').length - (a.textContent || '').length;
+    });
     const leaderEnds = (circle, rect) => {
       const c = circle.getBoundingClientRect();
       const cx = (c.left + c.right) / 2, cy = (c.top + c.bottom) / 2;
@@ -648,7 +666,7 @@
     const clearOf = (rect, ends) => {
       const pad = schematic ? 2 : 5;
       for (const d of dotCenters()) {
-        if (Math.hypot(d.x - ends.ownX, d.y - ends.ownY) <= 2) continue;
+        if (Math.hypot(d.x - ends.ownX, d.y - ends.ownY) <= (ends.cluster || 2)) continue;
         const rad = Math.min(d.r.width, d.r.height) / 2;
         if (pointBoxDist(d.x, d.y, rect) <= rad + pad) return false;
         if (ends.draw && distPointSeg(d.x, d.y, ends.x1, ends.y1, ends.x2, ends.y2) <= rad + 2) return false;
@@ -694,12 +712,13 @@
         host.insertBefore(line, host.firstChild);
       }
     };
-    const sit = (text, circle, gapScreen) => {
+    const sit = (text, circle, gapScreen, rank) => {
       const c = circle.getBoundingClientRect();
       const ccx = (c.left + c.right) / 2, ccy = (c.top + c.bottom) / 2;
       const rad = Math.min(c.width, c.height) / 2;
       let best = null;
-      const slides = schematic ? [0] : [0, -18, 18, -36, 36];
+      const pinned = text.classList.contains('p10-pick-tag') || text.classList.contains('v4-map-num') || text.classList.contains('gday-num');
+      const slides = pinned ? [0, -12, 12] : (schematic ? [0] : [0, -18, 18, -36, 36]);
       for (const [dx, dy, anchor] of dirs) {
         const len = Math.hypot(dx, dy) || 1;
         const ux = dx / len, uy = dy / len;
@@ -729,37 +748,69 @@
         const ends = leaderEnds(circle, r);
         ends.ownX = ccx;
         ends.ownY = ccy;
+        ends.cluster = text.classList.contains('p10-pick-tag') ? 6 : 2;
         ends.draw = coast ? gap > 3 : gap > 14;
         const maxGap = schematic ? gapScreen + 1.5 : Math.min(14, gapScreen + 1.5);
         const crowded = placed.some(o => schematic ? boxGap(r, o.rect) < 6 : overlaps(r, o.rect));
         if (!(inside(r) && gap >= 2 && gap <= maxGap && !crowded && clearOf(r, ends))) continue;
         let clear = Infinity;
+        let foreignPoint = Infinity;
         for (const d of dotCenters()) {
-          if (Math.hypot(d.x - ccx, d.y - ccy) <= 2) continue;
-          clear = Math.min(clear, pointBoxDist(d.x, d.y, r) - Math.min(d.r.width, d.r.height) / 2);
+          if (Math.hypot(d.x - ccx, d.y - ccy) <= (text.classList.contains('p10-pick-tag') ? 6 : 2)) continue;
+          if ((text.classList.contains('v4-map-num') || text.classList.contains('gday-num')) && !(d.el.parentNode && d.el.parentNode.querySelector('text'))) continue;
+          const pd = pointBoxDist(d.x, d.y, r);
+          foreignPoint = Math.min(foreignPoint, pd);
+          clear = Math.min(clear, pd - Math.min(d.r.width, d.r.height) / 2);
         }
+        const ownPoint = pointBoxDist(ccx, ccy, r);
         let apart = Infinity;
         for (const o of placed) apart = Math.min(apart, boxGap(r, o.rect));
         const score = schematic ? clear : apart + clear;
-        if (!best || score > best.score) best = { score, x: text.getAttribute('x'), y: text.getAttribute('y'), anchor, r, ends };
+        const cand = { score, x: text.getAttribute('x'), y: text.getAttribute('y'), anchor, r, ends, ownPoint, foreignPoint };
+        const ranked = rank ? rank(cand) : score;
+        if (ranked == null) continue;
+        if (!best || ranked > best.ranked) best = { ...cand, ranked };
         }
       }
       if (!best) return null;
       text.setAttribute('text-anchor', best.anchor);
       text.setAttribute('x', best.x);
       text.setAttribute('y', best.y);
-      return { r: text.getBoundingClientRect(), ends: best.ends };
+      return { r: text.getBoundingClientRect(), ends: best.ends, x: best.x, y: best.y, anchor: best.anchor, ownPoint: best.ownPoint, foreignPoint: best.foreignPoint, ranked: best.ranked };
     };
     const placeOne = text => {
       text.classList.remove('is-unplaced');
       const circle = labelDot(svg, text);
       if (!circle) return true;
       let fit = null;
+      const tag = text.classList.contains('p10-pick-tag');
+      const numeral = text.classList.contains('v4-map-num') || text.classList.contains('gday-num');
+      if (tag || numeral) {
+        // Start, end and stop numbers must sit nearer their own dot than any other city's dot.
+        const rank = cand => {
+          const owns = cand.foreignPoint > cand.ownPoint + 0.4;
+          if (tag && !(cand.ownPoint <= 12 && owns)) return null;
+          return (owns ? 1000 : 0) + (48 - cand.ownPoint) + Math.min(Math.max(cand.foreignPoint - cand.ownPoint, 0), 16);
+        };
+        let best = null;
+        for (const gap of tag ? [3, 4, 6, 8, 10, 12] : [4, 8, 12, 14, 18, 22, 26, 30]) {
+          const got = sit(text, circle, gap, rank);
+          if (got && (!best || got.ranked > best.ranked)) best = got;
+        }
+        if (best) {
+          text.setAttribute('text-anchor', best.anchor);
+          text.setAttribute('x', best.x);
+          text.setAttribute('y', best.y);
+          fit = best;
+        }
+      }
+      if (!fit && !tag) {
       for (const gap of schematic ? [4, 8, 12, 14] : [4, 6, 8, 10, 12, 14]) {
         fit = sit(text, circle, gap);
         if (fit) break;
       }
-      if (!fit && schematic) {
+      }
+      if (!fit && schematic && !tag) {
         for (const gap of [18, 22, 26, 30, 34, 38, 42, 46]) {
           fit = sit(text, circle, gap);
           if (fit) break;
@@ -791,13 +842,21 @@
       if (missed.length) {
         const kept = ordered.filter(text => !text.classList.contains('is-unplaced')).length;
         resetLabels();
-        const again = [...missed, ...ordered.filter(text => !missed.includes(text))];
+        const again = ordered.slice().sort((a, b) => {
+          const boost = t => (missed.includes(t) && pin(t) >= 3 ? pin(t) - 0.5 : pin(t));
+          return boost(a) - boost(b);
+        });
         again.forEach(placeOne);
         const now = texts.filter(text => !text.classList.contains('is-unplaced')).length;
         if (now < kept) {
           resetLabels();
           ordered.forEach(placeOne);
         }
+      }
+      if (texts.some(text => text.classList.contains('p10-pick-tag') && text.classList.contains('is-unplaced'))) {
+        resetLabels();
+        const tagsFirst = ordered.slice().sort((a, b) => (a.classList.contains('p10-pick-tag') ? 0 : pin(a) + 1) - (b.classList.contains('p10-pick-tag') ? 0 : pin(b) + 1));
+        tagsFirst.forEach(placeOne);
       }
     }
     for (const line of [...svg.querySelectorAll('.v4-map-leader, .p10-pick-leader, .gday-leader')]) {

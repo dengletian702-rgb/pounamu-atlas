@@ -321,14 +321,12 @@ test('phone toast Undo is not covered by the search button', { timeout: 120000 }
         assert.equal(modal.filter(c => c.covered).length, 0, w + ' ' + lang + ' modal covered ' + JSON.stringify(modal.filter(c => c.covered)));
         await page.click('[data-do-replace]');
         await page.waitFor('document.querySelector("#v4-toast [data-v4-undo]")');
-        await page.ev('document.querySelector("#v4-toast [data-v4-undo]").scrollIntoView({block:"center"})');
-        let hits = await page.ev(FIXED_HITS);
-        for (let attempt = 0; attempt < 3; attempt++) {
-          const probe = hits.find(c => c.t === (lang === 'zh' ? '撤销' : 'Undo'));
-          if (probe && !probe.covered) break;
-          await page.ev('document.querySelector("#v4-toast [data-v4-undo]").scrollIntoView({block:"center"})');
-          hits = await page.ev(FIXED_HITS);
-        }
+        // html { scroll-behavior: smooth } makes a bare scrollIntoView animate. A hit test during that
+        // animation reads the search button instead of Undo when the suite is busy. Instant scroll, then
+        // one frame so elementFromPoint matches the laid-out box.
+        await page.ev('document.querySelector("#v4-toast [data-v4-undo]").scrollIntoView({block:"center",behavior:"auto"})');
+        await page.ev('document.fonts.ready.then(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))))');
+        const hits = await page.ev(FIXED_HITS);
         const undo = hits.find(c => c.t === (lang === 'zh' ? '撤销' : 'Undo'));
         assert.ok(undo, w + ' ' + lang + ' missing undo ' + JSON.stringify(hits.map(c => c.t)));
         assert.equal(undo.covered, false, w + ' ' + lang + ' undo covered ' + JSON.stringify(undo));

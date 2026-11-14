@@ -890,7 +890,7 @@ test('day numbers stay clear of other dots and planner labels survive a resize',
       await page.waitFor('document.querySelector("#p10-pick-map svg")', 20000);
       await page.ev('new Promise(r => setTimeout(r, 600))');
     };
-    for (const w of [768, 900, 1000]) {
+    for (const w of [600, 768, 900, 1000, 1024]) {
       await page.view(w, 900, false);
       await page.go('plan.html?lang=zh');
       await openPlan();
@@ -912,8 +912,14 @@ test('day numbers stay clear of other dots and planner labels survive a resize',
     await page.ev('new Promise(r => setTimeout(r, 400))');
     await page.view(390, 844, true);
     await page.ev('new Promise(r => setTimeout(r, 600))');
-    const phone = await page.ev(`(() => { const svg=document.querySelector('#p10-pick-map svg'); const b=svg?svg.getBoundingClientRect():{width:0,height:0}; return {w:b.width,h:b.height}; })()`);
-    if (!(phone.w > 20) || !(phone.h > 20)) problems.push('1440->390 ' + JSON.stringify(phone));
+    const phone = await page.ev(`(() => {
+      const svg=document.querySelector('#p10-pick-map svg');
+      const b=svg?svg.getBoundingClientRect():{width:0,height:0};
+      const ul=document.querySelector('#p10-pick-map .p10-pick-name-list');
+      const listShown=Boolean(ul && getComputedStyle(ul).display !== 'none' && ul.querySelectorAll('li').length);
+      return {w:b.width,h:b.height,listShown,listN:ul?ul.querySelectorAll('li').length:0};
+    })()`);
+    if (!(phone.w > 20) || !(phone.h > 20) || !phone.listShown) problems.push('1440->390 ' + JSON.stringify(phone));
     assert.deepEqual(problems, []);
   } finally {
     await page.close();

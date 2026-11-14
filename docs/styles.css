@@ -43,8 +43,9 @@ body[data-page=index] .header{position:absolute;top:0;left:0;right:0;background:
 .journey-lead{font-size:var(--type-md);line-height:1.7;margin:23px 0 0;max-width:650px;color:#f2f3e9}
 .journey-title-sub{display:block;font-size:var(--type-xs);line-height:1.3;letter-spacing:-.015em;margin-top:15px}
 .journey-hero-jump{display:inline-block;font-size:var(--type-xs);margin-top:23px;border-bottom:1px solid #ffffff88;padding-bottom:7px}
-.journey-facts{display:grid;grid-template-columns:repeat(4,1fr);padding-top:30px;padding-bottom:30px;background:#e9ede4;border-bottom:1px solid #ccd5c6}
-.journey-facts>div{padding:0 24px;border-left:1px solid #c8d2c3}
+.journey-facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));max-width:100%;padding-top:30px;padding-bottom:30px;background:#e9ede4;border-bottom:1px solid #ccd5c6}
+.journey-facts>div{min-width:0;padding:0 24px;border-left:1px solid #c8d2c3}
+.journey-facts strong,.journey-facts span{overflow-wrap:anywhere}
 .journey-facts>div:first-child{border-left:0;padding-left:0}
 .journey-facts span{display:block;text-transform:uppercase;font-size:var(--type-xs);letter-spacing:.1em;color:#65796a;margin-bottom:12px}
 .journey-facts strong{font-size:var(--type-sm);line-height:1.5;font-weight:500}

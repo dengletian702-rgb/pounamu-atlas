@@ -379,8 +379,20 @@
   /* ---------- run, and again whenever the page scripts render more ---------- */
   function fitSvgText(svg) {
     const box = svg.getBoundingClientRect();
-    const vb = (svg.viewBox && svg.viewBox.baseVal && svg.viewBox.baseVal.width) || 0;
-    const scale = box.width > 0 && vb ? box.width / vb : 0;
+    const vb = svg.viewBox && svg.viewBox.baseVal;
+    const vbW = (vb && vb.width) || 0;
+    const vbH = (vb && vb.height) || 0;
+    let scale = box.width > 0 && vbW ? box.width / vbW : 0;
+    if (box.height > 0 && vbH) {
+      const byH = box.height / vbH;
+      if (byH > 0) scale = scale > 0 ? Math.min(scale, byH) : byH;
+    }
+    const sample = svg.querySelector('text, circle, path');
+    const ctm = sample && sample.getScreenCTM && sample.getScreenCTM();
+    if (ctm) {
+      const drawn = Math.hypot(ctm.a, ctm.b);
+      if (drawn > 0) scale = drawn;
+    }
     if (!scale) return;
     svg.querySelectorAll('text, tspan').forEach(node => {
       const cs = getComputedStyle(node);
@@ -391,7 +403,6 @@
       if (parseFloat(cs.fontSize) * sc < 12) node.style.setProperty('font-size', (13 / sc).toFixed(2) + 'px', 'important');
     });
     layoutNzMap(svg, scale);
-    spreadDayNumbers(svg, scale);
     settleMapLabels(svg, scale);
   }
   function textShown(el) {
@@ -539,7 +550,7 @@
   }
   function labelDot(svg, text) {
     const g = text.parentNode;
-    if (text.classList.contains('v4-map-name') || text.classList.contains('v4-map-tag') || text.classList.contains('v4-map-num')) {
+    if (text.classList.contains('gday-num') || text.classList.contains('v4-map-name') || text.classList.contains('v4-map-tag') || text.classList.contains('v4-map-num')) {
       const circle = g && g.querySelector && g.querySelector('circle');
       if (circle) return circle;
     }
@@ -589,16 +600,17 @@
     return Math.hypot(dx, dy) * (t1 - t0);
   }
   function settleMapLabels(svg, scale) {
-    if (!svg || (!svg.classList.contains('v4-schematic') && !svg.classList.contains('p10-pick-svg'))) return;
+    const coast = svg.classList.contains('gcoast');
+    if (!svg || (!svg.classList.contains('v4-schematic') && !svg.classList.contains('p10-pick-svg') && !coast)) return;
     const frame = svg.getBoundingClientRect();
     if (!(frame.width > 2) || !(scale > 0)) return;
-    const schematic = svg.classList.contains('v4-schematic');
+    const schematic = svg.classList.contains('v4-schematic') || coast;
     svg.querySelectorAll('.is-unplaced').forEach(node => {
       node.classList.remove('is-unplaced', 'is-off');
       node.style.removeProperty('display');
     });
-    const texts = [...svg.querySelectorAll(schematic ? '.v4-map-num, .v4-map-name, .v4-map-tag' : '.p10-pick-label, .p10-pick-tag')].filter(textShown);
-    svg.querySelectorAll('.v4-map-leader, .p10-pick-leader').forEach(line => line.remove());
+    const texts = [...svg.querySelectorAll(coast ? '.gday-num' : (svg.classList.contains('v4-schematic') ? '.v4-map-num, .v4-map-name, .v4-map-tag' : '.p10-pick-label, .p10-pick-tag'))].filter(textShown);
+    svg.querySelectorAll('.v4-map-leader, .p10-pick-leader, .gday-leader').forEach(line => line.remove());
     if (!texts.length) { syncPickList(svg); return; }
     const ns = 'http://www.w3.org/2000/svg';
     const inside = r => r.left >= frame.left - 0.5 && r.right <= frame.right + 0.5 && r.top >= frame.top - 0.5 && r.bottom <= frame.bottom + 0.5;
@@ -640,13 +652,21 @@
     const paint = (text, circle, ends) => {
       if (!ends.draw) return;
       const line = doc.createElementNS(ns, 'line');
-      line.setAttribute('class', schematic ? 'v4-map-leader' : 'p10-pick-leader');
+      line.setAttribute('class', coast ? 'gday-leader' : (svg.classList.contains('v4-schematic') ? 'v4-map-leader' : 'p10-pick-leader'));
       line.setAttribute('stroke', '#163528');
       line.setAttribute('stroke-width', '1.5');
       line.setAttribute('vector-effect', 'non-scaling-stroke');
       const c = circle.getBoundingClientRect();
       const ccx = (c.left + c.right) / 2, ccy = (c.top + c.bottom) / 2;
-      if (schematic) {
+      if (coast) {
+        const cx0 = parseFloat(circle.getAttribute('cx')) || 0;
+        const cy0 = parseFloat(circle.getAttribute('cy')) || 0;
+        line.setAttribute('x1', String(cx0));
+        line.setAttribute('y1', String(cy0));
+        line.setAttribute('x2', (cx0 + (ends.x2 - ccx) / scale).toFixed(1));
+        line.setAttribute('y2', (cy0 + (ends.y2 - ccy) / scale).toFixed(1));
+        text.parentNode.insertBefore(line, text);
+      } else if (svg.classList.contains('v4-schematic')) {
         line.setAttribute('x1', circle.getAttribute('cx') || '0');
         line.setAttribute('y1', circle.getAttribute('cy') || '0');
         line.setAttribute('x2', ((ends.x2 - ccx) / scale).toFixed(1));
@@ -701,7 +721,7 @@
         const ends = leaderEnds(circle, r);
         ends.ownX = ccx;
         ends.ownY = ccy;
-        ends.draw = schematic && gap > 14;
+        ends.draw = coast ? gap > 3 : (schematic && gap > 14);
         const maxGap = schematic ? gapScreen + 1.5 : Math.min(14, gapScreen + 1.5);
         const crowded = placed.some(o => schematic ? boxGap(r, o.rect) < 6 : overlaps(r, o.rect));
         if (!(inside(r) && gap >= 2 && gap <= maxGap && !crowded && clearOf(r, ends))) continue;
@@ -712,7 +732,7 @@
         }
         let apart = Infinity;
         for (const o of placed) apart = Math.min(apart, boxGap(r, o.rect));
-        const score = schematic ? apart : apart + clear;
+        const score = schematic ? clear : apart + clear;
         if (!best || score > best.score) best = { score, x: text.getAttribute('x'), y: text.getAttribute('y'), anchor, r, ends };
         }
       }
@@ -772,7 +792,7 @@
         }
       }
     }
-    for (const line of [...svg.querySelectorAll('.v4-map-leader, .p10-pick-leader')]) {
+    for (const line of [...svg.querySelectorAll('.v4-map-leader, .p10-pick-leader, .gday-leader')]) {
       const ctm = line.getScreenCTM();
       if (!ctm) { line.remove(); continue; }
       const pt = (x, y) => { const p = new DOMPoint(+x, +y).matrixTransform(ctm); return { x: p.x, y: p.y }; };

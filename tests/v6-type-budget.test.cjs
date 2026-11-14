@@ -784,13 +784,109 @@ test('schematic stop numbers stay apart from day numbers', async (t) => {
           const stopLegend = (document.querySelector('.v4-map-legend-note') || {}).textContent || '';
           return { min, pair, n: stops.length, dayText, stopText, dayLegend, stopLegend };
         })()`);
-        const dayOk = report.dayText.length >= 2 && report.dayText.every(label => /^D\d+$/.test(label));
+        const dayParts = report.dayText.flatMap(label => label.split('·'));
+        const dayOk = dayParts.filter(label => /^D\d+$/.test(label)).length >= 9 && [1, 2, 3, 4, 5, 6, 7, 8, 9].every(n => dayParts.includes('D' + n));
         const stopOk = report.stopText.some(label => /^\d+$/.test(label)) && report.stopText.every(label => !/^D/.test(label));
         const legends = lang === 'zh'
           ? /天数/.test(report.dayLegend) && /站点顺序/.test(report.stopLegend)
           : /by day/i.test(report.dayLegend) && /stop order/i.test(report.stopLegend);
         if (!(report.min >= 6) || !dayOk || !stopOk || !legends || report.n < 2) problems.push(lang + ' ' + w + ' ' + JSON.stringify(report));
       }
+    }
+    assert.deepEqual(problems, []);
+  } finally {
+    await page.close();
+  }
+});
+
+test('day numbers stay clear of other dots and planner labels survive a resize', async (t) => {
+  const page = await openBrowser();
+  if (!page) { t.skip('Chrome is not installed here'); return; }
+  try {
+    const problems = [];
+    const dayAudit = `(() => {
+      const svg = document.querySelector('#gcoast svg');
+      if (!svg || svg.getBoundingClientRect().width < 20) return { hidden: true };
+      const shown = el => { const cs = getComputedStyle(el); const r = el.getBoundingClientRect(); return cs.display !== 'none' && r.width > 1 && r.height > 1; };
+      const pd = (x, y, box) => Math.hypot(Math.max(box.left - x, x - box.right, 0), Math.max(box.top - y, y - box.bottom, 0));
+      const seg = (px, py, x1, y1, x2, y2) => { const dx = x2 - x1, dy = y2 - y1, l2 = dx * dx + dy * dy; if (l2 < 1e-6) return Math.hypot(px - x1, py - y1); const t = Math.max(0, Math.min(1, ((px - x1) * dx + (py - y1) * dy) / l2)); return Math.hypot(px - (x1 + t * dx), py - (y1 + t * dy)); };
+      const clip = (x1, y1, x2, y2, rect) => { let t0 = 0, t1 = 1; const dx = x2 - x1, dy = y2 - y1; const p = [-dx, dx, -dy, dy]; const q = [x1 - rect.left, rect.right - x1, y1 - rect.top, rect.bottom - y1]; for (let i = 0; i < 4; i++) { if (Math.abs(p[i]) < 1e-6) { if (q[i] < 0) return 0; continue; } const t = q[i] / p[i]; if (p[i] < 0) { if (t > t1) return 0; if (t > t0) t0 = t; } else { if (t < t0) return 0; if (t < t1) t1 = t; } } return t1 > t0 ? Math.hypot(dx, dy) * (t1 - t0) : 0; };
+      const texts = [...svg.querySelectorAll('.gday-num')].filter(shown);
+      const dots = [...svg.querySelectorAll('.gday-stop circle')].map(c => { const r = c.getBoundingClientRect(); return { x: (r.left + r.right) / 2, y: (r.top + r.bottom) / 2, rad: Math.min(r.width, r.height) / 2, el: c }; }).filter(d => d.rad > 0.4);
+      const frame = svg.getBoundingClientRect();
+      const covers = [], near = [], outside = [];
+      for (const el of texts) {
+        const box = el.getBoundingClientRect();
+        const own = el.parentNode.querySelector('circle');
+        const o = own.getBoundingClientRect();
+        const cx = (o.left + o.right) / 2, cy = (o.top + o.bottom) / 2;
+        if (box.left < frame.left - 1 || box.right > frame.right + 1 || box.top < frame.top - 1 || box.bottom > frame.bottom + 1) outside.push((el.textContent || '').trim());
+        for (const d of dots) {
+          if (Math.hypot(d.x - cx, d.y - cy) <= 2) continue;
+          if (d.x >= box.left && d.x <= box.right && d.y >= box.top && d.y <= box.bottom) covers.push((el.textContent || '').trim());
+          if (pd(d.x, d.y, box) <= d.rad + 2) near.push((el.textContent || '').trim());
+        }
+      }
+      const through = [], throughDot = [], long = [];
+      for (const line of svg.querySelectorAll('.gday-leader')) {
+        const ctm = line.getScreenCTM(); if (!ctm) continue;
+        const P = (x, y) => { const p = new DOMPoint(+x, +y).matrixTransform(ctm); return { x: p.x, y: p.y }; };
+        const a = P(line.getAttribute('x1'), line.getAttribute('y1')), b = P(line.getAttribute('x2'), line.getAttribute('y2'));
+        const len = Math.hypot(b.x - a.x, b.y - a.y);
+        if (len > 48) long.push(len.toFixed(1));
+        let own = null, ownD = 1e9;
+        for (const d of dots) { const dd = Math.hypot(d.x - a.x, d.y - a.y); if (dd < ownD) { ownD = dd; own = d; } }
+        for (const d of dots) if (d !== own && seg(d.x, d.y, a.x, a.y, b.x, b.y) <= d.rad + 2) throughDot.push(len.toFixed(0));
+        const ownText = texts.find(t => pd(b.x, b.y, t.getBoundingClientRect()) <= 3);
+        for (const el of texts) if (el !== ownText && clip(a.x, a.y, b.x, b.y, el.getBoundingClientRect()) > 0.2) through.push((ownText && ownText.textContent || '').trim());
+      }
+      return { n: texts.length, covers, near, outside, through, throughDot, long };
+    })()`;
+    for (const w of [320, 390, 419, 768, 1440]) {
+      await page.view(w, w >= 800 ? 1100 : 900, w < 800);
+      for (const lang of ['zh', 'en']) {
+        await page.go('guide.html?template=SI-09B&lang=' + lang);
+        await page.waitFor('document.querySelector("#gcoast .gday-num")', 20000);
+        await page.ev('document.querySelector("#gcoast").scrollIntoView({block:"center"})');
+        await page.ev('new Promise(r => setTimeout(r, 700))');
+        const day = await page.ev(dayAudit);
+        if (day.hidden || !day.n || day.covers.length || day.near.length || day.outside.length || day.through.length || day.throughDot.length || day.long.length) problems.push('day ' + lang + ' ' + w + ' ' + JSON.stringify(day));
+      }
+    }
+    const pickAudit = `(() => {
+      const svg = document.querySelector('#p10-pick-map svg');
+      if (!svg || svg.getBoundingClientRect().width < 20) return { hidden: true };
+      const shown = el => { const cs = getComputedStyle(el); const r = el.getBoundingClientRect(); return cs.display !== 'none' && r.width > 1 && r.height > 1; };
+      const texts = [...svg.querySelectorAll('text')].filter(shown);
+      const frame = svg.getBoundingClientRect();
+      const hits = [], covers = [], outside = [];
+      const dots = [...svg.querySelectorAll('.p10-pick-mark')].map(c => { const r = c.getBoundingClientRect(); return { x: (r.left + r.right) / 2, y: (r.top + r.bottom) / 2 }; }).filter(d => d.x || d.y);
+      for (let i = 0; i < texts.length; i++) {
+        const a = texts[i].getBoundingClientRect();
+        if (a.left < frame.left - 1 || a.right > frame.right + 1 || a.top < frame.top - 1 || a.bottom > frame.bottom + 1) outside.push((texts[i].textContent || '').trim().slice(0, 18));
+        for (let j = i + 1; j < texts.length; j++) {
+          const b = texts[j].getBoundingClientRect();
+          if (a.right > b.left + 0.5 && a.left < b.right - 0.5 && a.bottom > b.top + 0.5 && a.top < b.bottom - 0.5) hits.push((texts[i].textContent || '').trim().slice(0, 12));
+        }
+        for (const d of dots) if (d.x >= a.left && d.x <= a.right && d.y >= a.top && d.y <= a.bottom) covers.push((texts[i].textContent || '').trim().slice(0, 12));
+      }
+      return { n: texts.length, hits, covers, outside };
+    })()`;
+    for (const w of [600, 768, 900, 1024]) {
+      await page.view(w, 900, false);
+      await page.go('plan.html?lang=zh');
+      await page.waitFor('document.querySelector("#p10-next-1")', 20000);
+      await page.click('#p10-next-1');
+      await page.click('#p10-next-2');
+      await page.ev('const d=document.querySelector("#p10-more"); if(d) d.open=true');
+      await page.waitFor('document.querySelector("#p10-pick-map svg")', 20000);
+      await page.ev('new Promise(r => setTimeout(r, 800))');
+      const first = await page.ev(pickAudit);
+      await page.view(w, 960, false);
+      await page.ev('new Promise(r => setTimeout(r, 500))');
+      const after = await page.ev(pickAudit);
+      const bad = audit => audit.hidden || audit.hits.length || audit.covers.length || audit.outside.length;
+      if (bad(first) || bad(after)) problems.push('planner ' + w + ' ' + JSON.stringify({ first, after }));
     }
     assert.deepEqual(problems, []);
   } finally {

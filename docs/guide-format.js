@@ -180,10 +180,17 @@
     if (!coastD) { try { const data = await fetch('data/nz-coast.json').then(r => r.ok ? r.json() : null); coastD = data && data.d || ''; } catch { coastD = ''; } }
     const fallback = globalThis.P10_COAST_PATH || '';
     const d = coastD || fallback;
-    const dots = (stops || []).map((s, i) => {
-      if (!Number.isFinite(Number(s.lat)) || !Number.isFinite(Number(s.lng))) return '';
+    const groups = new Map();
+    (stops || []).forEach((s, i) => {
+      if (!Number.isFinite(Number(s.lat)) || !Number.isFinite(Number(s.lng))) return;
       const [x, y] = project(Number(s.lat), Number(s.lng));
-      return `<g class="gday-stop" data-gday-stop="${i + 1}"><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="6"/><text class="gday-num" x="${x.toFixed(1)}" y="${(y - 10).toFixed(1)}" text-anchor="middle">D${i + 1}</text></g>`;
+      const key = x.toFixed(1) + ',' + y.toFixed(1);
+      if (!groups.has(key)) groups.set(key, { x, y, days: [] });
+      groups.get(key).days.push(i + 1);
+    });
+    const dots = [...groups.values()].map(g => {
+      const mark = g.days.map(n => 'D' + n).join('·');
+      return `<g class="gday-stop" data-gday-stop="${g.days[0]}" data-gday-days="${g.days.join(',')}"><circle cx="${g.x.toFixed(1)}" cy="${g.y.toFixed(1)}" r="6"/><text class="gday-num" x="${g.x.toFixed(1)}" y="${(g.y - 10).toFixed(1)}" text-anchor="middle">${mark}</text></g>`;
     }).join('');
     const line = (stops || []).filter(s => Number.isFinite(Number(s.lat))).map(s => project(Number(s.lat), Number(s.lng)).map(n => n.toFixed(1)).join(',')).join(' ');
     host.innerHTML = `<div class="p10-map-day-list">${(stops || []).map((s, i) => `<button type="button" data-gday-focus="${i + 1}">${zh ? '第 ' + (i + 1) + ' 天' : 'Day ' + (i + 1)}</button>`).join('')}</div>
@@ -206,7 +213,10 @@
     host.addEventListener('click', ev => {
       const b = ev.target.closest('[data-gday-focus]');
       if (!b) return;
-      host.querySelectorAll('[data-gday-stop]').forEach(g => g.classList.toggle('is-hot', g.getAttribute('data-gday-stop') === b.getAttribute('data-gday-focus')));
+      host.querySelectorAll('[data-gday-stop]').forEach(g => {
+        const days = (g.getAttribute('data-gday-days') || g.getAttribute('data-gday-stop') || '').split(',');
+        g.classList.toggle('is-hot', days.includes(b.getAttribute('data-gday-focus')));
+      });
       const card = document.getElementById('day-' + b.getAttribute('data-gday-focus'));
       if (card) card.scrollIntoView({ block: 'nearest' });
     });

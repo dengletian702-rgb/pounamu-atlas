@@ -1624,7 +1624,20 @@ globalThis.P10_NODES = NODES;
       if(event.key==='ArrowDown'&&i<p10View.days.length-1){event.preventDefault();move(i,i+1);}
     });
     let p10ResizeTimer=0;
-    window.addEventListener('resize',()=>{clearTimeout(p10ResizeTimer);p10ResizeTimer=setTimeout(()=>{const on=p10$('#p10-trip-map [data-p10-map-day][aria-pressed="true"]');if(on)p10FocusDay(on.dataset.p10MapDay);const host=p10$('#p10-pick-map');if(host&&p10PickItems.length){if(Boolean(host.closest('.planner-explainer'))!==p10Wide())p10RenderPickMap(p10PickItems);else p10PickLayout();}},150);});
+    const p10RelayoutPick=()=>{
+      const host=p10$('#p10-pick-map');
+      if(!host||!p10PickItems.length)return;
+      const svg=host.querySelector('.p10-pick-svg');
+      if(svg&&!(svg.getBoundingClientRect().width>2))return;
+      if(Boolean(host.closest('.planner-explainer'))!==p10Wide())p10RenderPickMap(p10PickItems);
+      else p10PickLayout();
+    };
+    const more=document.getElementById('p10-more');
+    if(more&&!more.dataset.pickBound){
+      more.dataset.pickBound='1';
+      more.addEventListener('toggle',()=>{if(more.open)requestAnimationFrame(p10RelayoutPick);});
+    }
+    window.addEventListener('resize',()=>{clearTimeout(p10ResizeTimer);p10ResizeTimer=setTimeout(()=>{const on=p10$('#p10-trip-map [data-p10-map-day][aria-pressed="true"]');if(on)p10FocusDay(on.dataset.p10MapDay);p10RelayoutPick();},150);});
     p10$('#planResult').addEventListener('dragstart',event=>{const b=event.target.closest('[data-p10-drag]');if(!b)return;event.dataTransfer.setData('text/plain',b.dataset.p10Drag);});
     p10$('#planResult').addEventListener('dragover',event=>{if(event.target.closest('[data-p10-index]'))event.preventDefault();});
     p10$('#planResult').addEventListener('drop',event=>{const card=event.target.closest('[data-p10-index]');if(!card||!p10View)return;event.preventDefault();const from=Number(event.dataTransfer.getData('text/plain'));const to=Number(card.dataset.p10Index);if(!Number.isInteger(from)||from===to)return;move(from,to);});

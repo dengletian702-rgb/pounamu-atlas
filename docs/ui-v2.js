@@ -11,14 +11,14 @@
   const raf = fn => requestAnimationFrame(fn);
 
   /* ---------- 1. Generated contour art (periodic value noise + marching squares), tileable 900×900 ---------- */
-  function contourSvg(seed, stroke) {
+  function contourState(seed) {
     const S = 900, step = 12, n = S / step;
     let s = seed;
     const rnd = () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296);
     const grid = p => Array.from({ length: p }, () => Array.from({ length: p }, rnd));
     const octaves = [[5, grid(5), 1], [10, grid(10), .45], [20, grid(20), .2]];
     const smooth = t => t * t * (3 - 2 * t);
-    function noise(x, y) {
+    const noise = (x, y) => {
       let v = 0;
       for (const [p, g, a] of octaves) {
         const fx = x / S * p, fy = y / S * p, x0 = Math.floor(fx), y0 = Math.floor(fy), tx = smooth(fx - x0), ty = smooth(fy - y0);
@@ -27,36 +27,66 @@
         v += (a0 + (a1 - a0) * ty) * a;
       }
       return v / 1.65;
+    };
+    return { S, step, n, val: [], noise, levels: 14, k: 1, j: 0, d: '', gridRow: 0 };
+  }
+  function contourSlice(st, rows) {
+    const { step, n, val, levels } = st;
+    let left = rows;
+    while (st.gridRow <= n && left > 0) {
+      const j = st.gridRow;
+      val[j] = [];
+      for (let i = 0; i <= n; i++) val[j][i] = st.noise(i * step, j * step);
+      st.gridRow += 1;
+      left -= 1;
     }
-    const val = [];
-    for (let j = 0; j <= n; j++) { val[j] = []; for (let i = 0; i <= n; i++) val[j][i] = noise(i * step, j * step); }
-    let d = '';
-    const levels = 14;
-    for (let k = 1; k < levels; k++) {
-      const L = k / levels;
-      for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) {
+    if (st.gridRow <= n) return false;
+    while (st.k < levels && left > 0) {
+      const L = st.k / levels, j = st.j;
+      for (let i = 0; i < n; i++) {
         const a = val[j][i], b = val[j][i + 1], c = val[j + 1][i + 1], e = val[j + 1][i];
         const idx = (a > L ? 8 : 0) | (b > L ? 4 : 0) | (c > L ? 2 : 0) | (e > L ? 1 : 0);
         if (idx === 0 || idx === 15) continue;
         const x = i * step, y = j * step, lerp = (p, q) => (L - p) / (q - p || 1e-6);
         const T = [x + step * lerp(a, b), y], R = [x + step, y + step * lerp(b, c)], B = [x + step * lerp(e, c), y + step], Lf = [x, y + step * lerp(a, e)];
         const seg = { 1: [Lf, B], 2: [B, R], 3: [Lf, R], 4: [T, R], 5: [Lf, T, B, R], 6: [T, B], 7: [Lf, T], 8: [Lf, T], 9: [T, B], 10: [T, R, Lf, B], 11: [T, R], 12: [Lf, R], 13: [B, R], 14: [Lf, B] }[idx];
-        for (let q = 0; q < seg.length; q += 2) d += `M${seg[q][0].toFixed(0)} ${seg[q][1].toFixed(0)}L${seg[q + 1][0].toFixed(0)} ${seg[q + 1][1].toFixed(0)}`;
+        for (let q = 0; q < seg.length; q += 2) st.d += `M${seg[q][0].toFixed(0)} ${seg[q][1].toFixed(0)}L${seg[q + 1][0].toFixed(0)} ${seg[q + 1][1].toFixed(0)}`;
       }
+      st.j += 1;
+      left -= 1;
+      if (st.j >= n) { st.j = 0; st.k += 1; }
     }
-    const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${S}' height='${S}' viewBox='0 0 ${S} ${S}'><path d='${d}' fill='none' stroke='${stroke}' stroke-width='1' stroke-linecap='round'/></svg>`;
+    return st.k >= levels;
+  }
+  function contourUrl(st, stroke) {
+    const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${st.S}' height='${st.S}' viewBox='0 0 ${st.S} ${st.S}'><path d='${st.d}' fill='none' stroke='${stroke}' stroke-width='1' stroke-linecap='round'/></svg>`;
     return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
   }
   function installContours() {
     let light, dark;
     try { light = sessionStorage.getItem('ui2-contour-l'); dark = sessionStorage.getItem('ui2-contour-d'); } catch (e) {}
-    if (!light || !dark) {
-      light = contourSvg(20261113, 'rgba(198,236,218,0.16)');
-      dark = contourSvg(4219, 'rgba(20,53,43,0.13)');
-      try { sessionStorage.setItem('ui2-contour-l', light); sessionStorage.setItem('ui2-contour-d', dark); } catch (e) {}
+    if (light && dark) {
+      root.style.setProperty('--ui2-contour-light', light);
+      root.style.setProperty('--ui2-contour-dark', dark);
+      return;
     }
-    root.style.setProperty('--ui2-contour-light', light);
-    root.style.setProperty('--ui2-contour-dark', dark);
+    const jobs = [
+      { seed: 20261113, stroke: 'rgba(198,236,218,0.16)', prop: '--ui2-contour-light', store: 'ui2-contour-l' },
+      { seed: 4219, stroke: 'rgba(20,53,43,0.13)', prop: '--ui2-contour-dark', store: 'ui2-contour-d' }
+    ];
+    const later = fn => (window.requestIdleCallback || (cb => setTimeout(cb, 16)))(fn, { timeout: 400 });
+    const step = () => {
+      const job = jobs[0];
+      if (!job) return;
+      if (!job.state) job.state = contourState(job.seed);
+      if (!contourSlice(job.state, 6)) { later(step); return; }
+      const url = contourUrl(job.state, job.stroke);
+      root.style.setProperty(job.prop, url);
+      try { sessionStorage.setItem(job.store, url); } catch (e) {}
+      jobs.shift();
+      if (jobs.length) later(step);
+    };
+    later(step);
   }
 
   /* ---------- 2. Particle network on dark bands (pauses off screen) ---------- */
@@ -610,6 +640,7 @@
     if (t1 - t0 <= 0) return 0;
     return Math.hypot(dx, dy) * (t1 - t0);
   }
+  const layoutMemo = new WeakMap();
   function settleMapLabels(svg, scale) {
     const coast = svg.classList.contains('gcoast');
     if (!svg || (!svg.classList.contains('v4-schematic') && !svg.classList.contains('p10-pick-svg') && !coast)) return;
@@ -640,8 +671,76 @@
       }
       return out;
     };
-    let dirs = makeDirs(schematic ? 16 : 8);
-    let thorough = false;
+    let dirs = makeDirs(schematic ? 24 : 16);
+    let thorough = !schematic;
+    let sx = scale, sy = scale;
+    const probe = texts[0];
+    if (probe) {
+      const keepA = probe.getAttribute('text-anchor') || 'start';
+      const keepX = probe.getAttribute('x'), keepY = probe.getAttribute('y');
+      probe.setAttribute('x', '0');
+      probe.setAttribute('y', '0');
+      const origin = probe.getBoundingClientRect();
+      probe.setAttribute('x', '40');
+      probe.setAttribute('y', '40');
+      const moved = probe.getBoundingClientRect();
+      const dx = (moved.left - origin.left) / 40, dy = (moved.top - origin.top) / 40;
+      if (Math.abs(dx) > 0.01) sx = dx;
+      if (Math.abs(dy) > 0.01) sy = dy;
+      probe.setAttribute('text-anchor', keepA);
+      if (keepX != null) probe.setAttribute('x', keepX);
+      if (keepY != null) probe.setAttribute('y', keepY);
+    }
+    const measured = new Map();
+    const metrics = (text, anchor) => {
+      let by = measured.get(text);
+      if (!by) { by = new Map(); measured.set(text, by); }
+      if (by.has(anchor)) return by.get(anchor);
+      text.setAttribute('text-anchor', anchor);
+      text.setAttribute('x', '0');
+      text.setAttribute('y', '0');
+      const r0 = text.getBoundingClientRect();
+      const m = { w: r0.width, h: r0.height, cx: (r0.left + r0.right) / 2, cy: (r0.top + r0.bottom) / 2 };
+      by.set(anchor, m);
+      return m;
+    };
+    const quant = n => Math.round(n * 10) / 10;
+    const boxAt = (m, userX, userY) => {
+      const cx = m.cx + userX * sx, cy = m.cy + userY * sy;
+      return { left: cx - m.w / 2, right: cx + m.w / 2, top: cy - m.h / 2, bottom: cy + m.h / 2, width: m.w, height: m.h };
+    };
+    const memoKey = () => {
+      const box = svg.getBoundingClientRect();
+      return Math.round(box.width) + 'x' + Math.round(box.height) + ':' + texts.map(t => (t.getAttribute('data-p10-pick-label') || t.textContent || '') + ':' + (t.classList.contains('p10-pick-tag') ? 't' : 'n')).join('|');
+    };
+    if (!schematic) {
+      const key = memoKey();
+      const saved = layoutMemo.get(svg);
+      if (saved && saved.key === key) {
+        saved.items.forEach(item => {
+          item.text.setAttribute('text-anchor', item.anchor);
+          item.text.setAttribute('x', item.x);
+          item.text.setAttribute('y', item.y);
+          item.text.classList.toggle('is-off', item.off);
+          item.text.classList.toggle('is-unplaced', item.off);
+          if (item.display) item.text.style.setProperty('display', item.display, 'important');
+          else item.text.style.removeProperty('display');
+        });
+        const host = svg.querySelector('.p10-pick-labels') || svg;
+        saved.leaders.forEach(L => {
+          const line = doc.createElementNS(ns, 'line');
+          line.setAttribute('class', 'p10-pick-leader');
+          line.setAttribute('stroke', '#163528');
+          line.setAttribute('stroke-width', '1.5');
+          line.setAttribute('vector-effect', 'non-scaling-stroke');
+          line.setAttribute('x1', L.x1); line.setAttribute('y1', L.y1);
+          line.setAttribute('x2', L.x2); line.setAttribute('y2', L.y2);
+          host.insertBefore(line, host.firstChild);
+        });
+        syncPickList(svg);
+        return;
+      }
+    }
     const placed = [];
     let cachedDots = null;
     const dotCenters = () => {
@@ -665,12 +764,11 @@
       if (el.classList.contains('p10-pick-tag')) return 2;
       return 3;
     };
-    const ordered = texts.slice().sort((a, b) => {
+    const orderOf = shortFirst => texts.slice().sort((a, b) => {
       const pa = pin(a), pb = pin(b);
       if (pa !== pb) return pa - pb;
-      return schematic
-        ? (a.textContent || '').length - (b.textContent || '').length
-        : (b.textContent || '').length - (a.textContent || '').length;
+      const al = (a.textContent || '').length, bl = (b.textContent || '').length;
+      return shortFirst || schematic ? al - bl : bl - al;
     });
     const leaderEnds = (circle, rect) => {
       const c = circle.getBoundingClientRect();
@@ -736,41 +834,43 @@
       const ccx = (c.left + c.right) / 2, ccy = (c.top + c.bottom) / 2;
       const rad = Math.min(c.width, c.height) / 2;
       let best = null;
-      const pinned = text.classList.contains('p10-pick-tag') || text.classList.contains('v4-map-num') || text.classList.contains('gday-num');
-      const slides = pinned ? [0, -12, 12] : (schematic ? [0] : (thorough ? [0, -18, 18, -36, 36] : [0, -24, 24]));
+      const numeralSlide = text.classList.contains('v4-map-num') || text.classList.contains('gday-num');
+      const slides = numeralSlide ? [0, -8, 8, -16, 16, -24, 24] : (text.classList.contains('p10-pick-tag') ? [0, -12, 12] : (schematic ? [0] : [0, -18, 18, -36, 36]));
       for (const [dx, dy, anchor] of dirs) {
         const len = Math.hypot(dx, dy) || 1;
         const ux = dx / len, uy = dy / len;
+        const m = metrics(text, anchor);
+        if (!(m.w > 1)) continue;
         for (const slide of slides) {
-        text.setAttribute('text-anchor', anchor);
-        text.setAttribute('x', '0');
-        text.setAttribute('y', '0');
-        const r0 = text.getBoundingClientRect();
-        if (!(r0.width > 1)) continue;
-        const half = Math.abs(ux) * r0.width / 2 + Math.abs(uy) * r0.height / 2;
+        const half = Math.abs(ux) * m.w / 2 + Math.abs(uy) * m.h / 2;
         const dist = rad + gapScreen + half;
-        shiftText(text, (ccx + ux * dist - uy * slide - (r0.left + r0.right) / 2) / scale, (ccy + uy * dist + ux * slide - (r0.top + r0.bottom) / 2) / scale);
-        let r = text.getBoundingClientRect();
+        const targetX = ccx + ux * dist - uy * slide;
+        const targetY = ccy + uy * dist + ux * slide;
+        let userX = quant((targetX - m.cx) / sx);
+        let userY = quant((targetY - m.cy) / sy);
+        let r = boxAt(m, userX, userY);
         let gap = boxGap(r, c);
-        if (gap > gapScreen + 1) {
+        for (let pull = 0; pull < 3 && gap > gapScreen + 1; pull++) {
           const mx = (r.left + r.right) / 2, my = (r.top + r.bottom) / 2;
           const d = Math.hypot(mx - ccx, my - ccy) || 1;
-          shiftText(text, (ccx - mx) / d * (gap - gapScreen) / scale, (ccy - my) / d * (gap - gapScreen) / scale);
-          r = text.getBoundingClientRect();
+          userX = quant(userX + (ccx - mx) / d * (gap - gapScreen) / sx);
+          userY = quant(userY + (ccy - my) / d * (gap - gapScreen) / sy);
+          r = boxAt(m, userX, userY);
           gap = boxGap(r, c);
         }
         if (gap < 2) {
-          shiftText(text, ux * (3 - gap) / scale, uy * (3 - gap) / scale);
-          r = text.getBoundingClientRect();
+          userX = quant(userX + ux * (3 - gap) / sx);
+          userY = quant(userY + uy * (3 - gap) / sy);
+          r = boxAt(m, userX, userY);
           gap = boxGap(r, c);
         }
         const ends = leaderEnds(circle, r);
         ends.ownX = ccx;
         ends.ownY = ccy;
         ends.cluster = text.classList.contains('p10-pick-tag') ? 6 : 2;
-        ends.minAway = text.classList.contains('v4-map-num') ? 6 : 0;
+        ends.minAway = 0;
         ends.draw = coast ? gap > 3 : gap > 14;
-        const maxGap = schematic ? gapScreen + 1.5 : Math.min(14, gapScreen + 1.5);
+        const maxGap = gapScreen + 1.5;
         const crowded = placed.some(o => schematic ? boxGap(r, o.rect) < 6 : overlaps(r, o.rect));
         if (!(inside(r) && gap >= 2 && gap <= maxGap && !crowded && clearOf(r, ends))) continue;
         let clear = Infinity;
@@ -778,10 +878,9 @@
         let centerForeign = Infinity;
         const midX = (r.left + r.right) / 2, midY = (r.top + r.bottom) / 2;
         const centerOwn = Math.hypot(midX - ccx, midY - ccy);
-        const numeralDot = text.classList.contains('v4-map-num') || text.classList.contains('gday-num');
         for (const d of dotCenters()) {
           if (Math.hypot(d.x - ccx, d.y - ccy) <= (text.classList.contains('p10-pick-tag') ? 6 : 2)) continue;
-          if (numeralDot && !(d.el.parentNode && d.el.parentNode.querySelector('text'))) continue;
+          if (text.classList.contains('gday-num') && !(d.el.parentNode && d.el.parentNode.querySelector('text'))) continue;
           const pd = pointBoxDist(d.x, d.y, r);
           foreignPoint = Math.min(foreignPoint, pd);
           centerForeign = Math.min(centerForeign, Math.hypot(d.x - midX, d.y - midY));
@@ -791,7 +890,7 @@
         let apart = Infinity;
         for (const o of placed) apart = Math.min(apart, boxGap(r, o.rect));
         const score = schematic ? clear : apart + clear;
-        const cand = { score, x: text.getAttribute('x'), y: text.getAttribute('y'), anchor, r, ends, ownPoint, foreignPoint, centerOwn, centerForeign };
+        const cand = { score, x: userX.toFixed(1), y: userY.toFixed(1), anchor, r, ends, ownPoint, foreignPoint, centerOwn, centerForeign };
         const ranked = rank ? rank(cand) : score;
         if (ranked == null) continue;
         if (!best || ranked > best.ranked) best = { ...cand, ranked };
@@ -801,7 +900,19 @@
       text.setAttribute('text-anchor', best.anchor);
       text.setAttribute('x', best.x);
       text.setAttribute('y', best.y);
-      return { r: text.getBoundingClientRect(), ends: best.ends, x: best.x, y: best.y, anchor: best.anchor, ownPoint: best.ownPoint, foreignPoint: best.foreignPoint, ranked: best.ranked };
+      const real = text.getBoundingClientRect();
+      const ends = leaderEnds(circle, real);
+      ends.ownX = ccx;
+      ends.ownY = ccy;
+      ends.cluster = text.classList.contains('p10-pick-tag') ? 6 : 2;
+      ends.minAway = 0;
+      ends.draw = best.ends.draw;
+      const realGap = boxGap(real, c);
+      const maxGap = schematic ? gapScreen + 1.5 : Math.min(14, gapScreen + 1.5);
+      const crowded = placed.some(o => schematic ? boxGap(real, o.rect) < 6 : overlaps(real, o.rect));
+      if (!(inside(real) && realGap >= 2 && realGap <= maxGap + 1.5 && !crowded && clearOf(real, ends))) return null;
+      const ownPoint = pointBoxDist(ccx, ccy, real);
+      return { r: real, ends, x: best.x, y: best.y, anchor: best.anchor, ownPoint, foreignPoint: best.foreignPoint, ranked: best.ranked };
     };
     const placeOne = text => {
       text.classList.remove('is-unplaced');
@@ -815,7 +926,10 @@
         const rank = cand => {
           const owns = cand.foreignPoint > cand.ownPoint + 0.4 && cand.centerForeign > cand.centerOwn + 0.4;
           if (tag && !(cand.ownPoint <= 12 && owns)) return null;
-          return (owns ? 1000 : 0) + (48 - cand.ownPoint) + Math.min(Math.max(cand.foreignPoint - cand.ownPoint, 0), 16);
+          if (numeral && !owns && cand.ownPoint <= 14) return null;
+          const clear6 = cand.foreignPoint >= 6 ? 200 : 0;
+          if (numeral && cand.ownPoint > 14) return (owns ? 2000 : 0) + clear6 - cand.ownPoint * 8;
+          return (owns ? 5000 : 0) + clear6 - cand.ownPoint * 8;
         };
         let best = null;
         for (const gap of tag ? [3, 4, 6, 8, 10, 12] : [4, 8, 12, 14, 18, 22, 26, 30]) {
@@ -826,7 +940,7 @@
           text.setAttribute('text-anchor', best.anchor);
           text.setAttribute('x', best.x);
           text.setAttribute('y', best.y);
-          if (text.classList.contains('gday-num') && !(best.foreignPoint > best.ownPoint + 0.4 && best.centerForeign > best.centerOwn + 0.4)) best.ends.draw = true;
+          if (numeral && (best.ownPoint > 14 || !(best.foreignPoint > best.ownPoint + 0.4))) best.ends.draw = true;
           fit = best;
         }
       }
@@ -836,16 +950,11 @@
         if (fit) break;
       }
       }
-      if (!fit && !tag && !schematic && !thorough && tagCity.has(text.getAttribute('data-p10-pick-label'))) {
-        const prev = dirs;
-        dirs = makeDirs(16);
-        thorough = true;
-        for (const gap of [4, 6, 8, 10, 12, 14]) {
+      if (!fit && !schematic && !tag) {
+        for (const gap of [18, 22, 26, 32, 40]) {
           fit = sit(text, circle, gap);
           if (fit) break;
         }
-        thorough = false;
-        dirs = prev;
       }
       if (!fit && schematic && !tag) {
         for (const gap of [18, 22, 26, 30, 34, 38, 42, 46]) {
@@ -861,26 +970,66 @@
       }
       text.classList.remove('is-off');
       text.style.removeProperty('display');
-      placed.push({ rect: fit.r });
-      paint(text, circle, fit.ends);
+      placed.push({ rect: fit.r, text, ends: fit.ends, circle });
       return true;
     };
-    const resetLabels = () => {
+    const lay = list => {
       placed.length = 0;
-      svg.querySelectorAll('.v4-map-leader, .p10-pick-leader').forEach(line => line.remove());
       texts.forEach(text => {
         text.classList.remove('is-unplaced', 'is-off');
         text.style.removeProperty('display');
       });
+      list.forEach(placeOne);
+      if (!schematic) {
+        for (const tag of texts.filter(text => text.classList.contains('p10-pick-tag') && text.classList.contains('is-unplaced'))) {
+          const mark = labelDot(svg, tag);
+          const id = mark && mark.closest && mark.closest('[data-p10-pick]') && mark.closest('[data-p10-pick]').dataset.p10Pick;
+          const name = id && texts.find(text => text.getAttribute('data-p10-pick-label') === id);
+          if (name && !name.classList.contains('is-unplaced')) {
+            for (let i = placed.length - 1; i >= 0; i--) if (placed[i].text === name) placed.splice(i, 1);
+            name.classList.add('is-off', 'is-unplaced');
+            name.style.setProperty('display', 'none', 'important');
+          }
+          tag.classList.remove('is-off', 'is-unplaced');
+          tag.style.removeProperty('display');
+          placeOne(tag);
+          if (name) {
+            name.classList.remove('is-off', 'is-unplaced');
+            name.style.removeProperty('display');
+            placeOne(name);
+          }
+        }
+      }
     };
-    ordered.forEach(placeOne);
-    if (!schematic) {
-      if (texts.some(text => text.classList.contains('p10-pick-tag') && text.classList.contains('is-unplaced'))) {
-        resetLabels();
-        const tagsFirst = ordered.slice().sort((a, b) => (a.classList.contains('p10-pick-tag') ? 0 : pin(a) + 1) - (b.classList.contains('p10-pick-tag') ? 0 : pin(b) + 1));
-        tagsFirst.forEach(placeOne);
+    const placedCount = () => texts.filter(text => !text.classList.contains('is-unplaced')).length;
+    const snap = () => texts.map(text => ({
+      text,
+      x: text.getAttribute('x') || '0',
+      y: text.getAttribute('y') || '0',
+      anchor: text.getAttribute('text-anchor') || 'start',
+      off: text.classList.contains('is-unplaced')
+    }));
+    lay(orderOf(false));
+    if (!schematic && texts.some(text => text.classList.contains('is-unplaced'))) {
+      const longCount = placedCount();
+      const longItems = placed.map(item => ({ ...item }));
+      const longSnap = snap();
+      lay(orderOf(true));
+      if (placedCount() < longCount) {
+        placed.length = 0;
+        longItems.forEach(item => placed.push(item));
+        longSnap.forEach(item => {
+          item.text.setAttribute('x', item.x);
+          item.text.setAttribute('y', item.y);
+          item.text.setAttribute('text-anchor', item.anchor);
+          item.text.classList.toggle('is-off', item.off);
+          item.text.classList.toggle('is-unplaced', item.off);
+          if (item.off) item.text.style.setProperty('display', 'none', 'important');
+          else item.text.style.removeProperty('display');
+        });
       }
     }
+    placed.forEach(item => paint(item.text, item.circle, item.ends));
     for (const line of [...svg.querySelectorAll('.v4-map-leader, .p10-pick-leader, .gday-leader')]) {
       const ctm = line.getScreenCTM();
       if (!ctm) { line.remove(); continue; }
@@ -900,6 +1049,23 @@
         line.remove();
         if (own && !schematic) { own.classList.add('is-off', 'is-unplaced'); own.style.setProperty('display', 'none', 'important'); }
       }
+    }
+    if (!schematic) {
+      layoutMemo.set(svg, {
+        key: memoKey(),
+        items: texts.map(text => ({
+          text,
+          x: text.getAttribute('x') || '0',
+          y: text.getAttribute('y') || '0',
+          anchor: text.getAttribute('text-anchor') || 'start',
+          off: text.classList.contains('is-off'),
+          display: text.style.getPropertyValue('display')
+        })),
+        leaders: [...svg.querySelectorAll('.p10-pick-leader')].map(line => ({
+          x1: line.getAttribute('x1'), y1: line.getAttribute('y1'),
+          x2: line.getAttribute('x2'), y2: line.getAttribute('y2')
+        }))
+      });
     }
     syncPickList(svg);
   }

@@ -1482,12 +1482,13 @@ globalThis.P10_NODES = NODES;
       for(const t of svg.querySelectorAll('.p10-pick-label,.p10-pick-tag')){
         t.classList.remove('is-unplaced');
         t.style.removeProperty('display');
-        if(t.classList.contains('is-town')&&!p10Selected.has(t.dataset.p10PickLabel)){t.classList.add('is-off');continue;}
+        if(t.classList.contains('is-town')&&!p10Selected.has(t.dataset.p10PickLabel)){t.classList.remove('is-hot');t.classList.add('is-off');t.style.setProperty('display','none','important');continue;}
         t.classList.remove('is-off');
         t.style.setProperty('font-size',(13/sc).toFixed(2)+'px','important');
       }
       if(window.pounamuSettleLabels)window.pounamuSettleLabels(svg,sc);
       svg.classList.add('is-laid');
+      svg.dataset.p10LaidAt=String(performance.now());
       svg.dataset.p10W=String(Math.round(svg.getBoundingClientRect().width));
       return true;
     };

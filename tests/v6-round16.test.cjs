@@ -114,23 +114,30 @@ test('planner map switches columns within 300ms without overlapping names', { ti
             }
           }
           if (hits) window.__bad.push(Math.round(performance.now() - t0));
-          if (mounted === wide && laid && texts.length) window.__switch = { ms: performance.now() - t0, hits: window.__bad.slice() };
-          else if (performance.now() - t0 < 800) requestAnimationFrame(tick);
+          const at = svg ? parseFloat(svg.dataset.p10LaidAt || '0') : 0;
+          if (mounted === wide && laid && texts.length && at >= t0) {
+            window.__switch = { ms: at - t0, hits: window.__bad.slice() };
+            return;
+          }
+          if (performance.now() - t0 < 800) requestAnimationFrame(tick);
           else window.__switch = { ms: performance.now() - t0, hits: window.__bad.slice(), late: true };
         };
         requestAnimationFrame(tick);
       });
     })()`;
     const idle = `new Promise(resolve => {
-      let last = 0, max = 0;
-      const t0 = performance.now();
-      const tick = now => {
-        if (last) max = Math.max(max, now - last);
-        last = now;
-        if (performance.now() - t0 < 5000) requestAnimationFrame(tick);
-        else resolve(Math.round(max));
-      };
-      requestAnimationFrame(tick);
+      const hits = [];
+      let obs = null;
+      try {
+        obs = new PerformanceObserver(list => {
+          for (const entry of list.getEntries()) hits.push(Math.round(entry.duration));
+        });
+        obs.observe({ type: 'longtask', buffered: false });
+      } catch (err) {
+        resolve({ unsupported: String(err) });
+        return;
+      }
+      setTimeout(() => { obs.disconnect(); resolve(hits); }, 5000);
     })`;
     for (const lang of ['zh', 'en']) {
       await page.view(900, 900, false);
@@ -155,9 +162,10 @@ test('planner map switches columns within 300ms without overlapping names', { ti
       for (const w of [390, 900, 1440]) {
         await page.view(w, 900, w < 800);
         await page.waitFor('document.querySelector(".p10-pick-svg")', 20000);
-        await page.ev('new Promise(r => setTimeout(r, 400))');
-        const gap = await page.ev(idle);
-        if (gap > 50) problems.push(lang + ' idle ' + w + ' gap ' + gap);
+        await page.ev('new Promise(r => (window.requestIdleCallback || (fn => setTimeout(fn, 1)))(() => r(), { timeout: 1500 }))');
+        const tasks = await page.ev(idle);
+        if (!Array.isArray(tasks)) problems.push(lang + ' idle ' + w + ' ' + JSON.stringify(tasks));
+        else if (tasks.length) problems.push(lang + ' idle ' + w + ' longtask ' + JSON.stringify(tasks));
       }
     }
     assert.deepEqual(problems, []);
@@ -264,19 +272,16 @@ test('home way titles do not break a word between 751 and 1010', { timeout: 6000
   }
 });
 
-test('narrow schematic 4 stays 6px from other dots and D8 is attributable', { timeout: 60000 }, async t => {
+test('narrow schematic 4 stays with its stop and D8 is attributable', { timeout: 90000 }, async t => {
   const page = await openBrowser();
   if (!page) { t.skip('Chrome is not installed here'); return; }
   try {
-    await page.view(320, 800, true);
-    await page.go('guide.html?template=SI-09B&view=map&lang=zh');
-    await page.waitFor('document.querySelector("#v4-map .v4-map-num")', 20000);
-    await page.ev('document.querySelector("#v4-map").scrollIntoView()');
-    await page.ev('new Promise(r => setTimeout(r, 600))');
-    const four = await page.ev(`(() => {
+    const problems = [];
+    const audit = `(() => {
       const svg = document.querySelector('#v4-map svg.v4-schematic');
       const el = [...svg.querySelectorAll('.v4-map-num')].find(t => (t.textContent || '').trim() === '4');
       const pd = (x, y, r) => Math.hypot(Math.max(r.left - x, x - r.right, 0), Math.max(r.top - y, y - r.bottom, 0));
+      const gap = (a, b) => Math.hypot(Math.max(b.left - a.right, a.left - b.right, 0), Math.max(b.top - a.bottom, a.top - b.bottom, 0));
       const box = el.getBoundingClientRect();
       const own = el.parentNode.querySelector('circle').getBoundingClientRect();
       const ox = (own.left + own.right) / 2, oy = (own.top + own.bottom) / 2;
@@ -287,9 +292,36 @@ test('narrow schematic 4 stays 6px from other dots and D8 is attributable', { ti
         if (Math.hypot(x - ox, y - oy) <= 2) return;
         foreign = Math.min(foreign, pd(x, y, box));
       });
-      return { own: pd(ox, oy, box), foreign };
-    })()`);
-    assert.ok(four.foreign >= 6, 'schematic 4 is ' + four.foreign.toFixed(1) + 'px from another dot');
+      const ownGap = gap(box, own);
+      const leader = [...svg.querySelectorAll('.v4-map-leader')].some(line => {
+        const ctm = line.getScreenCTM();
+        if (!ctm) return false;
+        const pt = (x, y) => { const p = new DOMPoint(+x, +y).matrixTransform(ctm); return { x: p.x, y: p.y }; };
+        const a = pt(line.getAttribute('x1'), line.getAttribute('y1'));
+        const b = pt(line.getAttribute('x2'), line.getAttribute('y2'));
+        const rad = Math.min(own.width, own.height) / 2;
+        const nearDot = Math.hypot(a.x - ox, a.y - oy) <= rad + 3 || Math.hypot(b.x - ox, b.y - oy) <= rad + 3;
+        const nearText = pd(a.x, a.y, box) <= 3 || pd(b.x, b.y, box) <= 3;
+        return nearDot && nearText;
+      });
+      return { ownGap, foreign, leader };
+    })()`;
+    for (const lang of ['zh', 'en']) {
+      for (const w of [320, 360, 375]) {
+        await page.view(w, 800, true);
+        await page.go('guide.html?template=SI-09B&view=map&lang=' + lang);
+        await page.waitFor('document.querySelector("#v4-map .v4-map-num")', 20000);
+        await page.ev('document.querySelector("#v4-map").scrollIntoView()');
+        await page.ev('new Promise(r => setTimeout(r, 500))');
+        const four = await page.ev(audit);
+        const owned = four.foreign > four.ownGap + 0.4;
+        if (four.ownGap > 14 && !four.leader) problems.push(lang + ' ' + w + ' detached ' + JSON.stringify(four));
+        if (!owned && !four.leader) problems.push(lang + ' ' + w + ' nearer other ' + JSON.stringify(four));
+        if (lang === 'zh' && w === 320 && !(four.foreign >= 6)) problems.push('zh 320 clearance ' + JSON.stringify(four));
+      }
+    }
+    assert.deepEqual(problems, []);
+    await page.view(320, 800, true);
     await page.go('guide.html?template=SI-09B&lang=zh');
     await page.waitFor('document.querySelector("#gcoast .gday-num")', 20000);
     await page.ev('document.querySelector("#gcoast").scrollIntoView({block:"center"})');
@@ -320,6 +352,53 @@ test('narrow schematic 4 stays 6px from other dots and D8 is attributable', { ti
       return { own: pd(ox, oy, box), foreign, leaders };
     })()`);
     assert.ok(day.foreign > day.own + 0.4 || day.leaders, 'D8 ownership ' + JSON.stringify(day));
+  } finally {
+    await page.close();
+  }
+});
+
+test('deselecting a town removes its name from the planner map', { timeout: 60000 }, async t => {
+  const page = await openBrowser();
+  if (!page) { t.skip('Chrome is not installed here'); return; }
+  try {
+    await page.view(1100, 900, false);
+    await page.go('plan.html?lang=zh');
+    await page.waitFor('document.querySelector("#p10-next-1")', 20000);
+    await page.click('#p10-next-1');
+    await page.click('#p10-next-2');
+    await page.ev('const d=document.querySelector("#p10-more"); if(d) d.open=true');
+    await page.waitFor('document.querySelector("#p10-wishes input[name=p10-wish]")', 20000);
+    const id = await page.ev(`(() => {
+      const box = [...document.querySelectorAll('#p10-wishes input[name=p10-wish]')].find(input => {
+        const label = document.querySelector('[data-p10-pick-label="' + CSS.escape(input.value) + '"]');
+        return label && label.classList.contains('is-town');
+      });
+      return box ? box.value : '';
+    })()`);
+    assert.ok(id, 'no town checkbox');
+    await page.ev(`document.querySelector('#p10-wishes input[value="${id}"]').click()`);
+    await page.ev('new Promise(r => setTimeout(r, 300))');
+    const on = await page.ev(`(() => {
+      const label = document.querySelector('[data-p10-pick-label="${id}"]');
+      const cs = getComputedStyle(label);
+      const r = label.getBoundingClientRect();
+      const chip = document.querySelector('[data-p10-unselect="${id}"]');
+      return { shown: cs.display !== 'none' && r.width > 1, chip: !!chip, checked: document.querySelector('#p10-wishes input[value="${id}"]').checked };
+    })()`);
+    assert.equal(on.checked, true);
+    assert.equal(on.chip, true);
+    assert.equal(on.shown, true, 'selected town name is not on the map');
+    await page.ev(`document.querySelector('[data-p10-unselect="${id}"]').click()`);
+    await page.ev('new Promise(r => setTimeout(r, 300))');
+    const off = await page.ev(`(() => {
+      const label = document.querySelector('[data-p10-pick-label="${id}"]');
+      const cs = getComputedStyle(label);
+      const r = label.getBoundingClientRect();
+      return { shown: cs.display !== 'none' && cs.visibility !== 'hidden' && r.width > 1, chip: !!document.querySelector('[data-p10-unselect="${id}"]'), checked: document.querySelector('#p10-wishes input[value="${id}"]').checked };
+    })()`);
+    assert.equal(off.checked, false);
+    assert.equal(off.chip, false);
+    assert.equal(off.shown, false, 'deselected town name stayed on the map ' + JSON.stringify(off));
   } finally {
     await page.close();
   }

@@ -276,7 +276,7 @@ h1 .v4-en-name{font-style:italic;font-weight:400;font-size:var(--type-xs);letter
   .gday-sticky .gday-sum-amt{position:absolute;right:0;bottom:60px;width:max-content;max-width:220px;padding:8px 10px;border-radius:12px;background:#14352b;color:#f4efe4;font-size:var(--type-sm);white-space:normal}
   .gday-sticky a{color:inherit;text-decoration:none}
   body:has(.v4-modal) .gday-sticky,body:has(#v4-toast) .gday-sticky{display:none}
-  main{padding-bottom:7.5rem}
+  main{padding-bottom:10rem}
   .journey-facts{max-width:100%}
   .journey-facts div,.journey-facts strong{min-width:0;overflow-wrap:anywhere}
   .map-canvas,.route-map-svg,.p10-trip-svg{overflow:visible}

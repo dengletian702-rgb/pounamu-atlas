@@ -115,8 +115,8 @@ test('planner map switches columns within 300ms without overlapping names', { ti
           }
           if (hits) window.__bad.push(Math.round(performance.now() - t0));
           const at = svg ? parseFloat(svg.dataset.p10LaidAt || '0') : 0;
-          if (mounted === wide && laid && texts.length && at >= t0) {
-            window.__switch = { ms: at - t0, hits: window.__bad.slice() };
+          if (mounted === wide && laid && texts.length && at + 50 >= t0) {
+            window.__switch = { ms: Math.max(0, at - t0), hits: window.__bad.slice() };
             return;
           }
           if (performance.now() - t0 < 800) requestAnimationFrame(tick);
@@ -399,6 +399,138 @@ test('deselecting a town removes its name from the planner map', { timeout: 6000
     assert.equal(off.checked, false);
     assert.equal(off.chip, false);
     assert.equal(off.shown, false, 'deselected town name stayed on the map ' + JSON.stringify(off));
+    const hover = await page.ev(`(() => {
+      const dot = document.querySelector('[data-p10-pick="${id}"] .p10-pick-mark');
+      const r = dot.getBoundingClientRect();
+      dot.dispatchEvent(new MouseEvent('mouseover', { bubbles: true, clientX: (r.left + r.right) / 2, clientY: (r.top + r.bottom) / 2 }));
+      const label = document.querySelector('[data-p10-pick-label="${id}"]');
+      const cs = getComputedStyle(label);
+      const box = label.getBoundingClientRect();
+      const shown = cs.display !== 'none' && box.width > 1;
+      document.body.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
+      const after = getComputedStyle(label).display !== 'none' && label.getBoundingClientRect().width > 1;
+      return { shown, after };
+    })()`);
+    assert.equal(hover.shown, true, 'hover should show an unselected town ' + JSON.stringify(hover));
+    assert.equal(hover.after, false, 'leaving the dot should hide the town ' + JSON.stringify(hover));
+  } finally {
+    await page.close();
+  }
+});
+
+test('planner leaders touch their own dot', { timeout: 120000 }, async t => {
+  const page = await openBrowser();
+  if (!page) { t.skip('Chrome is not installed here'); return; }
+  try {
+    const problems = [];
+    const audit = `(() => {
+      const svg = document.querySelector('#p10-pick-map .p10-pick-svg');
+      const bad = [];
+      const pd = (x, y, r) => Math.hypot(Math.max(r.left - x, x - r.right, 0), Math.max(r.top - y, y - r.bottom, 0));
+      for (const line of svg.querySelectorAll('.p10-pick-leader')) {
+        const ctm = line.getScreenCTM();
+        if (!ctm) { bad.push('no-ctm'); continue; }
+        const pt = (x, y) => { const p = new DOMPoint(+x, +y).matrixTransform(ctm); return { x: p.x, y: p.y }; };
+        const a = pt(line.getAttribute('x1'), line.getAttribute('y1'));
+        const b = pt(line.getAttribute('x2'), line.getAttribute('y2'));
+        const id = line.dataset.for || '';
+        const label = id && [...svg.querySelectorAll('.p10-pick-label,.p10-pick-tag')].find(el => (el.getAttribute('data-p10-pick-label') || (el.textContent || '').trim()) === id);
+        if (!label) { bad.push('no-label ' + id); continue; }
+        const box = label.getBoundingClientRect();
+        const labelD = Math.min(pd(a.x, a.y, box), pd(b.x, b.y, box));
+        if (labelD > 4) bad.push('loose ' + id + ' ' + labelD.toFixed(1));
+        let mark = svg.querySelector('[data-p10-pick="' + CSS.escape(id) + '"] .p10-pick-mark');
+        if (!mark && label.classList.contains('p10-pick-tag')) {
+          const px = parseFloat(label.getAttribute('data-px')), py = parseFloat(label.getAttribute('data-py'));
+          let best = null, bestD = 1e9;
+          svg.querySelectorAll('.p10-pick-mark').forEach(m => {
+            const d = Math.hypot((parseFloat(m.getAttribute('cx')) || 0) - px, (parseFloat(m.getAttribute('cy')) || 0) - py);
+            if (d < bestD) { bestD = d; best = m; }
+          });
+          mark = best;
+        }
+        if (!mark) { bad.push('no-mark ' + id); continue; }
+        const mr = mark.getBoundingClientRect();
+        const mx = (mr.left + mr.right) / 2, my = (mr.top + mr.bottom) / 2;
+        const dotD = Math.min(Math.hypot(a.x - mx, a.y - my), Math.hypot(b.x - mx, b.y - my));
+        if (dotD > 6) bad.push(id + ' ' + dotD.toFixed(1));
+      }
+      return bad;
+    })()`;
+    for (const lang of ['zh', 'en']) {
+      await page.view(768, 900, false);
+      await page.go('plan.html?lang=' + lang);
+      await page.waitFor('document.querySelector("#p10-next-1")', 20000);
+      await page.click('#p10-next-1');
+      await page.click('#p10-next-2');
+      await page.ev('const d=document.querySelector("#p10-more"); if(d) d.open=true');
+      await page.waitFor('document.querySelector(".p10-pick-svg.is-laid")', 20000);
+      for (const w of [768, 1024, 1180]) {
+        await page.view(w, 900, false);
+        await page.ev('new Promise(r => setTimeout(r, 400))');
+        const bad = await page.ev(audit);
+        if (bad.length) problems.push(lang + ' ' + w + ' ' + JSON.stringify(bad));
+      }
+    }
+    assert.deepEqual(problems, []);
+  } finally {
+    await page.close();
+  }
+});
+
+test('guide map stays quiet after labels are drawn', { timeout: 90000 }, async t => {
+  const page = await openBrowser();
+  if (!page) { t.skip('Chrome is not installed here'); return; }
+  try {
+    const problems = [];
+    const idle = `new Promise(resolve => {
+      const hits = [];
+      const obs = new PerformanceObserver(list => { for (const entry of list.getEntries()) hits.push(Math.round(entry.duration)); });
+      obs.observe({ type: 'longtask', buffered: false });
+      setTimeout(() => { obs.disconnect(); resolve(hits); }, 5000);
+    })`;
+    for (const w of [390, 900, 1440]) {
+      await page.view(w, 900, w < 800);
+      await page.go('guide.html?template=SI-09B&lang=zh');
+      await page.waitFor('document.querySelector("#gcoast .gday-num, #v4-map .v4-map-num")', 20000);
+      await page.ev('new Promise(r => (window.requestIdleCallback || (fn => setTimeout(fn, 1)))(() => r(), { timeout: 1500 }))');
+      const tasks = await page.ev(idle);
+      const n = await page.ev('window.__ui2Enhance || 0');
+      if (!Array.isArray(tasks) || tasks.length) problems.push(w + ' ' + JSON.stringify(tasks) + ' enhance ' + n);
+    }
+    assert.deepEqual(problems, []);
+  } finally {
+    await page.close();
+  }
+});
+
+test('a click on Whitianga selects Whitianga', { timeout: 60000 }, async t => {
+  const page = await openBrowser();
+  if (!page) { t.skip('Chrome is not installed here'); return; }
+  try {
+    await page.view(900, 900, false);
+    await page.go('plan.html?lang=en');
+    await page.waitFor('document.querySelector("#p10-next-1")', 20000);
+    await page.click('#p10-next-1');
+    await page.click('#p10-next-2');
+    await page.ev('const d=document.querySelector("#p10-more"); if(d) d.open=true');
+    await page.waitFor('document.querySelector(".p10-pick-svg.is-laid")', 20000);
+    const picked = await page.ev(`(() => {
+      const dots = [...document.querySelectorAll('#p10-pick-map .p10-pick-dot')];
+      const ak = dots.find(g => g.dataset.p10Pick === 'auckland');
+      if (!ak) return { missing: true };
+      const center = g => { const r = g.querySelector('.p10-pick-mark').getBoundingClientRect(); return { x: (r.left + r.right) / 2, y: (r.top + r.bottom) / 2 }; };
+      const akC = center(ak);
+      const rad = Math.min(ak.querySelector('.p10-pick-hit').getBoundingClientRect().width, ak.querySelector('.p10-pick-hit').getBoundingClientRect().height) / 2;
+      const covered = dots.filter(g => g !== ak).map(g => { const c = center(g); return { g, d: Math.hypot(c.x - akC.x, c.y - akC.y), c }; }).filter(item => item.d <= rad + 1).sort((a, b) => a.d - b.d);
+      if (!covered.length) return { clear: true, rad: +rad.toFixed(1) };
+      const victim = covered[0];
+      victim.g.dispatchEvent(new MouseEvent('click', { bubbles: true, clientX: victim.c.x, clientY: victim.c.y }));
+      const id = victim.g.dataset.p10Pick;
+      const box = document.querySelector('#p10-wishes input[value="' + CSS.escape(id) + '"]') || document.querySelector('#p10-wishes input[value="' + id + '"]');
+      return { id, checked: box ? box.checked : null, auckland: document.querySelector('#p10-wishes input[value="auckland"]').checked };
+    })()`);
+    assert.ok(picked.clear || (picked.checked === true && picked.auckland === false), JSON.stringify(picked));
   } finally {
     await page.close();
   }

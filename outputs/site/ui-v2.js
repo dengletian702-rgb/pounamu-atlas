@@ -30,18 +30,18 @@
     };
     return { S, step, n, val: [], noise, levels: 14, k: 1, j: 0, d: '', gridRow: 0 };
   }
-  function contourSlice(st, rows) {
+  function contourSlice(st) {
     const { step, n, val, levels } = st;
-    let left = rows;
-    while (st.gridRow <= n && left > 0) {
+    const start = performance.now();
+    const budget = 16;
+    while (st.gridRow <= n && performance.now() - start < budget) {
       const j = st.gridRow;
       val[j] = [];
       for (let i = 0; i <= n; i++) val[j][i] = st.noise(i * step, j * step);
       st.gridRow += 1;
-      left -= 1;
     }
     if (st.gridRow <= n) return false;
-    while (st.k < levels && left > 0) {
+    while (st.k < levels && performance.now() - start < budget) {
       const L = st.k / levels, j = st.j;
       for (let i = 0; i < n; i++) {
         const a = val[j][i], b = val[j][i + 1], c = val[j + 1][i + 1], e = val[j + 1][i];
@@ -53,7 +53,6 @@
         for (let q = 0; q < seg.length; q += 2) st.d += `M${seg[q][0].toFixed(0)} ${seg[q][1].toFixed(0)}L${seg[q + 1][0].toFixed(0)} ${seg[q + 1][1].toFixed(0)}`;
       }
       st.j += 1;
-      left -= 1;
       if (st.j >= n) { st.j = 0; st.k += 1; }
     }
     return st.k >= levels;
@@ -74,17 +73,19 @@
       { seed: 20261113, stroke: 'rgba(198,236,218,0.16)', prop: '--ui2-contour-light', store: 'ui2-contour-l' },
       { seed: 4219, stroke: 'rgba(20,53,43,0.13)', prop: '--ui2-contour-dark', store: 'ui2-contour-d' }
     ];
-    const later = fn => (window.requestIdleCallback || (cb => setTimeout(cb, 16)))(fn, { timeout: 400 });
+    const later = fn => setTimeout(fn, 0);
     const step = () => {
       const job = jobs[0];
       if (!job) return;
       if (!job.state) job.state = contourState(job.seed);
-      if (!contourSlice(job.state, 6)) { later(step); return; }
-      const url = contourUrl(job.state, job.stroke);
-      root.style.setProperty(job.prop, url);
-      try { sessionStorage.setItem(job.store, url); } catch (e) {}
-      jobs.shift();
-      if (jobs.length) later(step);
+      if (!contourSlice(job.state)) { later(step); return; }
+      later(() => {
+        const url = contourUrl(job.state, job.stroke);
+        root.style.setProperty(job.prop, url);
+        try { sessionStorage.setItem(job.store, url); } catch (e) {}
+        jobs.shift();
+        if (jobs.length) later(step);
+      });
     };
     later(step);
   }
@@ -385,6 +386,16 @@
   });
 
   /* ---------- 9. Scroll state and progress ---------- */
+  function bumpSvgFonts() {
+    $$('svg text').forEach(node => {
+      const m = node.getScreenCTM && node.getScreenCTM();
+      if (!m) return;
+      const cs = getComputedStyle(node);
+      if (cs.display === 'none' || cs.visibility === 'hidden') return;
+      const sc = Math.hypot(m.a, m.b);
+      if (sc > 0 && parseFloat(cs.fontSize) * sc < 11.95) node.style.setProperty('font-size', (13 / sc).toFixed(2) + 'px', 'important');
+    });
+  }
   function scroll() {
     const bar = doc.createElement('div'); bar.className = 'ui2-progress'; bar.setAttribute('aria-hidden', 'true'); doc.body.append(bar);
     let ticking = false;
@@ -394,7 +405,12 @@
       bar.style.setProperty('--ui2-p', max > 0 ? (y / max).toFixed(4) : 0);
       doc.body.classList.toggle('ui2-scrolled', y > 90);
     };
-    addEventListener('scroll', () => { if (!ticking) { ticking = true; raf(update); } }, { passive: true });
+    let fontPass = 0;
+    addEventListener('scroll', () => {
+      if (!ticking) { ticking = true; raf(update); }
+      clearTimeout(fontPass);
+      fontPass = setTimeout(bumpSvgFonts, 80);
+    }, { passive: true });
     update();
   }
 
@@ -424,6 +440,13 @@
       if (drawn > 0) scale = drawn;
     }
     if (!scale) return;
+    if ((svg.classList.contains('v4-schematic') || svg.classList.contains('gcoast')) && !svg.dataset.ui2Watch) {
+      svg.dataset.ui2Watch = '1';
+      new ResizeObserver(() => {
+        const w = Math.round(svg.getBoundingClientRect().width);
+        if (w > 2 && svg.dataset.ui2Laid !== String(w)) fitSvgText(svg);
+      }).observe(svg);
+    }
     if (svg.classList.contains('p10-pick-svg')) {
       if (!svg.classList.contains('is-laid') && box.width > 2 && box.height > 2 && vbH) {
         const sc = Math.min(box.width / vbW, box.height / vbH);
@@ -444,6 +467,17 @@
     });
     layoutNzMap(svg, scale);
     settleMapLabels(svg, scale);
+    if (!svg.dataset.ui2Refit) {
+      requestAnimationFrame(() => {
+        const tiny = [...svg.querySelectorAll('text')].some(node => {
+          const cs = getComputedStyle(node);
+          if (cs.display === 'none' || cs.visibility === 'hidden') return false;
+          const m = node.getScreenCTM && node.getScreenCTM();
+          return m && parseFloat(cs.fontSize) * Math.hypot(m.a, m.b) < 11.95;
+        });
+        if (tiny) { svg.dataset.ui2Refit = '1'; bumpSvgFonts(); }
+      });
+    }
   }
   function textShown(el) {
     const cs = getComputedStyle(el);
@@ -735,6 +769,7 @@
           line.setAttribute('vector-effect', 'non-scaling-stroke');
           line.setAttribute('x1', L.x1); line.setAttribute('y1', L.y1);
           line.setAttribute('x2', L.x2); line.setAttribute('y2', L.y2);
+          if (L.owner) line.dataset.for = L.owner;
           host.insertBefore(line, host.firstChild);
         });
         syncPickList(svg);
@@ -758,11 +793,18 @@
       const id = mark && mark.closest && mark.closest('[data-p10-pick]') && mark.closest('[data-p10-pick]').dataset.p10Pick;
       if (id) tagCity.add(id);
     }
+    const picked = el => {
+      const id = el.getAttribute('data-p10-pick-label');
+      if (!id) return false;
+      const dot = svg.querySelector('[data-p10-pick="' + (window.CSS && CSS.escape ? CSS.escape(id) : id) + '"]');
+      return !!(dot && dot.classList.contains('is-on'));
+    };
     const pin = el => {
       if (el.classList.contains('v4-map-num') || el.classList.contains('gday-num')) return 0;
-      if (tagCity.has(el.getAttribute('data-p10-pick-label'))) return 1;
-      if (el.classList.contains('p10-pick-tag')) return 2;
-      return 3;
+      if (el.classList.contains('p10-pick-tag')) return 1;
+      if (picked(el)) return 2;
+      if (tagCity.has(el.getAttribute('data-p10-pick-label'))) return 3;
+      return 4;
     };
     const orderOf = shortFirst => texts.slice().sort((a, b) => {
       const pa = pin(a), pb = pin(b);
@@ -780,7 +822,7 @@
       return { x1: cx, y1: cy, x2: x - dx / len * 1.5, y2: y - dy / len * 1.5, len: len - 1.5 };
     };
     const clearOf = (rect, ends) => {
-      const pad = schematic ? 2 : 5;
+      const pad = ends.pad != null ? ends.pad : (schematic ? 2 : 5);
       for (const d of dotCenters()) {
         if (Math.hypot(d.x - ends.ownX, d.y - ends.ownY) <= (ends.cluster || 2)) continue;
         const rad = Math.min(d.r.width, d.r.height) / 2;
@@ -799,35 +841,23 @@
       line.setAttribute('stroke', '#163528');
       line.setAttribute('stroke-width', '1.5');
       line.setAttribute('vector-effect', 'non-scaling-stroke');
-      const c = circle.getBoundingClientRect();
-      const ccx = (c.left + c.right) / 2, ccy = (c.top + c.bottom) / 2;
-      if (coast) {
-        const cx0 = parseFloat(circle.getAttribute('cx')) || 0;
-        const cy0 = parseFloat(circle.getAttribute('cy')) || 0;
-        line.setAttribute('x1', String(cx0));
-        line.setAttribute('y1', String(cy0));
-        line.setAttribute('x2', (cx0 + (ends.x2 - ccx) / scale).toFixed(1));
-        line.setAttribute('y2', (cy0 + (ends.y2 - ccy) / scale).toFixed(1));
-        text.parentNode.insertBefore(line, text);
-      } else if (svg.classList.contains('v4-schematic')) {
-        line.setAttribute('x1', circle.getAttribute('cx') || '0');
-        line.setAttribute('y1', circle.getAttribute('cy') || '0');
-        line.setAttribute('x2', ((ends.x2 - ccx) / scale).toFixed(1));
-        line.setAttribute('y2', ((ends.y2 - ccy) / scale).toFixed(1));
-        text.parentNode.insertBefore(line, text);
-      } else {
-        const box = svg.getBoundingClientRect();
-        const vb = svg.viewBox.baseVal;
-        const sy = box.height / vb.height || scale;
-        const xOf = sx => vb.x + (sx - box.left) / scale;
-        const yOf = syv => vb.y + (syv - box.top) / sy;
-        line.setAttribute('x1', xOf(ends.x1).toFixed(1));
-        line.setAttribute('y1', yOf(ends.y1).toFixed(1));
-        line.setAttribute('x2', xOf(ends.x2).toFixed(1));
-        line.setAttribute('y2', yOf(ends.y2).toFixed(1));
-        const host = svg.querySelector('.p10-pick-labels') || text.parentNode;
-        host.insertBefore(line, host.firstChild);
+      const ctm = circle.getScreenCTM();
+      const cx0 = parseFloat(circle.getAttribute('cx')) || 0;
+      const cy0 = parseFloat(circle.getAttribute('cy')) || 0;
+      let x2 = cx0, y2 = cy0;
+      if (ctm) {
+        const local = new DOMPoint(ends.x2, ends.y2).matrixTransform(ctm.inverse());
+        x2 = local.x;
+        y2 = local.y;
       }
+      const owner = text.getAttribute('data-p10-pick-label') || (text.textContent || '').trim();
+      if (owner) line.dataset.for = owner;
+      line.setAttribute('x1', String(cx0));
+      line.setAttribute('y1', String(cy0));
+      line.setAttribute('x2', x2.toFixed(1));
+      line.setAttribute('y2', y2.toFixed(1));
+      const host = coast || svg.classList.contains('v4-schematic') ? text.parentNode : (svg.querySelector('.p10-pick-labels') || text.parentNode);
+      host.insertBefore(line, coast || svg.classList.contains('v4-schematic') ? text : host.firstChild);
     };
     const sit = (text, circle, gapScreen, rank) => {
       const c = circle.getBoundingClientRect();
@@ -869,15 +899,13 @@
         ends.ownY = ccy;
         ends.cluster = text.classList.contains('p10-pick-tag') ? 6 : 2;
         ends.minAway = 0;
-        ends.draw = coast ? gap > 3 : gap > 14;
-        const maxGap = gapScreen + 1.5;
-        const crowded = placed.some(o => schematic ? boxGap(r, o.rect) < 6 : overlaps(r, o.rect));
-        if (!(inside(r) && gap >= 2 && gap <= maxGap && !crowded && clearOf(r, ends))) continue;
+        ends.pad = text.dataset.p10Loose ? 0 : (schematic ? 2 : 5);
         let clear = Infinity;
         let foreignPoint = Infinity;
         let centerForeign = Infinity;
         const midX = (r.left + r.right) / 2, midY = (r.top + r.bottom) / 2;
         const centerOwn = Math.hypot(midX - ccx, midY - ccy);
+        const numeralHere = text.classList.contains('v4-map-num') || text.classList.contains('gday-num');
         for (const d of dotCenters()) {
           if (Math.hypot(d.x - ccx, d.y - ccy) <= (text.classList.contains('p10-pick-tag') ? 6 : 2)) continue;
           if (text.classList.contains('gday-num') && !(d.el.parentNode && d.el.parentNode.querySelector('text'))) continue;
@@ -887,6 +915,11 @@
           clear = Math.min(clear, pd - Math.min(d.r.width, d.r.height) / 2);
         }
         const ownPoint = pointBoxDist(ccx, ccy, r);
+        const ownsHere = foreignPoint > ownPoint + 0.4 && centerForeign > centerOwn + 0.4;
+        ends.draw = coast ? gap > 3 : (numeralHere ? (!ownsHere || ownPoint > 14 || gap > 14) : gap > 14);
+        const maxGap = gapScreen + 1.5;
+        const crowded = placed.some(o => schematic ? boxGap(r, o.rect) < 12 : overlaps(r, o.rect));
+        if (!(inside(r) && gap >= 2 && gap <= maxGap && !crowded && clearOf(r, ends))) continue;
         let apart = Infinity;
         for (const o of placed) apart = Math.min(apart, boxGap(r, o.rect));
         const score = schematic ? clear : apart + clear;
@@ -900,22 +933,11 @@
       text.setAttribute('text-anchor', best.anchor);
       text.setAttribute('x', best.x);
       text.setAttribute('y', best.y);
-      const real = text.getBoundingClientRect();
-      const ends = leaderEnds(circle, real);
-      ends.ownX = ccx;
-      ends.ownY = ccy;
-      ends.cluster = text.classList.contains('p10-pick-tag') ? 6 : 2;
-      ends.minAway = 0;
-      ends.draw = best.ends.draw;
-      const realGap = boxGap(real, c);
-      const maxGap = schematic ? gapScreen + 1.5 : Math.min(14, gapScreen + 1.5);
-      const crowded = placed.some(o => schematic ? boxGap(real, o.rect) < 6 : overlaps(real, o.rect));
-      if (!(inside(real) && realGap >= 2 && realGap <= maxGap + 1.5 && !crowded && clearOf(real, ends))) return null;
-      const ownPoint = pointBoxDist(ccx, ccy, real);
-      return { r: real, ends, x: best.x, y: best.y, anchor: best.anchor, ownPoint, foreignPoint: best.foreignPoint, ranked: best.ranked };
+      return { r: best.r, ends: best.ends, x: best.x, y: best.y, anchor: best.anchor, ownPoint: best.ownPoint, foreignPoint: best.foreignPoint, ranked: best.ranked };
     };
     const placeOne = text => {
       text.classList.remove('is-unplaced');
+      const keepX = text.getAttribute('x'), keepY = text.getAttribute('y'), keepA = text.getAttribute('text-anchor');
       const circle = labelDot(svg, text);
       if (!circle) return true;
       let fit = null;
@@ -962,7 +984,24 @@
           if (fit) break;
         }
       }
+      if (!fit && tag && !text.dataset.p10Loose) {
+        text.dataset.p10Loose = '1';
+        const loose = cand => (cand.ownPoint <= 12 && cand.foreignPoint > cand.ownPoint + 0.4 && cand.centerForeign > cand.centerOwn + 0.4) ? 5000 - cand.ownPoint * 8 : null;
+        for (const gap of [3, 4, 6, 8, 10, 12]) {
+          const got = sit(text, circle, gap, loose);
+          if (got && (!fit || got.ranked > fit.ranked)) fit = got;
+        }
+        delete text.dataset.p10Loose;
+        if (fit) {
+          text.setAttribute('text-anchor', fit.anchor);
+          text.setAttribute('x', fit.x);
+          text.setAttribute('y', fit.y);
+        }
+      }
       if (!fit) {
+        if (keepX != null) text.setAttribute('x', keepX);
+        if (keepY != null) text.setAttribute('y', keepY);
+        if (keepA != null) text.setAttribute('text-anchor', keepA);
         if (schematic) return false;
         text.classList.add('is-off', 'is-unplaced');
         text.style.setProperty('display', 'none', 'important');
@@ -981,26 +1020,30 @@
       });
       list.forEach(placeOne);
       if (!schematic) {
-        for (const tag of texts.filter(text => text.classList.contains('p10-pick-tag') && text.classList.contains('is-unplaced'))) {
+        for (const tag of texts.filter(text => text.classList.contains('p10-pick-tag') && (text.classList.contains('is-unplaced') || text.style.display === 'none'))) {
           const mark = labelDot(svg, tag);
-          const id = mark && mark.closest && mark.closest('[data-p10-pick]') && mark.closest('[data-p10-pick]').dataset.p10Pick;
-          const name = id && texts.find(text => text.getAttribute('data-p10-pick-label') === id);
-          if (name && !name.classList.contains('is-unplaced')) {
-            for (let i = placed.length - 1; i >= 0; i--) if (placed[i].text === name) placed.splice(i, 1);
-            name.classList.add('is-off', 'is-unplaced');
-            name.style.setProperty('display', 'none', 'important');
-          }
+          if (!mark) continue;
+          const c = mark.getBoundingClientRect();
+          const cx = (c.left + c.right) / 2, cy = (c.top + c.bottom) / 2;
+          const blocked = placed.filter(item => Math.hypot((item.rect.left + item.rect.right) / 2 - cx, (item.rect.top + item.rect.bottom) / 2 - cy) < 90);
+          blocked.forEach(item => {
+            const at = placed.indexOf(item);
+            if (at >= 0) placed.splice(at, 1);
+            item.text.classList.add('is-off', 'is-unplaced');
+            item.text.style.setProperty('display', 'none', 'important');
+          });
           tag.classList.remove('is-off', 'is-unplaced');
           tag.style.removeProperty('display');
           placeOne(tag);
-          if (name) {
-            name.classList.remove('is-off', 'is-unplaced');
-            name.style.removeProperty('display');
-            placeOne(name);
-          }
+          blocked.forEach(item => {
+            item.text.classList.remove('is-off', 'is-unplaced');
+            item.text.style.removeProperty('display');
+            placeOne(item.text);
+          });
         }
       }
     };
+    const tagMiss = () => texts.some(text => text.classList.contains('p10-pick-tag') && text.classList.contains('is-unplaced'));
     const placedCount = () => texts.filter(text => !text.classList.contains('is-unplaced')).length;
     const snap = () => texts.map(text => ({
       text,
@@ -1010,12 +1053,13 @@
       off: text.classList.contains('is-unplaced')
     }));
     lay(orderOf(false));
-    if (!schematic && texts.some(text => text.classList.contains('is-unplaced'))) {
+    if (!schematic && texts.some(text => text.classList.contains('is-unplaced') && !text.classList.contains('p10-pick-tag'))) {
       const longCount = placedCount();
+      const longMiss = tagMiss();
       const longItems = placed.map(item => ({ ...item }));
       const longSnap = snap();
       lay(orderOf(true));
-      if (placedCount() < longCount) {
+      if ((tagMiss() && !longMiss) || placedCount() < longCount) {
         placed.length = 0;
         longItems.forEach(item => placed.push(item));
         longSnap.forEach(item => {
@@ -1029,7 +1073,59 @@
         });
       }
     }
-    placed.forEach(item => paint(item.text, item.circle, item.ends));
+    placed.forEach(item => {
+      if (!item.ends || !item.ends.draw) return;
+      const rect = item.text.getBoundingClientRect();
+      if (!(rect.width > 1)) return;
+      const live = leaderEnds(item.circle, rect);
+      live.draw = true;
+      paint(item.text, item.circle, live);
+    });
+    if (svg.classList.contains('v4-schematic')) {
+      for (const text of texts.filter(t => t.classList.contains('v4-map-num'))) {
+        const circle = labelDot(svg, text);
+        if (!circle) continue;
+        const cc = circle.getBoundingClientRect();
+        const ccx = (cc.left + cc.right) / 2, ccy = (cc.top + cc.bottom) / 2;
+        const tooClose = () => {
+          const box = text.getBoundingClientRect();
+          for (const d of dotCenters()) {
+            if (Math.hypot(d.x - ccx, d.y - ccy) <= 2) continue;
+            const rad = Math.min(d.r.width, d.r.height) / 2;
+            if (pointBoxDist(d.x, d.y, box) <= rad + 2) return true;
+          }
+          return [...svg.querySelectorAll('.v4-map-num')].some(other => other !== text && overlaps(text.getBoundingClientRect(), other.getBoundingClientRect()));
+        };
+        if (!tooClose()) continue;
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('x', '0');
+        text.setAttribute('y', '0');
+        const base = text.getBoundingClientRect();
+        const bcx = (base.left + base.right) / 2, bcy = (base.top + base.bottom) / 2;
+        text.setAttribute('x', '30');
+        const moved = text.getBoundingClientRect();
+        const ux = ((moved.left + moved.right) / 2 - bcx) / 30 || 1;
+        text.setAttribute('y', '30');
+        text.setAttribute('x', '0');
+        const movedY = text.getBoundingClientRect();
+        const uy = ((movedY.top + movedY.bottom) / 2 - bcy) / 30 || 1;
+        let placedOk = false;
+        for (let i = 0; i < 12 && !placedOk; i++) {
+          const ang = i * Math.PI / 6;
+          for (const dist of [16, 26, 38]) {
+            text.setAttribute('x', ((ccx + Math.cos(ang) * dist - bcx) / ux).toFixed(1));
+            text.setAttribute('y', ((ccy + Math.sin(ang) * dist - bcy) / uy).toFixed(1));
+            if (!tooClose() && inside(text.getBoundingClientRect())) { placedOk = true; break; }
+          }
+        }
+        if (!placedOk) { text.setAttribute('x', '0'); text.setAttribute('y', '-14'); }
+        const box = text.getBoundingClientRect();
+        const gap = boxGap(box, cc);
+        const ends = leaderEnds(circle, box);
+        ends.draw = gap > 14;
+        if (ends.draw) paint(text, circle, ends);
+      }
+    }
     for (const line of [...svg.querySelectorAll('.v4-map-leader, .p10-pick-leader, .gday-leader')]) {
       const ctm = line.getScreenCTM();
       if (!ctm) { line.remove(); continue; }
@@ -1045,9 +1141,37 @@
         const rad = Math.min(d.r.width, d.r.height) / 2;
         return distPointSeg(d.x, d.y, a.x, a.y, b.x, b.y) <= rad + 2;
       });
-      if (len > 48 || crosses || throughDot) {
+      if (len > 48 || throughDot || (crosses && !schematic)) {
         line.remove();
         if (own && !schematic) { own.classList.add('is-off', 'is-unplaced'); own.style.setProperty('display', 'none', 'important'); }
+      }
+    }
+    if (svg.classList.contains('v4-schematic')) {
+      for (const text of texts.filter(t => t.classList.contains('v4-map-num'))) {
+        const circle = labelDot(svg, text);
+        if (!circle) continue;
+        const box = text.getBoundingClientRect();
+        const cc = circle.getBoundingClientRect();
+        if (!(box.width > 1) || boxGap(box, cc) <= 14) continue;
+        const hitsDot = rect => {
+          const ends = leaderEnds(circle, rect);
+          return dotCenters().some(d => {
+            if (Math.hypot(d.x - ends.x1, d.y - ends.y1) <= 2) return false;
+            const rad = Math.min(d.r.width, d.r.height) / 2;
+            return distPointSeg(d.x, d.y, ends.x1, ends.y1, ends.x2, ends.y2) <= rad + 2;
+          });
+        };
+        if (hitsDot(box)) {
+          const x0 = parseFloat(text.getAttribute('x')) || 0;
+          const y0 = parseFloat(text.getAttribute('y')) || 0;
+          text.setAttribute('x', (x0 * 0.55).toFixed(1));
+          text.setAttribute('y', (y0 * 0.55).toFixed(1));
+        }
+        const box2 = text.getBoundingClientRect();
+        if (boxGap(box2, cc) <= 14 || hitsDot(box2)) continue;
+        const ends = leaderEnds(circle, box2);
+        ends.draw = true;
+        if (ends.len <= 48) paint(text, circle, ends);
       }
     }
     if (!schematic) {
@@ -1063,11 +1187,13 @@
         })),
         leaders: [...svg.querySelectorAll('.p10-pick-leader')].map(line => ({
           x1: line.getAttribute('x1'), y1: line.getAttribute('y1'),
-          x2: line.getAttribute('x2'), y2: line.getAttribute('y2')
+          x2: line.getAttribute('x2'), y2: line.getAttribute('y2'),
+          owner: line.dataset.for || ''
         }))
       });
     }
     syncPickList(svg);
+    if (schematic) svg.dataset.ui2Laid = String(Math.round(svg.getBoundingClientRect().width));
   }
   function syncPickList(svg) {
     if (!svg || !svg.classList.contains('p10-pick-svg')) return;
@@ -1091,6 +1217,7 @@
   function fitMaps() { $$('svg').forEach(fitSvgText); }
   function enhance() {
     fitMaps();
+    setTimeout(bumpSvgFonts, 120);
     $$('main img, .plan-result img').forEach(blurUp);
     $$('.route-card, .v4-results .v4-card, .walk-recommendation').forEach(tilt);
     $$('.cinema-copy .button, .v4-primary, .planner-button, .p10-step-nav .button').forEach(magnetic);
@@ -1107,10 +1234,23 @@
     for (const ev of ['pointermove', 'scroll', 'touchstart', 'keydown']) addEventListener(ev, wake, { passive: true });
     scroll(); titles(); paletteButton(); enhance();
     // The contour art is decoration: draw it when the browser is idle, and only on pages that use it.
-    if (doc.querySelector('.home-ways, .page-planner, .page-intro, .v4-guide-top, .ui2-contour')) (window.requestIdleCallback || (fn => setTimeout(fn, 400)))(installContours, { timeout: 2500 });
+    if (doc.querySelector('.home-ways, .page-planner, .page-intro, .v4-guide-top, .ui2-contour')) installContours();
+    setTimeout(bumpSvgFonts, 400);
     let timer = 0;
-    const own = n => { const el = n.nodeType === 1 ? n : n.parentElement; return !!(el && el.closest && el.closest('.ui2-hud, .ui2-readout, .ui2-palette, .ui2-particles, .ui2-progress, #p10-pick-map')); };
-    new MutationObserver(muts => { if (muts.every(m => own(m.target))) return; clearTimeout(timer); timer = setTimeout(enhance, 120); }).observe(doc.body, { childList: true, subtree: true });
+    let enhancing = false;
+    const leaderNode = n => n.nodeType === 1 && n.classList && (n.classList.contains('v4-map-leader') || n.classList.contains('gday-leader') || n.classList.contains('p10-pick-leader'));
+    const own = m => {
+      const el = m.target && (m.target.nodeType === 1 ? m.target : m.target.parentElement);
+      if (el && el.closest && el.closest('.ui2-hud, .ui2-readout, .ui2-palette, .ui2-particles, .ui2-progress, #p10-pick-map')) return true;
+      const nodes = [...(m.addedNodes || []), ...(m.removedNodes || [])];
+      return nodes.length > 0 && nodes.every(leaderNode);
+    };
+    const runEnhance = () => {
+      if (enhancing) { clearTimeout(timer); timer = setTimeout(runEnhance, 40); return; }
+      enhancing = true;
+      try { enhance(); } finally { enhancing = false; }
+    };
+    new MutationObserver(muts => { if (muts.every(own)) return; clearTimeout(timer); timer = setTimeout(runEnhance, 0); }).observe(doc.body, { childList: true, subtree: true });
   }
   function skipFocus() {
     const main = doc.querySelector('main');

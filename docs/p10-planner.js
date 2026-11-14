@@ -1478,11 +1478,11 @@ globalThis.P10_NODES = NODES;
       if(!(sc>0.02))return false;
       const k=1/sc;
       svg.style.setProperty('--k',k.toFixed(3));
-      for(const g of svg.querySelectorAll('.p10-pick-dot')){const town=g.classList.contains('is-town');g.querySelector('.p10-pick-mark').setAttribute('r',((town?3.5:5.5)*k).toFixed(2));g.querySelector('.p10-pick-hit').setAttribute('r',(11*k).toFixed(2));}
+      for(const g of svg.querySelectorAll('.p10-pick-dot')){const town=g.classList.contains('is-town');g.querySelector('.p10-pick-mark').setAttribute('r',((town?3.5:5.5)*k).toFixed(2));g.querySelector('.p10-pick-hit').setAttribute('r',(8*k).toFixed(2));}
       for(const t of svg.querySelectorAll('.p10-pick-label,.p10-pick-tag')){
         t.classList.remove('is-unplaced');
         t.style.removeProperty('display');
-        if(t.classList.contains('is-town')&&!p10Selected.has(t.dataset.p10PickLabel)){t.classList.remove('is-hot');t.classList.add('is-off');t.style.setProperty('display','none','important');continue;}
+        if(t.classList.contains('is-town')&&!p10Selected.has(t.dataset.p10PickLabel)){t.classList.remove('is-hot');t.classList.add('is-off');t.style.removeProperty('display');continue;}
         t.classList.remove('is-off');
         t.style.setProperty('font-size',(13/sc).toFixed(2)+'px','important');
       }
@@ -1496,10 +1496,12 @@ globalThis.P10_NODES = NODES;
       svg.dataset.p10Watch='1';
       new ResizeObserver(()=>{
         const w=svg.getBoundingClientRect().width;
-        const prev=parseFloat(svg.dataset.p10W||'0');
-        if(!(w>2)||Math.abs(w-prev)<4)return;
-        svg.classList.remove('is-laid');
-        requestAnimationFrame(()=>requestAnimationFrame(apply));
+        requestAnimationFrame(()=>{
+          const prev=parseFloat(svg.dataset.p10W||'0');
+          if(!(w>2)||Math.abs(w-prev)<4)return;
+          svg.classList.remove('is-laid');
+          apply();
+        });
       }).observe(svg);
     }
     if(svg.getBoundingClientRect().width>2)apply();
@@ -1510,6 +1512,20 @@ globalThis.P10_NODES = NODES;
     const svg=document.querySelector('#p10-pick-map .p10-pick-svg');if(!svg)return;
     for(const g of svg.querySelectorAll('.p10-pick-dot'))g.classList.toggle('is-on',p10Selected.has(g.dataset.p10Pick));
     p10PickLayout();
+  }
+  function p10PickAt(x,y){
+    const svg=document.querySelector('#p10-pick-map .p10-pick-svg');if(!svg)return null;
+    let best=null,bestD=Infinity;
+    for(const g of svg.querySelectorAll('.p10-pick-dot')){
+      const mark=g.querySelector('.p10-pick-mark');if(!mark)continue;
+      const r=mark.getBoundingClientRect();
+      const cx=(r.left+r.right)/2,cy=(r.top+r.bottom)/2,d=Math.hypot(cx-x,cy-y);
+      const hit=g.querySelector('.p10-pick-hit');
+      const hr=hit?hit.getBoundingClientRect():r;
+      const rad=Math.max(Math.min(hr.width,hr.height)/2,14);
+      if(d<=rad&&d<bestD){bestD=d;best=g;}
+    }
+    return best;
   }
   function p10PickHot(id,on){
     const host=p10$('#p10-pick-map');if(!host)return;
@@ -1619,14 +1635,17 @@ globalThis.P10_NODES = NODES;
     });
     // The map lives outside the form on a wide screen, so its clicks and hovers are handled on the document.
     document.addEventListener('click',event=>{
-      const dot=event.target.closest&&event.target.closest('#p10-pick-map [data-p10-pick]');if(!dot)return;
+      if(!(event.target.closest&&event.target.closest('#p10-pick-map .p10-pick-svg')))return;
+      const dot=p10PickAt(event.clientX,event.clientY);if(!dot)return;
       const id=dot.dataset.p10Pick;if(p10Selected.has(id))p10Selected.delete(id);else p10Selected.add(id);
       for(const box of form.querySelectorAll('[name=p10-wish]'))box.checked=p10Selected.has(box.value);
       p10RenderSelected();p10PickHot(id,true);
     });
     document.addEventListener('mouseover',event=>{
-      const el=event.target.closest&&event.target.closest('#p10-pick-map [data-p10-pick],#p10-wishes label[data-p10-wish]');
-      if(el)p10PickHot(el.dataset.p10Pick||el.dataset.p10Wish,true);
+      const svg=event.target.closest&&event.target.closest('#p10-pick-map .p10-pick-svg');
+      if(svg){const dot=p10PickAt(event.clientX,event.clientY);p10PickHot(dot?dot.dataset.p10Pick:null,!!dot);return;}
+      const el=event.target.closest&&event.target.closest('#p10-wishes label[data-p10-wish]');
+      if(el)p10PickHot(el.dataset.p10Wish,true);
       else if(event.target.closest&&!event.target.closest('#p10-pick-map,#p10-wishes'))p10PickHot(null,false);
     });
     form.addEventListener('focusin',event=>{const el=event.target.closest('#p10-wishes label[data-p10-wish]');if(el)p10PickHot(el.dataset.p10Wish,true);});
@@ -1661,7 +1680,7 @@ globalThis.P10_NODES = NODES;
     }
     window.addEventListener('resize',()=>{
       cancelAnimationFrame(p10ResizeFrame);
-      p10ResizeFrame=requestAnimationFrame(p10RelayoutPick);
+      p10RelayoutPick();
       clearTimeout(p10FocusTimer);
       p10FocusTimer=setTimeout(()=>{const on=p10$('#p10-trip-map [data-p10-map-day][aria-pressed="true"]');if(on)p10FocusDay(on.dataset.p10MapDay);},40);
     });

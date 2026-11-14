@@ -114,6 +114,10 @@
       window.addEventListener('resize', again);
     }
     sticky.hidden = false;
+    if (!placeSticky.fonts && document.fonts && document.fonts.ready) {
+      placeSticky.fonts = true;
+      document.fonts.ready.then(() => { const chip = document.querySelector('.gday-sticky'); if (chip) placeSticky(chip); });
+    }
     const budget = document.querySelector('#p10-budget');
     if (budget) {
       const br = budget.getBoundingClientRect();

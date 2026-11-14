@@ -455,6 +455,27 @@ test('planner leaders touch their own dot', { timeout: 120000 }, async t => {
         const dotD = Math.min(Math.hypot(a.x - mx, a.y - my), Math.hypot(b.x - mx, b.y - my));
         if (dotD > 6) bad.push(id + ' ' + dotD.toFixed(1));
       }
+      for (const el of svg.querySelectorAll('.p10-pick-label,.p10-pick-tag')) {
+        const cs = getComputedStyle(el);
+        const box = el.getBoundingClientRect();
+        if (cs.display === 'none' || cs.visibility === 'hidden' || box.width < 1) continue;
+        const id = el.getAttribute('data-p10-pick-label') || (el.textContent || '').trim();
+        let mark = svg.querySelector('[data-p10-pick="' + CSS.escape(id) + '"] .p10-pick-mark');
+        if (!mark && el.hasAttribute('data-px')) {
+          const px = parseFloat(el.getAttribute('data-px')), py = parseFloat(el.getAttribute('data-py'));
+          let best = null, bestD = 1e9;
+          svg.querySelectorAll('.p10-pick-mark').forEach(m => {
+            const d = Math.hypot((parseFloat(m.getAttribute('cx')) || 0) - px, (parseFloat(m.getAttribute('cy')) || 0) - py);
+            if (d < bestD) { bestD = d; best = m; }
+          });
+          mark = best;
+        }
+        if (!mark) continue;
+        const mr = mark.getBoundingClientRect();
+        const gap = pd((mr.left + mr.right) / 2, (mr.top + mr.bottom) / 2, box);
+        const linked = [...svg.querySelectorAll('.p10-pick-leader')].some(line => (line.dataset.for || '') === id);
+        if (gap > 14 && !linked) bad.push('detached ' + id + ' ' + gap.toFixed(1));
+      }
       return bad;
     })()`;
     for (const lang of ['zh', 'en']) {

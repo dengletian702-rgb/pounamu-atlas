@@ -1202,6 +1202,33 @@
         if (ends.len <= 48) paint(text, circle, ends);
       }
     }
+    if (svg.classList.contains('p10-pick-svg')) {
+      for (const text of texts) {
+        if (text.classList.contains('is-unplaced') || text.style.display === 'none') continue;
+        const circle = labelDot(svg, text);
+        if (!circle) continue;
+        const box = text.getBoundingClientRect();
+        if (!(box.width > 1)) continue;
+        const ends = leaderEnds(circle, box);
+        if (!(pointBoxDist(ends.x1, ends.y1, box) > 14) || ends.len > 48) continue;
+        const owner = text.getAttribute('data-p10-pick-label') || (text.textContent || '').trim();
+        if ([...svg.querySelectorAll('.p10-pick-leader')].some(line => (line.dataset.for || '') === owner)) continue;
+        const through = dotCenters().some(d => {
+          if (Math.hypot(d.x - ends.x1, d.y - ends.y1) <= 2) return false;
+          const rad = Math.min(d.r.width, d.r.height) / 2;
+          return distPointSeg(d.x, d.y, ends.x1, ends.y1, ends.x2, ends.y2) <= rad + 2;
+        });
+        if (through) continue;
+        const crosses = texts.some(other => {
+          if (other === text || other.classList.contains('is-unplaced')) return false;
+          const rect = other.getBoundingClientRect();
+          return rect.width > 1 && clipLength(ends.x1, ends.y1, ends.x2, ends.y2, rect) > 0.2;
+        });
+        if (crosses) continue;
+        ends.draw = true;
+        paint(text, circle, ends);
+      }
+    }
     if (!schematic) {
       layoutMemo.set(svg, {
         key: memoKey(),

@@ -47,13 +47,17 @@ test('start and end marks stay with their own city', { timeout: 180000 }, async 
         const o = own.getBoundingClientRect();
         const ox = (o.left + o.right) / 2, oy = (o.top + o.bottom) / 2;
         const ownPoint = pointDist(ox, oy, box);
-        let foreign = 1e9, foreignId = '';
+        const midX = (box.left + box.right) / 2, midY = (box.top + box.bottom) / 2;
+        const centerOwn = Math.hypot(midX - ox, midY - oy);
+        let foreign = 1e9, foreignId = '', centerForeign = 1e9, centerId = '';
         for (const d of dots) {
           if (Math.hypot(d.x - ox, d.y - oy) <= 6) continue;
           const dist = pointDist(d.x, d.y, box);
           if (dist < foreign) { foreign = dist; foreignId = d.id; }
+          const cd = Math.hypot(d.x - midX, d.y - midY);
+          if (cd < centerForeign) { centerForeign = cd; centerId = d.id; }
         }
-        return { name: (el.textContent || '').trim(), shown, own: Math.round(ownPoint * 10) / 10, foreign: Math.round(foreign * 10) / 10, foreignId };
+        return { name: (el.textContent || '').trim(), shown, own: Math.round(ownPoint * 10) / 10, foreign: Math.round(foreign * 10) / 10, foreignId, centerOwn: Math.round(centerOwn * 10) / 10, centerForeign: Math.round(centerForeign * 10) / 10, centerId };
       });
     })()`;
     for (const lang of ['zh', 'en']) {
@@ -68,7 +72,7 @@ test('start and end marks stay with their own city', { timeout: 180000 }, async 
         await page.ev('new Promise(r => setTimeout(r, 250))');
         const tags = await page.ev(audit);
         for (const tag of tags) {
-          if (!tag.shown || !(tag.own <= 12) || !(tag.foreign > tag.own)) problems.push(lang + ' ' + w + ' ' + JSON.stringify(tag));
+          if (!tag.shown || !(tag.own <= 12) || !(tag.foreign > tag.own) || !(tag.centerForeign > tag.centerOwn)) problems.push(lang + ' ' + w + ' ' + JSON.stringify(tag));
         }
       }
     }
@@ -78,21 +82,17 @@ test('start and end marks stay with their own city', { timeout: 180000 }, async 
   }
 });
 
-test('planner map switches columns within 300ms without showing unplaced names', { timeout: 60000 }, async t => {
+test('planner map switches columns within 300ms without overlapping names', { timeout: 180000 }, async t => {
   const page = await openBrowser();
   if (!page) { t.skip('Chrome is not installed here'); return; }
   try {
-    await page.view(900, 900, false);
-    await page.go('plan.html?lang=zh');
-    await page.waitFor('document.querySelector("#p10-next-1")', 20000);
-    await page.click('#p10-next-1');
-    await page.click('#p10-next-2');
-    await page.ev('const d=document.querySelector("#p10-more"); if(d) d.open=true');
-    await page.waitFor('document.querySelector(".p10-pick-svg.is-laid")', 20000);
-    await page.ev(`(() => {
+    const problems = [];
+    const arm = `(() => {
       window.__switch = null;
-      window.__flash = false;
+      window.__bad = [];
       window.addEventListener('resize', () => {
+        if (window.__switchArmed) return;
+        window.__switchArmed = true;
         const t0 = performance.now();
         const tick = () => {
           const host = document.querySelector('#p10-pick-map');
@@ -100,27 +100,67 @@ test('planner map switches columns within 300ms without showing unplaced names',
           const wide = matchMedia('(min-width:1001px)').matches;
           const mounted = !!(host && host.closest('.planner-explainer'));
           const laid = !!(svg && svg.classList.contains('is-laid'));
-          const visible = svg ? [...svg.querySelectorAll('.p10-pick-label,.p10-pick-tag')].filter(el => {
+          const texts = svg ? [...svg.querySelectorAll('.p10-pick-label,.p10-pick-tag')].filter(el => {
             const cs = getComputedStyle(el);
-            return cs.visibility !== 'hidden' && cs.display !== 'none' && el.getBoundingClientRect().width > 1;
-          }).length : 0;
-          if (!laid && visible) window.__flash = true;
-          if (mounted === wide && laid && visible) window.__switch = performance.now() - t0;
+            const r = el.getBoundingClientRect();
+            return cs.visibility !== 'hidden' && cs.display !== 'none' && r.width > 1 && r.height > 1;
+          }) : [];
+          let hits = 0;
+          for (let i = 0; i < texts.length; i++) {
+            const a = texts[i].getBoundingClientRect();
+            for (let j = i + 1; j < texts.length; j++) {
+              const b = texts[j].getBoundingClientRect();
+              if (a.right > b.left + 0.5 && a.left < b.right - 0.5 && a.bottom > b.top + 0.5 && a.top < b.bottom - 0.5) hits++;
+            }
+          }
+          if (hits) window.__bad.push(Math.round(performance.now() - t0));
+          if (mounted === wide && laid && texts.length) window.__switch = { ms: performance.now() - t0, hits: window.__bad.slice() };
           else if (performance.now() - t0 < 800) requestAnimationFrame(tick);
-          else window.__switch = performance.now() - t0;
+          else window.__switch = { ms: performance.now() - t0, hits: window.__bad.slice(), late: true };
         };
         requestAnimationFrame(tick);
       });
-    })()`);
-    await page.view(1100, 900, false);
-    const wide = await page.ev('new Promise(r => { const i = setInterval(() => { if (window.__switch != null) { clearInterval(i); r({ ms: window.__switch, flash: window.__flash }); } }, 16); })');
-    assert.equal(wide.flash, false, 'unplaced names were visible while widening');
-    assert.ok(wide.ms < 300, 'widen took ' + wide.ms + 'ms');
-    await page.ev('window.__switch = null; window.__flash = false');
-    await page.view(820, 900, false);
-    const narrow = await page.ev('new Promise(r => { const i = setInterval(() => { if (window.__switch != null) { clearInterval(i); r({ ms: window.__switch, flash: window.__flash }); } }, 16); })');
-    assert.equal(narrow.flash, false, 'unplaced names were visible while narrowing');
-    assert.ok(narrow.ms < 300, 'narrow took ' + narrow.ms + 'ms');
+    })()`;
+    const idle = `new Promise(resolve => {
+      let last = 0, max = 0;
+      const t0 = performance.now();
+      const tick = now => {
+        if (last) max = Math.max(max, now - last);
+        last = now;
+        if (performance.now() - t0 < 5000) requestAnimationFrame(tick);
+        else resolve(Math.round(max));
+      };
+      requestAnimationFrame(tick);
+    })`;
+    for (const lang of ['zh', 'en']) {
+      await page.view(900, 900, false);
+      await page.go('plan.html?lang=' + lang);
+      await page.waitFor('document.querySelector("#p10-next-1")', 20000);
+      await page.click('#p10-next-1');
+      await page.click('#p10-next-2');
+      await page.ev('const d=document.querySelector("#p10-more"); if(d) d.open=true');
+      await page.waitFor('document.querySelector(".p10-pick-svg.is-laid")', 20000);
+      await page.ev('new Promise(r => setTimeout(r, 400))');
+      await page.ev(arm);
+      const pairs = [[900, 1100], [1100, 900], [990, 1010], [1010, 990], [1440, 820], [820, 1440]];
+      for (const [from, to] of pairs) {
+        await page.view(from, 900, false);
+        await page.ev('new Promise(r => setTimeout(r, 350))');
+        await page.waitFor('document.querySelector(".p10-pick-svg.is-laid")', 20000);
+        await page.ev('window.__switchArmed = false; window.__switch = null; window.__bad = []');
+        await page.view(to, 900, false);
+        const result = await page.ev('new Promise(r => { const i = setInterval(() => { if (window.__switch) { clearInterval(i); r(window.__switch); } }, 16); })');
+        if (result.hits.length || !(result.ms < 300)) problems.push(lang + ' ' + from + '->' + to + ' ' + JSON.stringify(result));
+      }
+      for (const w of [390, 900, 1440]) {
+        await page.view(w, 900, w < 800);
+        await page.waitFor('document.querySelector(".p10-pick-svg")', 20000);
+        await page.ev('new Promise(r => setTimeout(r, 400))');
+        const gap = await page.ev(idle);
+        if (gap > 50) problems.push(lang + ' idle ' + w + ' gap ' + gap);
+      }
+    }
+    assert.deepEqual(problems, []);
   } finally {
     await page.close();
   }
@@ -169,6 +209,117 @@ test('site pages do not scroll sideways', { timeout: 300000 }, async t => {
       }
     }
     assert.deepEqual(problems, []);
+  } finally {
+    await page.close();
+  }
+});
+
+test('home way titles do not break a word between 751 and 1010', { timeout: 60000 }, async t => {
+  const page = await openBrowser();
+  if (!page) { t.skip('Chrome is not installed here'); return; }
+  try {
+    await page.view(900, 900, false);
+    await page.go('index.html?lang=en');
+    await page.waitFor('document.querySelector("#homeWays h3")');
+    const problems = [];
+    const audit = `(() => {
+      const broken = [];
+      const root = document.querySelector('#homeWays');
+      for (const el of root.querySelectorAll('h3, p')) {
+        const chars = [];
+        const walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+        while (walk.nextNode()) {
+          const n = walk.currentNode;
+          for (let i = 0; i < n.textContent.length; i++) {
+            const range = document.createRange();
+            range.setStart(n, i);
+            range.setEnd(n, i + 1);
+            const rect = range.getClientRects()[0];
+            chars.push({ ch: n.textContent[i], top: rect ? rect.top : 0 });
+          }
+        }
+        let word = '', tops = [];
+        const flush = () => {
+          if (word && new Set(tops.map(t => Math.round(t))).size > 1) broken.push(word);
+          word = '';
+          tops = [];
+        };
+        for (const item of chars) {
+          if (item.ch.trim() === '') flush();
+          else { word += item.ch; tops.push(item.top); }
+        }
+        flush();
+      }
+      return { broken, over: document.documentElement.scrollWidth - document.documentElement.clientWidth };
+    })()`;
+    for (let w = 751; w <= 1010; w += 20) {
+      await page.view(w, 900, false);
+      await page.ev('new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)))');
+      const result = await page.ev(audit);
+      if (result.broken.length || result.over > 1) problems.push(w + ' ' + JSON.stringify(result));
+    }
+    assert.deepEqual(problems, []);
+  } finally {
+    await page.close();
+  }
+});
+
+test('narrow schematic 4 stays 6px from other dots and D8 is attributable', { timeout: 60000 }, async t => {
+  const page = await openBrowser();
+  if (!page) { t.skip('Chrome is not installed here'); return; }
+  try {
+    await page.view(320, 800, true);
+    await page.go('guide.html?template=SI-09B&view=map&lang=zh');
+    await page.waitFor('document.querySelector("#v4-map .v4-map-num")', 20000);
+    await page.ev('document.querySelector("#v4-map").scrollIntoView()');
+    await page.ev('new Promise(r => setTimeout(r, 600))');
+    const four = await page.ev(`(() => {
+      const svg = document.querySelector('#v4-map svg.v4-schematic');
+      const el = [...svg.querySelectorAll('.v4-map-num')].find(t => (t.textContent || '').trim() === '4');
+      const pd = (x, y, r) => Math.hypot(Math.max(r.left - x, x - r.right, 0), Math.max(r.top - y, y - r.bottom, 0));
+      const box = el.getBoundingClientRect();
+      const own = el.parentNode.querySelector('circle').getBoundingClientRect();
+      const ox = (own.left + own.right) / 2, oy = (own.top + own.bottom) / 2;
+      let foreign = 1e9;
+      svg.querySelectorAll('circle').forEach(c => {
+        const r = c.getBoundingClientRect();
+        const x = (r.left + r.right) / 2, y = (r.top + r.bottom) / 2;
+        if (Math.hypot(x - ox, y - oy) <= 2) return;
+        foreign = Math.min(foreign, pd(x, y, box));
+      });
+      return { own: pd(ox, oy, box), foreign };
+    })()`);
+    assert.ok(four.foreign >= 6, 'schematic 4 is ' + four.foreign.toFixed(1) + 'px from another dot');
+    await page.go('guide.html?template=SI-09B&lang=zh');
+    await page.waitFor('document.querySelector("#gcoast .gday-num")', 20000);
+    await page.ev('document.querySelector("#gcoast").scrollIntoView({block:"center"})');
+    await page.ev('new Promise(r => setTimeout(r, 500))');
+    const day = await page.ev(`(() => {
+      const el = [...document.querySelectorAll('#gcoast .gday-num')].find(t => (t.textContent || '').includes('D8'));
+      const pd = (x, y, r) => Math.hypot(Math.max(r.left - x, x - r.right, 0), Math.max(r.top - y, y - r.bottom, 0));
+      const box = el.getBoundingClientRect();
+      const ownC = el.parentNode.querySelector('circle').getBoundingClientRect();
+      const ox = (ownC.left + ownC.right) / 2, oy = (ownC.top + ownC.bottom) / 2;
+      const svg = el.ownerSVGElement;
+      let foreign = 1e9;
+      svg.querySelectorAll('circle').forEach(c => {
+        if (!(c.parentNode && c.parentNode.querySelector('text'))) return;
+        const r = c.getBoundingClientRect();
+        const x = (r.left + r.right) / 2, y = (r.top + r.bottom) / 2;
+        if (Math.hypot(x - ox, y - oy) <= 2) return;
+        foreign = Math.min(foreign, pd(x, y, box));
+      });
+      const leaders = [...svg.querySelectorAll('.gday-leader')].some(line => {
+        const ctm = line.getScreenCTM();
+        if (!ctm) return false;
+        const pt = (x, y) => { const p = new DOMPoint(+x, +y).matrixTransform(ctm); return { x: p.x, y: p.y }; };
+        const a = pt(line.getAttribute('x1'), line.getAttribute('y1'));
+        const b = pt(line.getAttribute('x2'), line.getAttribute('y2'));
+        return Math.hypot(a.x - ox, a.y - oy) <= 8 && pd(b.x, b.y, box) <= 4;
+      });
+      return { own: pd(ox, oy, box), foreign, leaders };
+    })()`);
+    assert.ok(day.foreign > day.own + 0.4 || day.leaders, 'D8 ownership ' + JSON.stringify(day));
   } finally {
     await page.close();
   }

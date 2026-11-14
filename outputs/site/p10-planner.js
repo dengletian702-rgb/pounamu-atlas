@@ -1488,20 +1488,21 @@ globalThis.P10_NODES = NODES;
       }
       if(window.pounamuSettleLabels)window.pounamuSettleLabels(svg,sc);
       svg.classList.add('is-laid');
+      svg.dataset.p10W=String(Math.round(svg.getBoundingClientRect().width));
       return true;
     };
     if(!svg.dataset.p10Watch){
       svg.dataset.p10Watch='1';
-      let last=0;
       new ResizeObserver(()=>{
         const w=svg.getBoundingClientRect().width;
-        if(!(w>2)||Math.abs(w-last)<1)return;
-        last=w;
+        const prev=parseFloat(svg.dataset.p10W||'0');
+        if(!(w>2)||Math.abs(w-prev)<4)return;
         svg.classList.remove('is-laid');
         requestAnimationFrame(()=>requestAnimationFrame(apply));
       }).observe(svg);
     }
-    requestAnimationFrame(()=>requestAnimationFrame(apply));
+    if(svg.getBoundingClientRect().width>2)apply();
+    else requestAnimationFrame(()=>requestAnimationFrame(apply));
   }
   // After a tick or untick: fill or empty the dots and redo the names (a ticked place always gets its name).
   function p10PickRefresh(){
@@ -1649,7 +1650,7 @@ globalThis.P10_NODES = NODES;
     const p10RelayoutPick=()=>{
       const host=p10$('#p10-pick-map');
       if(!host||!p10PickItems.length)return;
-      if(Boolean(host.closest('.planner-explainer'))!==p10Wide()){p10RenderPickMap(p10PickItems);return;}
+      if(Boolean(host.closest('.planner-explainer'))!==p10Wide())p10PickHost();
       p10PickLayout();
     };
     const more=document.getElementById('p10-more');
@@ -1658,11 +1659,6 @@ globalThis.P10_NODES = NODES;
       more.addEventListener('toggle',()=>{if(more.open)p10RelayoutPick();});
     }
     window.addEventListener('resize',()=>{
-      const host=p10$('#p10-pick-map');
-      if(host&&p10PickItems.length&&Boolean(host.closest('.planner-explainer'))!==p10Wide()){
-        host.querySelector('.p10-pick-svg')?.classList.remove('is-laid');
-        p10RenderPickMap(p10PickItems);
-      }
       cancelAnimationFrame(p10ResizeFrame);
       p10ResizeFrame=requestAnimationFrame(p10RelayoutPick);
       clearTimeout(p10FocusTimer);

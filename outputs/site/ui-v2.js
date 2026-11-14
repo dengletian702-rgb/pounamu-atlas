@@ -394,13 +394,15 @@
       if (drawn > 0) scale = drawn;
     }
     if (!scale) return;
-    if (svg.classList.contains('p10-pick-svg') && box.width > 2 && box.height > 2 && vbH) {
-      const sc = Math.min(box.width / vbW, box.height / vbH);
-      if (sc > 0) {
-        svg.querySelectorAll('text').forEach(node => node.style.setProperty('font-size', (13 / sc).toFixed(2) + 'px', 'important'));
-        settleMapLabels(svg, sc);
-        return;
+    if (svg.classList.contains('p10-pick-svg')) {
+      if (!svg.classList.contains('is-laid') && box.width > 2 && box.height > 2 && vbH) {
+        const sc = Math.min(box.width / vbW, box.height / vbH);
+        if (sc > 0) {
+          svg.querySelectorAll('text').forEach(node => node.style.setProperty('font-size', (13 / sc).toFixed(2) + 'px', 'important'));
+          settleMapLabels(svg, sc);
+        }
       }
+      return;
     }
     svg.querySelectorAll('text, tspan').forEach(node => {
       const cs = getComputedStyle(node);
@@ -618,22 +620,38 @@
       node.classList.remove('is-unplaced', 'is-off');
       node.style.removeProperty('display');
     });
-    const texts = [...svg.querySelectorAll(coast ? '.gday-num' : (svg.classList.contains('v4-schematic') ? '.v4-map-num, .v4-map-name, .v4-map-tag' : '.p10-pick-label, .p10-pick-tag'))].filter(textShown);
+    const placeable = el => {
+      const cs = getComputedStyle(el);
+      if (cs.display === 'none') return false;
+      const r = el.getBoundingClientRect();
+      return r.width > 1 && r.height > 1;
+    };
+    const texts = [...svg.querySelectorAll(coast ? '.gday-num' : (svg.classList.contains('v4-schematic') ? '.v4-map-num, .v4-map-name, .v4-map-tag' : '.p10-pick-label, .p10-pick-tag'))].filter(placeable);
     svg.querySelectorAll('.v4-map-leader, .p10-pick-leader, .gday-leader').forEach(line => line.remove());
     if (!texts.length) { syncPickList(svg); return; }
     const ns = 'http://www.w3.org/2000/svg';
     const inside = r => r.left >= frame.left - 0.5 && r.right <= frame.right + 0.5 && r.top >= frame.top - 0.5 && r.bottom <= frame.bottom + 0.5;
-    const dirs = [];
-    for (let i = 0; i < 16; i++) {
-      const ang = -Math.PI / 2 + i * Math.PI / 8;
-      const dx = Math.cos(ang), dy = Math.sin(ang);
-      dirs.push([dx, dy, Math.abs(dx) < 0.35 ? 'middle' : (dx < 0 ? 'end' : 'start')]);
-    }
+    const makeDirs = steps => {
+      const out = [];
+      for (let i = 0; i < steps; i++) {
+        const ang = -Math.PI / 2 + i * (Math.PI * 2 / steps);
+        const dx = Math.cos(ang), dy = Math.sin(ang);
+        out.push([dx, dy, Math.abs(dx) < 0.35 ? 'middle' : (dx < 0 ? 'end' : 'start')]);
+      }
+      return out;
+    };
+    let dirs = makeDirs(schematic ? 16 : 8);
+    let thorough = false;
     const placed = [];
-    const dotCenters = () => [...svg.querySelectorAll('circle')].filter(c => !c.classList.contains('p10-pick-hit')).map(c => {
-      const r = c.getBoundingClientRect();
-      return { x: (r.left + r.right) / 2, y: (r.top + r.bottom) / 2, r, el: c };
-    }).filter(d => d.r.width > 0.5);
+    let cachedDots = null;
+    const dotCenters = () => {
+      if (cachedDots) return cachedDots;
+      cachedDots = [...svg.querySelectorAll('circle')].filter(c => !c.classList.contains('p10-pick-hit')).map(c => {
+        const r = c.getBoundingClientRect();
+        return { x: (r.left + r.right) / 2, y: (r.top + r.bottom) / 2, r, el: c };
+      }).filter(d => d.r.width > 0.5);
+      return cachedDots;
+    };
     const tagCity = new Set();
     for (const tag of texts) {
       if (!tag.classList.contains('p10-pick-tag')) continue;
@@ -668,7 +686,8 @@
       for (const d of dotCenters()) {
         if (Math.hypot(d.x - ends.ownX, d.y - ends.ownY) <= (ends.cluster || 2)) continue;
         const rad = Math.min(d.r.width, d.r.height) / 2;
-        if (pointBoxDist(d.x, d.y, rect) <= rad + pad) return false;
+        const away = pointBoxDist(d.x, d.y, rect);
+        if (away <= rad + pad || away < (ends.minAway || 0)) return false;
         if (ends.draw && distPointSeg(d.x, d.y, ends.x1, ends.y1, ends.x2, ends.y2) <= rad + 2) return false;
       }
       if (!ends.draw) return true;
@@ -718,7 +737,7 @@
       const rad = Math.min(c.width, c.height) / 2;
       let best = null;
       const pinned = text.classList.contains('p10-pick-tag') || text.classList.contains('v4-map-num') || text.classList.contains('gday-num');
-      const slides = pinned ? [0, -12, 12] : (schematic ? [0] : [0, -18, 18, -36, 36]);
+      const slides = pinned ? [0, -12, 12] : (schematic ? [0] : (thorough ? [0, -18, 18, -36, 36] : [0, -24, 24]));
       for (const [dx, dy, anchor] of dirs) {
         const len = Math.hypot(dx, dy) || 1;
         const ux = dx / len, uy = dy / len;
@@ -749,24 +768,30 @@
         ends.ownX = ccx;
         ends.ownY = ccy;
         ends.cluster = text.classList.contains('p10-pick-tag') ? 6 : 2;
+        ends.minAway = text.classList.contains('v4-map-num') ? 6 : 0;
         ends.draw = coast ? gap > 3 : gap > 14;
         const maxGap = schematic ? gapScreen + 1.5 : Math.min(14, gapScreen + 1.5);
         const crowded = placed.some(o => schematic ? boxGap(r, o.rect) < 6 : overlaps(r, o.rect));
         if (!(inside(r) && gap >= 2 && gap <= maxGap && !crowded && clearOf(r, ends))) continue;
         let clear = Infinity;
         let foreignPoint = Infinity;
+        let centerForeign = Infinity;
+        const midX = (r.left + r.right) / 2, midY = (r.top + r.bottom) / 2;
+        const centerOwn = Math.hypot(midX - ccx, midY - ccy);
+        const numeralDot = text.classList.contains('v4-map-num') || text.classList.contains('gday-num');
         for (const d of dotCenters()) {
           if (Math.hypot(d.x - ccx, d.y - ccy) <= (text.classList.contains('p10-pick-tag') ? 6 : 2)) continue;
-          if ((text.classList.contains('v4-map-num') || text.classList.contains('gday-num')) && !(d.el.parentNode && d.el.parentNode.querySelector('text'))) continue;
+          if (numeralDot && !(d.el.parentNode && d.el.parentNode.querySelector('text'))) continue;
           const pd = pointBoxDist(d.x, d.y, r);
           foreignPoint = Math.min(foreignPoint, pd);
+          centerForeign = Math.min(centerForeign, Math.hypot(d.x - midX, d.y - midY));
           clear = Math.min(clear, pd - Math.min(d.r.width, d.r.height) / 2);
         }
         const ownPoint = pointBoxDist(ccx, ccy, r);
         let apart = Infinity;
         for (const o of placed) apart = Math.min(apart, boxGap(r, o.rect));
         const score = schematic ? clear : apart + clear;
-        const cand = { score, x: text.getAttribute('x'), y: text.getAttribute('y'), anchor, r, ends, ownPoint, foreignPoint };
+        const cand = { score, x: text.getAttribute('x'), y: text.getAttribute('y'), anchor, r, ends, ownPoint, foreignPoint, centerOwn, centerForeign };
         const ranked = rank ? rank(cand) : score;
         if (ranked == null) continue;
         if (!best || ranked > best.ranked) best = { ...cand, ranked };
@@ -788,7 +813,7 @@
       if (tag || numeral) {
         // Start, end and stop numbers must sit nearer their own dot than any other city's dot.
         const rank = cand => {
-          const owns = cand.foreignPoint > cand.ownPoint + 0.4;
+          const owns = cand.foreignPoint > cand.ownPoint + 0.4 && cand.centerForeign > cand.centerOwn + 0.4;
           if (tag && !(cand.ownPoint <= 12 && owns)) return null;
           return (owns ? 1000 : 0) + (48 - cand.ownPoint) + Math.min(Math.max(cand.foreignPoint - cand.ownPoint, 0), 16);
         };
@@ -801,14 +826,26 @@
           text.setAttribute('text-anchor', best.anchor);
           text.setAttribute('x', best.x);
           text.setAttribute('y', best.y);
+          if (text.classList.contains('gday-num') && !(best.foreignPoint > best.ownPoint + 0.4 && best.centerForeign > best.centerOwn + 0.4)) best.ends.draw = true;
           fit = best;
         }
       }
       if (!fit && !tag) {
-      for (const gap of schematic ? [4, 8, 12, 14] : [4, 6, 8, 10, 12, 14]) {
+      for (const gap of thorough ? [4, 6, 8, 10, 12, 14] : [4, 8, 12, 14]) {
         fit = sit(text, circle, gap);
         if (fit) break;
       }
+      }
+      if (!fit && !tag && !schematic && !thorough && tagCity.has(text.getAttribute('data-p10-pick-label'))) {
+        const prev = dirs;
+        dirs = makeDirs(16);
+        thorough = true;
+        for (const gap of [4, 6, 8, 10, 12, 14]) {
+          fit = sit(text, circle, gap);
+          if (fit) break;
+        }
+        thorough = false;
+        dirs = prev;
       }
       if (!fit && schematic && !tag) {
         for (const gap of [18, 22, 26, 30, 34, 38, 42, 46]) {
@@ -838,21 +875,6 @@
     };
     ordered.forEach(placeOne);
     if (!schematic) {
-      const missed = texts.filter(text => text.classList.contains('is-unplaced'));
-      if (missed.length) {
-        const kept = ordered.filter(text => !text.classList.contains('is-unplaced')).length;
-        resetLabels();
-        const again = ordered.slice().sort((a, b) => {
-          const boost = t => (missed.includes(t) && pin(t) >= 3 ? pin(t) - 0.5 : pin(t));
-          return boost(a) - boost(b);
-        });
-        again.forEach(placeOne);
-        const now = texts.filter(text => !text.classList.contains('is-unplaced')).length;
-        if (now < kept) {
-          resetLabels();
-          ordered.forEach(placeOne);
-        }
-      }
       if (texts.some(text => text.classList.contains('p10-pick-tag') && text.classList.contains('is-unplaced'))) {
         resetLabels();
         const tagsFirst = ordered.slice().sort((a, b) => (a.classList.contains('p10-pick-tag') ? 0 : pin(a) + 1) - (b.classList.contains('p10-pick-tag') ? 0 : pin(b) + 1));
@@ -866,7 +888,7 @@
       const a = pt(line.getAttribute('x1'), line.getAttribute('y1'));
       const b = pt(line.getAttribute('x2'), line.getAttribute('y2'));
       const len = Math.hypot(b.x - a.x, b.y - a.y);
-      const live = [...svg.querySelectorAll('text')].filter(textShown);
+      const live = [...svg.querySelectorAll('text')].filter(placeable);
       const own = live.find(t => pointBoxDist(b.x, b.y, t.getBoundingClientRect()) <= 3);
       const crosses = live.some(t => t !== own && clipLength(a.x, a.y, b.x, b.y, t.getBoundingClientRect()) > 0.2);
       const throughDot = dotCenters().some(d => {
@@ -888,6 +910,9 @@
     if (!ul.dataset.full) ul.dataset.full = ul.innerHTML;
     const narrow = window.matchMedia('(max-width:420px)').matches;
     const missed = [...svg.querySelectorAll('.is-unplaced')].map(t => (t.textContent || '').trim()).filter(Boolean);
+    const signature = (!narrow && missed.length) ? missed.join('\n') : 'full';
+    if (ul.dataset.shown === signature) return;
+    ul.dataset.shown = signature;
     if (!narrow && missed.length) {
       ul.replaceChildren(...missed.map(name => { const li = doc.createElement('li'); li.textContent = name; return li; }));
       ul.classList.add('is-open');
@@ -918,7 +943,7 @@
     // The contour art is decoration: draw it when the browser is idle, and only on pages that use it.
     if (doc.querySelector('.home-ways, .page-planner, .page-intro, .v4-guide-top, .ui2-contour')) (window.requestIdleCallback || (fn => setTimeout(fn, 400)))(installContours, { timeout: 2500 });
     let timer = 0;
-    const own = n => { const el = n.nodeType === 1 ? n : n.parentElement; return !!(el && el.closest && el.closest('.ui2-hud, .ui2-readout, .ui2-palette, .ui2-particles, .ui2-progress')); };
+    const own = n => { const el = n.nodeType === 1 ? n : n.parentElement; return !!(el && el.closest && el.closest('.ui2-hud, .ui2-readout, .ui2-palette, .ui2-particles, .ui2-progress, #p10-pick-map')); };
     new MutationObserver(muts => { if (muts.every(m => own(m.target))) return; clearTimeout(timer); timer = setTimeout(enhance, 120); }).observe(doc.body, { childList: true, subtree: true });
   }
   function skipFocus() {

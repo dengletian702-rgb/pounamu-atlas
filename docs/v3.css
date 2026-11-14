@@ -78,7 +78,8 @@
 .v3-card-closure{margin:10px 0 0;padding:4px 8px;background:#fbe3dc;color:#8e2a15;font-size:var(--type-xs);font-weight:600;border-left:3px solid #b3361d}
 @media(max-width:750px){.v3-closure{font-size:var(--type-sm);padding-top:12px;padding-bottom:12px}}
 /* v3.1 — five ways to travel (paddling added) */
-@media(min-width:751px){.ways-grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:16px}.ways-grid>a{min-width:0}.ways-grid h3,.ways-grid p{max-width:100%;overflow-wrap:anywhere}}
+@media(min-width:751px){.ways-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}.ways-grid>a{min-width:0}.ways-grid h3,.ways-grid p{max-width:100%;overflow-wrap:normal;word-break:normal;hyphens:manual}}
+@media(min-width:1100px){.ways-grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:20px}}
 @media(max-width:750px){.ways-grid>a:last-child:nth-child(odd){grid-column:1 / -1}}
 /* v3.1 C12: planner tip sources */
 .p10-tip-src{font-size:var(--type-sm);color:var(--muted,#5b6b63)}

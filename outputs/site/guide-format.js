@@ -183,11 +183,12 @@
     const dots = (stops || []).map((s, i) => {
       if (!Number.isFinite(Number(s.lat)) || !Number.isFinite(Number(s.lng))) return '';
       const [x, y] = project(Number(s.lat), Number(s.lng));
-      return `<g class="gday-stop" data-gday-stop="${i + 1}"><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="6"/><text x="${x.toFixed(1)}" y="${(y - 10).toFixed(1)}" text-anchor="middle">${i + 1}</text></g>`;
+      return `<g class="gday-stop" data-gday-stop="${i + 1}"><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="6"/><text class="gday-num" x="${x.toFixed(1)}" y="${(y - 10).toFixed(1)}" text-anchor="middle">D${i + 1}</text></g>`;
     }).join('');
     const line = (stops || []).filter(s => Number.isFinite(Number(s.lat))).map(s => project(Number(s.lat), Number(s.lng)).map(n => n.toFixed(1)).join(',')).join(' ');
     host.innerHTML = `<div class="p10-map-day-list">${(stops || []).map((s, i) => `<button type="button" data-gday-focus="${i + 1}">${zh ? '第 ' + (i + 1) + ' 天' : 'Day ' + (i + 1)}</button>`).join('')}</div>
       <svg class="p10-trip-svg gcoast" viewBox="0 0 680 820" role="img" aria-label="${zh ? '新西兰海岸与停留点' : 'New Zealand coastline and stops'}"><rect width="680" height="820" fill="#e2ece8"/><path class="p10-coast" data-coast="${coastD ? 'natural-earth' : 'schematic'}" d="${d}"/><polyline points="${line}" fill="none" stroke="#244c39" stroke-width="3"/>${dots}</svg>
+      <p class="gcoast-legend">${zh ? '按天数编号，D1 是第 1 天。' : 'Numbered by day: D1 is day 1.'}</p>
       <p class="v4-note">${zh ? '海岸线来自 Natural Earth（公有领域），连线是示意，不能导航。' : 'Coastline: Natural Earth (public domain). The line is a sketch, not for navigation.'} <a href="https://www.naturalearthdata.com/about/terms-of-use/" target="_blank" rel="noopener" data-keep-link="1">Natural Earth</a></p>`;
     const svg = host.querySelector('svg');
     const fit = () => {

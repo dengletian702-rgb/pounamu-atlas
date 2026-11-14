@@ -125,7 +125,7 @@ body[data-page=plan] .type-char{opacity:1!important;transform:none!important;ani
   body[data-page=plan] .planner-explainer.p10-has-map{align-self:stretch;background:none;border-left:0;padding:0}
   body[data-page=plan] .planner-explainer.p10-has-map > .planner-explainer-zh,body[data-page=plan] .planner-explainer.p10-has-map > .planner-explainer-en{background:#f5ede1;border-left:3px solid #c87d4b;padding:22px 26px}
   body[data-page=plan] .planner-explainer.p10-has-map .p10-pick-map{position:sticky;top:12px;margin:18px 0 0;padding:14px 16px;background:#f5ede1;border:0;border-left:3px solid #c87d4b}
-  .planner-explainer.p10-has-map .p10-pick-svg{max-height:calc(100vh - 150px)}
+  .planner-explainer.p10-has-map .p10-pick-svg{max-height:none}
 }
 /* ticket D/E: road and winter notes on a day card */
 .p10-road-note{margin:.6rem 0;font-size:var(--type-sm)}

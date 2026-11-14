@@ -1452,7 +1452,7 @@ globalThis.P10_NODES = NODES;
     host.hidden=false;
     const xs=p10PickItems.map(i=>i.xy[0]),ys=p10PickItems.map(i=>i.xy[1]);
     const x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);
-    const w=Math.max(x1-x0+130,220),h=Math.max(y1-y0+70,220),vb=[(x0+x1)/2+15-w/2,(y0+y1)/2-h/2,w,h];
+    const w=Math.max(x1-x0+140,240),h=Math.max(y1-y0+100,200),vb=[(x0+x1)/2-w/2,(y0+y1)/2-h/2,w,h];
     const start=p10$('#p10-start')?.value,end=p10$('#p10-end')?.value;
     // Labels are placed in this order, so ticked places and the best-known sights keep theirs when space runs out.
     const order=[...p10PickItems].sort((a,b)=>(p10Selected.has(b.id)-p10Selected.has(a.id))||((b.kind==='sight')-(a.kind==='sight'))||(b.worth-a.worth));

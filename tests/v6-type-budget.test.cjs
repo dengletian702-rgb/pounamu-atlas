@@ -662,6 +662,13 @@ test('map labels do not overlap and stay inside the svg', async (t) => {
         })()`);
         const badPick = !pick.wide || pick.hits.length || pick.outside.length || pick.small.length || (pick.detached || []).length || (pick.covers || []).length || (pick.leaderThrough || []).length || (pick.leaderThroughDot || []).length || (pick.labelNextToOtherDot || []).length || (pick.leaderLong || []).length || (spill.hidden.length && (!spill.shown || spill.absent.length || !(spill.fs >= 11.95)));
         if (badPick) found.push('planner ' + lang + ' ' + w + ' ' + JSON.stringify({ pick, spill }));
+        if (w === 1440) {
+          const overflow = await page.ev(`(() => {
+            const ul = document.querySelector('#p10-pick-map .p10-pick-name-list');
+            return { open: Boolean(ul && ul.classList.contains('is-open')), missed: [...document.querySelectorAll('#p10-pick-map .is-unplaced')].map(t => (t.textContent || '').trim()) };
+          })()`);
+          if (overflow.open || overflow.missed.length) found.push('planner overflow ' + lang + ' ' + JSON.stringify(overflow));
+        }
         if (w <= 420) {
           const list = await page.ev(`(() => {
             const ul = document.querySelector('#p10-pick-map .p10-pick-name-list');
@@ -746,6 +753,46 @@ test('copy share link shows 已复制 at 390', async (t) => {
     await page.cdp('Input.dispatchMouseEvent', { type: 'mousePressed', x: box.x, y: box.y, button: 'left', clickCount: 1 });
     await page.cdp('Input.dispatchMouseEvent', { type: 'mouseReleased', x: box.x, y: box.y, button: 'left', clickCount: 1 });
     await page.waitFor('document.querySelector(".p10-share-status") && /已复制/.test(document.querySelector(".p10-share-status").textContent)', 5000);
+  } finally {
+    await page.close();
+  }
+});
+
+test('schematic stop numbers stay apart from day numbers', async (t) => {
+  const page = await openBrowser();
+  if (!page) { t.skip('Chrome is not installed here'); return; }
+  try {
+    const problems = [];
+    for (const w of [320, 390, 419, 768, 1440]) {
+      await page.view(w, w >= 800 ? 1100 : 900, w < 800);
+      for (const lang of ['zh', 'en']) {
+        await page.go('guide.html?template=SI-09B&view=map&lang=' + lang);
+        await page.waitFor('document.querySelector("#v4-map .v4-map-num") && document.querySelector("#gcoast .gday-num")', 20000);
+        await page.ev('new Promise(r => setTimeout(r, 500))');
+        const report = await page.ev(`(() => {
+          const shown = el => { const cs = getComputedStyle(el); const r = el.getBoundingClientRect(); return cs.display !== 'none' && r.width > 1 && r.height > 1; };
+          const gap = (a, b) => Math.hypot(Math.max(b.left - a.right, a.left - b.right, 0), Math.max(b.top - a.bottom, a.top - b.bottom, 0));
+          const stops = [...document.querySelectorAll('#v4-map .v4-map-num')].filter(shown);
+          let min = 1e9, pair = '';
+          for (let i = 0; i < stops.length; i++) for (let j = i + 1; j < stops.length; j++) {
+            const g = gap(stops[i].getBoundingClientRect(), stops[j].getBoundingClientRect());
+            if (g < min) { min = g; pair = (stops[i].textContent || '').trim() + '/' + (stops[j].textContent || '').trim(); }
+          }
+          const dayText = [...document.querySelectorAll('#gcoast .gday-num')].map(el => (el.textContent || '').trim());
+          const stopText = [...document.querySelectorAll('#v4-map .v4-map-num')].map(el => (el.textContent || '').trim());
+          const dayLegend = (document.querySelector('.gcoast-legend') || {}).textContent || '';
+          const stopLegend = (document.querySelector('.v4-map-legend-note') || {}).textContent || '';
+          return { min, pair, n: stops.length, dayText, stopText, dayLegend, stopLegend };
+        })()`);
+        const dayOk = report.dayText.length >= 2 && report.dayText.every(label => /^D\d+$/.test(label));
+        const stopOk = report.stopText.some(label => /^\d+$/.test(label)) && report.stopText.every(label => !/^D/.test(label));
+        const legends = lang === 'zh'
+          ? /天数/.test(report.dayLegend) && /站点顺序/.test(report.stopLegend)
+          : /by day/i.test(report.dayLegend) && /stop order/i.test(report.stopLegend);
+        if (!(report.min >= 6) || !dayOk || !stopOk || !legends || report.n < 2) problems.push(lang + ' ' + w + ' ' + JSON.stringify(report));
+      }
+    }
+    assert.deepEqual(problems, []);
   } finally {
     await page.close();
   }

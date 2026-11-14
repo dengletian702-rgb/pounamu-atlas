@@ -613,7 +613,9 @@
       const r = c.getBoundingClientRect();
       return { x: (r.left + r.right) / 2, y: (r.top + r.bottom) / 2, r };
     }).filter(d => d.r.width > 0.5);
-    const ordered = texts.slice().sort((a, b) => (a.textContent || '').length - (b.textContent || '').length);
+    const ordered = texts.slice().sort((a, b) => schematic
+      ? (a.textContent || '').length - (b.textContent || '').length
+      : (b.textContent || '').length - (a.textContent || '').length);
     const leaderEnds = (circle, rect) => {
       const c = circle.getBoundingClientRect();
       const cx = (c.left + c.right) / 2, cy = (c.top + c.bottom) / 2;
@@ -669,9 +671,11 @@
       const ccx = (c.left + c.right) / 2, ccy = (c.top + c.bottom) / 2;
       const rad = Math.min(c.width, c.height) / 2;
       let best = null;
+      const slides = schematic ? [0] : [0, -18, 18, -36, 36];
       for (const [dx, dy, anchor] of dirs) {
         const len = Math.hypot(dx, dy) || 1;
         const ux = dx / len, uy = dy / len;
+        for (const slide of slides) {
         text.setAttribute('text-anchor', anchor);
         text.setAttribute('x', '0');
         text.setAttribute('y', '0');
@@ -679,7 +683,7 @@
         if (!(r0.width > 1)) continue;
         const half = Math.abs(ux) * r0.width / 2 + Math.abs(uy) * r0.height / 2;
         const dist = rad + gapScreen + half;
-        shiftText(text, (ccx + ux * dist - (r0.left + r0.right) / 2) / scale, (ccy + uy * dist - (r0.top + r0.bottom) / 2) / scale);
+        shiftText(text, (ccx + ux * dist - uy * slide - (r0.left + r0.right) / 2) / scale, (ccy + uy * dist + ux * slide - (r0.top + r0.bottom) / 2) / scale);
         let r = text.getBoundingClientRect();
         let gap = boxGap(r, c);
         if (gap > gapScreen + 1) {
@@ -699,13 +703,18 @@
         ends.ownY = ccy;
         ends.draw = schematic && gap > 14;
         const maxGap = schematic ? gapScreen + 1.5 : Math.min(14, gapScreen + 1.5);
-        if (!(inside(r) && gap >= 2 && gap <= maxGap && !placed.some(o => overlaps(r, o.rect)) && clearOf(r, ends))) continue;
+        const crowded = placed.some(o => schematic ? boxGap(r, o.rect) < 6 : overlaps(r, o.rect));
+        if (!(inside(r) && gap >= 2 && gap <= maxGap && !crowded && clearOf(r, ends))) continue;
         let clear = Infinity;
         for (const d of dotCenters()) {
           if (Math.hypot(d.x - ccx, d.y - ccy) <= 2) continue;
           clear = Math.min(clear, pointBoxDist(d.x, d.y, r) - Math.min(d.r.width, d.r.height) / 2);
         }
-        if (!best || clear > best.clear) best = { clear, x: text.getAttribute('x'), y: text.getAttribute('y'), anchor, r, ends };
+        let apart = Infinity;
+        for (const o of placed) apart = Math.min(apart, boxGap(r, o.rect));
+        const score = schematic ? apart : apart + clear;
+        if (!best || score > best.score) best = { score, x: text.getAttribute('x'), y: text.getAttribute('y'), anchor, r, ends };
+        }
       }
       if (!best) return null;
       text.setAttribute('text-anchor', best.anchor);
@@ -713,12 +722,12 @@
       text.setAttribute('y', best.y);
       return { r: text.getBoundingClientRect(), ends: best.ends };
     };
-    for (const text of ordered) {
+    const placeOne = text => {
       text.classList.remove('is-unplaced');
       const circle = labelDot(svg, text);
-      if (!circle) continue;
+      if (!circle) return true;
       let fit = null;
-      for (const gap of [4, 8, 12, 14]) {
+      for (const gap of schematic ? [4, 8, 12, 14] : [4, 6, 8, 10, 12, 14]) {
         fit = sit(text, circle, gap);
         if (fit) break;
       }
@@ -729,15 +738,39 @@
         }
       }
       if (!fit) {
-        if (schematic) continue;
+        if (schematic) return false;
         text.classList.add('is-off', 'is-unplaced');
         text.style.setProperty('display', 'none', 'important');
-        continue;
+        return false;
       }
       text.classList.remove('is-off');
       text.style.removeProperty('display');
       placed.push({ rect: fit.r });
       paint(text, circle, fit.ends);
+      return true;
+    };
+    const resetLabels = () => {
+      placed.length = 0;
+      svg.querySelectorAll('.v4-map-leader, .p10-pick-leader').forEach(line => line.remove());
+      texts.forEach(text => {
+        text.classList.remove('is-unplaced', 'is-off');
+        text.style.removeProperty('display');
+      });
+    };
+    ordered.forEach(placeOne);
+    if (!schematic) {
+      const missed = texts.filter(text => text.classList.contains('is-unplaced'));
+      if (missed.length) {
+        const kept = ordered.filter(text => !text.classList.contains('is-unplaced')).length;
+        resetLabels();
+        const again = [...missed, ...ordered.filter(text => !missed.includes(text))];
+        again.forEach(placeOne);
+        const now = texts.filter(text => !text.classList.contains('is-unplaced')).length;
+        if (now < kept) {
+          resetLabels();
+          ordered.forEach(placeOne);
+        }
+      }
     }
     for (const line of [...svg.querySelectorAll('.v4-map-leader, .p10-pick-leader')]) {
       const ctm = line.getScreenCTM();

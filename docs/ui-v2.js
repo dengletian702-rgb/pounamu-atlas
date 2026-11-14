@@ -944,7 +944,7 @@
         }
         const ownPoint = pointBoxDist(ccx, ccy, r);
         const ownsHere = foreignPoint > ownPoint + 0.4 && centerForeign > centerOwn + 0.4;
-        ends.draw = coast ? gap > 3 : (numeralHere ? (!ownsHere || ownPoint > 14 || gap > 14) : gap > 14);
+        ends.draw = coast ? gap > 3 : (numeralHere ? (!ownsHere || ownPoint > 14 || gap > 14) : gap > 8);
         const maxGap = gapScreen + 1.5;
         const crowded = placed.some(o => schematic ? boxGap(r, o.rect) < 12 : overlaps(r, o.rect));
         if (!(inside(r) && gap >= 2 && gap <= maxGap && !crowded && clearOf(r, ends))) continue;
@@ -1201,37 +1201,6 @@
         ends.draw = true;
         if (ends.len <= 48) paint(text, circle, ends);
       }
-    }
-    if (svg.classList.contains('p10-pick-svg')) {
-      const owned = new Set([...svg.querySelectorAll('.p10-pick-leader')].map(line => line.dataset.for || ''));
-      const liveTexts = texts.filter(text => !text.classList.contains('is-unplaced') && text.style.display !== 'none');
-      const rects = new Map(liveTexts.map(text => [text, text.getBoundingClientRect()]));
-      const todo = [];
-      for (const text of liveTexts) {
-        const circle = labelDot(svg, text);
-        if (!circle) continue;
-        const box = rects.get(text);
-        if (!(box.width > 1)) continue;
-        const ends = leaderEnds(circle, box);
-        if (!(pointBoxDist(ends.x1, ends.y1, box) > 14) || ends.len > 48) continue;
-        const owner = text.getAttribute('data-p10-pick-label') || (text.textContent || '').trim();
-        if (owned.has(owner)) continue;
-        const through = dotCenters().some(d => {
-          if (Math.hypot(d.x - ends.x1, d.y - ends.y1) <= 2) return false;
-          const rad = Math.min(d.r.width, d.r.height) / 2;
-          return distPointSeg(d.x, d.y, ends.x1, ends.y1, ends.x2, ends.y2) <= rad + 2;
-        });
-        if (through) continue;
-        const crosses = liveTexts.some(other => {
-          if (other === text) return false;
-          const rect = rects.get(other);
-          return rect && rect.width > 1 && clipLength(ends.x1, ends.y1, ends.x2, ends.y2, rect) > 0.2;
-        });
-        if (crosses) continue;
-        ends.draw = true;
-        todo.push({ text, circle, ends });
-      }
-      for (const item of todo) paint(item.text, item.circle, item.ends);
     }
     if (!schematic) {
       layoutMemo.set(svg, {

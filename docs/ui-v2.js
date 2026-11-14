@@ -73,21 +73,41 @@
       { seed: 20261113, stroke: 'rgba(198,236,218,0.16)', prop: '--ui2-contour-light', store: 'ui2-contour-l' },
       { seed: 4219, stroke: 'rgba(20,53,43,0.13)', prop: '--ui2-contour-dark', store: 'ui2-contour-d' }
     ];
-    const later = fn => setTimeout(fn, 0);
-    const step = () => {
-      const job = jobs[0];
-      if (!job) return;
-      if (!job.state) job.state = contourState(job.seed);
-      if (!contourSlice(job.state)) { later(step); return; }
-      later(() => {
-        const url = contourUrl(job.state, job.stroke);
-        root.style.setProperty(job.prop, url);
-        try { sessionStorage.setItem(job.store, url); } catch (e) {}
-        jobs.shift();
-        if (jobs.length) later(step);
-      });
+    const apply = (done) => {
+      for (const item of done) {
+        root.style.setProperty(item.prop, item.url);
+        try { sessionStorage.setItem(item.store, item.url); } catch (e) {}
+      }
     };
-    later(step);
+    try {
+      const src = [contourState, contourSlice, contourUrl].map(fn => fn.toString()).join('\n') + `
+        self.onmessage = (e) => {
+          const out = [];
+          for (const job of e.data) {
+            const st = contourState(job.seed);
+            while (!contourSlice(st)) {}
+            out.push({ prop: job.prop, store: job.store, url: contourUrl(st, job.stroke) });
+          }
+          self.postMessage(out);
+        };`;
+      const worker = new Worker(URL.createObjectURL(new Blob([src], { type: 'text/javascript' })));
+      worker.onmessage = (e) => { apply(e.data); worker.terminate(); };
+      worker.postMessage(jobs);
+    } catch (e) {
+      const later = fn => setTimeout(fn, 0);
+      const step = () => {
+        const job = jobs[0];
+        if (!job) return;
+        if (!job.state) job.state = contourState(job.seed);
+        if (!contourSlice(job.state)) { later(step); return; }
+        later(() => {
+          apply([{ prop: job.prop, store: job.store, url: contourUrl(job.state, job.stroke) }]);
+          jobs.shift();
+          if (jobs.length) later(step);
+        });
+      };
+      later(step);
+    }
   }
 
   /* ---------- 2. Particle network on dark bands (pauses off screen) ---------- */

@@ -27,23 +27,38 @@
       if (extra) pool = [extra, ...pool];
     }
     const pts = lineStops.map(s => ({ ...s, xy: project(Number(s.lat), Number(s.lon)) }));
-    const endId = state.endId || (pts.length ? pts[pts.length - 1].id : '');
+    const endId = state.endId || '';
     const line = pts.length > 1 ? pts.map(p => p.xy.map(n => n.toFixed(1)).join(',')).join(' ') : '';
+    const routeIds = [];
+    for (const s of lineStops) if (s.id && !routeIds.includes(s.id)) routeIds.push(s.id);
+    const numbered = routeIds.length >= 2;
+    const samePlace = Boolean(state.startId) && state.startId === endId;
+    let seq = 0;
+    const badge = {};
+    for (const id of routeIds) {
+      if ((samePlace && id === state.startId) || (state.startId && endId && id === state.startId && id === endId)) badge[id] = zh ? '起终' : 'Start/end';
+      else if (state.startId && id === state.startId) badge[id] = zh ? '起' : 'S';
+      else if (endId && id === endId) badge[id] = zh ? '终' : 'E';
+      else badge[id] = String(++seq);
+    }
     const dots = pool.map(p => {
       const xy = project(Number(p.lat), Number(p.lon));
       const label = zh ? (p.name_zh || p.name_en || '') : (p.name_en || p.name_zh || '');
-      const isStart = Boolean(state.startId) && p.id === state.startId;
-      const isEnd = Boolean(endId) && p.id === endId;
-      const tag = isStart && isEnd ? (zh ? '起终' : 'Start/end') : isStart ? (zh ? '起' : 'S') : isEnd ? (zh ? '终' : 'E') : '';
+      const isStart = Boolean(state.startId) && p.id === state.startId && !samePlace;
+      const isEnd = Boolean(endId) && p.id === endId && !samePlace;
       const cls = [
         'v4-map-stop',
         p.selected ? 'is-on' : 'is-off',
         p.unscheduled ? 'is-unscheduled' : '',
       ].filter(Boolean).join(' ');
-      return `<g class="${cls}" data-place="${esc(p.id)}" tabindex="0" role="button" aria-pressed="${p.selected ? 'true' : 'false'}" aria-label="${esc(label)}" transform="translate(${xy[0].toFixed(1)} ${xy[1].toFixed(1)})">
+      const mark = numbered ? badge[p.id] : '';
+      const ord = mark ? routeIds.indexOf(p.id) : -1;
+      const text = mark
+        ? `<text class="v4-map-num" y="-14" text-anchor="middle">${esc(mark)}</text>`
+        : ((p.selected || isStart || isEnd || (samePlace && p.id === state.startId)) && label ? `<text class="v4-map-name" y="22" text-anchor="middle">${esc(label)}</text>` : '');
+      return `<g class="${cls}" data-place="${esc(p.id)}" data-ord="${ord}" data-legend="${esc(mark)}" data-name="${esc(label)}" tabindex="0" role="button" aria-pressed="${p.selected ? 'true' : 'false'}" aria-label="${esc(label)}" transform="translate(${xy[0].toFixed(1)} ${xy[1].toFixed(1)})">
         <circle r="${p.selected ? 7 : 5}"><title>${esc(label)}</title></circle>
-        ${tag ? `<text y="-10" text-anchor="middle">${esc(tag)}</text>` : ''}
-        ${(p.selected || isStart || isEnd) && label ? `<text class="v4-map-name" y="16" text-anchor="middle">${esc(label)}</text>` : ''}
+        ${text}
       </g>`;
     }).join('');
     const coast = coastPath();
@@ -139,6 +154,39 @@
     el.dataset.mapKind = 'svg';
     el.innerHTML = schematicSvg(state);
     bindSvg(el, state);
+    const svg = el.querySelector('svg');
+    const fit = () => {
+      if (!svg) return;
+      const box = svg.getBoundingClientRect();
+      const vb = svg.viewBox.baseVal.width || 680;
+      const scale = box.width > 0 ? box.width / vb : 0;
+      if (!scale) return;
+      svg.querySelectorAll('text').forEach(t => t.style.setProperty('font-size', (13 / scale).toFixed(2) + 'px', 'important'));
+    };
+    fit();
+    requestAnimationFrame(fit);
+    setTimeout(fit, 80);
+    const rows = [...el.querySelectorAll('[data-legend]')]
+      .filter(g => g.dataset.legend)
+      .sort((a, b) => Number(a.dataset.ord) - Number(b.dataset.ord));
+    if (rows.length) {
+      const note = document.createElement('p');
+      note.className = 'v4-map-legend-note';
+      note.textContent = state.lang === 'en' ? 'Numbered in stop order, not by day.' : '按站点顺序编号，不是按天数。';
+      const list = document.createElement('ul');
+      list.className = 'v4-map-name-list';
+      list.innerHTML = rows.map(g => `<li>${esc(g.dataset.legend)} ${esc(g.dataset.name || '')}</li>`).join('');
+      svg.after(list);
+      svg.after(note);
+    } else {
+      const names = [...el.querySelectorAll('.v4-map-name')].map(t => t.textContent.trim()).filter(Boolean);
+      if (names.length) {
+        const list = document.createElement('ul');
+        list.className = 'v4-map-name-list';
+        list.innerHTML = names.map(name => `<li>${esc(name)}</li>`).join('');
+        svg.after(list);
+      }
+    }
     return { kind: 'svg' };
   }
   function loadGoogle(key) {

@@ -7,7 +7,7 @@ import {fileURLToPath} from 'node:url';
 const root=dirname(dirname(fileURLToPath(import.meta.url)));
 const sites=['docs','outputs/site'];
 // The v4 scripts and every page are versioned too, so a returning visitor never mixes old and new code (walk-through H-16).
-const assets=['app.js','v3.js','route-maps.js','p10-planner.js','planner-adapter.js','styles.css','v3.css','p10-planner.css','v4-guide.js','v4-maps.js','v4-match.js','v4-guide.css','ui-v2.css','ui-v2.js'];
+const assets=['app.js','v3.js','route-maps.js','p10-planner.js','planner-adapter.js','styles.css','v3.css','p10-planner.css','v4-guide.js','v4-maps.js','v4-match.js','v4-guide.css','ui-v2.css','ui-v2.js','type.css','maps-urls.js','budget.js','guide-format.js','route-days.js'];
 const pages=['index.html','routes.html','route.html','prepare.html','plan.html','tracks.html','cities.html','city.html','destination.html','guide.html'];
 const pattern=new RegExp('\\b(src|href)="('+assets.map(a=>a.replace(/[.]/g,'\\.')).join('|')+')(?:\\?[^"#]*)?"','g');
 const check=process.argv.includes('--check');let errors=[];const hashed={};

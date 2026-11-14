@@ -1,0 +1,67 @@
+/* Single type system. The only file allowed to set font-family.
+   Faces are the ones UI v2 already uses: self-hosted NZDisplay for the page title,
+   a CJK-aware heading stack, a CJK-aware body stack, and a mono for labels and numbers.
+   No paid fonts. font-display: swap. */
+
+@font-face{
+  font-family:NZDisplay;
+  src:url('assets/fonts/display-v1.woff2') format('woff2');
+  font-weight:400;
+  font-style:normal;
+  font-display:swap;
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+
+:root{
+  --type-display:NZDisplay,var(--type-heading);
+  --type-heading:"Songti SC","Noto Serif SC","Source Han Serif SC","STSong","PingFang SC",Georgia,serif;
+  --type-body:-apple-system,BlinkMacSystemFont,"Helvetica Neue","PingFang SC","Microsoft YaHei","Noto Sans SC",Arial,sans-serif;
+  --type-mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --type-xs:.75rem;
+  --type-sm:.8125rem;
+  --type-md:1rem;
+  --type-lg:1.25rem;
+  --type-xl:1.75rem;
+  --type-2xl:2.5rem;
+  --type-3xl:clamp(2.75rem,6vw,4.5rem);
+  --type-regular:400;
+  --type-medium:500;
+  --type-bold:600;
+  --type-tight:1.15;
+  --type-snug:1.4;
+  --type-body-leading:1.7;
+  /* Names older stylesheets still read. They point at this system. */
+  --serif:var(--type-heading);
+  --sans:var(--type-body);
+  --bodyface:var(--type-body);
+  --ui2-head:var(--type-heading);
+  --ui2-sans:var(--type-body);
+  --ui2-mono:var(--type-mono);
+}
+
+html:lang(zh),html:lang(zh-Hans){
+  --type-heading:"Songti SC","Noto Serif SC","Source Han Serif SC","STSong","PingFang SC",serif;
+  --type-body:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+}
+html:lang(en){
+  --type-heading:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Songti SC",serif;
+  --type-body:-apple-system,BlinkMacSystemFont,"Helvetica Neue","PingFang SC",Arial,sans-serif;
+}
+
+html,body,button,input,select,textarea{font-family:var(--type-body)}
+body{font-size:var(--type-md);font-weight:var(--type-regular);line-height:var(--type-body-leading)}
+button,input,select,textarea{font-size:inherit;font-weight:inherit;line-height:inherit}
+h1,.cinema-copy h1{font-family:var(--type-display);font-weight:var(--type-regular);line-height:var(--type-tight);font-size:var(--type-3xl)}
+h2,h3,h4,.plan-day-title,.v4-place h3,.v4-card h3,.route-body h3,.prepare-card h2,.v4-block h2,.p10-result-title,.gday h3{
+  font-family:var(--type-heading);font-weight:var(--type-bold);line-height:var(--type-snug)
+}
+h2{font-size:var(--type-2xl);font-weight:var(--type-regular)}
+h3{font-size:var(--type-xl)}
+.section-label,.eyebrow,.v4-badge,.route-kind,.ui2-mono,.ui2-hud,.ui2-readout,.ui2-kbtn,.ui2-pal footer,.ui2-pal li a small,.v4-field,.v4-field>span,.p10-day-focus,.gday-date b{
+  font-family:var(--type-mono);font-weight:var(--type-bold);letter-spacing:.06em
+}
+svg text,.nz-map text,.p10-map-label,.p10-map-tag,.p10-pick-label,.terrain-label,.gday-stop text{
+  font-family:var(--type-body);font-weight:var(--type-bold)
+}
+html:lang(en) h1,html:lang(en) .cinema-copy h1{font-family:var(--type-heading);font-weight:var(--type-medium)}
+html:lang(en) .v4-en-name{font-family:var(--type-heading);font-style:italic;font-weight:var(--type-regular)}

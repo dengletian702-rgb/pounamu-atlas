@@ -214,7 +214,12 @@
     stay: /budget|cheap|hostel|backpack|luxury|lodge|camping|campsite|holiday park|motel|hotel|accommodation|青旅|背包|露营|营地|高端|豪华|奢华|省钱|预算|住宿|酒店|旅馆|民宿/i,
     sport: /tennis|golf|basketball|网球|高尔夫|篮球|球场/i,
     boat: /boat|boating|kayak|canoe|paddl|jet ?boat|cruise|划船|皮划艇|独木舟|游船|快艇|泛舟/i,
-    family: /亲子|带娃|带孩子|孩子|小孩|儿童|家庭|一家|family|kids?\b|children|child|toddler|easy walk/i,
+    family: /亲子|带娃|带孩子|孩子|小孩|儿童|家庭|一家|family|kids?\b|children|child|toddler|easy walk|少走路/i,
+    hot: /hot pools?|温泉/i,
+    safety: /\b111\b|safety|emergency|紧急|安全/i,
+    licence: /驾照|左行|keep left|driving licence|driver licence|overseas licence/i,
+    van: /campervan|房车|freedom camp/i,
+    walks: /great walks?|大步道|九大步道/i,
   };
   function routeHours(r) {
     const text = String((Array.isArray(r.time) ? r.time[0] : r.time) || '').toLowerCase();
@@ -267,9 +272,8 @@
     const out = [];
     const ski = skiMatches(q);
     if (ski.length) out.push({ id: 'ski', fields: ski });
-    for (const id of ['stay', 'sport', 'boat', 'family']) {
-      if (id === 'sport' && window.pounamuFlag && !window.pounamuFlag('sports')) continue;
-      if (TOPICS[id].test(q)) out.push({ id });
+    for (const id of ['stay', 'sport', 'boat', 'family', 'hot', 'safety', 'licence', 'van', 'walks']) {
+      if (TOPICS[id] && TOPICS[id].test(q)) out.push({ id });
     }
     return out;
   }
@@ -288,7 +292,16 @@
       const list = familyRoutes().map(r => `<li><a href="route.html?id=${esc(r.id)}&amp;lang=${L}">${esc(L === 'en' ? r.name : r.zh)}</a> · ${esc(Array.isArray(r.time) ? r.time[L === 'en' ? 0 : 1] : '')}</li>`).join('');
       return `<article class="v4-card v4-topic" data-topic="family"><h3>${esc(L === 'en' ? 'Short, easy walks for families' : '适合带孩子的轻松短途步道')}</h3><p>${esc(L === 'en' ? 'The site has no separate family tag. These walks are DOC-graded easy and take about 2 hours or less; check each route’s safety notes for your children.' : '本站没有单独的亲子标签。下面这些步道按 DOC 分级为简易、用时约 2 小时以内；是否适合你的孩子，请看各线路的安全提示。')}</p>${list ? `<ul>${list}</ul>` : ''}<div class="v4-actions">${link(`routes.html?mode=walk&amp;lang=${L}`, L === 'en' ? 'All walks' : '全部徒步线路')}</div></article>`;
     }
-    if (topic.id === 'sport') return `<article class="v4-card v4-topic" data-topic="sport"><h3>${esc(t('topicSportTitle'))}</h3><p>${esc(t('topicSportLead'))}</p><div class="v4-actions">${link(`cities.html?lang=${L}`, t('topicSportMore'))}</div></article>`;
+    if (topic.id === 'sport') {
+      if (window.pounamuFlag && !window.pounamuFlag('sports')) return '';
+      const cities = [['auckland','Auckland','奥克兰'],['wellington','Wellington','惠灵顿'],['christchurch','Christchurch','基督城'],['queenstown','Queenstown','皇后镇'],['dunedin','Dunedin','但尼丁'],['rotorua','Rotorua','罗托鲁瓦'],['taupo','Taupō','陶波'],['nelson','Nelson','纳尔逊'],['hamilton','Hamilton','汉密尔顿'],['tauranga','Tauranga','陶朗加'],['napier','Napier','内皮尔'],['new-plymouth','New Plymouth','新普利茅斯'],['palmerston-north','Palmerston North','北帕默斯顿'],['whangarei','Whangārei','旺阿雷'],['invercargill','Invercargill','因弗卡吉尔'],['wanaka','Wānaka','瓦纳卡']];
+      return `<article class="v4-card v4-topic" data-topic="sport"><h3>${esc(t('topicSportTitle'))}</h3><p>${esc(L === 'en' ? 'Tennis, golf and basketball from OpenStreetMap.' : '网球、高尔夫和篮球，数据来自 OpenStreetMap。')}</p><div class="v4-actions">${cities.map(([id, en, zh]) => link(`city.html?id=${id}&lang=${L}`, L === 'en' ? en : zh)).join('')}</div></article>`;
+    }
+    if (topic.id === 'hot') return `<article class="v4-card v4-topic" data-topic="hot"><h3>${esc(L === 'en' ? 'Hot pools' : '温泉')}</h3><p>${esc(L === 'en' ? 'Named hot pools already on town pages.' : '城镇页上已有的温泉。')}</p><div class="v4-actions">${link(`destination.html?id=si-tek&lang=${L}#activities`, L === 'en' ? 'Tekapo Springs' : '特卡波温泉')}${link(`destination.html?id=ni-tga&lang=${L}#activities`, L === 'en' ? 'Mount Hot Pools' : '芒特温泉')}</div></article>`;
+    if (topic.id === 'safety') return `<article class="v4-card v4-topic" data-topic="safety"><h3>${esc(L === 'en' ? 'Safety' : '安全')}</h3><p>${esc(L === 'en' ? 'In an emergency call 111.' : '紧急情况拨 111。')}</p><div class="v4-actions">${link(`prepare.html?lang=${L}#safety`, L === 'en' ? 'Safety card' : '安全卡片')}</div></article>`;
+    if (topic.id === 'licence') return `<article class="v4-card v4-topic" data-topic="licence"><h3>${esc(L === 'en' ? 'Driving in New Zealand' : '在新西兰开车')}</h3><div class="v4-actions">${link(`prepare.html?lang=${L}#driving`, L === 'en' ? 'First-time driver' : '第一次开车')}</div></article>`;
+    if (topic.id === 'van') return `<article class="v4-card v4-topic" data-topic="van"><h3>${esc(L === 'en' ? 'Campervan' : '房车')}</h3><div class="v4-actions">${link(`prepare.html?lang=${L}#campervan`, L === 'en' ? 'Campervan notes' : '房车须知')}</div></article>`;
+    if (topic.id === 'walks') return `<article class="v4-card v4-topic" data-topic="walks"><h3>${esc(L === 'en' ? 'Great Walks' : '大步道')}</h3><div class="v4-actions">${[['milford-track','Milford Track','米尔福德步道'],['routeburn-track','Routeburn','路特本'],['kepler-track','Kepler','开普勒'],['abel-tasman','Abel Tasman','亚伯塔斯曼'],['whanganui-journey','Whanganui','旺格努伊'],['paparoa-track','Paparoa','帕帕罗阿']].map(([id, en, zh]) => link(`route.html?id=${id}&lang=${L}`, L === 'en' ? en : zh)).join('')}</div></article>`;
     return `<article class="v4-card v4-topic" data-topic="boat"><h3>${esc(t('topicBoatTitle'))}</h3><p>${esc(t('topicBoatLead'))}</p><div class="v4-actions">${link(`routes.html?mode=paddle&lang=${L}`, t('topicBoatMore'))}</div></article>`;
   }
   function typeLabel(type) {
@@ -840,22 +853,38 @@
       const title = state.lang === 'en'
         ? (day.label_en || (p && p.name_en) || '')
         : (day.label_zh || (p && p.name_zh) || '');
-      const verify = (day.nameVerify || (p && p.verify)) && !state.draft.hideVerify ? ` <span class="v4-badge">${esc(t('verifyBadge'))}</span>` : '';
+      const knownTown = /格雷茅斯|瓦纳卡|皇后镇|米尔福德峡湾|库克山|基督城|Greymouth|Wānaka|Wanaka|Queenstown|Milford Sound|Mount Cook|Aoraki|Christchurch/i.test(title);
+      const nameMark = (day.nameVerify || (p && p.verify)) && !state.draft.hideVerify && !knownTown ? ` <span class="v4-badge">${esc(state.lang === 'en' ? 'Place name to verify' : '地名待核')}</span>` : '';
+      const verify = nameMark;
       const roadVia = state.lang === 'en' && day.notes ? (String(day.notes).match(/via\s*SH\s?\d+(?:\s*(?:and|&|、|\/|,)\s*SH\s?\d+)*/i) || [])[0] : '';
-      const via = (roadVia ? `<p>${esc(t('roadLabel'))}: ${esc(roadVia)}</p>` : '') + (day.via ? `<p>${esc(viaText(day.via))}${/†|待核/.test(day.via) ? ` <span class="v4-badge">${esc(t('verifyBadge'))}</span>` : ''}</p>` : '');
+      const viaClean = String(day.via || '').split(/\s*或\s*/)[0];
+      const via = (roadVia ? `<p>${esc(t('roadLabel'))}: ${esc(roadVia)}</p>` : '') + (viaClean ? `<p>${esc(viaText(viaClean))}${/†|待核/.test(viaClean) ? ` <span class="v4-badge">${esc(t('verifyBadge'))}</span>` : ''}</p>` : '');
       const pace = /超过\s*5|接近\/超过5|≥\s*5|4–5h|5h/.test(`${day.notes} ${day.rawTime}`) ? `<p class="v4-alert">${esc(t('paceAlert'))}</p>` : '';
       const ferry = day.ferry ? `<p>${esc(t('ferryNote'))}</p>` : '';
-      return `<article class="v4-day" tabindex="0" data-index="${i}" draggable="true">
+      const g = window.pounamuGuide;
+      const prev = i > 0 ? byId(days[i - 1].placeId) : placeFromLabel(day.from);
+      const here = p || placeFromLabel(day.to);
+      const viaStops = viaClean.split(/[；;]/).map(x => x.replace(/（[^）]*）/g, '').trim()).filter(Boolean).map(name => ({ name }));
+      const stops = [prev || here, ...viaStops, here].filter(Boolean).map(item => item.place_id ? { name: item.name_en, lat: item.lat, lng: item.lon } : item);
+      const sameTown = String(day.from || '').replace(/（[^）]*）/g, '').trim() && String(day.from || '').replace(/（[^）]*）/g, '').trim().toLowerCase() === String(day.to || '').replace(/（[^）]*）/g, '').trim().toLowerCase();
+      const mapsHtml = g && !sameTown && stops.length >= 2 ? g.dirLinks(stops, day.ferry ? 'transit' : 'driving', state.lang) : (g ? g.searchLink({ name: title, lat: p && p.lat, lng: p && p.lon }, state.lang) : '');
+      const move = (day.parts && day.parts.map(part => state.lang === 'en' ? legTextEn(part.text) : part.text).filter(Boolean).join(' · ')) || (state.lang === 'en' ? 'To verify' : '待核');
+      return `<article class="v4-day gday" id="day-${i + 1}" tabindex="0" data-index="${i}" data-gday="${i + 1}" draggable="true">
+        <div class="gday-date"><b>DAY ${String(i + 1).padStart(2, '0')}</b><span>${esc(state.lang === 'en' ? 'Date to verify' : '日期待核')}</span></div>
         <div class="v4-day-tools"><button type="button" data-drag="${i}" aria-label="${esc(t('dragHandle'))}">⋮⋮</button>
         <button type="button" data-up="${i}" ${i === 0 ? 'disabled' : ''}>${esc(t('moveUp'))}</button>
         <button type="button" data-down="${i}" ${i === days.length - 1 ? 'disabled' : ''}>${esc(t('moveDown'))}</button>
         <button type="button" data-moveto="${i}">${esc(t('moveTo'))}</button>
         <button type="button" data-add-after="${i}">${esc(t('addDayAfter'))}</button>
         <button type="button" data-del="${i}">${esc(t('deleteDay'))}</button></div>
-        <h3>${esc(t('dayN', { n: i + 1 }))} · ${esc(title)}${verify}</h3>
+        <h3 class="plan-day-title">${esc(title)}${verify}</h3>
+        <p class="gday-must">${esc(state.lang === 'en' ? 'Must-do' : '必去')}</p>
+        <dl class="gday-meta"><div><dt>${esc(state.lang === 'en' ? 'STAY' : '住哪里')}</dt><dd>${esc(title || (state.lang === 'en' ? 'To verify' : '待核'))}</dd></div><div><dt>${esc(day.ferry ? (state.lang === 'en' ? 'FERRY' : '渡轮') : (state.lang === 'en' ? 'DRIVE' : '开车多久'))}</dt><dd>${esc(String(move))}${day.ferry ? (state.lang === 'en' ? ' · includes the ferry' : ' · 含渡轮') : ''}</dd></div></dl>
+        <div class="gday-budget" data-gday-budget="${i}"></div>
         ${p ? `<p><a href="destination.html?id=${esc(p.place_id)}&amp;lang=${state.lang}">${esc(t('viewDest'))}</a></p>` : ''}
         ${via}${legHtml(day)}${ferry}${pace}
         ${day.notes && state.lang !== 'en' && !state.draft.hideVerify && day.notes.replace(/【[^】]*】/g, '').trim() ? `<p class="v4-note">${esc(day.notes.replace(/【[^】]*】/g, '').trim())}</p>` : ''}
+        <p class="gday-actions">${mapsHtml} <button type="button" class="gday-jumpmap" data-gday-focus="${i + 1}">${esc(state.lang === 'en' ? 'Show on the map ↑' : '在地图中查看 ↑')}</button></p>
       </article>`;
     }).join('') + unscheduledHtml();
   }
@@ -937,6 +966,16 @@
       onToggle: (id, how) => { if (how === 'key') state.focusPlace = id; togglePlace(id); },
     });
     bindGuide(host);
+    if (window.pounamuGuide) {
+      delete host.dataset.budgetBound;
+      if (!host.querySelector('#p10-budget')) host.insertAdjacentHTML('beforeend', window.pounamuGuide.budgetShell(state.lang));
+      const priced = state.draft.days.map(day => ({ kind: 'activity', legs: [{ km: Number(String(day.km || '').replace(/[^\d.]/g, '')) || 0, mode: day.ferry ? 'ferry' : 'car' }], activities: [{}] }));
+      window.pounamuGuide.bindBudget(host, priced);
+      const stops = state.draft.days.map(day => { const place = byId(day.placeId); return place ? { lat: place.lat, lng: place.lon, name: place.name_en } : {}; });
+      let coast = host.querySelector('#gcoast');
+      if (!coast) { coast = document.createElement('div'); coast.id = 'gcoast'; coast.className = 'gcoast-wrap'; host.querySelector('.v4-pane-days')?.prepend(coast); }
+      window.pounamuGuide.coastMap(coast, stops, state.lang);
+    }
     window.pounamuSealContent?.();
     if (state.focusDay != null) {
       const card = host.querySelector(`.v4-day[data-index="${state.focusDay}"]`);
@@ -1137,7 +1176,7 @@
   function sourceHtml(url, date) {
     if (!url) return date ? `<p>${esc(date)}</p>` : '';
     if (!safeHttp(url)) return `<p>${esc(t('sourceToVerify'))}</p>`;
-    return `<p><a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(t('sourceLink'))}</a>${date ? ' ' + esc(date) : ''}</p>`;
+    return `<p><a class="v4-source" href="${esc(url)}" target="_blank" rel="noopener" data-keep-link="1">${esc(t('sourceLink'))}</a>${date ? ' · ' + esc(date) : ''}</p>`;
   }
   function townOverviewZh(town, kids) {
     const region = regionMeta(town.region_id);
@@ -1221,7 +1260,9 @@
       const verify = k.verify ? ` <span class="v4-badge">${esc(t('verifyBadge'))}</span>` : '';
       const date = k.summary_accessed ? `${esc(t('checked'))}: ${esc(k.summary_accessed)}` : '';
       const shown = state.lang === 'en' ? sum : zhSummary(sum);
-      return `<article class="v4-place" id="p-${esc(k.place_id)}"><h3>${esc(nameOf(k))}${verify}</h3>${shown ? `<p>${esc(shown)}</p>` : `<p class="v4-note">${esc(t('summaryEmpty'))}</p>`}${sourceHtml(k.source_url, k.summary_accessed)}</article>`;
+      const gmaps = window.pounamuGuide ? window.pounamuGuide.searchLink({ name: nameOf(k), town: k.town, lat: k.lat, lng: k.lon }, state.lang) : '';
+      const unknown = state.lang === 'en' ? 'Time and cost to verify' : '用时和花费待核';
+      return `<article class="v4-place gplace" id="p-${esc(k.place_id)}"><h3>${esc(nameOf(k))}${verify}</h3>${shown ? `<p>${esc(shown)}</p>` : `<p class="v4-note">${esc(t('summaryEmpty'))}</p>`}<p><span class="v4-badge">${esc(unknown)}</span></p>${sourceHtml(k.source_url, k.summary_accessed)}<p class="gday-actions">${gmaps} <a href="guide.html?add=${esc(k.place_id)}&amp;lang=${state.lang}">${esc(state.lang === 'en' ? 'Add this place' : '加入此地点')}</a></p></article>`;
     };
     const L = state.lang;
     const staysHtml = (stays.tiers || []).map(tier => `<article class="v4-place v4-stay-tier" data-tier="${esc(tier.id)}"><h3>${esc(L === 'en' ? tier.en : tier.zh)}</h3>
@@ -1233,6 +1274,7 @@
     const photoHtml = photo ? `<figure class="v4-dest-photo"><img src="${esc(photo.src)}" alt="${esc(Array.isArray(photo.place) ? photo.place[L === 'en' ? 0 : 1] || photo.place[0] : '')}" loading="lazy" decoding="async" width="960" height="540"><figcaption>${esc(Array.isArray(photo.place) ? photo.place[L === 'en' ? 0 : 1] || photo.place[0] : '')} · ${esc(t('photoNear', { route: L === 'en' ? photo.route_en : photo.route_zh }))} · <a href="${esc(photo.source)}" target="_blank" rel="noopener noreferrer">${esc(photo.author)}</a> · <a href="${esc(photo.licenseUrl)}" target="_blank" rel="noopener noreferrer">${esc(photo.license)}</a></figcaption></figure>` : '';
     host.innerHTML = `<p class="v4-note"><a href="index.html?lang=${state.lang}">${esc(t('homeCrumb'))}</a> / ${esc(town.island === 'north' ? t('islandNorth') : t('islandSouth'))}${crumbRegion} / ${esc(townLabel)}</p>
       <div class="v4-guide-top"><h1>${esc(townLabel)} <span class="v4-en-name">${esc(state.lang === 'en' ? town.name_zh : town.name_en)}</span></h1></div>
+      ${window.pounamuGuide ? window.pounamuGuide.glance({ lang: state.lang, place: town.name_en, lat: town.lat, lng: town.lon, days: town.suggested_stay ? (state.lang === 'en' ? 'About ' + town.suggested_stay + ' days (editorial estimate)' : '约 ' + town.suggested_stay + ' 天（编辑估算）') : '', season: state.lang === 'en' ? 'A town visit works year round. Mountain tracks and ski days follow the operator notice.' : '城镇全年可安排。高山步道和雪场以运营方公告为准。', access: state.lang === 'en' ? 'Drive or take a coach into ' + town.name_en + '. The map link opens this town.' : '开车或坐长途巴士到' + town.name_zh + '。地图链接打开这个镇。' }) : ''}
       ${photoHtml}
       <p>${esc(town.island === 'north' ? t('islandNorth') : t('islandSouth'))} · ${esc(regionLabel)}${town.region_uncertain ? ` <span class="v4-badge">${esc(t('verifyBadge'))}</span>` : ''}</p>
       ${town.suggested_stay ? `<p>${esc(t('suggestedStay', { n: town.suggested_stay }))}</p>` : ''}
@@ -1247,12 +1289,39 @@
       ${skiNear.length ? `<section class="v4-block" id="ski"><h2>${esc(t('skiNear'))}</h2>${skiHtml}</section>` : ''}
       <section class="v4-block" id="sports"><h2>${esc(t('paddleSports'))}</h2>
         <h3>${esc(t('paddleBlock'))}</h3>${boats.map(row).join('')}${paddleRoutes.length ? `<p>${esc(t('paddleNearby'))}: ${paddleRoutes.map(r => `<a href="route.html?id=${esc(r.id)}&amp;lang=${state.lang}">${esc(L === 'en' ? r.name : (r.zh || r.name))}</a>`).join(' · ')}</p>` : ''}${!boats.length && !paddleRoutes.length ? `<p>${esc(t('paddleNone'))}</p>` : ''}
-        <h3>${esc(t('sportsBlock'))}</h3>${(window.pounamuFlag && !window.pounamuFlag('sports')) ? `<p class="pounamu-paused">${state.lang === 'en' ? `This section is being updated. Meanwhile <a href="guide.html?view=pick&amp;lang=en">Plan a trip and pick places</a>, or see the <a href="https://www.doc.govt.nz/">DOC website</a>.` : `本栏目更新中。可先<a href="guide.html?view=pick&amp;lang=zh">规划行程、挑选地点</a>，或看 <a href="https://www.doc.govt.nz/">DOC 官网</a>。`}</p>` : (sport ? `<p><a href="city.html?id=${esc(sport.id)}&amp;lang=${state.lang}">${esc(t('openSports'))}</a></p>` : `<p><a href="cities.html?lang=${state.lang}">${esc(t('openSports'))}</a></p>`)}
+        ${(window.pounamuFlag && window.pounamuFlag('sports')) ? `<h3>${esc(t('sportsBlock'))}</h3><div id="sports-venues" data-sports-city="${sport ? esc(sport.id) : ''}"><p>${esc(state.lang === 'en' ? 'Loading courts from the saved OpenStreetMap extract…' : '正在读取已保存的 OpenStreetMap 场地…')}</p></div>` : `<p class="v4-note">${esc(state.lang === 'en' ? 'Sports listings are switched off.' : '运动场地列表已关闭。')}</p>`}
         <h3>${esc(t('routeBlock'))}</h3><p><a href="routes.html?island=${town.island}&amp;lang=${state.lang}">${esc(t('readGuide'))}</a></p>
       </section>
       <section class="v4-block" id="links"><h2>${esc(t('officialLinks'))}</h2>${[town, ...visible].filter(k => k.source_url).slice(0, 12).map(k => safeHttp(k.source_url) ? `<p><a href="${esc(k.source_url)}" target="_blank" rel="noopener noreferrer">${esc(nameOf(k))}</a>${k.summary_accessed ? ' · ' + esc(k.summary_accessed) : ''}</p>` : `<p>${esc(nameOf(k))} · ${esc(t('sourceToVerify'))}</p>`).join('')}</section>
       ${town.lat != null && town.lon != null ? `<section class="v4-block" id="place-map"><h2>${esc(t('viewMap'))}</h2><div id="v4-dest-map"></div><p class="v4-note">${esc(t('noKeyNote'))}</p><p class="v4-note"><a href="https://www.openstreetmap.org/copyright">${esc(t('osmCredit'))}</a> · ODbL</p></section>` : ''}`;
     document.title = nameOf(town) + ' — 绿石之地 · Pounamu Atlas';
+    const sportsBox = host.querySelector('#sports-venues');
+    const sportsId = sportsBox && sportsBox.dataset.sportsCity;
+    if (sportsBox && sportsId) {
+      fetch('data/sports/' + sportsId + '.json').then(r => r.ok ? r.json() : null).then(file => {
+        if (!file || !sportsBox.isConnected) return;
+        const zh = state.lang !== 'en';
+        const shop = /warehouse|shop|store|商店|零售/i;
+        const all = (file.venues || []).filter(v => v.name && !shop.test(v.name));
+        const typeName = { tennis: zh ? '网球' : 'Tennis', golf: zh ? '高尔夫' : 'Golf', basketball: zh ? '篮球' : 'Basketball' };
+        let kind = 'all', open = false;
+        const paint = () => {
+          const pool = all.filter(v => kind === 'all' || v.type === kind);
+          const show = open ? pool.slice(0, 48) : pool.slice(0, 8);
+          const filters = ['all', 'tennis', 'golf', 'basketball'].map(id => `<button type="button" data-sport-filter="${id}" aria-pressed="${kind === id}">${id === 'all' ? (zh ? '全部' : 'All') : typeName[id]}</button>`).join('');
+          sportsBox.innerHTML = `<div class="v4-chips">${filters}</div><p class="v4-note">${esc(file.attribution || '© OpenStreetMap contributors')} · ODbL · ${esc((file.fetchedAt || '').slice(0, 10))}</p>` + show.map(v => {
+            const href = window.pounamuMapsUrl ? window.pounamuMapsUrl.searchUrl({ lat: v.lat, lng: v.lon, name: v.name }) : '';
+            return `<article class="v4-place gplace" data-sport="${esc(v.type)}"><h3>${esc(v.name)}</h3><p>${esc(typeName[v.type] || v.type)}${v.courts ? ' · ' + v.courts + (zh ? ' 片' : ' courts') : ''}</p><p class="gday-actions">${href ? `<a class="v4-gmaps" href="${esc(href)}" target="_blank" rel="noopener" data-keep-link="1">${zh ? '在谷歌地图打开' : 'Open in Google Maps'}</a>` : ''} <a href="guide.html?add=${esc(town.place_id)}&amp;lang=${state.lang}">${zh ? '加入此地点' : 'Add this place'}</a></p></article>`;
+          }).join('') + (pool.length > show.length ? `<p><button type="button" data-sport-more>${zh ? '显示更多' : 'Show more'}</button></p>` : '');
+        };
+        paint();
+        sportsBox.onclick = ev => {
+          const f = ev.target.closest('[data-sport-filter]');
+          if (f) { kind = f.getAttribute('data-sport-filter'); open = false; paint(); }
+          if (ev.target.closest('[data-sport-more]')) { open = true; paint(); }
+        };
+      }).catch(() => { if (sportsBox) sportsBox.textContent = state.lang === 'en' ? 'The sports file did not load.' : '运动场地文件没有载入。'; });
+    }
     const mapEl = host.querySelector('#v4-dest-map');
     if (mapEl && window.PounamuMaps) {
       window.PounamuMaps.mount(mapEl, {

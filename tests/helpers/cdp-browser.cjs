@@ -51,6 +51,20 @@ async function openBrowser() {
     if (!target) await sleep(100);
   }
   if (!target) { chrome.kill(); server.close(); throw new Error('Chrome did not start'); }
+  const version = await (await fetch(`http://127.0.0.1:${port}/json/version`)).json();
+  const browserWs = new WebSocket(version.webSocketDebuggerUrl);
+  await new Promise((resolve, reject) => { browserWs.onopen = resolve; browserWs.onerror = reject; });
+  let browserId = 0;
+  const browserPending = new Map();
+  browserWs.onmessage = event => {
+    const msg = JSON.parse(event.data);
+    if (msg.id && browserPending.has(msg.id)) { browserPending.get(msg.id)(msg); browserPending.delete(msg.id); }
+  };
+  const browserSend = (method, params = {}) => new Promise(resolve => {
+    const n = ++browserId;
+    browserPending.set(n, resolve);
+    browserWs.send(JSON.stringify({ id: n, method, params }));
+  });
   const ws = new WebSocket(target.webSocketDebuggerUrl);
   await new Promise((resolve, reject) => { ws.onopen = resolve; ws.onerror = reject; });
   let id = 0;
@@ -105,24 +119,43 @@ async function openBrowser() {
         loaded = false;
       });
       page.on('Page.loadEventFired', () => { if (committed) loaded = true; });
-      const nav = await send('Page.navigate', { url: target.href });
-      if (nav.result && nav.result.errorText) throw new Error(nav.result.errorText);
-      const until = Date.now() + 15000;
-      while (Date.now() < until) {
-        let ready = '';
-        try { ready = await ev('document.readyState'); } catch { ready = ''; }
-        if (committed && loaded && ready === 'complete') return;
-        await sleep(40);
+      const attempt = async () => {
+        committed = false;
+        loaded = false;
+        const nav = await send('Page.navigate', { url: target.href });
+        if (nav.result && nav.result.errorText) throw new Error(nav.result.errorText);
+        const until = Date.now() + 15000;
+        while (Date.now() < until) {
+          let ready = '';
+          try { ready = await ev('document.readyState'); } catch { ready = ''; }
+          if (committed && loaded && ready === 'complete') return;
+          await sleep(40);
+        }
+        throw new Error('navigation did not finish: ' + target.pathname);
+      };
+      try { await attempt(); }
+      catch (err) {
+        if (!String(err && err.message).includes('navigation did not finish')) throw err;
+        await attempt();
       }
-      throw new Error('navigation did not finish: ' + target.pathname);
     },
-    async waitFor(expr, timeout = 8000) {
+    async waitFor(expr, timeout = 20000) {
       const until = Date.now() + timeout;
       while (Date.now() < until) {
         try { if (await ev(`Boolean(${expr})`)) return true; } catch { /* page still loading */ }
         await sleep(100);
       }
+      const retryUntil = Date.now() + 10000;
+      while (Date.now() < retryUntil) {
+        try { if (await ev(`Boolean(${expr})`)) return true; } catch { /* one more window */ }
+        await sleep(150);
+      }
       throw new Error('timed out waiting for ' + expr);
+    },
+    async grant(permissions) {
+      const origin = new URL(base).origin;
+      const granted = await browserSend('Browser.grantPermissions', { origin, permissions });
+      if (granted.error) throw new Error(granted.error.message || 'could not grant permissions');
     },
     async click(selector) {
       const r = await ev(`(()=>{const e=document.querySelector(${JSON.stringify(selector)});if(!e)return 'missing';e.scrollIntoView({block:'center'});e.click();return 'ok'})()`);
@@ -131,6 +164,7 @@ async function openBrowser() {
     },
     async close() {
       try { ws.close(); } catch { /* closed */ }
+      try { browserWs.close(); } catch { /* closed */ }
       chrome.kill();
       await new Promise(resolve => server.close(resolve));
       await sleep(200);

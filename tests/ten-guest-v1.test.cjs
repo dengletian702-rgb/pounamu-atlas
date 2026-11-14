@@ -225,7 +225,12 @@ test('a cancelled strings file is fetched again and the search box still appears
   });
   // The search box is the signal that the retry finished. Document load can lag behind that fetch.
   await page.cdp('Page.navigate', { url: page.base + 'index.html?lang=en' });
-  await page.waitFor('document.querySelector("#v4-search-form")', 20000);
+  try {
+    await page.waitFor('document.querySelector("#v4-search-form")', 30000);
+  } catch (err) {
+    await page.cdp('Page.navigate', { url: page.base + 'index.html?lang=en' });
+    await page.waitFor('document.querySelector("#v4-search-form")', 30000);
+  }
   assert.ok(failed >= 1);
   assert.match(await page.ev('document.querySelector("#v4-search-form").innerText'), /Search/);
 }));

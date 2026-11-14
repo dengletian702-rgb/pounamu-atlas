@@ -49,7 +49,7 @@ test('an edited trip survives refresh, appends a place, and confirms a template 
         await page.goto(`${base}/guide.html?template=SI-09B&lang=${lang}`, { waitUntil: 'networkidle' });
         await page.waitForSelector('article.v4-day h3');
         assert.equal(new URL(page.url()).searchParams.get('template'), null);
-        const placeOf = text => text.split('·').slice(1).join('·').trim();
+        const placeOf = text => (text.includes('·') ? text.split('·').slice(1).join('·') : text).trim();
         const first = placeOf(await page.locator('article.v4-day h3').nth(0).innerText());
         const second = placeOf(await page.locator('article.v4-day h3').nth(1).innerText());
         await page.locator('[data-up="1"]').click();
@@ -113,7 +113,7 @@ test('blank and sample entries confirm before replacing an edited draft, and del
         const context = await browser.newContext({ viewport: { width, height: width === 1280 ? 900 : 844 } });
         const page = await context.newPage();
         const base = `http://127.0.0.1:${port}`;
-        const placeOf = text => text.split('·').slice(1).join('·').replace(/待核|To verify/g, '').trim();
+        const placeOf = text => (text.includes('·') ? text.split('·').slice(1).join('·') : text).replace(/待核|To verify/g, '').trim();
         await page.goto(`${base}/guide.html?template=SI-09B&lang=${lang}`, { waitUntil: 'networkidle' });
         const second = placeOf(await page.locator('article.v4-day h3').nth(1).innerText());
         await page.locator('[data-up="1"]').click();

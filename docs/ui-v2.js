@@ -11,14 +11,14 @@
   const raf = fn => requestAnimationFrame(fn);
 
   /* ---------- 1. Generated contour art (periodic value noise + marching squares), tileable 900×900 ---------- */
-  function contourSvg(seed, stroke) {
+  function contourState(seed) {
     const S = 900, step = 12, n = S / step;
     let s = seed;
     const rnd = () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296);
     const grid = p => Array.from({ length: p }, () => Array.from({ length: p }, rnd));
     const octaves = [[5, grid(5), 1], [10, grid(10), .45], [20, grid(20), .2]];
     const smooth = t => t * t * (3 - 2 * t);
-    function noise(x, y) {
+    const noise = (x, y) => {
       let v = 0;
       for (const [p, g, a] of octaves) {
         const fx = x / S * p, fy = y / S * p, x0 = Math.floor(fx), y0 = Math.floor(fy), tx = smooth(fx - x0), ty = smooth(fy - y0);
@@ -27,36 +27,87 @@
         v += (a0 + (a1 - a0) * ty) * a;
       }
       return v / 1.65;
+    };
+    return { S, step, n, val: [], noise, levels: 14, k: 1, j: 0, d: '', gridRow: 0 };
+  }
+  function contourSlice(st) {
+    const { step, n, val, levels } = st;
+    const start = performance.now();
+    const budget = 5;
+    while (st.gridRow <= n && performance.now() - start < budget) {
+      const j = st.gridRow;
+      val[j] = [];
+      for (let i = 0; i <= n; i++) val[j][i] = st.noise(i * step, j * step);
+      st.gridRow += 1;
     }
-    const val = [];
-    for (let j = 0; j <= n; j++) { val[j] = []; for (let i = 0; i <= n; i++) val[j][i] = noise(i * step, j * step); }
-    let d = '';
-    const levels = 14;
-    for (let k = 1; k < levels; k++) {
-      const L = k / levels;
-      for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) {
+    if (st.gridRow <= n) return false;
+    while (st.k < levels && performance.now() - start < budget) {
+      const L = st.k / levels, j = st.j;
+      for (let i = 0; i < n; i++) {
         const a = val[j][i], b = val[j][i + 1], c = val[j + 1][i + 1], e = val[j + 1][i];
         const idx = (a > L ? 8 : 0) | (b > L ? 4 : 0) | (c > L ? 2 : 0) | (e > L ? 1 : 0);
         if (idx === 0 || idx === 15) continue;
         const x = i * step, y = j * step, lerp = (p, q) => (L - p) / (q - p || 1e-6);
         const T = [x + step * lerp(a, b), y], R = [x + step, y + step * lerp(b, c)], B = [x + step * lerp(e, c), y + step], Lf = [x, y + step * lerp(a, e)];
         const seg = { 1: [Lf, B], 2: [B, R], 3: [Lf, R], 4: [T, R], 5: [Lf, T, B, R], 6: [T, B], 7: [Lf, T], 8: [Lf, T], 9: [T, B], 10: [T, R, Lf, B], 11: [T, R], 12: [Lf, R], 13: [B, R], 14: [Lf, B] }[idx];
-        for (let q = 0; q < seg.length; q += 2) d += `M${seg[q][0].toFixed(0)} ${seg[q][1].toFixed(0)}L${seg[q + 1][0].toFixed(0)} ${seg[q + 1][1].toFixed(0)}`;
+        for (let q = 0; q < seg.length; q += 2) st.d += `M${seg[q][0].toFixed(0)} ${seg[q][1].toFixed(0)}L${seg[q + 1][0].toFixed(0)} ${seg[q + 1][1].toFixed(0)}`;
       }
+      st.j += 1;
+      if (st.j >= n) { st.j = 0; st.k += 1; }
     }
-    const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${S}' height='${S}' viewBox='0 0 ${S} ${S}'><path d='${d}' fill='none' stroke='${stroke}' stroke-width='1' stroke-linecap='round'/></svg>`;
+    return st.k >= levels;
+  }
+  function contourUrl(st, stroke) {
+    const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${st.S}' height='${st.S}' viewBox='0 0 ${st.S} ${st.S}'><path d='${st.d}' fill='none' stroke='${stroke}' stroke-width='1' stroke-linecap='round'/></svg>`;
     return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
   }
   function installContours() {
     let light, dark;
     try { light = sessionStorage.getItem('ui2-contour-l'); dark = sessionStorage.getItem('ui2-contour-d'); } catch (e) {}
-    if (!light || !dark) {
-      light = contourSvg(20261113, 'rgba(198,236,218,0.16)');
-      dark = contourSvg(4219, 'rgba(20,53,43,0.13)');
-      try { sessionStorage.setItem('ui2-contour-l', light); sessionStorage.setItem('ui2-contour-d', dark); } catch (e) {}
+    if (light && dark) {
+      root.style.setProperty('--ui2-contour-light', light);
+      root.style.setProperty('--ui2-contour-dark', dark);
+      return;
     }
-    root.style.setProperty('--ui2-contour-light', light);
-    root.style.setProperty('--ui2-contour-dark', dark);
+    const jobs = [
+      { seed: 20261113, stroke: 'rgba(198,236,218,0.16)', prop: '--ui2-contour-light', store: 'ui2-contour-l' },
+      { seed: 4219, stroke: 'rgba(20,53,43,0.13)', prop: '--ui2-contour-dark', store: 'ui2-contour-d' }
+    ];
+    const apply = (done) => {
+      for (const item of done) {
+        root.style.setProperty(item.prop, item.url);
+        try { sessionStorage.setItem(item.store, item.url); } catch (e) {}
+      }
+    };
+    try {
+      const src = [contourState, contourSlice, contourUrl].map(fn => fn.toString()).join('\n') + `
+        self.onmessage = (e) => {
+          const out = [];
+          for (const job of e.data) {
+            const st = contourState(job.seed);
+            while (!contourSlice(st)) {}
+            out.push({ prop: job.prop, store: job.store, url: contourUrl(st, job.stroke) });
+          }
+          self.postMessage(out);
+        };`;
+      const worker = new Worker(URL.createObjectURL(new Blob([src], { type: 'text/javascript' })));
+      worker.onmessage = (e) => { apply(e.data); worker.terminate(); };
+      worker.postMessage(jobs);
+    } catch (e) {
+      const later = fn => setTimeout(fn, 0);
+      const step = () => {
+        const job = jobs[0];
+        if (!job) return;
+        if (!job.state) job.state = contourState(job.seed);
+        if (!contourSlice(job.state)) { later(step); return; }
+        later(() => {
+          apply([{ prop: job.prop, store: job.store, url: contourUrl(job.state, job.stroke) }]);
+          jobs.shift();
+          if (jobs.length) later(step);
+        });
+      };
+      later(step);
+    }
   }
 
   /* ---------- 2. Particle network on dark bands (pauses off screen) ---------- */
@@ -73,8 +124,8 @@
     }
     let last = 0;
     function frame(now) {
-      if (!on) return;
-      if (doc.hidden || now - last < 33) { raf(frame); return; }
+      if (!on || reduced() || doc.hidden) { on = false; return; }
+      if (now - last < 33) { raf(frame); return; }
       last = now;
       ctx.clearRect(0, 0, w, h);
       for (const p of pts) {
@@ -258,24 +309,46 @@
     } catch (e) {}
     try {
       const cat = await fetch('data/v4-catalog.json').then(r => r.ok ? r.json() : null);
-      for (const p of (cat && cat.places) || []) if (p.type === 'town') list.push({ k: en ? 'Place' : '目的地', t: en ? p.name_en : p.name_zh, s: en ? p.name_zh : p.name_en, h: `destination.html?id=${encodeURIComponent(p.place_id)}&lang=${lang}` });
+      for (const p of (cat && cat.places) || []) {
+        if (p.type === 'town') list.push({ k: en ? 'Place' : '目的地', t: en ? p.name_en : p.name_zh, s: en ? p.name_zh : p.name_en, sub: en ? p.name_zh : p.name_en, h: `destination.html?id=${encodeURIComponent(p.place_id)}&lang=${lang}` });
+        else if (/hot pool|温泉|hot spring/i.test(`${p.name_en} ${p.name_zh}`)) list.push({ k: en ? 'Activity' : '活动', t: en ? p.name_en : p.name_zh, s: 'hot pools 温泉', h: `destination.html?id=${encodeURIComponent(p.place_id)}&lang=${lang}#p-${encodeURIComponent(p.place_id)}` });
+      }
     } catch (e) {}
-    items = list.map(x => Object.assign(x, { f: fold(`${x.t} ${x.s || ''}`) }));
+    try {
+      const ski = await fetch('data/ski-fields.json').then(r => r.ok ? r.json() : null);
+      for (const f of (ski && ski.fields) || []) list.push({ k: en ? 'Ski' : '滑雪', t: en ? f.name_en : f.name_zh, s: (f.aliases || []).join(' '), aliases: f.aliases || [], h: `prepare.html?lang=${lang}#ski-${encodeURIComponent(f.id)}` });
+    } catch (e) {}
+    list.push(
+      { k: en ? 'Page' : '页面', t: en ? 'Safety and 111' : '安全与 111', s: 'safety emergency 紧急 安全', h: `prepare.html?lang=${lang}#safety` },
+      { k: en ? 'Page' : '页面', t: en ? 'Keep left, overseas licence' : '靠左行驶与驾照翻译', s: 'driving licence keep left 驾照翻译 左行', h: `prepare.html?lang=${lang}#driving` },
+      { k: en ? 'Page' : '页面', t: en ? 'Campervan' : '房车', s: 'campervan 房车 freedom camping', h: `prepare.html?lang=${lang}#campervan` },
+      { k: en ? 'Route' : '线路', t: en ? 'Milford Track' : '米尔福德步道', s: 'great walk great walks 大步道', h: `route.html?id=milford-track&lang=${lang}` },
+      { k: en ? 'Route' : '线路', t: en ? 'Routeburn Track' : '路特本步道', s: 'great walk great walks 大步道', h: `route.html?id=routeburn-track&lang=${lang}` },
+      { k: en ? 'Route' : '线路', t: en ? 'Kepler Track' : '开普勒步道', s: 'great walk great walks 大步道', h: `route.html?id=kepler-track&lang=${lang}` },
+      { k: en ? 'Route' : '线路', t: en ? 'Abel Tasman Coast Track' : '亚伯塔斯曼海岸步道', s: 'great walk great walks 大步道', h: `route.html?id=abel-tasman&lang=${lang}` },
+      { k: en ? 'Route' : '线路', t: en ? 'Whanganui Journey' : '旺格努伊河之旅', s: 'great walk great walks 大步道', h: `route.html?id=whanganui-journey&lang=${lang}` },
+      { k: en ? 'Activity' : '活动', t: en ? 'Short, easy walks' : '少走路的短途', s: '少走路 easy walk low walking', h: `routes.html?mode=walk&lang=${lang}` },
+      ...(typeof pounamuFlag === 'function' && !pounamuFlag('sports') ? [] : [['auckland','Auckland','奥克兰'],['wellington','Wellington','惠灵顿'],['christchurch','Christchurch','基督城'],['queenstown','Queenstown','皇后镇'],['dunedin','Dunedin','但尼丁'],['rotorua','Rotorua','罗托鲁瓦'],['taupo','Taupō','陶波'],['nelson','Nelson','纳尔逊'],['hamilton','Hamilton','汉密尔顿'],['tauranga','Tauranga','陶朗加'],['napier','Napier','内皮尔'],['wanaka','Wānaka','瓦纳卡']].map(([id, enName, zhName]) => ({ k: en ? 'Sport' : '运动', t: en ? enName : zhName, s: 'tennis golf basketball 网球 高尔夫 篮球', h: `city.html?id=${id}&lang=${lang}` })))
+    );
+    items = list.map(x => Object.assign(x, { f: fold(`${x.t} ${x.s || ''} ${(x.aliases || []).join(' ')}`) }));
     return items;
   }
   function score(item, q) {
     if (!q) return 1;
-    const i = item.f.indexOf(q); if (i >= 0) return 100 - i;
+    if (item.f === q || item.aliases && item.aliases.some(a => fold(a) === q)) return 240;
+    if (item.f.startsWith(q)) return 200;
+    const i = item.f.indexOf(q); if (i >= 0) return 140 - Math.min(i, 30);
     let pos = 0, gaps = 0;
     for (const ch of q) { const at = item.f.indexOf(ch, pos); if (at < 0) return 0; gaps += at - pos; pos = at + 1; }
-    return Math.max(1, 40 - gaps);
+    if (gaps > q.length * 2) return 0;
+    return Math.max(1, 30 - gaps);
   }
   function render(q) {
     const f = fold(q);
     shown = (items || []).map(x => [score(x, f), x]).filter(([s]) => s > 0).sort((a, b) => b[0] - a[0]).slice(0, 12).map(([, x]) => x);
     sel = 0;
     const ul = palette.querySelector('ul');
-    ul.innerHTML = shown.length ? shown.map((x, i) => `<li role="option" id="ui2-opt-${i}" aria-selected="${i === sel}"><a href="${x.h}"><small>${x.k}</small><span>${x.t.replace(/[&<>]/g, '')}</span>${x.s ? `<em>${String(x.s).replace(/[&<>]/g, '')}</em>` : ''}</a></li>`).join('')
+    ul.innerHTML = shown.length ? shown.map((x, i) => `<li role="option" id="ui2-opt-${i}" aria-selected="${i === sel}"><a href="${x.h}"><small>${x.k}</small><span>${x.t.replace(/[&<>]/g, '')}</span>${x.sub ? `<em>${String(x.sub).replace(/[&<>]/g, '')}</em>` : ''}</a></li>`).join('')
       : `<li><a href="index.html?q=${encodeURIComponent(q)}&lang=${isEn() ? 'en' : 'zh'}#v4-search"><small>${isEn() ? 'Search' : '搜索'}</small><span>${isEn() ? 'Search the site for' : '在站内搜索'} “${q.replace(/[&<>]/g, '')}”</span></a></li>`;
     palette.querySelector('input').setAttribute('aria-activedescendant', shown.length ? 'ui2-opt-0' : '');
   }
@@ -333,6 +406,24 @@
   });
 
   /* ---------- 9. Scroll state and progress ---------- */
+  function bumpSvgFonts() {
+    const nodes = $$('svg text');
+    let i = 0;
+    const step = () => {
+      const start = performance.now();
+      while (i < nodes.length && performance.now() - start < 5) {
+        const node = nodes[i++];
+        const m = node.getScreenCTM && node.getScreenCTM();
+        if (!m) continue;
+        const cs = getComputedStyle(node);
+        if (cs.display === 'none' || cs.visibility === 'hidden') continue;
+        const sc = Math.hypot(m.a, m.b);
+        if (sc > 0 && parseFloat(cs.fontSize) * sc < 11.95) node.style.setProperty('font-size', (13 / sc).toFixed(2) + 'px', 'important');
+      }
+      if (i < nodes.length) setTimeout(step, 0);
+    };
+    step();
+  }
   function scroll() {
     const bar = doc.createElement('div'); bar.className = 'ui2-progress'; bar.setAttribute('aria-hidden', 'true'); doc.body.append(bar);
     let ticking = false;
@@ -342,7 +433,12 @@
       bar.style.setProperty('--ui2-p', max > 0 ? (y / max).toFixed(4) : 0);
       doc.body.classList.toggle('ui2-scrolled', y > 90);
     };
-    addEventListener('scroll', () => { if (!ticking) { ticking = true; raf(update); } }, { passive: true });
+    let fontPass = 0;
+    addEventListener('scroll', () => {
+      if (!ticking) { ticking = true; raf(update); }
+      clearTimeout(fontPass);
+      fontPass = setTimeout(bumpSvgFonts, 80);
+    }, { passive: true });
     update();
   }
 
@@ -355,7 +451,801 @@
   }
 
   /* ---------- run, and again whenever the page scripts render more ---------- */
+  function fitSvgText(svg) {
+    const box = svg.getBoundingClientRect();
+    const vb = svg.viewBox && svg.viewBox.baseVal;
+    const vbW = (vb && vb.width) || 0;
+    const vbH = (vb && vb.height) || 0;
+    let scale = box.width > 0 && vbW ? box.width / vbW : 0;
+    if (box.height > 0 && vbH) {
+      const byH = box.height / vbH;
+      if (byH > 0) scale = scale > 0 ? Math.min(scale, byH) : byH;
+    }
+    const sample = svg.querySelector('text, circle, path');
+    const ctm = sample && sample.getScreenCTM && sample.getScreenCTM();
+    if (ctm) {
+      const drawn = Math.hypot(ctm.a, ctm.b);
+      if (drawn > 0) scale = drawn;
+    }
+    if (!scale) return;
+    if ((svg.classList.contains('v4-schematic') || svg.classList.contains('gcoast')) && !svg.dataset.ui2Watch) {
+      svg.dataset.ui2Watch = '1';
+      new ResizeObserver(() => {
+        const w = Math.round(svg.getBoundingClientRect().width);
+        if (w > 2 && svg.dataset.ui2Laid !== String(w)) fitSvgText(svg);
+      }).observe(svg);
+    }
+    if (svg.classList.contains('p10-pick-svg')) {
+      if (!svg.classList.contains('is-laid') && box.width > 2 && box.height > 2 && vbH) {
+        const sc = Math.min(box.width / vbW, box.height / vbH);
+        if (sc > 0) {
+          svg.querySelectorAll('text').forEach(node => node.style.setProperty('font-size', (13 / sc).toFixed(2) + 'px', 'important'));
+          settleMapLabels(svg, sc);
+        }
+      }
+      return;
+    }
+    svg.querySelectorAll('text, tspan').forEach(node => {
+      const cs = getComputedStyle(node);
+      if (cs.display === 'none' || cs.visibility === 'hidden') return;
+      const ctm = node.getScreenCTM && node.getScreenCTM();
+      const sc = ctm ? Math.hypot(ctm.a, ctm.b) : scale;
+      if (!(sc > 0)) return;
+      if (parseFloat(cs.fontSize) * sc < 12) node.style.setProperty('font-size', (13 / sc).toFixed(2) + 'px', 'important');
+    });
+    layoutNzMap(svg, scale);
+    settleMapLabels(svg, scale);
+    if (!svg.dataset.ui2Refit) {
+      requestAnimationFrame(() => {
+        const tiny = [...svg.querySelectorAll('text')].some(node => {
+          const cs = getComputedStyle(node);
+          if (cs.display === 'none' || cs.visibility === 'hidden') return false;
+          const m = node.getScreenCTM && node.getScreenCTM();
+          return m && parseFloat(cs.fontSize) * Math.hypot(m.a, m.b) < 11.95;
+        });
+        if (tiny) { svg.dataset.ui2Refit = '1'; bumpSvgFonts(); }
+      });
+    }
+  }
+  function textShown(el) {
+    const cs = getComputedStyle(el);
+    if (cs.display === 'none' || cs.visibility === 'hidden') return false;
+    const r = el.getBoundingClientRect();
+    return r.width > 1 && r.height > 1;
+  }
+  function overlaps(a, b) {
+    return a.right > b.left + 0.5 && a.left < b.right - 0.5 && a.bottom > b.top + 0.5 && a.top < b.bottom - 0.5;
+  }
+  function shiftText(t, dx, dy) {
+    if (!dx && !dy) return;
+    const x = (parseFloat(t.getAttribute('x')) || 0) + dx;
+    const y = (parseFloat(t.getAttribute('y')) || 0) + dy;
+    t.setAttribute('x', x.toFixed(1));
+    t.setAttribute('y', y.toFixed(1));
+    t.querySelectorAll('tspan').forEach(s => {
+      if (s.hasAttribute('x')) s.setAttribute('x', ((parseFloat(s.getAttribute('x')) || 0) + dx).toFixed(1));
+    });
+  }
+  function layoutNzMap(svg, scale) {
+    if (!svg.classList.contains('nz-map')) return;
+    const narrow = window.matchMedia('(max-width:760px)').matches;
+    const en = (doc.documentElement.lang || '').toLowerCase().startsWith('en');
+    svg.querySelectorAll('.nzmap-label-zh').forEach(el => {
+      if (en || narrow) el.style.setProperty('display', 'none', 'important');
+      else {
+        el.style.removeProperty('display');
+        el.setAttribute('dy', Math.max(18, 18 / scale).toFixed(1));
+      }
+    });
+    const shortName = { 'NORTH ISLAND': ['北岛', 'North Island'], 'SOUTH ISLAND': ['南岛', 'South Island'], 'TASMAN SEA': ['塔斯曼海', 'Tasman Sea'], 'PACIFIC OCEAN': ['太平洋', 'Pacific'], 'RAKIURA / STEWART ISLAND': ['拉奇乌拉', 'Rakiura'] };
+    svg.querySelectorAll('.nzmap-island-label, .nzmap-water, .nzmap-label').forEach(el => {
+      if (el.hasAttribute('data-i18n')) return;
+      if (!el.dataset.bilingual) el.dataset.bilingual = el.innerHTML;
+      if (!narrow) { if (el.innerHTML !== el.dataset.bilingual) el.innerHTML = el.dataset.bilingual; return; }
+      const hold = doc.createElement('div');
+      hold.innerHTML = el.dataset.bilingual;
+      const sub = hold.querySelector('tspan');
+      const english = hold.childNodes[0] && hold.childNodes[0].nodeType === 3 ? hold.childNodes[0].textContent.trim() : (hold.querySelector('[data-map-label-en]') || {}).textContent || '';
+      const pair = shortName[english];
+      if (!pair) return;
+      el.textContent = en ? pair[1] : pair[0];
+    });
+    svg.querySelectorAll('text').forEach(t => {
+      if (!t.dataset.ox) {
+        t.dataset.ox = t.getAttribute('x') || '0';
+        t.dataset.oy = t.getAttribute('y') || '0';
+        t.querySelectorAll('tspan').forEach(s => { if (s.hasAttribute('x')) s.dataset.ox = s.getAttribute('x'); });
+      }
+      t.setAttribute('x', t.dataset.ox);
+      t.setAttribute('y', t.dataset.oy);
+      t.querySelectorAll('tspan').forEach(s => { if (s.dataset.ox) s.setAttribute('x', s.dataset.ox); });
+    });
+    const frame = svg.getBoundingClientRect();
+    const texts = [...svg.querySelectorAll('text')].filter(textShown);
+    const clamp = t => {
+      const r = t.getBoundingClientRect();
+      let dxs = 0, dys = 0;
+      if (r.left < frame.left + 1) dxs = frame.left + 1 - r.left;
+      else if (r.right > frame.right - 1) dxs = frame.right - 1 - r.right;
+      if (r.top < frame.top + 1) dys = frame.top + 1 - r.top;
+      else if (r.bottom > frame.bottom - 1) dys = frame.bottom - 1 - r.bottom;
+      if (dxs || dys) shiftText(t, dxs / scale, dys / scale);
+    };
+    texts.forEach(clamp);
+    for (let pass = 0; pass < 24; pass++) {
+      let moved = false;
+      for (let i = 0; i < texts.length; i++) {
+        for (let j = i + 1; j < texts.length; j++) {
+          const a = texts[i].getBoundingClientRect();
+          const b = texts[j].getBoundingClientRect();
+          if (!overlaps(a, b)) continue;
+          const options = [[0, a.bottom - b.top + 4], [0, a.top - b.bottom - 4], [a.right - b.left + 4, 0], [a.left - b.right - 4, 0]];
+          for (const [dxs, dys] of options) {
+            shiftText(texts[j], dxs / scale, dys / scale);
+            const r = texts[j].getBoundingClientRect();
+            const inside = r.left >= frame.left - 0.5 && r.right <= frame.right + 0.5 && r.top >= frame.top - 0.5 && r.bottom <= frame.bottom + 0.5;
+            if (inside && !overlaps(texts[i].getBoundingClientRect(), r)) { moved = true; break; }
+            shiftText(texts[j], -dxs / scale, -dys / scale);
+          }
+        }
+      }
+      if (!moved) break;
+    }
+  }
+  function spreadDayNumbers(svg, scale) {
+    if (!svg.classList.contains('gcoast')) return;
+    const texts = [...svg.querySelectorAll('.gday-stop text')];
+    texts.forEach(t => {
+      if (!t.dataset.ox) { t.dataset.ox = t.getAttribute('x'); t.dataset.oy = t.getAttribute('y'); }
+      t.setAttribute('x', t.dataset.ox);
+      t.setAttribute('y', t.dataset.oy);
+    });
+    const live = texts.filter(textShown);
+    const frame = svg.getBoundingClientRect();
+    for (let pass = 0; pass < 20; pass++) {
+      let moved = false;
+      for (let i = 0; i < live.length; i++) {
+        for (let j = i + 1; j < live.length; j++) {
+          const a = live[i].getBoundingClientRect();
+          const b = live[j].getBoundingClientRect();
+          if (!overlaps(a, b)) continue;
+          const ox = Math.min(a.right, b.right) - Math.max(a.left, b.left);
+          const oy = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.bottom);
+          const side = (j % 2 === 0 ? 1 : -1);
+          shiftText(live[j], side * (ox + 4) / scale, (oy + 4) / scale * (j % 3 === 0 ? -1 : 1) * 0.35);
+          moved = true;
+        }
+      }
+      for (const t of live) {
+        const r = t.getBoundingClientRect();
+        let dxs = 0, dys = 0;
+        if (r.left < frame.left + 1) dxs = frame.left + 1 - r.left;
+        else if (r.right > frame.right - 1) dxs = frame.right - 1 - r.right;
+        if (r.top < frame.top + 1) dys = frame.top + 1 - r.top;
+        else if (r.bottom > frame.bottom - 1) dys = frame.bottom - 1 - r.bottom;
+        if (dxs || dys) { shiftText(t, dxs / scale, dys / scale); moved = true; }
+      }
+      if (!moved) break;
+    }
+    const ns = 'http://www.w3.org/2000/svg';
+    for (const t of live) {
+      const g = t.parentNode;
+      const circle = g && g.querySelector('circle');
+      if (!circle) continue;
+      const far = Math.hypot(parseFloat(t.getAttribute('x')) - parseFloat(t.dataset.ox), parseFloat(t.getAttribute('y')) - parseFloat(t.dataset.oy)) > 8;
+      let line = g.querySelector('.gday-leader');
+      if (!far) { if (line) line.remove(); continue; }
+      if (!line) { line = doc.createElementNS(ns, 'line'); line.setAttribute('class', 'gday-leader'); g.insertBefore(line, t); }
+      line.setAttribute('stroke', '#163528');
+      line.setAttribute('stroke-width', '1.5');
+      line.setAttribute('vector-effect', 'non-scaling-stroke');
+      line.setAttribute('x1', circle.getAttribute('cx'));
+      line.setAttribute('y1', circle.getAttribute('cy'));
+      line.setAttribute('x2', t.getAttribute('x'));
+      line.setAttribute('y2', t.getAttribute('y'));
+    }
+  }
+  function boxGap(a, b) {
+    const dx = Math.max(b.left - a.right, a.left - b.right, 0);
+    const dy = Math.max(b.top - a.bottom, a.top - b.bottom, 0);
+    return Math.hypot(dx, dy);
+  }
+  function labelDot(svg, text) {
+    const g = text.parentNode;
+    if (text.classList.contains('gday-num') || text.classList.contains('v4-map-name') || text.classList.contains('v4-map-tag') || text.classList.contains('v4-map-num')) {
+      const circle = g && g.querySelector && g.querySelector('circle');
+      if (circle) return circle;
+    }
+    const id = text.getAttribute('data-p10-pick-label');
+    if (id) {
+      const mark = svg.querySelector('[data-p10-pick="' + (window.CSS && CSS.escape ? CSS.escape(id) : id) + '"] .p10-pick-mark');
+      if (mark) return mark;
+    }
+    const px = parseFloat(text.getAttribute('data-px'));
+    const py = parseFloat(text.getAttribute('data-py'));
+    if (!Number.isFinite(px)) return null;
+    let best = null, bestD = Infinity;
+    svg.querySelectorAll('circle').forEach(circle => {
+      if (circle.classList.contains('p10-pick-hit')) return;
+      const cx = parseFloat(circle.getAttribute('cx'));
+      const cy = parseFloat(circle.getAttribute('cy'));
+      if (!Number.isFinite(cx)) return;
+      const d = Math.hypot(cx - px, cy - py);
+      if (d < bestD) { bestD = d; best = circle; }
+    });
+    return bestD < 3 ? best : null;
+  }
+  function coversPoint(box, x, y) {
+    return x >= box.left && x <= box.right && y >= box.top && y <= box.bottom;
+  }
+  function pointBoxDist(x, y, box) {
+    return Math.hypot(Math.max(box.left - x, x - box.right, 0), Math.max(box.top - y, y - box.bottom, 0));
+  }
+  function distPointSeg(px, py, x1, y1, x2, y2) {
+    const dx = x2 - x1, dy = y2 - y1;
+    const len2 = dx * dx + dy * dy;
+    if (len2 < 1e-6) return Math.hypot(px - x1, py - y1);
+    const t = Math.max(0, Math.min(1, ((px - x1) * dx + (py - y1) * dy) / len2));
+    return Math.hypot(px - (x1 + t * dx), py - (y1 + t * dy));
+  }
+  function clipLength(x1, y1, x2, y2, rect) {
+    let t0 = 0, t1 = 1;
+    const dx = x2 - x1, dy = y2 - y1;
+    const p = [-dx, dx, -dy, dy];
+    const q = [x1 - rect.left, rect.right - x1, y1 - rect.top, rect.bottom - y1];
+    for (let i = 0; i < 4; i++) {
+      if (Math.abs(p[i]) < 1e-6) { if (q[i] < 0) return 0; continue; }
+      const t = q[i] / p[i];
+      if (p[i] < 0) { if (t > t1) return 0; if (t > t0) t0 = t; }
+      else { if (t < t0) return 0; if (t < t1) t1 = t; }
+    }
+    if (t1 - t0 <= 0) return 0;
+    return Math.hypot(dx, dy) * (t1 - t0);
+  }
+  const layoutMemo = new WeakMap();
+  function settleMapLabels(svg, scale) {
+    const coast = svg.classList.contains('gcoast');
+    if (!svg || (!svg.classList.contains('v4-schematic') && !svg.classList.contains('p10-pick-svg') && !coast)) return;
+    const frame = svg.getBoundingClientRect();
+    if (!(frame.width > 2) || !(scale > 0)) return;
+    const schematic = svg.classList.contains('v4-schematic') || coast;
+    svg.querySelectorAll('.is-unplaced').forEach(node => {
+      node.classList.remove('is-unplaced', 'is-off');
+      node.style.removeProperty('display');
+    });
+    const placeable = el => {
+      const cs = getComputedStyle(el);
+      if (cs.display === 'none') return false;
+      const r = el.getBoundingClientRect();
+      return r.width > 1 && r.height > 1;
+    };
+    const texts = [...svg.querySelectorAll(coast ? '.gday-num' : (svg.classList.contains('v4-schematic') ? '.v4-map-num, .v4-map-name, .v4-map-tag' : '.p10-pick-label, .p10-pick-tag'))].filter(placeable);
+    svg.querySelectorAll('.v4-map-leader, .p10-pick-leader, .gday-leader').forEach(line => line.remove());
+    if (!texts.length) { syncPickList(svg); return; }
+    const ns = 'http://www.w3.org/2000/svg';
+    const inside = r => r.left >= frame.left - 0.5 && r.right <= frame.right + 0.5 && r.top >= frame.top - 0.5 && r.bottom <= frame.bottom + 0.5;
+    const makeDirs = steps => {
+      const out = [];
+      for (let i = 0; i < steps; i++) {
+        const ang = -Math.PI / 2 + i * (Math.PI * 2 / steps);
+        const dx = Math.cos(ang), dy = Math.sin(ang);
+        out.push([dx, dy, Math.abs(dx) < 0.35 ? 'middle' : (dx < 0 ? 'end' : 'start')]);
+      }
+      return out;
+    };
+    let dirs = makeDirs(schematic ? 24 : 16);
+    let thorough = !schematic;
+    let sx = scale, sy = scale;
+    const probe = texts[0];
+    if (probe) {
+      const keepA = probe.getAttribute('text-anchor') || 'start';
+      const keepX = probe.getAttribute('x'), keepY = probe.getAttribute('y');
+      probe.setAttribute('x', '0');
+      probe.setAttribute('y', '0');
+      const origin = probe.getBoundingClientRect();
+      probe.setAttribute('x', '40');
+      probe.setAttribute('y', '40');
+      const moved = probe.getBoundingClientRect();
+      const dx = (moved.left - origin.left) / 40, dy = (moved.top - origin.top) / 40;
+      if (Math.abs(dx) > 0.01) sx = dx;
+      if (Math.abs(dy) > 0.01) sy = dy;
+      probe.setAttribute('text-anchor', keepA);
+      if (keepX != null) probe.setAttribute('x', keepX);
+      if (keepY != null) probe.setAttribute('y', keepY);
+    }
+    const measured = new Map();
+    const metrics = (text, anchor) => {
+      let by = measured.get(text);
+      if (!by) { by = new Map(); measured.set(text, by); }
+      if (by.has(anchor)) return by.get(anchor);
+      text.setAttribute('text-anchor', anchor);
+      text.setAttribute('x', '0');
+      text.setAttribute('y', '0');
+      const r0 = text.getBoundingClientRect();
+      const m = { w: r0.width, h: r0.height, cx: (r0.left + r0.right) / 2, cy: (r0.top + r0.bottom) / 2 };
+      by.set(anchor, m);
+      return m;
+    };
+    const quant = n => Math.round(n * 10) / 10;
+    const boxAt = (m, userX, userY) => {
+      const cx = m.cx + userX * sx, cy = m.cy + userY * sy;
+      return { left: cx - m.w / 2, right: cx + m.w / 2, top: cy - m.h / 2, bottom: cy + m.h / 2, width: m.w, height: m.h };
+    };
+    const memoKey = () => {
+      const box = svg.getBoundingClientRect();
+      return Math.round(box.width) + 'x' + Math.round(box.height) + ':' + texts.map(t => (t.getAttribute('data-p10-pick-label') || t.textContent || '') + ':' + (t.classList.contains('p10-pick-tag') ? 't' : 'n')).join('|');
+    };
+    if (!schematic) {
+      const key = memoKey();
+      const saved = layoutMemo.get(svg);
+      if (saved && saved.key === key) {
+        saved.items.forEach(item => {
+          item.text.setAttribute('text-anchor', item.anchor);
+          item.text.setAttribute('x', item.x);
+          item.text.setAttribute('y', item.y);
+          item.text.classList.toggle('is-off', item.off);
+          item.text.classList.toggle('is-unplaced', item.off);
+          if (item.display) item.text.style.setProperty('display', item.display, 'important');
+          else item.text.style.removeProperty('display');
+        });
+        const host = svg.querySelector('.p10-pick-labels') || svg;
+        saved.leaders.forEach(L => {
+          const line = doc.createElementNS(ns, 'line');
+          line.setAttribute('class', 'p10-pick-leader');
+          line.setAttribute('stroke', '#163528');
+          line.setAttribute('stroke-width', '1.5');
+          line.setAttribute('vector-effect', 'non-scaling-stroke');
+          line.setAttribute('x1', L.x1); line.setAttribute('y1', L.y1);
+          line.setAttribute('x2', L.x2); line.setAttribute('y2', L.y2);
+          if (L.owner) line.dataset.for = L.owner;
+          host.insertBefore(line, host.firstChild);
+        });
+        syncPickList(svg);
+        return;
+      }
+    }
+    const placed = [];
+    let cachedDots = null;
+    const dotCenters = () => {
+      if (cachedDots) return cachedDots;
+      cachedDots = [...svg.querySelectorAll('circle')].filter(c => !c.classList.contains('p10-pick-hit')).map(c => {
+        const r = c.getBoundingClientRect();
+        return { x: (r.left + r.right) / 2, y: (r.top + r.bottom) / 2, r, el: c };
+      }).filter(d => d.r.width > 0.5);
+      return cachedDots;
+    };
+    const tagCity = new Set();
+    for (const tag of texts) {
+      if (!tag.classList.contains('p10-pick-tag')) continue;
+      const mark = labelDot(svg, tag);
+      const id = mark && mark.closest && mark.closest('[data-p10-pick]') && mark.closest('[data-p10-pick]').dataset.p10Pick;
+      if (id) tagCity.add(id);
+    }
+    const picked = el => {
+      const id = el.getAttribute('data-p10-pick-label');
+      if (!id) return false;
+      const dot = svg.querySelector('[data-p10-pick="' + (window.CSS && CSS.escape ? CSS.escape(id) : id) + '"]');
+      return !!(dot && dot.classList.contains('is-on'));
+    };
+    const pin = el => {
+      if (el.classList.contains('v4-map-num') || el.classList.contains('gday-num')) return 0;
+      if (el.classList.contains('p10-pick-tag')) return 1;
+      if (picked(el)) return 2;
+      if (tagCity.has(el.getAttribute('data-p10-pick-label'))) return 3;
+      return 4;
+    };
+    const orderOf = shortFirst => texts.slice().sort((a, b) => {
+      const pa = pin(a), pb = pin(b);
+      if (pa !== pb) return pa - pb;
+      const al = (a.textContent || '').length, bl = (b.textContent || '').length;
+      return shortFirst || schematic ? al - bl : bl - al;
+    });
+    const leaderEnds = (circle, rect) => {
+      const c = circle.getBoundingClientRect();
+      const cx = (c.left + c.right) / 2, cy = (c.top + c.bottom) / 2;
+      const x = Math.max(rect.left, Math.min(cx, rect.right));
+      const y = Math.max(rect.top, Math.min(cy, rect.bottom));
+      const dx = x - cx, dy = y - cy;
+      const len = Math.hypot(dx, dy) || 1;
+      return { x1: cx, y1: cy, x2: x - dx / len * 1.5, y2: y - dy / len * 1.5, len: len - 1.5 };
+    };
+    const clearOf = (rect, ends) => {
+      const pad = ends.pad != null ? ends.pad : (schematic ? 2 : 5);
+      for (const d of dotCenters()) {
+        if (Math.hypot(d.x - ends.ownX, d.y - ends.ownY) <= (ends.cluster || 2)) continue;
+        const rad = Math.min(d.r.width, d.r.height) / 2;
+        const away = pointBoxDist(d.x, d.y, rect);
+        if (away <= rad + pad || away < (ends.minAway || 0)) return false;
+        if (ends.draw && distPointSeg(d.x, d.y, ends.x1, ends.y1, ends.x2, ends.y2) <= rad + 2) return false;
+      }
+      if (!ends.draw) return true;
+      if (ends.len > 48) return false;
+      return !placed.some(p => clipLength(ends.x1, ends.y1, ends.x2, ends.y2, p.rect) > 0.2);
+    };
+    const paint = (text, circle, ends) => {
+      if (!ends.draw) return;
+      const line = doc.createElementNS(ns, 'line');
+      line.setAttribute('class', coast ? 'gday-leader' : (svg.classList.contains('v4-schematic') ? 'v4-map-leader' : 'p10-pick-leader'));
+      line.setAttribute('stroke', '#163528');
+      line.setAttribute('stroke-width', '1.5');
+      line.setAttribute('vector-effect', 'non-scaling-stroke');
+      const ctm = circle.getScreenCTM();
+      const cx0 = parseFloat(circle.getAttribute('cx')) || 0;
+      const cy0 = parseFloat(circle.getAttribute('cy')) || 0;
+      let x2 = cx0, y2 = cy0;
+      if (ctm) {
+        const local = new DOMPoint(ends.x2, ends.y2).matrixTransform(ctm.inverse());
+        x2 = local.x;
+        y2 = local.y;
+      }
+      const owner = text.getAttribute('data-p10-pick-label') || (text.textContent || '').trim();
+      if (owner) line.dataset.for = owner;
+      line.setAttribute('x1', String(cx0));
+      line.setAttribute('y1', String(cy0));
+      line.setAttribute('x2', x2.toFixed(1));
+      line.setAttribute('y2', y2.toFixed(1));
+      const host = coast || svg.classList.contains('v4-schematic') ? text.parentNode : (svg.querySelector('.p10-pick-labels') || text.parentNode);
+      host.insertBefore(line, coast || svg.classList.contains('v4-schematic') ? text : host.firstChild);
+    };
+    const sit = (text, circle, gapScreen, rank) => {
+      const c = circle.getBoundingClientRect();
+      const ccx = (c.left + c.right) / 2, ccy = (c.top + c.bottom) / 2;
+      const rad = Math.min(c.width, c.height) / 2;
+      let best = null;
+      const numeralSlide = text.classList.contains('v4-map-num') || text.classList.contains('gday-num');
+      const slides = numeralSlide ? [0, -8, 8, -16, 16, -24, 24] : (text.classList.contains('p10-pick-tag') ? [0, -12, 12] : (schematic ? [0] : [0, -18, 18, -36, 36]));
+      for (const [dx, dy, anchor] of dirs) {
+        const len = Math.hypot(dx, dy) || 1;
+        const ux = dx / len, uy = dy / len;
+        const m = metrics(text, anchor);
+        if (!(m.w > 1)) continue;
+        for (const slide of slides) {
+        const half = Math.abs(ux) * m.w / 2 + Math.abs(uy) * m.h / 2;
+        const dist = rad + gapScreen + half;
+        const targetX = ccx + ux * dist - uy * slide;
+        const targetY = ccy + uy * dist + ux * slide;
+        let userX = quant((targetX - m.cx) / sx);
+        let userY = quant((targetY - m.cy) / sy);
+        let r = boxAt(m, userX, userY);
+        let gap = boxGap(r, c);
+        for (let pull = 0; pull < 3 && gap > gapScreen + 1; pull++) {
+          const mx = (r.left + r.right) / 2, my = (r.top + r.bottom) / 2;
+          const d = Math.hypot(mx - ccx, my - ccy) || 1;
+          userX = quant(userX + (ccx - mx) / d * (gap - gapScreen) / sx);
+          userY = quant(userY + (ccy - my) / d * (gap - gapScreen) / sy);
+          r = boxAt(m, userX, userY);
+          gap = boxGap(r, c);
+        }
+        if (gap < 2) {
+          userX = quant(userX + ux * (3 - gap) / sx);
+          userY = quant(userY + uy * (3 - gap) / sy);
+          r = boxAt(m, userX, userY);
+          gap = boxGap(r, c);
+        }
+        const ends = leaderEnds(circle, r);
+        ends.ownX = ccx;
+        ends.ownY = ccy;
+        ends.cluster = text.classList.contains('p10-pick-tag') ? 6 : 2;
+        ends.minAway = 0;
+        ends.pad = text.dataset.p10Loose ? 0 : (schematic ? 2 : 5);
+        let clear = Infinity;
+        let foreignPoint = Infinity;
+        let centerForeign = Infinity;
+        const midX = (r.left + r.right) / 2, midY = (r.top + r.bottom) / 2;
+        const centerOwn = Math.hypot(midX - ccx, midY - ccy);
+        const numeralHere = text.classList.contains('v4-map-num') || text.classList.contains('gday-num');
+        for (const d of dotCenters()) {
+          if (Math.hypot(d.x - ccx, d.y - ccy) <= (text.classList.contains('p10-pick-tag') ? 6 : 2)) continue;
+          if (text.classList.contains('gday-num') && !(d.el.parentNode && d.el.parentNode.querySelector('text'))) continue;
+          const pd = pointBoxDist(d.x, d.y, r);
+          foreignPoint = Math.min(foreignPoint, pd);
+          centerForeign = Math.min(centerForeign, Math.hypot(d.x - midX, d.y - midY));
+          clear = Math.min(clear, pd - Math.min(d.r.width, d.r.height) / 2);
+        }
+        const ownPoint = pointBoxDist(ccx, ccy, r);
+        const ownsHere = foreignPoint > ownPoint + 0.4 && centerForeign > centerOwn + 0.4;
+        ends.draw = coast ? gap > 3 : (numeralHere ? (!ownsHere || ownPoint > 14 || gap > 14) : gap > 8);
+        const maxGap = gapScreen + 1.5;
+        const crowded = placed.some(o => schematic ? boxGap(r, o.rect) < 12 : overlaps(r, o.rect));
+        if (!(inside(r) && gap >= 2 && gap <= maxGap && !crowded && clearOf(r, ends))) continue;
+        let apart = Infinity;
+        for (const o of placed) apart = Math.min(apart, boxGap(r, o.rect));
+        const score = schematic ? clear : apart + clear;
+        const cand = { score, x: userX.toFixed(1), y: userY.toFixed(1), anchor, r, ends, ownPoint, foreignPoint, centerOwn, centerForeign };
+        const ranked = rank ? rank(cand) : score;
+        if (ranked == null) continue;
+        if (!best || ranked > best.ranked) best = { ...cand, ranked };
+        }
+      }
+      if (!best) return null;
+      text.setAttribute('text-anchor', best.anchor);
+      text.setAttribute('x', best.x);
+      text.setAttribute('y', best.y);
+      return { r: best.r, ends: best.ends, x: best.x, y: best.y, anchor: best.anchor, ownPoint: best.ownPoint, foreignPoint: best.foreignPoint, ranked: best.ranked };
+    };
+    const placeOne = text => {
+      text.classList.remove('is-unplaced');
+      const keepX = text.getAttribute('x'), keepY = text.getAttribute('y'), keepA = text.getAttribute('text-anchor');
+      const circle = labelDot(svg, text);
+      if (!circle) return true;
+      let fit = null;
+      const tag = text.classList.contains('p10-pick-tag');
+      const numeral = text.classList.contains('v4-map-num') || text.classList.contains('gday-num');
+      if (tag || numeral) {
+        // Start, end and stop numbers must sit nearer their own dot than any other city's dot.
+        const rank = cand => {
+          const owns = cand.foreignPoint > cand.ownPoint + 0.4 && cand.centerForeign > cand.centerOwn + 0.4;
+          if (tag && !(cand.ownPoint <= 12 && owns)) return null;
+          if (numeral && !owns && cand.ownPoint <= 14) return null;
+          const clear6 = cand.foreignPoint >= 6 ? 200 : 0;
+          if (numeral && cand.ownPoint > 14) return (owns ? 2000 : 0) + clear6 - cand.ownPoint * 8;
+          return (owns ? 5000 : 0) + clear6 - cand.ownPoint * 8;
+        };
+        let best = null;
+        for (const gap of tag ? [3, 4, 6, 8, 10, 12] : [4, 8, 12, 14, 18, 22, 26, 30]) {
+          const got = sit(text, circle, gap, rank);
+          if (got && (!best || got.ranked > best.ranked)) best = got;
+        }
+        if (best) {
+          text.setAttribute('text-anchor', best.anchor);
+          text.setAttribute('x', best.x);
+          text.setAttribute('y', best.y);
+          if (numeral && (best.ownPoint > 14 || !(best.foreignPoint > best.ownPoint + 0.4))) best.ends.draw = true;
+          fit = best;
+        }
+      }
+      if (!fit && !tag) {
+      for (const gap of thorough ? [4, 6, 8, 10, 12, 14] : [4, 8, 12, 14]) {
+        fit = sit(text, circle, gap);
+        if (fit) break;
+      }
+      }
+      if (!fit && !schematic && !tag) {
+        for (const gap of [18, 22, 26, 32, 40]) {
+          fit = sit(text, circle, gap);
+          if (fit) break;
+        }
+      }
+      if (!fit && schematic && !tag) {
+        for (const gap of [18, 22, 26, 30, 34, 38, 42, 46]) {
+          fit = sit(text, circle, gap);
+          if (fit) break;
+        }
+      }
+      if (!fit && tag && !text.dataset.p10Loose) {
+        text.dataset.p10Loose = '1';
+        const loose = cand => (cand.ownPoint <= 12 && cand.foreignPoint > cand.ownPoint + 0.4 && cand.centerForeign > cand.centerOwn + 0.4) ? 5000 - cand.ownPoint * 8 : null;
+        for (const gap of [3, 4, 6, 8, 10, 12]) {
+          const got = sit(text, circle, gap, loose);
+          if (got && (!fit || got.ranked > fit.ranked)) fit = got;
+        }
+        delete text.dataset.p10Loose;
+        if (fit) {
+          text.setAttribute('text-anchor', fit.anchor);
+          text.setAttribute('x', fit.x);
+          text.setAttribute('y', fit.y);
+        }
+      }
+      if (!fit) {
+        if (keepX != null) text.setAttribute('x', keepX);
+        if (keepY != null) text.setAttribute('y', keepY);
+        if (keepA != null) text.setAttribute('text-anchor', keepA);
+        if (schematic) return false;
+        text.classList.add('is-off', 'is-unplaced');
+        text.style.setProperty('display', 'none', 'important');
+        return false;
+      }
+      text.classList.remove('is-off');
+      text.style.removeProperty('display');
+      placed.push({ rect: fit.r, text, ends: fit.ends, circle });
+      return true;
+    };
+    const lay = list => {
+      placed.length = 0;
+      texts.forEach(text => {
+        text.classList.remove('is-unplaced', 'is-off');
+        text.style.removeProperty('display');
+      });
+      list.forEach(placeOne);
+      if (!schematic) {
+        for (const tag of texts.filter(text => text.classList.contains('p10-pick-tag') && (text.classList.contains('is-unplaced') || text.style.display === 'none'))) {
+          const mark = labelDot(svg, tag);
+          if (!mark) continue;
+          const c = mark.getBoundingClientRect();
+          const cx = (c.left + c.right) / 2, cy = (c.top + c.bottom) / 2;
+          const blocked = placed.filter(item => Math.hypot((item.rect.left + item.rect.right) / 2 - cx, (item.rect.top + item.rect.bottom) / 2 - cy) < 90);
+          blocked.forEach(item => {
+            const at = placed.indexOf(item);
+            if (at >= 0) placed.splice(at, 1);
+            item.text.classList.add('is-off', 'is-unplaced');
+            item.text.style.setProperty('display', 'none', 'important');
+          });
+          tag.classList.remove('is-off', 'is-unplaced');
+          tag.style.removeProperty('display');
+          placeOne(tag);
+          blocked.forEach(item => {
+            item.text.classList.remove('is-off', 'is-unplaced');
+            item.text.style.removeProperty('display');
+            placeOne(item.text);
+          });
+        }
+      }
+    };
+    const tagMiss = () => texts.some(text => text.classList.contains('p10-pick-tag') && text.classList.contains('is-unplaced'));
+    const placedCount = () => texts.filter(text => !text.classList.contains('is-unplaced')).length;
+    const snap = () => texts.map(text => ({
+      text,
+      x: text.getAttribute('x') || '0',
+      y: text.getAttribute('y') || '0',
+      anchor: text.getAttribute('text-anchor') || 'start',
+      off: text.classList.contains('is-unplaced')
+    }));
+    lay(orderOf(false));
+    if (!schematic && texts.some(text => text.classList.contains('is-unplaced') && !text.classList.contains('p10-pick-tag'))) {
+      const longCount = placedCount();
+      const longMiss = tagMiss();
+      const longItems = placed.map(item => ({ ...item }));
+      const longSnap = snap();
+      lay(orderOf(true));
+      if ((tagMiss() && !longMiss) || placedCount() < longCount) {
+        placed.length = 0;
+        longItems.forEach(item => placed.push(item));
+        longSnap.forEach(item => {
+          item.text.setAttribute('x', item.x);
+          item.text.setAttribute('y', item.y);
+          item.text.setAttribute('text-anchor', item.anchor);
+          item.text.classList.toggle('is-off', item.off);
+          item.text.classList.toggle('is-unplaced', item.off);
+          if (item.off) item.text.style.setProperty('display', 'none', 'important');
+          else item.text.style.removeProperty('display');
+        });
+      }
+    }
+    placed.forEach(item => {
+      if (!item.ends || !item.ends.draw) return;
+      const rect = item.text.getBoundingClientRect();
+      if (!(rect.width > 1)) return;
+      const live = leaderEnds(item.circle, rect);
+      live.draw = true;
+      paint(item.text, item.circle, live);
+    });
+    if (svg.classList.contains('v4-schematic')) {
+      for (const text of texts.filter(t => t.classList.contains('v4-map-num'))) {
+        const circle = labelDot(svg, text);
+        if (!circle) continue;
+        const cc = circle.getBoundingClientRect();
+        const ccx = (cc.left + cc.right) / 2, ccy = (cc.top + cc.bottom) / 2;
+        const tooClose = () => {
+          const box = text.getBoundingClientRect();
+          for (const d of dotCenters()) {
+            if (Math.hypot(d.x - ccx, d.y - ccy) <= 2) continue;
+            const rad = Math.min(d.r.width, d.r.height) / 2;
+            if (pointBoxDist(d.x, d.y, box) <= rad + 2) return true;
+          }
+          return [...svg.querySelectorAll('.v4-map-num')].some(other => other !== text && overlaps(text.getBoundingClientRect(), other.getBoundingClientRect()));
+        };
+        if (!tooClose()) continue;
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('x', '0');
+        text.setAttribute('y', '0');
+        const base = text.getBoundingClientRect();
+        const bcx = (base.left + base.right) / 2, bcy = (base.top + base.bottom) / 2;
+        text.setAttribute('x', '30');
+        const moved = text.getBoundingClientRect();
+        const ux = ((moved.left + moved.right) / 2 - bcx) / 30 || 1;
+        text.setAttribute('y', '30');
+        text.setAttribute('x', '0');
+        const movedY = text.getBoundingClientRect();
+        const uy = ((movedY.top + movedY.bottom) / 2 - bcy) / 30 || 1;
+        let placedOk = false;
+        for (let i = 0; i < 12 && !placedOk; i++) {
+          const ang = i * Math.PI / 6;
+          for (const dist of [16, 26, 38]) {
+            text.setAttribute('x', ((ccx + Math.cos(ang) * dist - bcx) / ux).toFixed(1));
+            text.setAttribute('y', ((ccy + Math.sin(ang) * dist - bcy) / uy).toFixed(1));
+            if (!tooClose() && inside(text.getBoundingClientRect())) { placedOk = true; break; }
+          }
+        }
+        if (!placedOk) { text.setAttribute('x', '0'); text.setAttribute('y', '-14'); }
+        const box = text.getBoundingClientRect();
+        const gap = boxGap(box, cc);
+        const ends = leaderEnds(circle, box);
+        ends.draw = gap > 14;
+        if (ends.draw) paint(text, circle, ends);
+      }
+    }
+    for (const line of [...svg.querySelectorAll('.v4-map-leader, .p10-pick-leader, .gday-leader')]) {
+      const ctm = line.getScreenCTM();
+      if (!ctm) { line.remove(); continue; }
+      const pt = (x, y) => { const p = new DOMPoint(+x, +y).matrixTransform(ctm); return { x: p.x, y: p.y }; };
+      const a = pt(line.getAttribute('x1'), line.getAttribute('y1'));
+      const b = pt(line.getAttribute('x2'), line.getAttribute('y2'));
+      const len = Math.hypot(b.x - a.x, b.y - a.y);
+      const live = [...svg.querySelectorAll('text')].filter(placeable);
+      const own = live.find(t => pointBoxDist(b.x, b.y, t.getBoundingClientRect()) <= 3);
+      const crosses = live.some(t => t !== own && clipLength(a.x, a.y, b.x, b.y, t.getBoundingClientRect()) > 0.2);
+      const throughDot = dotCenters().some(d => {
+        if (Math.hypot(d.x - a.x, d.y - a.y) <= 2) return false;
+        const rad = Math.min(d.r.width, d.r.height) / 2;
+        return distPointSeg(d.x, d.y, a.x, a.y, b.x, b.y) <= rad + 2;
+      });
+      if (len > 48 || throughDot || (crosses && !schematic)) {
+        line.remove();
+        if (own && !schematic) { own.classList.add('is-off', 'is-unplaced'); own.style.setProperty('display', 'none', 'important'); }
+      }
+    }
+    if (svg.classList.contains('v4-schematic')) {
+      for (const text of texts.filter(t => t.classList.contains('v4-map-num'))) {
+        const circle = labelDot(svg, text);
+        if (!circle) continue;
+        const box = text.getBoundingClientRect();
+        const cc = circle.getBoundingClientRect();
+        if (!(box.width > 1) || boxGap(box, cc) <= 14) continue;
+        const hitsDot = rect => {
+          const ends = leaderEnds(circle, rect);
+          return dotCenters().some(d => {
+            if (Math.hypot(d.x - ends.x1, d.y - ends.y1) <= 2) return false;
+            const rad = Math.min(d.r.width, d.r.height) / 2;
+            return distPointSeg(d.x, d.y, ends.x1, ends.y1, ends.x2, ends.y2) <= rad + 2;
+          });
+        };
+        if (hitsDot(box)) {
+          const x0 = parseFloat(text.getAttribute('x')) || 0;
+          const y0 = parseFloat(text.getAttribute('y')) || 0;
+          text.setAttribute('x', (x0 * 0.55).toFixed(1));
+          text.setAttribute('y', (y0 * 0.55).toFixed(1));
+        }
+        const box2 = text.getBoundingClientRect();
+        if (boxGap(box2, cc) <= 14 || hitsDot(box2)) continue;
+        const ends = leaderEnds(circle, box2);
+        ends.draw = true;
+        if (ends.len <= 48) paint(text, circle, ends);
+      }
+    }
+    if (!schematic) {
+      layoutMemo.set(svg, {
+        key: memoKey(),
+        items: texts.map(text => ({
+          text,
+          x: text.getAttribute('x') || '0',
+          y: text.getAttribute('y') || '0',
+          anchor: text.getAttribute('text-anchor') || 'start',
+          off: text.classList.contains('is-off'),
+          display: text.style.getPropertyValue('display')
+        })),
+        leaders: [...svg.querySelectorAll('.p10-pick-leader')].map(line => ({
+          x1: line.getAttribute('x1'), y1: line.getAttribute('y1'),
+          x2: line.getAttribute('x2'), y2: line.getAttribute('y2'),
+          owner: line.dataset.for || ''
+        }))
+      });
+    }
+    syncPickList(svg);
+    if (schematic) svg.dataset.ui2Laid = String(Math.round(svg.getBoundingClientRect().width));
+  }
+  function syncPickList(svg) {
+    if (!svg || !svg.classList.contains('p10-pick-svg')) return;
+    const ul = svg.parentElement && svg.parentElement.querySelector('.p10-pick-name-list');
+    if (!ul) return;
+    if (!ul.dataset.full) ul.dataset.full = ul.innerHTML;
+    const narrow = window.matchMedia('(max-width:420px)').matches;
+    const missed = [...svg.querySelectorAll('.is-unplaced')].map(t => (t.textContent || '').trim()).filter(Boolean);
+    const signature = (!narrow && missed.length) ? missed.join('\n') : 'full';
+    if (ul.dataset.shown === signature) return;
+    ul.dataset.shown = signature;
+    if (!narrow && missed.length) {
+      ul.replaceChildren(...missed.map(name => { const li = doc.createElement('li'); li.textContent = name; return li; }));
+      ul.classList.add('is-open');
+    } else {
+      ul.innerHTML = ul.dataset.full;
+      ul.classList.remove('is-open');
+    }
+  }
+  window.pounamuSettleLabels = settleMapLabels;
+  function fitMaps() { $$('svg').forEach(fitSvgText); }
   function enhance() {
+    fitMaps();
+    setTimeout(bumpSvgFonts, 120);
     $$('main img, .plan-result img').forEach(blurUp);
     $$('.route-card, .v4-results .v4-card, .walk-recommendation').forEach(tilt);
     $$('.cinema-copy .button, .v4-primary, .planner-button, .p10-step-nav .button').forEach(magnetic);
@@ -372,10 +1262,47 @@
     for (const ev of ['pointermove', 'scroll', 'touchstart', 'keydown']) addEventListener(ev, wake, { passive: true });
     scroll(); titles(); paletteButton(); enhance();
     // The contour art is decoration: draw it when the browser is idle, and only on pages that use it.
-    if (doc.querySelector('.home-ways, .page-planner, .page-intro, .v4-guide-top, .ui2-contour')) (window.requestIdleCallback || (fn => setTimeout(fn, 400)))(installContours, { timeout: 2500 });
+    if (doc.querySelector('.home-ways, .page-planner, .page-intro, .v4-guide-top, .ui2-contour')) installContours();
+    setTimeout(bumpSvgFonts, 400);
     let timer = 0;
-    const own = n => { const el = n.nodeType === 1 ? n : n.parentElement; return !!(el && el.closest && el.closest('.ui2-hud, .ui2-readout, .ui2-palette, .ui2-particles, .ui2-progress')); };
-    new MutationObserver(muts => { if (muts.every(m => own(m.target))) return; clearTimeout(timer); timer = setTimeout(enhance, 120); }).observe(doc.body, { childList: true, subtree: true });
+    let enhancing = false;
+    const leaderNode = n => n.nodeType === 1 && n.classList && (n.classList.contains('v4-map-leader') || n.classList.contains('gday-leader') || n.classList.contains('p10-pick-leader'));
+    const own = m => {
+      const el = m.target && (m.target.nodeType === 1 ? m.target : m.target.parentElement);
+      if (el && el.closest && el.closest('.ui2-hud, .ui2-readout, .ui2-palette, .ui2-particles, .ui2-progress, #p10-pick-map')) return true;
+      const nodes = [...(m.addedNodes || []), ...(m.removedNodes || [])];
+      return nodes.length > 0 && nodes.every(leaderNode);
+    };
+    const runEnhance = () => {
+      if (enhancing) { clearTimeout(timer); timer = setTimeout(runEnhance, 40); return; }
+      enhancing = true;
+      try { enhance(); } finally { enhancing = false; }
+    };
+    new MutationObserver(muts => { if (muts.every(own)) return; clearTimeout(timer); timer = setTimeout(runEnhance, 0); }).observe(doc.body, { childList: true, subtree: true });
   }
-  if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', start); else start();
+  function skipFocus() {
+    const main = doc.querySelector('main');
+    if (main) main.tabIndex = -1;
+    doc.querySelectorAll('a.skip-link').forEach(a => {
+      if (a.dataset.skipBound) return;
+      a.dataset.skipBound = '1';
+      a.addEventListener('click', ev => {
+        const target = doc.querySelector(a.getAttribute('href'));
+        if (!target) return;
+        ev.preventDefault();
+        target.tabIndex = -1;
+        target.focus();
+      });
+    });
+  }
+  function paletteChrome() {
+    if (!palette) return;
+    const foot = palette.querySelector('footer');
+    if (foot) foot.innerHTML = `<span>↑↓ ${isEn() ? 'move' : '选择'}</span><span>↵ ${isEn() ? 'open' : '打开'}</span><span>esc ${isEn() ? 'close' : '关闭'}</span>`;
+    const input = palette.querySelector('input');
+    if (input) input.placeholder = isEn() ? 'Search routes, places and pages…' : '搜线路、目的地、页面……';
+    palette.setAttribute('aria-label', isEn() ? 'Quick search' : '快速搜索');
+  }
+  new MutationObserver(() => { items = null; paletteChrome(); if (palette && palette.classList.contains('on')) { const q = palette.querySelector('input').value; loadItems().then(() => render(q)); } }).observe(root, { attributes: true, attributeFilter: ['lang'] });
+  if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', () => { skipFocus(); start(); }); else { skipFocus(); start(); }
 })();

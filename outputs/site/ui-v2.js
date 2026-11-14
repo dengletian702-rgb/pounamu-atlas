@@ -394,6 +394,14 @@
       if (drawn > 0) scale = drawn;
     }
     if (!scale) return;
+    if (svg.classList.contains('p10-pick-svg') && box.width > 2 && box.height > 2 && vbH) {
+      const sc = Math.min(box.width / vbW, box.height / vbH);
+      if (sc > 0) {
+        svg.querySelectorAll('text').forEach(node => node.style.setProperty('font-size', (13 / sc).toFixed(2) + 'px', 'important'));
+        settleMapLabels(svg, sc);
+        return;
+      }
+    }
     svg.querySelectorAll('text, tspan').forEach(node => {
       const cs = getComputedStyle(node);
       if (cs.display === 'none' || cs.visibility === 'hidden') return;
@@ -721,7 +729,7 @@
         const ends = leaderEnds(circle, r);
         ends.ownX = ccx;
         ends.ownY = ccy;
-        ends.draw = coast ? gap > 3 : (schematic && gap > 14);
+        ends.draw = coast ? gap > 3 : gap > 14;
         const maxGap = schematic ? gapScreen + 1.5 : Math.min(14, gapScreen + 1.5);
         const crowded = placed.some(o => schematic ? boxGap(r, o.rect) < 6 : overlaps(r, o.rect));
         if (!(inside(r) && gap >= 2 && gap <= maxGap && !crowded && clearOf(r, ends))) continue;

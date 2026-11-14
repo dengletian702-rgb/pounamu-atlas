@@ -1469,17 +1469,39 @@ globalThis.P10_NODES = NODES;
   // left off (it still shows when the place is pointed at or ticked).
   function p10PickLayout(){
     const svg=document.querySelector('#p10-pick-map .p10-pick-svg');if(!svg)return;
-    const vb=svg.viewBox.baseVal,box=svg.getBoundingClientRect();
-    const k=box.width&&box.height?Math.max(vb.width/box.width,vb.height/box.height):vb.width/360;
-    svg.style.setProperty('--k',k.toFixed(3));
-    for(const g of svg.querySelectorAll('.p10-pick-dot')){const town=g.classList.contains('is-town');g.querySelector('.p10-pick-mark').setAttribute('r',((town?3.5:5.5)*k).toFixed(2));g.querySelector('.p10-pick-hit').setAttribute('r',(11*k).toFixed(2));}
-    for(const t of svg.querySelectorAll('.p10-pick-label,.p10-pick-tag')){
-      t.classList.remove('is-off','is-unplaced');
-      t.style.removeProperty('display');
-      if(t.classList.contains('is-town')&&!p10Selected.has(t.dataset.p10PickLabel))t.classList.add('is-off');
+    const vb=svg.viewBox.baseVal;
+    const apply=()=>{
+      const b=svg.getBoundingClientRect();
+      if(!(b.width>2)||!(b.height>2)||!vb.width||!vb.height)return false;
+      const sc=Math.min(b.width/vb.width,b.height/vb.height);
+      if(!(sc>0.02))return false;
+      const k=1/sc;
+      svg.style.setProperty('--k',k.toFixed(3));
+      for(const g of svg.querySelectorAll('.p10-pick-dot')){const town=g.classList.contains('is-town');g.querySelector('.p10-pick-mark').setAttribute('r',((town?3.5:5.5)*k).toFixed(2));g.querySelector('.p10-pick-hit').setAttribute('r',(11*k).toFixed(2));}
+      for(const t of svg.querySelectorAll('.p10-pick-label,.p10-pick-tag')){
+        t.classList.remove('is-unplaced');
+        t.style.removeProperty('display');
+        if(t.classList.contains('is-town')&&!p10Selected.has(t.dataset.p10PickLabel)){t.classList.add('is-off');continue;}
+        t.classList.remove('is-off');
+        t.style.setProperty('font-size',(13/sc).toFixed(2)+'px','important');
+      }
+      if(window.pounamuSettleLabels)window.pounamuSettleLabels(svg,sc);
+      return true;
+    };
+    if(!svg.dataset.p10Watch){
+      svg.dataset.p10Watch='1';
+      let last=0, stable=0;
+      const kick=()=>{
+        const w=svg.getBoundingClientRect().width;
+        if(!(w>2)){stable=0;last=0;return;}
+        if(Math.abs(w-last)<1)stable++; else stable=0;
+        last=w;
+        if(stable<1)return;
+        apply();
+      };
+      new ResizeObserver(kick).observe(svg);
     }
-    const fitPick=()=>{const b=svg.getBoundingClientRect();if(!b.width||!vb.width)return;const sc=b.width/vb.width;svg.querySelectorAll('text').forEach(t=>t.style.setProperty('font-size',(13/sc).toFixed(2)+'px','important'));if(window.pounamuSettleLabels)window.pounamuSettleLabels(svg,sc);};
-    fitPick();requestAnimationFrame(fitPick);setTimeout(fitPick,120);
+    requestAnimationFrame(()=>requestAnimationFrame(apply));
   }
   // After a tick or untick: fill or empty the dots and redo the names (a ticked place always gets its name).
   function p10PickRefresh(){
@@ -1627,15 +1649,15 @@ globalThis.P10_NODES = NODES;
     const p10RelayoutPick=()=>{
       const host=p10$('#p10-pick-map');
       if(!host||!p10PickItems.length)return;
+      if(Boolean(host.closest('.planner-explainer'))!==p10Wide()){p10RenderPickMap(p10PickItems);return;}
       const svg=host.querySelector('.p10-pick-svg');
-      if(svg&&!(svg.getBoundingClientRect().width>2))return;
-      if(Boolean(host.closest('.planner-explainer'))!==p10Wide())p10RenderPickMap(p10PickItems);
-      else p10PickLayout();
+      if(svg&&!(svg.getBoundingClientRect().width>2)){p10PickLayout();return;}
+      p10PickLayout();
     };
     const more=document.getElementById('p10-more');
     if(more&&!more.dataset.pickBound){
       more.dataset.pickBound='1';
-      more.addEventListener('toggle',()=>{if(more.open)requestAnimationFrame(p10RelayoutPick);});
+      more.addEventListener('toggle',()=>{if(more.open)requestAnimationFrame(()=>requestAnimationFrame(p10RelayoutPick));});
     }
     window.addEventListener('resize',()=>{clearTimeout(p10ResizeTimer);p10ResizeTimer=setTimeout(()=>{const on=p10$('#p10-trip-map [data-p10-map-day][aria-pressed="true"]');if(on)p10FocusDay(on.dataset.p10MapDay);p10RelayoutPick();},150);});
     p10$('#planResult').addEventListener('dragstart',event=>{const b=event.target.closest('[data-p10-drag]');if(!b)return;event.dataTransfer.setData('text/plain',b.dataset.p10Drag);});

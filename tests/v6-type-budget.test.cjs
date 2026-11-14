@@ -854,15 +854,21 @@ test('day numbers stay clear of other dots and planner labels survive a resize',
       }
     }
     const pickAudit = `(() => {
-      const svg = document.querySelector('#p10-pick-map svg');
-      if (!svg || svg.getBoundingClientRect().width < 20) return { hidden: true };
+      const host = document.querySelector('#p10-pick-map');
+      const svg = host && host.querySelector('svg');
+      const box = svg ? svg.getBoundingClientRect() : { width: 0, height: 0 };
+      if (!svg || box.width < 20 || box.height < 20) return { hidden: true, w: box.width, h: box.height };
       const shown = el => { const cs = getComputedStyle(el); const r = el.getBoundingClientRect(); return cs.display !== 'none' && r.width > 1 && r.height > 1; };
-      const texts = [...svg.querySelectorAll('text')].filter(shown);
+      const texts = [...svg.querySelectorAll('.p10-pick-label,.p10-pick-tag')].filter(shown);
       const frame = svg.getBoundingClientRect();
-      const hits = [], covers = [], outside = [];
+      const hits = [], covers = [], outside = [], small = [];
       const dots = [...svg.querySelectorAll('.p10-pick-mark')].map(c => { const r = c.getBoundingClientRect(); return { x: (r.left + r.right) / 2, y: (r.top + r.bottom) / 2 }; }).filter(d => d.x || d.y);
       for (let i = 0; i < texts.length; i++) {
         const a = texts[i].getBoundingClientRect();
+        const cs = getComputedStyle(texts[i]);
+        const ctm = texts[i].getScreenCTM();
+        const screen = ctm ? parseFloat(cs.fontSize) * Math.hypot(ctm.a, ctm.b) : parseFloat(cs.fontSize);
+        if (!(screen >= 11.95)) small.push((texts[i].textContent || '').trim().slice(0, 12) + ' ' + screen.toFixed(1));
         if (a.left < frame.left - 1 || a.right > frame.right + 1 || a.top < frame.top - 1 || a.bottom > frame.bottom + 1) outside.push((texts[i].textContent || '').trim().slice(0, 18));
         for (let j = i + 1; j < texts.length; j++) {
           const b = texts[j].getBoundingClientRect();
@@ -870,24 +876,44 @@ test('day numbers stay clear of other dots and planner labels survive a resize',
         }
         for (const d of dots) if (d.x >= a.left && d.x <= a.right && d.y >= a.top && d.y <= a.bottom) covers.push((texts[i].textContent || '').trim().slice(0, 12));
       }
-      return { n: texts.length, hits, covers, outside };
+      const ul = host.querySelector('.p10-pick-name-list');
+      const listShown = Boolean(ul && getComputedStyle(ul).display !== 'none');
+      const listN = listShown ? ul.querySelectorAll('li').length : 0;
+      const total = [...svg.querySelectorAll('.p10-pick-label,.p10-pick-tag')].filter(t => !t.classList.contains('is-off') || t.classList.contains('is-unplaced')).length;
+      return { n: texts.length, total, listN, listShown, hits, covers, outside, small, w: box.width, h: box.height };
     })()`;
-    for (const w of [600, 768, 900, 1024]) {
-      await page.view(w, 900, false);
-      await page.go('plan.html?lang=zh');
+    const openPlan = async () => {
       await page.waitFor('document.querySelector("#p10-next-1")', 20000);
       await page.click('#p10-next-1');
       await page.click('#p10-next-2');
       await page.ev('const d=document.querySelector("#p10-more"); if(d) d.open=true');
       await page.waitFor('document.querySelector("#p10-pick-map svg")', 20000);
-      await page.ev('new Promise(r => setTimeout(r, 800))');
+      await page.ev('new Promise(r => setTimeout(r, 600))');
+    };
+    for (const w of [768, 900, 1000]) {
+      await page.view(w, 900, false);
+      await page.go('plan.html?lang=zh');
+      await openPlan();
       const first = await page.ev(pickAudit);
       await page.view(w, 960, false);
-      await page.ev('new Promise(r => setTimeout(r, 500))');
+      await page.ev('new Promise(r => setTimeout(r, 600))');
       const after = await page.ev(pickAudit);
-      const bad = audit => audit.hidden || audit.hits.length || audit.covers.length || audit.outside.length;
+      const bad = audit => audit.hidden || audit.n < 25 || audit.hits.length || audit.covers.length || audit.outside.length || audit.small.length || audit.n < audit.total - audit.listN || (audit.listN > 0 && !audit.listShown);
       if (bad(first) || bad(after)) problems.push('planner ' + w + ' ' + JSON.stringify({ first, after }));
     }
+    await page.view(1180, 900, false);
+    await page.go('plan.html?lang=zh');
+    await openPlan();
+    await page.view(820, 900, false);
+    await page.ev('new Promise(r => setTimeout(r, 600))');
+    const narrow = await page.ev(pickAudit);
+    if (narrow.hidden || !(narrow.w > 20) || !(narrow.h > 20)) problems.push('1180->820 ' + JSON.stringify(narrow));
+    await page.view(1440, 900, false);
+    await page.ev('new Promise(r => setTimeout(r, 400))');
+    await page.view(390, 844, true);
+    await page.ev('new Promise(r => setTimeout(r, 600))');
+    const phone = await page.ev(`(() => { const svg=document.querySelector('#p10-pick-map svg'); const b=svg?svg.getBoundingClientRect():{width:0,height:0}; return {w:b.width,h:b.height}; })()`);
+    if (!(phone.w > 20) || !(phone.h > 20)) problems.push('1440->390 ' + JSON.stringify(phone));
     assert.deepEqual(problems, []);
   } finally {
     await page.close();

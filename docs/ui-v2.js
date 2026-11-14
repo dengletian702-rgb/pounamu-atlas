@@ -1203,31 +1203,35 @@
       }
     }
     if (svg.classList.contains('p10-pick-svg')) {
-      for (const text of texts) {
-        if (text.classList.contains('is-unplaced') || text.style.display === 'none') continue;
+      const owned = new Set([...svg.querySelectorAll('.p10-pick-leader')].map(line => line.dataset.for || ''));
+      const liveTexts = texts.filter(text => !text.classList.contains('is-unplaced') && text.style.display !== 'none');
+      const rects = new Map(liveTexts.map(text => [text, text.getBoundingClientRect()]));
+      const todo = [];
+      for (const text of liveTexts) {
         const circle = labelDot(svg, text);
         if (!circle) continue;
-        const box = text.getBoundingClientRect();
+        const box = rects.get(text);
         if (!(box.width > 1)) continue;
         const ends = leaderEnds(circle, box);
         if (!(pointBoxDist(ends.x1, ends.y1, box) > 14) || ends.len > 48) continue;
         const owner = text.getAttribute('data-p10-pick-label') || (text.textContent || '').trim();
-        if ([...svg.querySelectorAll('.p10-pick-leader')].some(line => (line.dataset.for || '') === owner)) continue;
+        if (owned.has(owner)) continue;
         const through = dotCenters().some(d => {
           if (Math.hypot(d.x - ends.x1, d.y - ends.y1) <= 2) return false;
           const rad = Math.min(d.r.width, d.r.height) / 2;
           return distPointSeg(d.x, d.y, ends.x1, ends.y1, ends.x2, ends.y2) <= rad + 2;
         });
         if (through) continue;
-        const crosses = texts.some(other => {
-          if (other === text || other.classList.contains('is-unplaced')) return false;
-          const rect = other.getBoundingClientRect();
-          return rect.width > 1 && clipLength(ends.x1, ends.y1, ends.x2, ends.y2, rect) > 0.2;
+        const crosses = liveTexts.some(other => {
+          if (other === text) return false;
+          const rect = rects.get(other);
+          return rect && rect.width > 1 && clipLength(ends.x1, ends.y1, ends.x2, ends.y2, rect) > 0.2;
         });
         if (crosses) continue;
         ends.draw = true;
-        paint(text, circle, ends);
+        todo.push({ text, circle, ends });
       }
+      for (const item of todo) paint(item.text, item.circle, item.ends);
     }
     if (!schematic) {
       layoutMemo.set(svg, {

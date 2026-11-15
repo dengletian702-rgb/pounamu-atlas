@@ -1,7 +1,7 @@
 // One switch for each hidden section. Set a flag to true to show it again in
 // navigation, search, town pages and its own URL.
 window.POUNAMU_FLAGS = {
-  sports: true,
+  sports: false,
   docDirectory: false
 };
 
@@ -42,6 +42,19 @@ function pounamuSealContent() {
     if (/creativecommons\.org|openstreetmap\.org\/copyright|naturalearthdata\.com|data\.linz\.govt\.nz|linz\.govt\.nz/i.test(href)) return true;
     return false;
   };
+  // v7: every source, credit and reference now lives on sources.html. Source links are dropped from the
+  // reading text (not turned into plain text), and no reference list is appended to the page.
+  if (window.POUNAMU_V7_SOURCES_PAGE !== false) {
+    main.querySelectorAll('a[href]').forEach(a => {
+      if (a.closest('.v7-keep, .v7-sources-page')) return;
+      const text = (a.textContent || '').trim();
+      if (a.matches('.route-source, .v4-source, .v3-ok, .v3-tv, .v3-role') || /^(资料来源|参考来源|来源|Sources?|References?)\s*[:：]|^(已核|Checked)\s+20\d\d/i.test(text)) { a.remove(); return; }
+      if (keep(a)) return;
+      a.replaceWith(document.createTextNode((a.textContent || '').replace(/↗/g, '').trim()));
+    });
+    document.getElementById('page-references')?.remove();
+    return;
+  }
   const found = [];
   main.querySelectorAll('a[href]').forEach(a => {
     if (keep(a)) return;

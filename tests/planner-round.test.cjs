@@ -12,9 +12,10 @@ const planner = require('../docs/p10-planner.js');
 
 const linked = ['si-gle', 'si-bhe', 'ni-whk', 'si-crm', 'ni-cor', 'ni-ktt', 'ni-opo', 'ni-whg', 'ni-wmt', 'ni-str', 'ni-wmo', 'ni-mtb'];
 
-test('sports is on and the DOC directory stays off', () => {
+// v7 (2026-11-15): 城市运动 (sports) is switched off again at the owner's request.
+test('sports and the DOC directory both stay off', () => {
   const flags = fs.readFileSync(path.join(root, 'docs/site-flags.js'), 'utf8');
-  assert.match(flags, /sports:\s*true/);
+  assert.match(flags, /sports:\s*false/);
   assert.match(flags, /docDirectory:\s*false/);
   for (const file of ['docs/index.html', 'docs/plan.html', 'docs/prepare.html', 'docs/routes.html']) {
     const html = fs.readFileSync(path.join(root, file), 'utf8');
@@ -92,17 +93,14 @@ test('navigation hides sports and the DOC directory, and preparation has no outb
         return { hrefs, overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1 };
       })()`);
       assert.equal(nav.hrefs.some(href => /tracks\.html/.test(href)), false, lang);
-      assert.equal(nav.hrefs.some(href => /cities\.html/.test(href)), true, lang);
+      assert.equal(nav.hrefs.some(href => /cities\.html/.test(href)), false, lang);
       assert.equal(nav.overflow, false, lang);
       await page.go('prepare.html?lang=' + lang);
       await page.waitFor('document.readyState === "complete"', 20000);
-      try {
-        await page.waitFor('document.querySelector("#page-references")', 20000);
-      } catch (err) {
-        await page.go('prepare.html?lang=' + lang);
-        await page.waitFor('document.readyState === "complete"', 20000);
-        await page.waitFor('document.querySelector("#page-references")', 20000);
-      }
+      // v7: sources are no longer listed on each page; the footer opens sources.html instead.
+      await page.waitFor('document.querySelector(".v7-foot a[href*=\\"sources.html\\"]")', 20000);
+      // the extra preparation blocks load later; wait until v7 has swept them too
+      await page.waitFor('document.querySelector("#v4-prepare-extra .v4-block") && document.documentElement.dataset.v7Idle === "1"', 20000);
       const prep = await page.ev(`(() => {
         const main = document.querySelector('main');
         const links = [...main.querySelectorAll('a[href]')].map(a => a.href).filter(href => { try { return new URL(href).host !== location.host; } catch { return false; } });
@@ -110,25 +108,22 @@ test('navigation hides sports and the DOC directory, and preparation has no outb
         return {
           links: links.filter(href => !/nzta\\.govt\\.nz|interislander\\.co\\.nz|doc\\.govt\\.nz|metservice\\.com|intercity\\.co\\.nz|bluebridge\\.co\\.nz|fullers\\.co\\.nz|immigration\\.govt\\.nz|mountainsafety\\.org\\.nz|stats\\.govt\\.nz/.test(href)),
           refs: Boolean(refs),
+          sourcesLink: Boolean(document.querySelector('.v7-foot a[href*="sources.html"]')),
           text: main.innerText,
           overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1
         };
       })()`);
       assert.deepEqual(prep.links, []);
-      assert.equal(prep.refs, true);
-      assert.match(prep.text, lang === 'zh' ? /参考来源/ : /References/);
+      assert.equal(prep.refs, false);
+      assert.equal(prep.sourcesLink, true);
+      assert.doesNotMatch(prep.text, lang === 'zh' ? /参考来源|资料来源|待核/ : /References|To verify/);
       assert.match(prep.text, /NZeTA|电子旅行/);
       assert.match(prep.text, /111/);
       assert.match(prep.text, /Mountain Safety Council/);
       assert.match(prep.text, /NZTA/);
-      assert.match(prep.text, lang === 'zh' ? /mountainsafety\.org\.nz/ : /mountainsafety\.org\.nz/);
       assert.equal(prep.overflow, false);
     }
-    await page.go('cities.html?lang=zh');
-    const cities = await page.ev(`document.querySelector('main').innerText`);
-    assert.match(cities, /网球场|Tennis/);
-    assert.doesNotMatch(cities, /本栏目更新中/);
-    for (const [file, gone] of [['tracks.html', /全量目录|Every DOC walk|待核实/]]) {
+    for (const [file, gone] of [['tracks.html', /全量目录|Every DOC walk|待核实/], ['cities.html', /网球场|Tennis/]]) {
       await page.go(file + '?lang=zh');
       const hidden = await page.ev(`(() => {
         const main = document.querySelector('main');
@@ -175,10 +170,10 @@ test('the hidden-section notice opens the place picker, not the editor', async (
     assert.equal(view, 'true');
     await page.go('destination.html?id=si-zqn&lang=zh');
     await page.waitFor('document.querySelector("#sports")');
-    await page.waitFor('document.querySelector("#sports-venues article, #sports-venues .v4-note")', 8000);
+    // v7 (2026-11-15): sports are switched off, so the town page says the venue list is off and lists no courts.
     const town = await page.ev('document.querySelector("#sports").innerText');
-    assert.match(town, /OpenStreetMap|网球|高尔夫|Tennis|Golf/);
-    assert.doesNotMatch(town, /运动场地已暂时收起|site-flags/);
+    assert.match(town, /运动场地列表已关闭/);
+    assert.doesNotMatch(town, /网球|高尔夫|site-flags/);
     assert.deepEqual(page.errors, []);
   } finally {
     await page.close();

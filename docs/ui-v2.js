@@ -1267,11 +1267,14 @@
     let timer = 0;
     let enhancing = false;
     const leaderNode = n => n.nodeType === 1 && n.classList && (n.classList.contains('v4-map-leader') || n.classList.contains('gday-leader') || n.classList.contains('p10-pick-leader'));
+    // v7 layer (v7.js): notebook buttons, dock, toast and the Google maps never need the map labels laid again
+    const V7 = '[class^="v7-"], [class*=" v7-"]';
+    const v7Node = n => n.nodeType === 1 && !!(n.closest && n.closest(V7));
     const own = m => {
       const el = m.target && (m.target.nodeType === 1 ? m.target : m.target.parentElement);
-      if (el && el.closest && el.closest('.ui2-hud, .ui2-readout, .ui2-palette, .ui2-particles, .ui2-progress, #p10-pick-map')) return true;
+      if (el && el.closest && el.closest('.ui2-hud, .ui2-readout, .ui2-palette, .ui2-particles, .ui2-progress, #p10-pick-map, ' + V7)) return true;
       const nodes = [...(m.addedNodes || []), ...(m.removedNodes || [])];
-      return nodes.length > 0 && nodes.every(leaderNode);
+      return nodes.length > 0 && nodes.every(n => leaderNode(n) || v7Node(n));
     };
     const runEnhance = () => {
       if (enhancing) { clearTimeout(timer); timer = setTimeout(runEnhance, 40); return; }

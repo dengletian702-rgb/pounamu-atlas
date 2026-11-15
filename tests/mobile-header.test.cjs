@@ -211,7 +211,8 @@ test('mobile header P1: one row, search button clear of the bar', { timeout: 180
       await page.view(w, w === 1280 ? 900 : 844, w < 800);
       for (const lang of ['zh', 'en']) {
         await page.go('prepare.html?lang=' + lang);
-        await page.waitFor('document.querySelector("#page-references") && document.querySelector(".ui2-kbtn")');
+        // v7: no reference list on the page any more; the footer links to sources.html
+        await page.waitFor('document.querySelector(".v7-foot a[href*=\\"sources.html\\"]") && document.querySelector(".ui2-kbtn")');
         await page.ev('document.fonts.ready');
         const prep = await page.ev(`(() => {
           const main = document.querySelector("main");
@@ -222,7 +223,6 @@ test('mobile header P1: one row, search button clear of the bar', { timeout: 180
         assert.match(prep.text, /111/);
         assert.match(prep.text, /Mountain Safety Council/);
         assert.match(prep.text, /NZTA/);
-        assert.match(prep.text, /mountainsafety\.org\.nz/);
         assert.ok(prep.overflow <= 1, 'prepare overflow');
         const bar = await page.ev(LAYOUT);
         assertChrome(bar, { mobile: w < 800, closed: true, glass: false });
@@ -236,12 +236,8 @@ test('mobile header P1: one row, search button clear of the bar', { timeout: 180
     }
 
     await page.view(390, 844, true);
-    await page.go('cities.html?lang=en');
-    await page.waitFor('document.querySelector("main")');
-    const citiesOn = await page.ev('document.querySelector("main").innerText');
-    assert.match(citiesOn, /Tennis courts/);
-    assert.doesNotMatch(citiesOn, /This section is being updated/);
-    for (const [file, gone] of [['tracks.html', /全量目录|Every DOC walk|待核实/]]) {
+    // v7 (2026-11-15): sports (cities.html) is paused like the DOC directory.
+    for (const [file, gone] of [['tracks.html', /全量目录|Every DOC walk|待核实/], ['cities.html', /Tennis courts|网球场/]]) {
       for (const lang of ['zh', 'en']) {
         await page.go(file + '?lang=' + lang);
         await page.waitFor('document.querySelector("main .pounamu-paused")');

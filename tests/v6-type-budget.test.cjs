@@ -337,30 +337,10 @@ test('route day cards render on first load and the sticky line does not cover co
       await page.view(w, 844, true);
       for (const lang of ['zh', 'en']) {
         await page.go('route.html?id=milford-track&lang=' + lang);
-        await page.waitFor('document.querySelector(".gday-actions a") && document.querySelector(".gday-sticky") && document.querySelector(".ui2-kbtn")');
-        const hit = await page.ev(`(() => {
-          const overlaps = (a, b) => a && b && !(a.right < b.left || a.left > b.right || a.bottom < b.top || a.top > b.bottom);
-          const sticky = document.querySelector('.gday-sticky').getBoundingClientRect();
-          const action = document.querySelector('.gday-actions a').getBoundingClientRect();
-          const search = document.querySelector('.ui2-kbtn').getBoundingClientRect();
-          const legend = document.querySelector('.map-legend, .p10-map-day-list');
-          const legendBox = legend ? legend.getBoundingClientRect() : null;
-          const cs = getComputedStyle(document.querySelector('.gday-sticky'));
-          return {
-            action: overlaps(sticky, action),
-            search: overlaps(sticky, search),
-            legend: legendBox ? overlaps(sticky, legendBox) : false,
-            sub: [...document.querySelectorAll('.gday-sub')].some(el => overlaps(sticky, el.getBoundingClientRect())),
-            nowrap: cs.whiteSpace === 'nowrap',
-            line: document.querySelector('.gday-sticky').innerText.replace(/\\s+/g, ' ')
-          };
-        })()`);
-        assert.equal(hit.action, false, w + lang);
-        assert.equal(hit.search, false, w + lang);
-        assert.equal(hit.legend, false, w + lang);
-        assert.equal(hit.sub, false, w + lang + ' running total');
-        assert.equal(hit.nowrap, true, w + lang);
-        assert.match(hit.line, lang === 'zh' ? /^合计/ : /^Total/);
+        await page.waitFor('document.querySelector(".gday-actions a") && document.querySelector(".ui2-kbtn")');
+        // v7 (2026-11-15): the budget system is paused at the owner's request, so the running-total line is not shown.
+        const sticky = await page.ev(`(() => { const el = document.querySelector('.gday-sticky'); return el ? getComputedStyle(el).display : 'none'; })()`);
+        assert.equal(sticky, 'none', w + lang);
       }
     }
     assert.deepEqual(page.errors, []);
@@ -611,13 +591,10 @@ test('map labels do not overlap and stay inside the svg', async (t) => {
       await page.ev('new Promise(r => setTimeout(r, 400))');
       const dest = await page.ev(report('#v4-dest-map svg'));
       if (dest.hits.length || dest.outside.length || dest.small.length) found.push('destination ' + w + ' ' + JSON.stringify(dest));
+      // v7 (2026-11-15): the day sketch (#gcoast svg) on the guide is replaced by a Google map, so it has no
+      // labels to lay out; the clickable schematic in the Map pane is still checked below.
       await page.go('guide.html?template=SI-09B&lang=zh');
-      await page.waitFor('document.querySelector("#gcoast text")', 20000);
-      await page.ev('document.querySelector("#gcoast").scrollIntoView()');
-      await page.ev('new Promise(r => setTimeout(r, 500))');
-      const tpl = await page.ev(report('#gcoast svg'));
-      const faint = (tpl.leaders || []).filter(line => line.rendered < 1 || line.ratio < 3);
-      if (tpl.hits.length || tpl.outside.length || tpl.small.length || !tpl.leaders.length || faint.length) found.push('template ' + w + ' ' + JSON.stringify(tpl));
+      await page.waitFor('document.querySelector("#gcoast + .v7-guide-gmap iframe")', 20000);
       for (const lang of ['zh', 'en']) {
         await page.go('guide.html?template=SI-09B&view=map&lang=' + lang);
         await page.waitFor('document.querySelector("#v4-map svg.v4-schematic text")', 20000);
@@ -847,10 +824,15 @@ test('day numbers stay clear of other dots and planner labels survive a resize',
       for (const lang of ['zh', 'en']) {
         await page.go('guide.html?template=SI-09B&lang=' + lang);
         await page.waitFor('document.querySelector("#gcoast .gday-num")', 20000);
-        await page.ev('document.querySelector("#gcoast").scrollIntoView({block:"center"})');
-        await page.ev('new Promise(r => setTimeout(r, 700))');
-        const day = await page.ev(dayAudit);
-        if (day.hidden || !day.n || day.covers.length || day.near.length || day.outside.length || day.through.length || day.throughDot.length || day.long.length) problems.push('day ' + lang + ' ' + w + ' ' + JSON.stringify(day));
+        // v7 (2026-11-15): the day sketch on the guide is replaced by a Google map of the same days.
+        await page.waitFor('document.querySelector("#gcoast + .v7-guide-gmap iframe")', 20000);
+        const day = await page.ev(`(() => {
+          const svg = document.querySelector('#gcoast svg');
+          const frame = document.querySelector('#gcoast + .v7-guide-gmap iframe');
+          const src = frame.getAttribute('src') || frame.dataset.src || '';
+          return { hidden: !svg || svg.getBoundingClientRect().width < 2, google: src.startsWith('https://maps.google.com/maps?'), stops: document.querySelectorAll('#gcoast + .v7-guide-gmap .v7-stops li').length, wide: frame.closest('.v7-gmap').getBoundingClientRect().width };
+        })()`);
+        if (!day.hidden || !day.google || day.stops < 2 || !(day.wide > 200)) problems.push('day ' + lang + ' ' + w + ' ' + JSON.stringify(day));
       }
     }
     const pickAudit = `(() => {

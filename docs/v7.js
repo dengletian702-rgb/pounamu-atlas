@@ -241,14 +241,17 @@
     paint();
     const arm = () => { if (frame.dataset.armed) return; frame.dataset.armed = '1'; frame.src = frame.dataset.src; window.removeEventListener('scroll', near); };
     const near = () => { const r = host.getBoundingClientRect(); if (r.top < innerHeight * 2 && r.bottom > -innerHeight) arm(); };
-    near();
-    if (!frame.dataset.armed) {
-      window.addEventListener('scroll', near, { passive: true });
-      if ('IntersectionObserver' in window) {
-        const io = new IntersectionObserver(es => { if (es.some(x => x.isIntersecting)) { io.disconnect(); arm(); } }, { rootMargin: '300px' });
-        io.observe(host);
+    const watch = () => {
+      near();
+      if (!frame.dataset.armed) {
+        window.addEventListener('scroll', near, { passive: true });
+        if ('IntersectionObserver' in window) {
+          const io = new IntersectionObserver(es => { if (es.some(x => x.isIntersecting)) { io.disconnect(); arm(); } }, { rootMargin: '300px' });
+          io.observe(host);
+        }
       }
-    }
+    };
+    if (mapsOff()) mapsGate(host.querySelector('.v7-gmap-frame'), watch); else watch();
   }
 
   /* ------------------------------------------------------- ui helpers */
@@ -353,16 +356,53 @@
     a.href = 'notebook.html?lang=' + langQ();
     a.innerHTML = `${L('笔记本', 'Notebook')}<span class="v7-nav-count"></span>`;
     if (page === 'notebook') { nav.querySelectorAll('[aria-current]').forEach(x => x.removeAttribute('aria-current')); a.setAttribute('aria-current', 'page'); }
-    if (page === 'sources') nav.querySelectorAll('[aria-current]').forEach(x => x.removeAttribute('aria-current'));
+    if (['sources', 'about', 'privacy', 'terms', 'safety', 'settings'].includes(page)) nav.querySelectorAll('[aria-current]').forEach(x => x.removeAttribute('aria-current'));
     const h = d.querySelector('.header'); if (h) html.style.setProperty('--v7-header-h', h.offsetHeight + 'px');
   }
+  // v8: a full site footer (brand, About / Help / Legal & settings), in place of the old one-line footer.
   function ensureFooter() {
     d.querySelectorAll('.footer').forEach(f => {
       let box = f.querySelector('.v7-foot');
-      if (!box) { box = d.createElement('div'); box.className = 'v7-foot'; f.append(box); f.style.flexWrap = 'wrap'; }
-      box.innerHTML = `<a class="v7-foot-src" href="sources.html?lang=${langQ()}"><span class="v7-ico">${ICON.doc}</span><span><strong>${L('资料来源', 'Sources')}</strong><small>${L('官方来源 · 待核实清单 · 图片署名 · 许可', 'Official sources · to verify · photo credits · licences')}</small></span></a><span class="v7-foot-meta">POUNAMU ATLAS · S 34°–47° · E 166°–179°</span>`;
+      if (!box) { box = d.createElement('div'); box.className = 'v7-foot v8-foot'; f.append(box); }
+      f.classList.add('v8-footer');
+      if (box.dataset.lang === langQ()) return;
+      box.dataset.lang = langQ();
+      const q = '?lang=' + langQ();
+      const col = (title, links) => `<div class="v8-foot-col"><h2>${title}</h2><ul>${links.map(([href, label]) => `<li><a href="${href}">${label}</a></li>`).join('')}</ul></div>`;
+      box.innerHTML = `<div class="v8-foot-grid">
+        <div class="v8-foot-brand">
+          <a class="v8-foot-logo" href="index.html${q}" aria-label="${L('绿石之地 首页', 'Pounamu Atlas home')}"><img src="assets/brand/mark.svg" alt="" width="46" height="46"><img src="assets/brand/wordmark-zh-light.svg" alt="" width="124" height="31"></a>
+          <p>${L('新西兰南北两岛的徒步、骑行、自驾和公共交通线路，配上逐日行程、出发准备和真实地图，帮你把一次新西兰旅行排清楚。', 'Walking, cycling, driving and public-transport routes across both islands of New Zealand, with day-by-day plans, trip prep and real maps.')}</p>
+          <a class="v8-foot-cta" href="plan.html${q}">${L('开始排行程', 'Start planning')} <span aria-hidden="true">→</span></a>
+        </div>
+        ${col(L('关于', 'About'), [['about.html' + q, L('关于我们', 'About us')], ['sources.html' + q, L('资料来源', 'Sources')], ['sources.html' + q + '#photos', L('图片署名', 'Photo credits')], ['sources.html' + q + '#licence', L('内容许可', 'Licences')]])}
+        ${col(L('帮助', 'Help'), [['prepare.html' + q, L('出发准备', 'Before you go')], ['safety.html' + q, L('安全须知', 'Safety')], ['plan.html' + q, L('排行程', 'Plan a trip')], ['notebook.html' + q, L('我的笔记本', 'My notebook')]])}
+        ${col(L('法律与设置', 'Legal & settings'), [['privacy.html' + q, L('隐私政策', 'Privacy policy')], ['terms.html' + q, L('使用条款', 'Terms of use')], ['settings.html' + q + '#privacy', L('隐私设置', 'Privacy settings')], ['settings.html' + q + '#security', L('安全设置', 'Security settings')]])}
+      </div>
+      <div class="v8-foot-note"><span>${L('信息仅供行前参考，出发前请以 DOC、NZTA、MetService 等官方发布为准。紧急情况拨打 111。', 'For trip planning only; check DOC, NZTA, MetService and other official sources before you go. In an emergency, call 111.')}</span><span>© 2026 ${L('绿石之地', 'Pounamu Atlas')} · S 34°–47° · E 166°–179°</span></div>`;
     });
   }
+  // v8 privacy setting: with Google Maps switched off, a map waits behind a button instead of contacting Google.
+  const mapsOff = () => { try { return localStorage.getItem('pounamu-maps') === 'off' && sessionStorage.getItem('pounamu-maps') !== 'once'; } catch (e) { return false; } };
+  function mapsGate(box, load) {
+    const g = d.createElement('div'); g.className = 'v8-maps-off';
+    g.innerHTML = `<p><strong>${L('Google 地图已关闭', 'Google Maps is off')}</strong>${L('你在隐私设置里关掉了地图，这个页面不会连接 Google。', 'You turned maps off in privacy settings, so this page does not contact Google.')}</p><div><button type="button" class="v7-btn glow">${L('本次浏览加载地图', 'Load maps for this visit')}</button><a class="v7-btn" href="settings.html?lang=${langQ()}#privacy">${L('隐私设置', 'Privacy settings')}</a></div>`;
+    g.querySelector('button').addEventListener('click', () => {
+      try { sessionStorage.setItem('pounamu-maps', 'once'); } catch (e) { /* private mode */ }
+      d.querySelectorAll('.v8-maps-off').forEach(x => { const go = x._load; x.remove(); if (go) go(); });
+    });
+    g._load = load;
+    box.append(g);
+  }
+  // v8 security setting: ask before leaving for another site.
+  d.addEventListener('click', e => {
+    let on = false; try { on = localStorage.getItem('pounamu-ext-warn') === 'on'; } catch (err) { on = false; }
+    if (!on || e.defaultPrevented || e.button) return;
+    const a = e.target.closest && e.target.closest('a[href]'); if (!a) return;
+    let u; try { u = new URL(a.getAttribute('href'), location.href); } catch (err) { return; }
+    if (!/^https?:$/.test(u.protocol) || u.host === location.host) return;
+    if (!window.confirm(L(`即将离开绿石之地，打开：\n${u.host}\n\n继续吗？`, `You are leaving Pounamu Atlas for:\n${u.host}\n\nContinue?`))) e.preventDefault();
+  }, true);
   function ground() {
     if (d.querySelector('.v7-ground')) return;
     const g = d.createElement('div'); g.className = 'v7-ground'; g.setAttribute('aria-hidden', 'true');
@@ -829,7 +869,8 @@
     const open = main.querySelector('#v7NbOpen');
     if (!pts.length) { box.innerHTML = `<div class="v7-gmap-loading">${L('这些卡还没有坐标', 'No coordinates on these cards yet')}</div>`; if (open) open.hidden = true; return; }
     const src = pts.length >= 2 ? gmapSrc({ stops: pts, view: 'route' }) : gmapSrc({ stops: pts, view: 0, zoom: 10 });
-    box.insertAdjacentHTML('beforeend', `<iframe title="${esc(L('行程总览地图', 'Trip overview map'))}" referrerpolicy="no-referrer-when-downgrade" src="${esc(src)}"></iframe>`);
+    const load = () => box.insertAdjacentHTML('beforeend', `<iframe title="${esc(L('行程总览地图', 'Trip overview map'))}" referrerpolicy="no-referrer-when-downgrade" src="${esc(src)}"></iframe>`);
+    if (mapsOff()) mapsGate(box, load); else load();
     if (open) open.href = gmapOpenUrl(sample(pts, 10), 'drive');
   }
   function notesPanel(s) {

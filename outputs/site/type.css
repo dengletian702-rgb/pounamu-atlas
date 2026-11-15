@@ -139,3 +139,8 @@ html:lang(en) .v4-en-name{font-family:var(--type-heading);font-style:italic;font
 .v7-src-item summary strong,
 .v7-src-card strong{font-family:var(--type-heading)}
 .v7-src-h3{font-family:var(--type-heading);font-weight:var(--type-regular)}
+
+/* v8 brand, footer and info pages (v7.css). */
+.v8-doc-hero h1,.v8-doc-sec h2{font-family:var(--type-heading)}
+.v8-doc-label,.v8-doc-meta,.v8-doc-toc p,.v8-foot-col h2,.v8-table th,.v8-foot-note span:last-child{font-family:var(--type-mono)}
+.v8-foot-brand p,.v8-foot-col a,.v8-foot-cta,.v8-doc-sec p,.v8-doc-sec li,.v8-table td,.v8-btn,.v8-setting strong,.v8-h3,.v8-maps-off,.p10-more-close,#p10-back-2,#p10-back-3{font-family:var(--type-body)}

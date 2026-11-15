@@ -1553,6 +1553,21 @@ globalThis.P10_NODES = NODES;
     let ranked=[]; try{ranked=p10Rank(input).slice(0,5);}catch{ranked=[];}
     host.innerHTML=ranked.map(w=>`<li>${p10Esc(zh?w.zh:w.en)}</li>`).join('');
   }
+  // Which island the trip stays on: both ends on one island gives that island, otherwise all of New Zealand.
+  function p10TripIsland(){
+    const side=id=>{const s=p10$('#p10-start');const o=s?[...s.options].find(x=>x.value===id):null;const g=o&&o.parentElement&&o.parentElement.tagName==='OPTGROUP'?o.parentElement.dataset.p10Group:'';return g||'';};
+    const a=side(p10$('#p10-start')?.value),b=side(p10$('#p10-end')?.value);
+    return a&&a===b?a:'all';
+  }
+  // Point the place list's island filter at the trip's island. Returns true when the filter changed.
+  function p10FollowIsland(){
+    const island=p10TripIsland();
+    if(p10Filter.island===island)return false;
+    p10Filter.island=island;
+    const meta=P10_REGIONS.find(r=>r.id===p10Filter.region);
+    if(meta&&island!=='all'&&meta.island!==island)p10Filter.region='all';
+    return true;
+  }
   function p10SyncAreaPressed(){
     const start=p10$('#p10-start')?.value, end=p10$('#p10-end')?.value, zh=p10Lang()==='zh';
     let matched=false;
@@ -1631,7 +1646,7 @@ globalThis.P10_NODES = NODES;
       if(t.id==='p10-transport')p10SyncTransport();
       if(t.id==='preference'||t.id==='p10-start'||t.id==='p10-end'||t.id==='days'||t.id==='p10-pace')p10FillRank();
       if(t.id==='p10-stay'&&p10Result){p10Result.input={...p10Result.input,stay:p10Stay()};try{localStorage.setItem('p10-road-plan',JSON.stringify(p10Result.input));}catch{}p10Show(p10Result);}
-      if(t.id==='p10-start'||t.id==='p10-end'){p10SyncAreaPressed();p10RenderPickMap(p10PickItems);}
+      if(t.id==='p10-start'||t.id==='p10-end'){p10SyncAreaPressed();if(p10FollowIsland())p10RenderWishes();else p10RenderPickMap(p10PickItems);}
     });
     // The map lives outside the form on a wide screen, so its clicks and hovers are handled on the document.
     document.addEventListener('click',event=>{
@@ -1785,6 +1800,24 @@ globalThis.P10_NODES = NODES;
       p10$('#p10-start').value=pair[0]; p10$('#p10-end').value=pair[1];
       form.querySelectorAll('[data-p10-area]').forEach(b=>b.setAttribute('aria-pressed',b===area?'true':'false'));
       p10FillRank();
+      // The place list and the pick map follow the island, so the start/end tags and dots match the choice.
+      if(p10FollowIsland())p10RenderWishes();else p10RenderPickMap(p10PickItems);
+      p10SyncAreaPressed();
+    });
+    // Closing "more options" from far down the place list must not leave the reader below the page.
+    if(more&&!more.querySelector('.p10-more-close')){
+      const close=document.createElement('button');
+      close.type='button';close.className='p10-more-close';
+      close.textContent=p10Lang()==='zh'?'收起更多选项 ↑':'Close more options ↑';
+      close.addEventListener('click',()=>{more.open=false;});
+      more.append(close);
+    }
+    more?.addEventListener('toggle',()=>{
+      const close=more.querySelector('.p10-more-close');if(close)close.textContent=p10Lang()==='zh'?'收起更多选项 ↑':'Close more options ↑';
+      if(more.open)return;
+      const s=more.querySelector('summary');if(!s)return;
+      const top=s.getBoundingClientRect().top;
+      if(top<90||top>innerHeight-80)window.scrollTo({top:Math.max(0,scrollY+top-140),behavior:'auto'});
     });
     p10Step(saved?3:1);
   };

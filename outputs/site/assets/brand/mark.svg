@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="绿石之地"><title>绿石之地</title>
+<defs><linearGradient id="g" x1=".15" y1="0" x2=".85" y2="1"><stop offset="0" stop-color="#5bb293"/><stop offset=".5" stop-color="#1d6a53"/><stop offset="1" stop-color="#0a2b21"/></linearGradient>
+<radialGradient id="h" cx=".36" cy=".3" r=".38"><stop offset="0" stop-color="#eafff6" stop-opacity=".6"/><stop offset="1" stop-color="#eafff6" stop-opacity="0"/></radialGradient></defs>
+<g transform="rotate(-8 24 25)"><path fill="url(#g)" d="M24.6 3.2c5.7.2 10.2 5.6 13.6 12.3 4.3 8.6 5.2 16.6 1.6 22.6-3.6 6-10.1 8.4-16.2 8.1-7.4-.4-13.6-4.3-15.8-10.8-2.3-6.6-.3-14.4 4-20.8 3.5-5.3 7.6-11.6 12.8-11.4z"/><path fill="url(#h)" d="M24.6 3.2c5.7.2 10.2 5.6 13.6 12.3 4.3 8.6 5.2 16.6 1.6 22.6-3.6 6-10.1 8.4-16.2 8.1-7.4-.4-13.6-4.3-15.8-10.8-2.3-6.6-.3-14.4 4-20.8 3.5-5.3 7.6-11.6 12.8-11.4z"/>
+<circle cx="24.4" cy="10.2" r="2.4" fill="#eef3f0"/>
+<path d="M11.2 33.4l7.3-9.4 3.9 4.6 5.8-8.8 8.8 13.6" fill="none" stroke="#eef3f0" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M13.2 38.8c2.6-1.9 4.9-1.9 7.5 0s4.9 1.9 7.5 0 4.9-1.9 7.3 0" fill="none" stroke="#a6e6cb" stroke-width="2" stroke-linecap="round"/></g>
+</svg>
